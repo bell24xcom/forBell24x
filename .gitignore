@@ -34,3 +34,7 @@ Thumbs.db
 
 # Vercel
 .vercel/
+
+*.env.local.txt
+
+test-*.js
