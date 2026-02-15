@@ -1,0 +1,34 @@
+{
+  "environments": {
+    "development": {
+      "url": "http://localhost:3000",
+      "branch": "develop",
+      "autoBackup": true
+    },
+    "staging": {
+      "url": "https://staging.bell24h.vercel.app",
+      "branch": "staging",
+      "requiresApproval": true,
+      "autoBackup": true
+    },
+    "production": {
+      "url": "https://www.bell24h.com",
+      "branch": "main",
+      "requiresApproval": true,
+      "requiresTests": true,
+      "autoBackup": true,
+      "rollbackEnabled": true
+    }
+  },
+  "backup": {
+    "enabled": true,
+    "location": "./backups",
+    "maxBackups": 10,
+    "autoBackupBeforeDeploy": true
+  },
+  "protection": {
+    "preventForceCommit": true,
+    "requireTestsBeforeDeploy": true,
+    "blockDirectProduction": true
+  }
+}

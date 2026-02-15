@@ -1,0 +1,84 @@
+{
+  "mcpServers": {
+    "ultra-fast-generator": {
+      "command": "node",
+      "args": ["mcp-ultra-fast-simple.js"],
+      "cwd": ".",
+      "description": "Ultra-fast page generation (2ms per page)",
+      "features": [
+        "Single page generation",
+        "Multiple pages generation", 
+        "All pages generation",
+        "Sub-millisecond performance"
+      ]
+    },
+    "vibe-coding": {
+      "command": "node",
+      "args": ["mcp-vibe-coding-simple.js"],
+      "cwd": ".",
+      "description": "AI-powered natural language coding (3ms response)",
+      "features": [
+        "Natural language processing",
+        "AI vibe recognition",
+        "Template matching",
+        "Multi-vibe sessions"
+      ]
+    },
+    "github-ultra": {
+      "command": "node",
+      "args": ["mcp-github-ultra-simple.js"],
+      "cwd": ".",
+      "description": "GitHub integration with auto-deployment (5ms generation)",
+      "features": [
+        "Direct GitHub push",
+        "Automatic git operations",
+        "Version control",
+        "Production deployment"
+      ]
+    },
+    "hybrid-generator": {
+      "command": "node",
+      "args": ["scripts/hybrid-generator-simple.js"],
+      "cwd": ".",
+      "description": "Hybrid Spec Kit + Custom Templates generator",
+      "features": [
+        "API client generation",
+        "Type-safe pages",
+        "Real API integration",
+        "Pagination support"
+      ]
+    }
+  },
+  "mcpQuickCommands": {
+    "generate-page": "node scripts/hybrid-generator-simple.js page",
+    "generate-multiple": "node scripts/hybrid-generator-simple.js multiple",
+    "generate-all": "node scripts/hybrid-generator-simple.js all",
+    "generate-api": "npm run gen:api",
+    "generate-client": "npm run gen:client",
+    "setup-hybrid": "npm run setup"
+  },
+  "mcpTemplates": {
+    "available": [
+      "suppliers",
+      "products", 
+      "rfq",
+      "dashboard",
+      "admin",
+      "profile"
+    ],
+    "features": [
+      "search",
+      "filter",
+      "responsive",
+      "api-integration",
+      "loading-states",
+      "accessibility",
+      "pagination",
+      "type-safety"
+    ]
+  },
+  "mcpAutoStart": true,
+  "mcpPerformanceMode": true,
+  "mcpLogLevel": "info",
+  "mcpTimeout": 5000
+}

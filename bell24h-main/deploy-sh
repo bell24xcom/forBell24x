@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# Deploy wrapper script for Unix/Linux/WSL environments
+# Removes leading 'q' prefix if present and executes command
+
+# Join all arguments
+full="$*"
+
+# Remove leading q and whitespace if present
+full="${full#q }"
+full="${full#q}"
+
+# Create logs directory if it doesn't exist
+mkdir -p ./logs
+
+# Generate timestamp for logging
+timestamp=$(date +%Y%m%d_%H%M%S)
+
+echo "========================================"
+echo "DEPLOY WRAPPER - $timestamp"
+echo "========================================"
+echo "Original command: $*"
+echo "Cleaned command: $full"
+echo "Working directory: $(pwd)"
+echo "Shell: $SHELL"
+echo "========================================"
+
+# Start logging
+exec > >(tee "./logs/deploy_$timestamp.log") 2>&1
+
+echo "Executing: $full"
+eval "$full"
+
+if [ $? -eq 0 ]; then
+    echo "✅ Command executed successfully"
+else
+    echo "❌ Command failed with exit code $?"
+    exit 1
+fi

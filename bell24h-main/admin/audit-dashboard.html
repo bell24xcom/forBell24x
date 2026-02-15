@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bell24h Pages Audit Dashboard</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .stat-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .stat-number { font-size: 2em; font-weight: bold; margin-bottom: 5px; }
+        .stat-label { color: #666; }
+        .missing { color: #e74c3c; }
+        .present { color: #27ae60; }
+        .section { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .page-list { list-style: none; padding: 0; }
+        .page-item { padding: 10px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+        .page-item:last-child { border-bottom: none; }
+        .status { padding: 4px 8px; border-radius: 4px; font-size: 0.8em; font-weight: bold; }
+        .status.missing { background: #ffeaea; color: #e74c3c; }
+        .status.present { background: #eafaf1; color: #27ae60; }
+        .actions { margin-top: 20px; }
+        .btn { background: #3498db; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; }
+        .btn:hover { background: #2980b9; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 Bell24h Pages Audit Dashboard</h1>
+            <p>Generated: 2/9/2025, 10:05:00 pm</p>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number present">3</div>
+                <div class="stat-label">Localhost Pages</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number present">34</div>
+                <div class="stat-label">Vercel Pages</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number missing">3</div>
+                <div class="stat-label">Missing in Vercel</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number missing">34</div>
+                <div class="stat-label">Missing in Local</div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>❌ Missing in Vercel (3)</h2>
+            <ul class="page-list">
+                
+                    <li class="page-item">
+                        <span>layout</span>
+                        <span class="status missing">Missing</span>
+                    </li>
+                
+                    <li class="page-item">
+                        <span>page</span>
+                        <span class="status missing">Missing</span>
+                    </li>
+                
+                    <li class="page-item">
+                        <span>mobile/ShippingPage</span>
+                        <span class="status missing">Missing</span>
+                    </li>
+                
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2>❌ Missing in Local (34)</h2>
+            <ul class="page-list">
+                
+                    <li class="page-item">
+                        <span></span>
+                        <span class="status missing">Vercel Only</span>
+                    </li>
+                
+                    <li class="page-item">
+                        <span>/marketplace</span>
+                        <span class="status missing">Vercel Only</span>
+                    </li>
+                
+                    <li class="page-item">
+                        <span>/suppliers</span>
+                        <span class="status missing">Vercel Only</span>
+                    </li>
+                
+                    <li class="page-item">
+                        <span>/rfq/create</span>
+                        <span class="status missing">Vercel Only</span>
+                    </li>
+                
+                    <li class="page-item">
+                        <span>/register</span>
+                        <span class="status missing">Vercel Only</span>
+                    </li>
+                
+                    <li class="page-item">
+                        <span>/login</span>
+                        <span class="status missing">Vercel Only</span>
+                    </li>
+                
+                    <li class="page-item">
+                        <span>/categories/textiles-garments</span>
+                        <span class="status missing">Vercel Only</span>
+                    </li>
+                
+                    <li class="page-item">
+                        <span>/categories/pharmaceuticals</span>
+                        <span class="status missing">Vercel Only</span>
+                    </li>
+                
+                    <li class="page-item">
+                        <span>/categories/agricultural-products</span>
+                        <span class="status missing">Vercel Only</span>
+                    </li>
+                
+                    <li class="page-item">
+                        <span>/categories/automotive-parts</span>
+                        <span class="status missing">Vercel Only</span>
+                    </li>
+                
+                    <li class="page-item">
+                        <span>/categories/it-services</span>
+                        <span class="status missing">Vercel Only</span>
+                    </li>
+                
+                    <li class="page-item">
+                        <span>/categories/gems-jewelry</span>
+                        <span class="status missing">Vercel Only</span>
+                    </li>
+                
+                    <li class="page-item">
+                        <span>/categories/handicrafts</span>
+                        <span class="status missing">Vercel Only</span>
+                    </li>
+                
+                    <li class="page-item">
+                        <span>/categories/machinery-equipment</span>
+                        <span class="status missing">Vercel Only</span>
+                    </li>
+                
+                    <li class="page-item">
+                        <span>/categories/chemicals</span>
+                        <span class="status missing">Vercel Only</span>
+                    </li>
+                
+                    <li class="page-item">
+                        <span>/categories/food-processing</span>
+                        <span class="status missing">Vercel Only</span>
+                    </li>
+                
+                    <li class="page-item">
+                        <span>/categories/construction</span>
+                        <span class="status missing">Vercel Only</span>
+                    </li>
+                
+                    <li class="page-item">
+                        <span>/categories/metals-steel</span>
+                        <span class="status missing">Vercel Only</span>
+                    </li>
+                
+                    <li class="page-item">
+                        <span>/categories/plastics</span>
+                        <span class="status missing">Vercel Only</span>
+                    </li>
+                
+                    <li class="page-item">
+                        <span>/categories/paper-packaging</span>
+                        <span class="status missing">Vercel Only</span>
+                    </li>
+                
+                    <li class="page-item">
+                        <span>/categories/rubber</span>
+                        <span class="status missing">Vercel Only</span>
+                    </li>
+                
+                    <li class="page-item">
+                        <span>/categories/ceramics</span>
+                        <span class="status missing">Vercel Only</span>
+                    </li>
+                
+                    <li class="page-item">
+                        <span>/categories/glass</span>
+                        <span class="status missing">Vercel Only</span>
+                    </li>
+                
+                    <li class="page-item">
+                        <span>/categories/wood</span>
+                        <span class="status missing">Vercel Only</span>
+                    </li>
+                
+                    <li class="page-item">
+                        <span>/categories/leather</span>
+                        <span class="status missing">Vercel Only</span>
+                    </li>
+                
+                    <li class="page-item">
+                        <span>/dashboard/ai-features</span>
+                        <span class="status missing">Vercel Only</span>
+                    </li>
+                
+                    <li class="page-item">
+                        <span>/fintech</span>
+                        <span class="status missing">Vercel Only</span>
+                    </li>
+                
+                    <li class="page-item">
+                        <span>/wallet</span>
+                        <span class="status missing">Vercel Only</span>
+                    </li>
+                
+                    <li class="page-item">
+                        <span>/voice-rfq</span>
+                        <span class="status missing">Vercel Only</span>
+                    </li>
+                
+                    <li class="page-item">
+                        <span>/about</span>
+                        <span class="status missing">Vercel Only</span>
+                    </li>
+                
+                    <li class="page-item">
+                        <span>/contact</span>
+                        <span class="status missing">Vercel Only</span>
+                    </li>
+                
+                    <li class="page-item">
+                        <span>/privacy</span>
+                        <span class="status missing">Vercel Only</span>
+                    </li>
+                
+                    <li class="page-item">
+                        <span>/terms</span>
+                        <span class="status missing">Vercel Only</span>
+                    </li>
+                
+                    <li class="page-item">
+                        <span>/help</span>
+                        <span class="status missing">Vercel Only</span>
+                    </li>
+                
+            </ul>
+        </div>
+        
+        <div class="actions">
+            <button class="btn" onclick="window.open('pages-audit.md', '_blank')">📄 View Markdown Report</button>
+            <button class="btn" onclick="window.open('audit-report-2025-09-02.json', '_blank')">📊 View JSON Data</button>
+            <button class="btn" onclick="alert('Run: npm run migrate:missing')">🚀 Start Migration</button>
+        </div>
+    </div>
+</body>
+</html>

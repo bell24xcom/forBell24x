@@ -1,0 +1,248 @@
+{
+  "name": "Bell24H AI Category Scraper Worker",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "When Called",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.source_url }}/search",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "category",
+              "value": "={{ $json.category_name }}"
+            },
+            {
+              "name": "page",
+              "value": "1"
+            },
+            {
+              "name": "limit",
+              "value": "100"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "scrape-data",
+      "name": "Scrape Source Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "mode": "chat",
+        "model": "gpt-4-turbo-preview",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are a B2B data extraction specialist. Extract and structure company information from the provided data.\n\nCategories available:\n{{ $node[\"Get Categories\"].json }}\n\nFor each company, extract:\n1. Company name (required)\n2. Contact person name\n3. Email (validate format)\n4. Phone (normalize to Indian format)\n5. Address, city, state, pincode\n6. Website\n7. Products/Services offered\n8. Business type (Manufacturer/Trader/Service)\n\nClassify into the most appropriate category from the list.\n\nReturn JSON array:\n[\n  {\n    \"company_name\": \"ABC Corp\",\n    \"contact_person\": \"John Doe\",\n    \"email\": \"john@abc.com\",\n    \"phone\": \"+91-9876543210\",\n    \"address\": \"123 Street\",\n    \"city\": \"Mumbai\",\n    \"state\": \"Maharashtra\",\n    \"primary_category\": \"Textiles\",\n    \"subcategories\": [\"Cotton\", \"Fabrics\"],\n    \"products\": [\"Cotton Fabric\", \"Printed Textiles\"],\n    \"business_type\": \"Manufacturer\",\n    \"confidence_score\": 0.95\n  }\n]"
+            },
+            {
+              "role": "user", 
+              "content": "Extract company data from:\n{{ JSON.stringify($json) }}"
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.3,
+          "maxTokens": 2000
+        }
+      },
+      "id": "ai-extract",
+      "name": "AI Extract & Classify",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.3,
+      "position": [680, 300],
+      "credentials": {
+        "openAiApi": {
+          "id": "2",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "findPlace",
+        "inputType": "textquery",
+        "textQuery": "={{ $json.company_name }} {{ $json.city }}",
+        "fields": [
+          "formatted_address",
+          "formatted_phone_number",
+          "website",
+          "geometry",
+          "rating",
+          "user_ratings_total"
+        ]
+      },
+      "id": "google-maps",
+      "name": "Google Maps Enrichment",
+      "type": "n8n-nodes-base.googleMaps",
+      "typeVersion": 1,
+      "position": [900, 300],
+      "credentials": {
+        "googleMapsApi": {
+          "id": "3",
+          "name": "Google Maps API"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Merge AI extracted data with Google Maps data\nconst aiData = $input.all()[0].json;\nconst mapsData = $input.all()[1].json || {};\n\n// Generate unique claim token\nconst generateToken = () => {\n  return 'CLM-' + Date.now().toString(36) + Math.random().toString(36).substr(2, 9);\n};\n\n// Merge and enhance data\nconst enrichedData = {\n  ...aiData,\n  \n  // Override with Maps data if available\n  address: mapsData.formatted_address || aiData.address,\n  phone: mapsData.formatted_phone_number || aiData.phone,\n  website: mapsData.website || aiData.website,\n  \n  // Add location coordinates\n  latitude: mapsData.geometry?.location?.lat || null,\n  longitude: mapsData.geometry?.location?.lng || null,\n  \n  // Add Google ratings\n  google_rating: mapsData.rating || null,\n  google_reviews_count: mapsData.user_ratings_total || null,\n  \n  // Add metadata\n  source_id: $node[\"When Called\"].json.source_id,\n  source_url: $node[\"When Called\"].json.source_url,\n  category_id: $node[\"When Called\"].json.category_id,\n  \n  // Generate claim token\n  claim_token: generateToken(),\n  \n  // Quality score based on data completeness\n  scrape_quality_score: calculateQualityScore(aiData, mapsData),\n  \n  // Timestamps\n  created_at: new Date().toISOString(),\n  last_scraped_at: new Date().toISOString()\n};\n\nfunction calculateQualityScore(ai, maps) {\n  let score = 0;\n  if (ai.company_name) score += 20;\n  if (ai.email) score += 20;\n  if (ai.phone) score += 15;\n  if (ai.address) score += 10;\n  if (ai.products?.length > 0) score += 15;\n  if (maps.geometry) score += 10;\n  if (ai.confidence_score > 0.8) score += 10;\n  return score;\n}\n\nreturn enrichedData;"
+      },
+      "id": "merge-data",
+      "name": "Merge & Enhance Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "table": "suppliers",
+        "columns": "company_name,contact_person,email,phone,address,city,state,website,latitude,longitude,primary_category_id,ai_classification_score,ai_extracted_products,source_id,source_url,claim_token,scrape_quality_score,created_at,last_scraped_at",
+        "returnFields": "id,company_name,email,phone,claim_token",
+        "options": {
+          "onConflict": {
+            "columns": ["email", "phone"],
+            "updateColumns": ["last_scraped_at", "scrape_quality_score"]
+          }
+        }
+      },
+      "id": "insert-supplier",
+      "name": "Insert/Update Supplier",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [1340, 300],
+      "credentials": {
+        "postgres": {
+          "id": "1",
+          "name": "Bell24H DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": "send-claim-invitation",
+        "workflowData": "={{ $json }}"
+      },
+      "id": "trigger-invite",
+      "name": "Trigger Claim Invite",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [1560, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE scraping_logs \nSET completed_at = NOW(),\n    suppliers_found = {{ $json.suppliers_found }},\n    suppliers_inserted = {{ $json.suppliers_inserted }},\n    status = 'completed'\nWHERE batch_id = '{{ $json.batch_id }}';",
+        "options": {}
+      },
+      "id": "update-log",
+      "name": "Update Scraping Log",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [1560, 450],
+      "credentials": {
+        "postgres": {
+          "id": "1",
+          "name": "Bell24H DB"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When Called": {
+      "main": [
+        [
+          {
+            "node": "Scrape Source Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scrape Source Data": {
+      "main": [
+        [
+          {
+            "node": "AI Extract & Classify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Extract & Classify": {
+      "main": [
+        [
+          {
+            "node": "Google Maps Enrichment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Maps Enrichment": {
+      "main": [
+        [
+          {
+            "node": "Merge & Enhance Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge & Enhance Data": {
+      "main": [
+        [
+          {
+            "node": "Insert/Update Supplier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert/Update Supplier": {
+      "main": [
+        [
+          {
+            "node": "Trigger Claim Invite",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Update Scraping Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "errorWorkflow": "error-handler"
+  },
+  "versionId": "ai-worker-v1",
+  "id": "category-scraper-ai-worker",
+  "tags": ["bell24h", "scraping", "ai", "worker"]
+}

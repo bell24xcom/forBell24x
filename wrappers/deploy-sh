@@ -1,0 +1,37 @@
+#!/bin/bash
+# Bash wrapper to bypass Cursor terminal 'q' prefix bug
+
+# Create logs directory
+mkdir -p ./logs
+
+# Generate timestamp
+timestamp=$(date +"%Y%m%d_%H%M%S")
+log_file="./logs/deploy_${timestamp}.log"
+
+# Function to log messages
+log_message() {
+    local level=${2:-INFO}
+    local message="[${timestamp}] [${level}] $1"
+    echo "$message"
+    echo "$message" >> "$log_file"
+}
+
+# Strip any 'q' prefixes from commands
+clean_commands=()
+for arg in "$@"; do
+    clean_arg=$(echo "$arg" | sed 's/^q\+//')
+    clean_commands+=("$clean_arg")
+    log_message "Original: $arg -> Cleaned: $clean_arg"
+done
+
+# Join and execute commands
+full_command="${clean_commands[*]}"
+log_message "Executing: $full_command"
+
+# Execute the cleaned command
+if eval "$full_command"; then
+    log_message "Command executed successfully" "SUCCESS"
+else
+    log_message "Command failed" "ERROR"
+    exit 1
+fi

@@ -1,0 +1,59 @@
+# BELL24h Production Caddy Configuration
+# Replace YOUR_EMAIL with your actual email for Let's Encrypt
+
+api.bell24h.com {
+    reverse_proxy localhost:8000
+    
+    # HTTPS with Let's Encrypt
+    tls sanika@bell24h.com
+    
+    # Logging
+    log {
+        output file /var/log/caddy/bell24h-api.log {
+            roll_size 100mb
+            roll_keep 10
+        }
+    }
+    
+    # CORS headers (additional to FastAPI)
+    header {
+        Access-Control-Allow-Origin "*"
+        Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+        Access-Control-Allow-Headers "Content-Type, Authorization"
+    }
+    
+    # Security headers
+    header {
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        X-XSS-Protection "1; mode=block"
+        Referrer-Policy "strict-origin-when-cross-origin"
+    }
+}
+
+# Redirect www to non-www
+www.bell24h.com {
+    redir https://bell24h.com{uri} permanent
+}
+
+# n8n Editor and Workflows
+n8n.bell24h.com {
+    reverse_proxy localhost:5678
+    
+    tls sanika@bell24h.com
+    
+    # Allow webhooks
+    header {
+        Access-Control-Allow-Origin "*"
+        Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+        Access-Control-Allow-Headers "Content-Type, Authorization"
+    }
+    
+    log {
+        output file /var/log/caddy/bell24h-n8n.log {
+            roll_size 100mb
+            roll_keep 10
+        }
+    }
+}
+

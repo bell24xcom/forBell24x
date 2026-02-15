@@ -1,0 +1,647 @@
+openapi: 3.0.0
+info:
+  title: Bell24h B2B Marketplace API
+  description: Complete API specification for Bell24h B2B marketplace platform
+  version: 1.0.0
+  contact:
+    name: Bell24h API Support
+    email: support@bell24h.com
+    url: https://bell24h.com
+servers:
+  - url: https://api.bell24h.com/v1
+    description: Production server
+  - url: https://staging-api.bell24h.com/v1
+    description: Staging server
+  - url: http://localhost:3000/api
+    description: Development server
+
+paths:
+  /auth/otp/send:
+    post:
+      summary: Send OTP for authentication
+      tags: [Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [phone]
+              properties:
+                phone:
+                  type: string
+                  example: "+919876543210"
+      responses:
+        '200':
+          description: OTP sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OTPResponse'
+        '400':
+          description: Invalid phone number
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/otp/verify:
+    post:
+      summary: Verify OTP and authenticate user
+      tags: [Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [phone, otp]
+              properties:
+                phone:
+                  type: string
+                  example: "+919876543210"
+                otp:
+                  type: string
+                  example: "123456"
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Invalid OTP
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /suppliers:
+    get:
+      summary: Get list of suppliers
+      tags: [Suppliers]
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+          description: Page number
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+          description: Number of items per page
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Search term
+        - name: category
+          in: query
+          schema:
+            type: string
+          description: Filter by category
+        - name: location
+          in: query
+          schema:
+            type: string
+          description: Filter by location
+        - name: verified
+          in: query
+          schema:
+            type: boolean
+          description: Filter by verification status
+      responses:
+        '200':
+          description: List of suppliers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SupplierListResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /suppliers/{id}:
+    get:
+      summary: Get supplier by ID
+      tags: [Suppliers]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Supplier ID
+      responses:
+        '200':
+          description: Supplier details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Supplier'
+        '404':
+          description: Supplier not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /products:
+    get:
+      summary: Get list of products
+      tags: [Products]
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+          description: Page number
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+          description: Number of items per page
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Search term
+        - name: category
+          in: query
+          schema:
+            type: string
+          description: Filter by category
+        - name: minPrice
+          in: query
+          schema:
+            type: number
+          description: Minimum price filter
+        - name: maxPrice
+          in: query
+          schema:
+            type: number
+          description: Maximum price filter
+      responses:
+        '200':
+          description: List of products
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductListResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /rfqs:
+    get:
+      summary: Get list of RFQs
+      tags: [RFQs]
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+          description: Page number
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+          description: Number of items per page
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, pending, closed, expired]
+          description: Filter by status
+        - name: category
+          in: query
+          schema:
+            type: string
+          description: Filter by category
+        - name: urgency
+          in: query
+          schema:
+            type: string
+            enum: [LOW, MEDIUM, HIGH, URGENT]
+          description: Filter by urgency
+      responses:
+        '200':
+          description: List of RFQs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFQListResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /rfqs:
+    post:
+      summary: Create new RFQ
+      tags: [RFQs]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRFQRequest'
+      responses:
+        '201':
+          description: RFQ created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RFQ'
+        '400':
+          description: Invalid RFQ data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /categories:
+    get:
+      summary: Get list of categories
+      tags: [Categories]
+      responses:
+        '200':
+          description: List of categories
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryListResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    Supplier:
+      type: object
+      required: [id, company, name, email, phone, location, category, verified, rating]
+      properties:
+        id:
+          type: string
+          example: "supplier_123"
+        company:
+          type: string
+          example: "ABC Steel Works"
+        name:
+          type: string
+          example: "John Doe"
+        email:
+          type: string
+          format: email
+          example: "john@abcsteel.com"
+        phone:
+          type: string
+          example: "+919876543210"
+        location:
+          type: string
+          example: "Mumbai, Maharashtra"
+        category:
+          type: string
+          example: "Steel & Metals"
+        verified:
+          type: boolean
+          example: true
+        rating:
+          type: number
+          minimum: 0
+          maximum: 5
+          example: 4.5
+        description:
+          type: string
+          example: "Leading steel manufacturer with 20+ years experience"
+        gstNumber:
+          type: string
+          example: "27ABCDE1234F1Z5"
+        website:
+          type: string
+          format: uri
+          example: "https://abcsteel.com"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Product:
+      type: object
+      required: [id, name, description, price, category, supplierId]
+      properties:
+        id:
+          type: string
+          example: "product_123"
+        name:
+          type: string
+          example: "Steel Pipes - Grade A"
+        description:
+          type: string
+          example: "High quality steel pipes for construction"
+        price:
+          type: number
+          format: float
+          example: 1500.50
+        category:
+          type: string
+          example: "Steel & Metals"
+        supplierId:
+          type: string
+          example: "supplier_123"
+        supplier:
+          $ref: '#/components/schemas/Supplier'
+        images:
+          type: array
+          items:
+            type: string
+            format: uri
+          example: ["https://example.com/image1.jpg", "https://example.com/image2.jpg"]
+        specifications:
+          type: object
+          additionalProperties: true
+          example:
+            material: "Steel"
+            diameter: "6 inches"
+            length: "12 feet"
+        inStock:
+          type: boolean
+          example: true
+        quantity:
+          type: integer
+          example: 100
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    RFQ:
+      type: object
+      required: [id, title, description, category, budget, quantity, timeline, urgency, status]
+      properties:
+        id:
+          type: string
+          example: "rfq_123"
+        title:
+          type: string
+          example: "Steel Pipes for Construction Project"
+        description:
+          type: string
+          example: "Need 1000 steel pipes for construction project"
+        category:
+          type: string
+          example: "Steel & Metals"
+        budget:
+          type: number
+          format: float
+          example: 150000.00
+        quantity:
+          type: integer
+          example: 1000
+        timeline:
+          type: string
+          example: "30 days"
+        urgency:
+          type: string
+          enum: [LOW, MEDIUM, HIGH, URGENT]
+          example: "HIGH"
+        status:
+          type: string
+          enum: [active, pending, closed, expired]
+          example: "active"
+        buyerId:
+          type: string
+          example: "buyer_123"
+        buyer:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+            company:
+              type: string
+        responses:
+          type: integer
+          example: 5
+        views:
+          type: integer
+          example: 25
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Category:
+      type: object
+      required: [id, name, description, parentId]
+      properties:
+        id:
+          type: string
+          example: "cat_123"
+        name:
+          type: string
+          example: "Steel & Metals"
+        description:
+          type: string
+          example: "Steel products and metal components"
+        parentId:
+          type: string
+          nullable: true
+          example: null
+        subcategories:
+          type: array
+          items:
+            $ref: '#/components/schemas/Category'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    SupplierListResponse:
+      type: object
+      required: [suppliers, pagination]
+      properties:
+        suppliers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Supplier'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    ProductListResponse:
+      type: object
+      required: [products, pagination]
+      properties:
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/Product'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    RFQListResponse:
+      type: object
+      required: [rfqs, pagination]
+      properties:
+        rfqs:
+          type: array
+          items:
+            $ref: '#/components/schemas/RFQ'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    CategoryListResponse:
+      type: object
+      required: [categories]
+      properties:
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/Category'
+
+    Pagination:
+      type: object
+      required: [page, limit, total, totalPages]
+      properties:
+        page:
+          type: integer
+          example: 1
+        limit:
+          type: integer
+          example: 10
+        total:
+          type: integer
+          example: 100
+        totalPages:
+          type: integer
+          example: 10
+        hasNext:
+          type: boolean
+          example: true
+        hasPrev:
+          type: boolean
+          example: false
+
+    OTPResponse:
+      type: object
+      required: [success, message]
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "OTP sent successfully"
+
+    AuthResponse:
+      type: object
+      required: [success, message, user, token]
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Login successful"
+        user:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+            email:
+              type: string
+            phone:
+              type: string
+            role:
+              type: string
+              enum: [buyer, supplier, admin]
+        token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+    CreateRFQRequest:
+      type: object
+      required: [title, description, category, budget, quantity, timeline, urgency]
+      properties:
+        title:
+          type: string
+          example: "Steel Pipes for Construction Project"
+        description:
+          type: string
+          example: "Need 1000 steel pipes for construction project"
+        category:
+          type: string
+          example: "Steel & Metals"
+        budget:
+          type: number
+          format: float
+          example: 150000.00
+        quantity:
+          type: integer
+          example: 1000
+        timeline:
+          type: string
+          example: "30 days"
+        urgency:
+          type: string
+          enum: [LOW, MEDIUM, HIGH, URGENT]
+          example: "HIGH"
+
+    ErrorResponse:
+      type: object
+      required: [success, message]
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: "Error message"
+        code:
+          type: string
+          example: "VALIDATION_ERROR"
+        details:
+          type: object
+          additionalProperties: true
+
+tags:
+  - name: Authentication
+    description: User authentication and authorization
+  - name: Suppliers
+    description: Supplier management and listing
+  - name: Products
+    description: Product catalog and management
+  - name: RFQs
+    description: Request for Quotation management
+  - name: Categories
+    description: Product and service categories

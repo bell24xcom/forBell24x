@@ -1,0 +1,161 @@
+openapi: 3.0.3
+info:
+  title: Bell24H.com API
+  version: 1.0.0
+  description: API documentation for Bell24H.com escrow and wallet services
+servers:
+  - url: http://localhost:3002
+paths:
+  /api/escrow/hold:
+    post:
+      summary: Create an escrow hold
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                walletId:
+                  type: string
+                amount:
+                  type: number
+                currency:
+                  type: string
+                gateway:
+                  type: string
+                buyerId:
+                  type: string
+                sellerId:
+                  type: string
+            example:
+              walletId: "test-wallet-id"
+              amount: 1000
+              currency: "INR"
+              gateway: "RAZORPAY"
+              buyerId: "buyer-test-id"
+              sellerId: "seller-test-id"
+      responses:
+        '201':
+          description: Escrow hold created
+        '400':
+          description: Invalid input
+  /api/escrow/release:
+    post:
+      summary: Release an escrow hold
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                escrowId:
+                  type: string
+                userId:
+                  type: string
+            example:
+              escrowId: "escrow-123"
+              userId: "buyer-test-id"
+      responses:
+        '200':
+          description: Escrow released
+        '400':
+          description: Invalid input
+  /api/escrow/refund:
+    post:
+      summary: Refund an escrow hold
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                escrowId:
+                  type: string
+                userId:
+                  type: string
+            example:
+              escrowId: "escrow-123"
+              userId: "buyer-test-id"
+      responses:
+        '200':
+          description: Escrow refunded
+        '400':
+          description: Invalid input
+  /api/wallet:
+    post:
+      summary: Create a wallet
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                countryCode:
+                  type: string
+                email:
+                  type: string
+                phone:
+                  type: string
+            example:
+              userId: "user-test-id"
+              countryCode: "IN"
+              email: "testuser@example.com"
+              phone: "9999999999"
+      responses:
+        '201':
+          description: Wallet created
+        '400':
+          description: Invalid input
+  /api/wallet/fund:
+    post:
+      summary: Fund a wallet
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                walletId:
+                  type: string
+                amount:
+                  type: number
+            example:
+              walletId: "test-wallet-id"
+              amount: 500
+      responses:
+        '200':
+          description: Wallet funded
+        '400':
+          description: Invalid input
+  /api/wallet/transfer:
+    post:
+      summary: Transfer funds between wallets
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fromWalletId:
+                  type: string
+                toWalletId:
+                  type: string
+                amount:
+                  type: number
+            example:
+              fromWalletId: "wallet1"
+              toWalletId: "wallet2"
+              amount: 200
+      responses:
+        '200':
+          description: Transfer successful
+        '400':
+          description: Invalid input

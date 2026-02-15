@@ -1,0 +1,66 @@
+﻿{
+    "memory":  "2048",
+    "executionRoleArn":  "arn:aws:iam:::role/ecsTaskExecutionRole",
+    "family":  "bell24h-production",
+    "networkMode":  "awsvpc",
+    "containerDefinitions":  [
+                                 {
+                                     "healthCheck":  {
+                                                         "retries":  3,
+                                                         "command":  [
+                                                                         "CMD-SHELL",
+                                                                         "curl -f http://localhost:3000/health || exit 1"
+                                                                     ],
+                                                         "timeout":  5,
+                                                         "interval":  30,
+                                                         "startPeriod":  60
+                                                     },
+                                     "logConfiguration":  {
+                                                              "logDriver":  "awslogs",
+                                                              "options":  {
+                                                                              "awslogs-region":  "ap-south-1",
+                                                                              "awslogs-stream-prefix":  "ecs",
+                                                                              "awslogs-group":  "/ecs/bell24h-production"
+                                                                          }
+                                                          },
+                                     "essential":  true,
+                                     "name":  "bell24h-container",
+                                     "environment":  [
+                                                         {
+                                                             "value":  "production",
+                                                             "name":  "NODE_ENV"
+                                                         },
+                                                         {
+                                                             "value":  "ap-south-1",
+                                                             "name":  "AWS_REGION"
+                                                         }
+                                                     ],
+                                     "portMappings":  [
+                                                          {
+                                                              "containerPort":  3000,
+                                                              "protocol":  "tcp",
+                                                              "hostPort":  3000
+                                                          }
+                                                      ],
+                                     "secrets":  [
+                                                     {
+                                                         "valueFrom":  "arn:aws:ssm:ap-south-1::parameter/bell24h/production/DATABASE_URL",
+                                                         "name":  "DATABASE_URL"
+                                                     },
+                                                     {
+                                                         "valueFrom":  "arn:aws:ssm:ap-south-1::parameter/bell24h/production/JWT_SECRET",
+                                                         "name":  "JWT_SECRET"
+                                                     },
+                                                     {
+                                                         "valueFrom":  "arn:aws:ssm:ap-south-1::parameter/bell24h/production/REDIS_URL",
+                                                         "name":  "REDIS_URL"
+                                                     }
+                                                 ],
+                                     "image":  ":latest"
+                                 }
+                             ],
+    "requiresCompatibilities":  [
+                                    "FARGATE"
+                                ],
+    "cpu":  "1024"
+}

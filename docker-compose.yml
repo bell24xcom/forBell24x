@@ -1,0 +1,65 @@
+
+services:
+  # Main Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bell24h-app
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
+    ports:
+      - '5000:5000'
+    depends_on:
+      - mongodb
+    networks:
+      - bell24h-network
+
+  # n8n Service
+  n8n:
+    image: n8nio/n8n:1.94.1
+    container_name: bell24h-n8n
+    restart: unless-stopped
+    ports:
+      - '5678:5678'
+    environment:
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - N8N_WEBHOOK_URL=http://localhost:5678/
+      - N8N_EMAIL_MODE=smtp
+      - N8N_SMTP_HOST=your-smtp-host
+      - N8N_SMTP_PORT=587
+      - N8N_SMTP_USER=your-email@example.com
+      - N8N_SMTP_PASS=your-email-password
+      - N8N_SMTP_SENDER=your-email@example.com
+    volumes:
+      - n8n_data:/home/node/.n8n
+    networks:
+      - bell24h-network
+
+  # MongoDB Service
+  mongodb:
+    image: mongo:6.0
+    container_name: bell24h-mongodb
+    restart: unless-stopped
+    environment:
+      - MONGO_INITDB_DATABASE=bell24h
+    volumes:
+      - mongodb_data:/data/db
+    ports:
+      - '27017:27017'
+    networks:
+      - bell24h-network
+
+# Volumes
+volumes:
+  n8n_data:
+  mongodb_data:
+
+# Networks
+networks:
+  bell24h-network:
+    driver: bridge

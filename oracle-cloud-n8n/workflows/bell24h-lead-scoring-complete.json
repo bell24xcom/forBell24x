@@ -1,0 +1,246 @@
+{
+  "name": "Bell24H Lead Scoring - Complete",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lead-scored",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-lead-scored",
+      "name": "Lead Scored Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "webhookId": "lead-scored-webhook"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "condition-1",
+              "leftValue": "={{ $json.score }}",
+              "rightValue": "80",
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "check-high-score",
+      "name": "Check High Score",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "condition-1",
+              "leftValue": "={{ $json.score }}",
+              "rightValue": "50",
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "check-medium-score",
+      "name": "Check Medium Score",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [680, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get lead data from input\nconst leadData = $input.first().json;\n\n// Calculate lead priority based on score\nlet priority = 'Low';\nlet urgency = 'Normal';\nlet recommendedActions = [];\n\nif (leadData.score >= 80) {\n  priority = 'High';\n  urgency = 'Immediate';\n  recommendedActions = [\n    'Call within 1 hour',\n    'Send personalized proposal',\n    'Schedule demo meeting',\n    'Assign to senior sales rep'\n  ];\n} else if (leadData.score >= 50) {\n  priority = 'Medium';\n  urgency = 'Within 24 hours';\n  recommendedActions = [\n    'Send follow-up email',\n    'Add to nurture campaign',\n    'Schedule follow-up call'\n  ];\n} else {\n  priority = 'Low';\n  urgency = 'Within 1 week';\n  recommendedActions = [\n    'Add to general newsletter',\n    'Monitor for engagement'\n  ];\n}\n\n// Generate lead insights\nconst insights = {\n  leadScore: leadData.score,\n  priority: priority,\n  urgency: urgency,\n  recommendedActions: recommendedActions,\n  companySize: leadData.companySize || 'Unknown',\n  industry: leadData.industry || 'Unknown',\n  budget: leadData.budget || 'Not specified',\n  timeline: leadData.timeline || 'Not specified',\n  source: leadData.source || 'Unknown',\n  lastActivity: leadData.lastActivity || new Date().toISOString(),\n  processedAt: new Date().toISOString()\n};\n\n// Return original lead data plus insights\nreturn {\n  ...leadData,\n  ...insights\n};"
+      },
+      "id": "generate-lead-insights",
+      "name": "Generate Lead Insights",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 200]
+    },
+    {
+      "parameters": {
+        "fromEmail": "hi@bell24h.com",
+        "toEmail": "={{ $json.email }}",
+        "subject": "🚨 HIGH PRIORITY LEAD: {{ $json.companyName || 'New Lead' }} (Score: {{ $json.score }})",
+        "emailFormat": "html",
+        "message": "<!DOCTYPE html>\n<html>\n<head>\n    <meta charset=\"utf-8\">\n    <title>High Priority Lead Alert</title>\n    <style>\n        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }\n        .container { max-width: 600px; margin: 0 auto; padding: 20px; }\n        .header { background: #dc2626; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }\n        .content { background: #f8fafc; padding: 30px; border-radius: 0 0 8px 8px; }\n        .alert-box { background: #fef2f2; border: 2px solid #dc2626; padding: 20px; border-radius: 8px; margin: 20px 0; }\n        .lead-details { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }\n        .action-list { background: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0; }\n        .action-item { background: white; padding: 10px; margin: 5px 0; border-radius: 4px; border-left: 4px solid #2563eb; }\n        .btn { display: inline-block; background: #dc2626; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 10px 0; }\n        .footer { text-align: center; margin-top: 30px; color: #666; font-size: 14px; }\n    </style>\n</head>\n<body>\n    <div class=\"container\">\n        <div class=\"header\">\n            <h1>🚨 HIGH PRIORITY LEAD ALERT</h1>\n            <p>Bell24H Sales Team</p>\n        </div>\n        \n        <div class=\"content\">\n            <div class=\"alert-box\">\n                <h2>⚠️ Immediate Action Required</h2>\n                <p><strong>Lead Score:</strong> {{ $json.score }}/100</p>\n                <p><strong>Priority:</strong> {{ $json.priority }}</p>\n                <p><strong>Urgency:</strong> {{ $json.urgency }}</p>\n            </div>\n            \n            <h2>Lead Details</h2>\n            <div class=\"lead-details\">\n                <p><strong>Company:</strong> {{ $json.companyName || 'Not provided' }}</p>\n                <p><strong>Contact:</strong> {{ $json.contactName || 'Not provided' }}</p>\n                <p><strong>Email:</strong> {{ $json.email }}</p>\n                <p><strong>Phone:</strong> {{ $json.phone || 'Not provided' }}</p>\n                <p><strong>Company Size:</strong> {{ $json.companySize || 'Unknown' }}</p>\n                <p><strong>Industry:</strong> {{ $json.industry || 'Unknown' }}</p>\n                <p><strong>Budget:</strong> {{ $json.budget || 'Not specified' }}</p>\n                <p><strong>Timeline:</strong> {{ $json.timeline || 'Not specified' }}</p>\n                <p><strong>Source:</strong> {{ $json.source || 'Unknown' }}</p>\n            </div>\n            \n            <h3>Recommended Actions</h3>\n            <div class=\"action-list\">\n                {{#each $json.recommendedActions}}\n                <div class=\"action-item\">\n                    <strong>{{ this }}</strong>\n                </div>\n                {{/each}}\n            </div>\n            \n            <div style=\"text-align: center; margin: 30px 0;\">\n                <a href=\"https://bell24h.com/leads/{{ $json.id || 'new' }}\" class=\"btn\">View Lead Details</a>\n            </div>\n        </div>\n        \n        <div class=\"footer\">\n            <p>This alert was generated by Bell24H Lead Scoring System</p>\n            <p>© 2025 Bell24H. All rights reserved.</p>\n        </div>\n    </div>\n</body>\n</html>",
+        "options": {}
+      },
+      "id": "send-high-value-alert",
+      "name": "Send High-Value Alert",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [1120, 200],
+      "credentials": {
+        "smtp": "bell24h-smtp-credential"
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "hi@bell24h.com",
+        "toEmail": "={{ $json.email }}",
+        "subject": "Welcome to Bell24H! Let's explore opportunities together",
+        "emailFormat": "html",
+        "message": "<!DOCTYPE html>\n<html>\n<head>\n    <meta charset=\"utf-8\">\n    <title>Welcome to Bell24H</title>\n    <style>\n        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }\n        .container { max-width: 600px; margin: 0 auto; padding: 20px; }\n        .header { background: #2563eb; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }\n        .content { background: #f8fafc; padding: 30px; border-radius: 0 0 8px 8px; }\n        .welcome-box { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }\n        .features { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }\n        .feature { background: white; padding: 15px; border-radius: 8px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }\n        .btn { display: inline-block; background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 10px 0; }\n        .footer { text-align: center; margin-top: 30px; color: #666; font-size: 14px; }\n    </style>\n</head>\n<body>\n    <div class=\"container\">\n        <div class=\"header\">\n            <h1>🎉 Welcome to Bell24H!</h1>\n            <p>Your B2B Marketplace Partner</p>\n        </div>\n        \n        <div class=\"content\">\n            <div class=\"welcome-box\">\n                <h2>Hello {{ $json.contactName || 'there' }}!</h2>\n                <p>Thank you for your interest in Bell24H. We're excited to help you discover amazing business opportunities and connect with the right partners.</p>\n                \n                <p><strong>Lead Score:</strong> {{ $json.score }}/100</p>\n                <p><strong>Priority Level:</strong> {{ $json.priority }}</p>\n            </div>\n            \n            <h3>What you can do on Bell24H:</h3>\n            <div class=\"features\">\n                <div class=\"feature\">\n                    <h4>🔍 Browse RFQs</h4>\n                    <p>Discover relevant business opportunities in your industry</p>\n                </div>\n                <div class=\"feature\">\n                    <h4>📝 Post Your Needs</h4>\n                    <p>Create RFQs and get quotes from verified suppliers</p>\n                </div>\n                <div class=\"feature\">\n                    <h4>🤝 Connect & Network</h4>\n                    <p>Build relationships with industry professionals</p>\n                </div>\n                <div class=\"feature\">\n                    <h4>📊 Track Progress</h4>\n                    <p>Monitor your opportunities and manage deals</p>\n                </div>\n            </div>\n            \n            <div style=\"text-align: center; margin: 30px 0;\">\n                <a href=\"https://bell24h.com/dashboard\" class=\"btn\">Get Started</a>\n                <a href=\"https://bell24h.com/browse-rfqs\" class=\"btn\" style=\"background: #059669; margin-left: 10px;\">Browse RFQs</a>\n            </div>\n            \n            <div style=\"background: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0;\">\n                <h4>Need Help Getting Started?</h4>\n                <p>Our team is here to help you make the most of Bell24H. Feel free to reach out if you have any questions!</p>\n                <p><strong>Contact:</strong> support@bell24h.com | +91-XXXX-XXXX</p>\n            </div>\n        </div>\n        \n        <div class=\"footer\">\n            <p>This email was sent by Bell24H B2B Marketplace</p>\n            <p>© 2025 Bell24H. All rights reserved.</p>\n        </div>\n    </div>\n</body>\n</html>",
+        "options": {}
+      },
+      "id": "send-welcome-email",
+      "name": "Send Welcome Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [900, 400],
+      "credentials": {
+        "smtp": "bell24h-smtp-credential"
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": true, \"message\": \"Lead processed successfully\", \"leadId\": $json.id, \"score\": $json.score, \"priority\": $json.priority, \"processedAt\": $json.processedAt } }}",
+        "options": {}
+      },
+      "id": "webhook-response-success",
+      "name": "Webhook Response Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1340, 200]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": true, \"message\": \"Lead processed successfully\", \"leadId\": $json.id, \"score\": $json.score, \"priority\": $json.priority, \"processedAt\": $json.processedAt } }}",
+        "options": {}
+      },
+      "id": "webhook-response-medium",
+      "name": "Webhook Response Medium",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1120, 400]
+    }
+  ],
+  "connections": {
+    "Lead Scored Webhook": {
+      "main": [
+        [
+          {
+            "node": "Check High Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check High Score": {
+      "main": [
+        [
+          {
+            "node": "Generate Lead Insights",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Check Medium Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Medium Score": {
+      "main": [
+        [
+          {
+            "node": "Generate Lead Insights",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Webhook Response Medium",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Lead Insights": {
+      "main": [
+        [
+          {
+            "node": "Send High-Value Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Welcome Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send High-Value Alert": {
+      "main": [
+        [
+          {
+            "node": "Webhook Response Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Welcome Email": {
+      "main": [
+        [
+          {
+            "node": "Webhook Response Medium",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "id": "lead-scoring-complete",
+  "tags": ["bell24h", "lead-scoring", "automation", "email"]
+}

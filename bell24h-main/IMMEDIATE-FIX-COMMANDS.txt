@@ -1,0 +1,74 @@
+========================================
+IMMEDIATE FIX - COPY-PASTE THESE COMMANDS
+========================================
+
+ISSUE 1: Disk Space Full
+ISSUE 2: Nginx Not Running
+
+Copy-paste ALL commands below into your terminal:
+
+
+# 1. Free up disk space (remove unused Docker resources)
+docker container prune -f
+docker image prune -a -f
+docker volume prune -f
+docker builder prune -f
+sudo apt-get clean
+sudo apt-get autoremove -y
+
+# 2. Check disk space (should show more free space now)
+df -h
+
+# 3. Check if container is running
+docker ps | grep bell24h
+
+# 4. If container stopped, restart it
+docker start bell24h || docker restart bell24h
+
+# 5. Start Nginx (CRITICAL - this is why you get 502 errors!)
+sudo systemctl start nginx
+sudo systemctl enable nginx
+
+# 6. Check Nginx status
+sudo systemctl status nginx
+
+# 7. Test Nginx configuration
+sudo nginx -t
+
+# 8. Reload Nginx
+sudo systemctl reload nginx
+
+# 9. Test port 3000 (container)
+curl -I http://localhost:3000
+
+# 10. Test Nginx proxying
+curl -I http://localhost
+
+# 11. Verify everything
+docker ps | grep bell24h
+sudo systemctl is-active nginx
+
+# 12. Check disk space one more time
+df -h
+
+
+========================================
+EXPECTED RESULTS:
+========================================
+
+✅ df -h should show more free space (after cleanup)
+✅ docker ps should show bell24h container running
+✅ sudo systemctl status nginx should show "active (running)"
+✅ curl http://localhost:3000 should return HTTP 200
+✅ curl http://localhost should return HTTP 200 (proxied)
+
+========================================
+AFTER FIX - TEST IN 2-3 MINUTES:
+========================================
+
+🌐 https://bell24h.com
+🌐 https://bell24h.com/auth/demo-login
+🌐 https://bell24h.com/dashboard
+
+========================================
+

@@ -1,0 +1,224 @@
+{
+  "name": "Bell24H AI Lead Scoring with Database",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lead-scoring",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Lead Scoring Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "webhookId": "lead-scoring-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "// AI-Powered Lead Scoring Algorithm with Database Integration\nconst leadData = $input.first().json;\n\n// Scoring factors and weights\nconst scoringFactors = {\n  company_size: { weight: 0.15, max_score: 100 },\n  industry_match: { weight: 0.20, max_score: 100 },\n  website_quality: { weight: 0.10, max_score: 100 },\n  contact_completeness: { weight: 0.15, max_score: 100 },\n  location_relevance: { weight: 0.10, max_score: 100 },\n  response_time: { weight: 0.10, max_score: 100 },\n  previous_interactions: { weight: 0.20, max_score: 100 }\n};\n\n// Calculate individual scores\nfunction calculateCompanySizeScore(size) {\n  const sizeMap = {\n    'startup': 20,\n    'small': 40,\n    'medium': 70,\n    'large': 90,\n    'enterprise': 100\n  };\n  return sizeMap[size?.toLowerCase()] || 30;\n}\n\nfunction calculateIndustryScore(industry) {\n  const highValueIndustries = ['manufacturing', 'technology', 'automotive', 'electronics', 'pharmaceuticals', 'steel', 'textiles', 'chemicals'];\n  return highValueIndustries.includes(industry?.toLowerCase()) ? 90 : 60;\n}\n\nfunction calculateWebsiteScore(website) {\n  if (!website) return 0;\n  if (website.includes('https://')) return 80;\n  if (website.includes('http://')) return 60;\n  return 40;\n}\n\nfunction calculateContactScore(contact) {\n  let score = 0;\n  if (contact?.email) score += 30;\n  if (contact?.phone) score += 30;\n  if (contact?.linkedin) score += 20;\n  if (contact?.name) score += 20;\n  return score;\n}\n\nfunction calculateLocationScore(location) {\n  const preferredLocations = ['india', 'china', 'germany', 'usa', 'japan', 'mumbai', 'delhi', 'bangalore', 'chennai', 'pune'];\n  return preferredLocations.some(loc => \n    location?.toLowerCase().includes(loc)\n  ) ? 80 : 50;\n}\n\nfunction calculateResponseScore(responseTime) {\n  if (!responseTime) return 50;\n  const hours = parseInt(responseTime);\n  if (hours <= 2) return 100;\n  if (hours <= 24) return 80;\n  if (hours <= 72) return 60;\n  return 30;\n}\n\nfunction calculateInteractionScore(interactions) {\n  if (!interactions || interactions === 0) return 20;\n  if (interactions >= 5) return 100;\n  if (interactions >= 3) return 80;\n  if (interactions >= 1) return 60;\n  return 40;\n}\n\n// Calculate weighted total score\nconst scores = {\n  company_size: calculateCompanySizeScore(leadData.company_size),\n  industry_match: calculateIndustryScore(leadData.industry),\n  website_quality: calculateWebsiteScore(leadData.website),\n  contact_completeness: calculateContactScore(leadData.contact),\n  location_relevance: calculateLocationScore(leadData.location),\n  response_time: calculateResponseScore(leadData.avg_response_time),\n  previous_interactions: calculateInteractionScore(leadData.previous_interactions)\n};\n\nlet totalScore = 0;\nObject.keys(scoringFactors).forEach(factor => {\n  totalScore += scores[factor] * scoringFactors[factor].weight;\n});\n\n// Determine lead priority\nlet priority = 'low';\nlet priorityScore = 0;\nif (totalScore >= 80) {\n  priority = 'high';\n  priorityScore = 3;\n} else if (totalScore >= 60) {\n  priority = 'medium';\n  priorityScore = 2;\n} else {\n  priority = 'low';\n  priorityScore = 1;\n}\n\n// Generate lead insights\nconst insights = [];\nif (scores.company_size >= 80) insights.push('Large company with significant purchasing power');\nif (scores.industry_match >= 80) insights.push('High-value industry match');\nif (scores.website_quality >= 80) insights.push('Professional online presence');\nif (scores.contact_completeness >= 80) insights.push('Complete contact information available');\nif (scores.location_relevance >= 80) insights.push('Located in preferred market');\nif (scores.response_time >= 80) insights.push('Quick response time');\nif (scores.previous_interactions >= 80) insights.push('Active engagement history');\n\n// Prepare scoring result with database fields\nconst scoringResult = {\n  lead_id: leadData.lead_id || `lead_${Date.now()}`,\n  company_name: leadData.company_name,\n  industry: leadData.industry,\n  company_size: leadData.company_size,\n  website: leadData.website,\n  location: leadData.location,\n  contact_email: leadData.contact?.email || leadData.email,\n  contact_phone: leadData.contact?.phone || leadData.phone,\n  contact_name: leadData.contact?.name || leadData.contact_person,\n  total_score: Math.round(totalScore),\n  priority: priority,\n  priority_score: priorityScore,\n  individual_scores: scores,\n  insights: insights,\n  recommended_actions: [\n    priority === 'high' ? 'Immediate follow-up required' : 'Standard follow-up process',\n    scores.contact_completeness < 60 ? 'Request complete contact information' : 'Contact information complete',\n    scores.website_quality < 60 ? 'Verify company legitimacy' : 'Company verified',\n    scores.previous_interactions < 60 ? 'Initiate engagement campaign' : 'Continue existing relationship'\n  ],\n  timestamp: new Date().toISOString(),\n  next_follow_up: priority === 'high' ? 'immediate' : priority === 'medium' ? '24_hours' : '72_hours',\n  source: leadData.source || 'webhook',\n  status: 'scored'\n};\n\nreturn [{ json: scoringResult }];"
+      },
+      "id": "ai-scoring",
+      "name": "AI Lead Scoring",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "schema": "public",
+        "table": "leads",
+        "columns": "lead_id, company_name, industry, company_size, website, location, contact_email, contact_phone, contact_name, total_score, priority, priority_score, individual_scores, insights, recommended_actions, next_follow_up, source, status, created_at",
+        "values": "={{ $json.lead_id }}, {{ $json.company_name }}, {{ $json.industry }}, {{ $json.company_size }}, {{ $json.website }}, {{ $json.location }}, {{ $json.contact_email }}, {{ $json.contact_phone }}, {{ $json.contact_name }}, {{ $json.total_score }}, {{ $json.priority }}, {{ $json.priority_score }}, {{ JSON.stringify($json.individual_scores) }}, {{ JSON.stringify($json.insights) }}, {{ JSON.stringify($json.recommended_actions) }}, {{ $json.next_follow_up }}, {{ $json.source }}, {{ $json.status }}, NOW()",
+        "options": {}
+      },
+      "id": "save-lead",
+      "name": "Save Lead to Database",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "priority-check",
+              "leftValue": "={{ $json.priority }}",
+              "rightValue": "high",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "priority-routing",
+      "name": "Route by Priority",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "alerts@bell24h.com",
+        "toEmail": "sales@bell24h.com",
+        "subject": "🚨 HIGH PRIORITY LEAD ALERT - {{ $json.company_name }} (Score: {{ $json.total_score }})",
+        "emailType": "html",
+        "message": "<!DOCTYPE html>\n<html>\n<head>\n    <meta charset=\"utf-8\">\n    <title>High Priority Lead Alert</title>\n    <style>\n        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }\n        .container { max-width: 600px; margin: 0 auto; padding: 20px; }\n        .header { background: #ef4444; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }\n        .content { background: #fef2f2; padding: 30px; border-radius: 0 0 8px 8px; }\n        .lead-details { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ef4444; }\n        .score-breakdown { background: #f8fafc; padding: 15px; border-radius: 6px; margin: 15px 0; }\n        .insights { background: #ecfdf5; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #10b981; }\n        .cta-button { display: inline-block; background: #ef4444; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 20px 0; }\n        .footer { text-align: center; color: #666; font-size: 12px; margin-top: 30px; }\n    </style>\n</head>\n<body>\n    <div class=\"container\">\n        <div class=\"header\">\n            <h1>🚨 HIGH PRIORITY LEAD</h1>\n            <p>Immediate Action Required</p>\n        </div>\n        \n        <div class=\"content\">\n            <h2>Lead Details</h2>\n            \n            <div class=\"lead-details\">\n                <h3>🏢 {{ $json.company_name }}</h3>\n                <ul>\n                    <li><strong>Lead ID:</strong> {{ $json.lead_id }}</li>\n                    <li><strong>Industry:</strong> {{ $json.industry }}</li>\n                    <li><strong>Company Size:</strong> {{ $json.company_size }}</li>\n                    <li><strong>Location:</strong> {{ $json.location }}</li>\n                    <li><strong>Website:</strong> <a href=\"{{ $json.website }}\" target=\"_blank\">{{ $json.website }}</a></li>\n                    <li><strong>Contact Email:</strong> {{ $json.contact_email }}</li>\n                    <li><strong>Contact Phone:</strong> {{ $json.contact_phone }}</li>\n                    <li><strong>Total Score:</strong> <span style=\"color: #ef4444; font-weight: bold;\">{{ $json.total_score }}/100</span></li>\n                    <li><strong>Priority:</strong> <span style=\"color: #ef4444; font-weight: bold; text-transform: uppercase;\">{{ $json.priority }}</span></li>\n                    <li><strong>Next Follow-up:</strong> {{ $json.next_follow_up }}</li>\n                </ul>\n            </div>\n            \n            <div class=\"score-breakdown\">\n                <h4>📊 Score Breakdown:</h4>\n                <ul>\n                    <li>Company Size: {{ $json.individual_scores.company_size }}/100</li>\n                    <li>Industry Match: {{ $json.individual_scores.industry_match }}/100</li>\n                    <li>Website Quality: {{ $json.individual_scores.website_quality }}/100</li>\n                    <li>Contact Completeness: {{ $json.individual_scores.contact_completeness }}/100</li>\n                    <li>Location Relevance: {{ $json.individual_scores.location_relevance }}/100</li>\n                    <li>Response Time: {{ $json.individual_scores.response_time }}/100</li>\n                    <li>Previous Interactions: {{ $json.individual_scores.previous_interactions }}/100</li>\n                </ul>\n            </div>\n            \n            <div class=\"insights\">\n                <h4>💡 Key Insights:</h4>\n                <ul>\n                    {{ $json.insights.map(insight => `<li>${insight}</li>`).join('') }}\n                </ul>\n            </div>\n            \n            <div style=\"background: #fef3c7; padding: 15px; border-radius: 6px; margin: 20px 0;\">\n                <h4>⚡ Recommended Actions:</h4>\n                <ul>\n                    {{ $json.recommended_actions.map(action => `<li>${action}</li>`).join('') }}\n                </ul>\n            </div>\n            \n            <div style=\"text-align: center;\">\n                <a href=\"https://bell24h.com/admin/leads/{{ $json.lead_id }}\" class=\"cta-button\">\n                    View Lead Details\n                </a>\n            </div>\n        </div>\n        \n        <div class=\"footer\">\n            <p>This is an automated alert from Bell24H Lead Scoring System.</p>\n            <p>© 2024 Bell24H. All rights reserved.</p>\n        </div>\n    </div>\n</body>\n</html>",
+        "options": {}
+      },
+      "id": "high-priority-alert",
+      "name": "High Priority Alert",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [1120, 200]
+    },
+    {
+      "parameters": {
+        "fromEmail": "welcome@bell24h.com",
+        "toEmail": "={{ $json.contact_email }}",
+        "subject": "Welcome to Bell24H - Your Supplier Profile is Ready!",
+        "emailType": "html",
+        "message": "<!DOCTYPE html>\n<html>\n<head>\n    <meta charset=\"utf-8\">\n    <title>Welcome to Bell24H</title>\n    <style>\n        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }\n        .container { max-width: 600px; margin: 0 auto; padding: 20px; }\n        .header { background: #7c3aed; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }\n        .content { background: #f8fafc; padding: 30px; border-radius: 0 0 8px 8px; }\n        .welcome-box { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #7c3aed; }\n        .cta-button { display: inline-block; background: #7c3aed; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 20px 0; }\n        .footer { text-align: center; color: #666; font-size: 12px; margin-top: 30px; }\n    </style>\n</head>\n<body>\n    <div class=\"container\">\n        <div class=\"header\">\n            <h1>🎉 Welcome to Bell24H!</h1>\n            <p>Your Global Supplier Network</p>\n        </div>\n        \n        <div class=\"content\">\n            <h2>Hello {{ $json.company_name }}!</h2>\n            \n            <p>We're excited to welcome you to Bell24H, the premier platform connecting global suppliers with quality buyers.</p>\n            \n            <div class=\"welcome-box\">\n                <h3>🚀 What's Next?</h3>\n                <ul>\n                    <li><strong>Complete Your Profile:</strong> Add detailed company information and capabilities</li>\n                    <li><strong>Upload Product Catalog:</strong> Showcase your products and services</li>\n                    <li><strong>Set Your Preferences:</strong> Choose the types of opportunities you're interested in</li>\n                    <li><strong>Start Receiving RFQs:</strong> Get matched with relevant buyer requests</li>\n                </ul>\n            </div>\n            \n            <div style=\"text-align: center;\">\n                <a href=\"https://bell24h.com/supplier/dashboard\" class=\"cta-button\">\n                    Complete Your Profile\n                </a>\n            </div>\n            \n            <div style=\"background: #e0e7ff; padding: 15px; border-radius: 6px; margin: 20px 0;\">\n                <h4>💡 Pro Tips for Success:</h4>\n                <ul>\n                    <li>Keep your profile updated with latest capabilities</li>\n                    <li>Respond quickly to RFQ opportunities</li>\n                    <li>Provide detailed and competitive quotes</li>\n                    <li>Build your reputation with quality responses</li>\n                </ul>\n            </div>\n            \n            <p>If you have any questions, our support team is here to help!</p>\n            \n            <p>Best regards,<br>\n            <strong>Bell24H Team</strong><br>\n            <em>Connecting Global Suppliers with Quality Buyers</em></p>\n        </div>\n        \n        <div class=\"footer\">\n            <p>This email was sent to {{ $json.contact_email }}.</p>\n            <p>© 2024 Bell24H. All rights reserved.</p>\n        </div>\n    </div>\n</body>\n</html>",
+        "options": {}
+      },
+      "id": "welcome-email",
+      "name": "Send Welcome Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [1120, 400]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"status\": \"success\", \"message\": \"Lead scored and saved successfully\", \"lead_id\": $json.lead_id, \"total_score\": $json.total_score, \"priority\": $json.priority, \"next_follow_up\": $json.next_follow_up, \"timestamp\": $json.timestamp } }}"
+      },
+      "id": "success-response",
+      "name": "Success Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1340, 300]
+    }
+  ],
+  "connections": {
+    "Lead Scoring Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Lead Scoring",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Lead Scoring": {
+      "main": [
+        [
+          {
+            "node": "Save Lead to Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Lead to Database": {
+      "main": [
+        [
+          {
+            "node": "Route by Priority",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Priority": {
+      "main": [
+        [
+          {
+            "node": "High Priority Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Welcome Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "High Priority Alert": {
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Welcome Email": {
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "id": "lead-scoring-with-db",
+  "tags": [
+    {
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "id": "bell24h",
+      "name": "bell24h"
+    },
+    {
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "id": "ai",
+      "name": "ai"
+    },
+    {
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "id": "scoring",
+      "name": "scoring"
+    },
+    {
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "id": "database",
+      "name": "database"
+    }
+  ]
+}

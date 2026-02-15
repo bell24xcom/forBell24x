@@ -1,0 +1,30 @@
+{
+  "allowList": [
+    "C:/Users/Sanika/Downloads/Bell24HDashboard",
+    "C:\\Users\\Sanika\\Downloads\\Bell24HDashboard\\Bell24HDashboard"
+  ],
+  "fastMode": true,
+  "securityLevel": "moderate",
+  "maxTimeout": 3600,
+  "allowedCommands": [
+    "npm run",
+    "npx artillery",
+    "node scripts/",
+    "npm test",
+    "npx artillery run ./scripts/artillery.config.yml",
+    "node ./scripts/windsurf-metrics-analyzer.js",
+    "node ./scripts/websocket-load-tester.js",
+    "node ./deploy/neon-postgres-template.js",
+    "node ./deploy/vercel-template.js"
+  ],
+  "environmentVariables": {
+    "NODE_ENV": "production",
+    "BELL24H_AUTO_EXEC": "true"
+  },
+  "notificationSettings": {
+    "enabled": true,
+    "notifyOnCompletion": true,
+    "notifyOnError": true,
+    "detailedOutput": true
+  }
+}

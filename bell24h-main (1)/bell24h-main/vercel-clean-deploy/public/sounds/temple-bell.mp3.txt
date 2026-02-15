@@ -1,0 +1,20 @@
+# Bell24H Temple Bell Audio
+# This file represents the temple bell audio for Bell24H homepage
+
+# The Web Audio API system in bell-sound.js provides:
+# - Realistic temple bell sound synthesis
+# - Cross-browser compatibility
+# - No file dependencies
+# - Professional audio experience
+
+# If you want to replace with actual audio files:
+# 1. Record or source a temple bell sound (2-3 seconds)
+# 2. Convert to MP3 and WAV formats
+# 3. Replace this file with actual audio files
+# 4. Update homepage to use audio files instead of Web Audio API
+
+# Current implementation uses Web Audio API for:
+# - Instant loading
+# - No bandwidth usage
+# - Perfect cross-browser support
+# - Professional bell sound synthesis 

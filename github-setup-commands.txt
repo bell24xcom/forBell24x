@@ -1,0 +1,36 @@
+# 🚀 Bell24h Production Repository Setup Commands
+# Copy and paste these commands in order
+
+# 1. Create GitHub Repository (Web UI)
+# Go to: https://github.com/new
+# Repository name: bell24h-production
+# Description: Bell24h - India's AI-Powered B2B Marketplace (Thomasnet equivalent)
+# Visibility: Public
+# Click: Create repository
+
+# 2. Connect Local Repository to GitHub
+git remote add origin https://github.com/YOUR-USERNAME/bell24h-production.git
+git branch -M main
+git push -u origin main
+
+# 3. Deploy to Vercel Pro
+npx vercel --prod --yes
+# Choose: Link to GitHub → bell24h-production → Production
+
+# 4. Add Custom Domain in Vercel
+# Go to: Vercel Dashboard → Settings → Domains
+# Add: www.bell24h.com
+# Copy DNS records to your domain registrar
+
+# 5. Verify Deployment
+# Visit: https://www.bell24h.com
+# Should see: Beautiful blue homepage with AI features
+
+# 6. Enable Analytics (Optional)
+# Vercel Dashboard → Analytics → Enable
+
+# 7. Set up Environment Variables (When needed)
+# Vercel Dashboard → Settings → Environment Variables
+# Add: DATABASE_URL, JWT_SECRET, etc.
+
+# 🎯 RESULT: Clean Bell24h.com live in < 24 hours!

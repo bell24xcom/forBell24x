@@ -1,0 +1,107 @@
+name: Bell24h CI/CD - Build, Test & Deploy
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    name: Build & Playwright Tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: |
+          cd client
+          npm ci
+
+      - name: Install Playwright browsers
+        run: |
+          cd client
+          npx playwright install --with-deps
+
+      - name: Build (Next.js)
+        run: |
+          cd client
+          npm run build
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+          NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
+
+      - name: Run Playwright tests
+        run: |
+          cd client
+          npm run test:e2e
+        env:
+          BASE_URL: https://bell24h-v1.vercel.app
+          TEST_PHONE_NUMBER: ${{ secrets.TEST_PHONE_NUMBER }}
+          TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
+          OTP_TEST_MODE: ${{ secrets.OTP_TEST_MODE }}
+          OTP_API_URL: ${{ secrets.OTP_API_URL }}
+          OTP_API_KEY: ${{ secrets.OTP_API_KEY }}
+
+  deploy:
+    name: Deploy to Vercel (only if tests pass)
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: ${{ needs.build-and-test.result == 'success' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel
+
+      - name: Deploy to Vercel (production)
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+        run: |
+          cd client
+          npx vercel --prod --confirm --token "$VERCEL_TOKEN" --project "$VERCEL_PROJECT_ID"
+
+      - name: Wait for deployment to propagate
+        run: sleep 15
+
+      - name: Post-deploy smoke check
+        run: |
+          echo "Checking https://www.bell24h.com ..."
+          http_status=$(curl -s -o /dev/null -w "%{http_code}" https://www.bell24h.com)
+          if [[ "$http_status" != "200" ]]; then
+            echo "❌ Site returned HTTP $http_status"
+            exit 1
+          fi
+          echo "✅ Site returned 200 OK"
+
+      - name: Optional - Purge Cloudflare cache
+        if: ${{ secrets.CF_API_TOKEN && secrets.CF_ZONE_ID }}
+        env:
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CF_ZONE_ID: ${{ secrets.CF_ZONE_ID }}
+        run: |
+          echo "Purging Cloudflare cache..."
+          curl -s -X POST "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/purge_cache" \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            --data '{"purge_everything":true}' | jq .

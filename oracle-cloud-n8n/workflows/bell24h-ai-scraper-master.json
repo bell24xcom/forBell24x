@@ -1,0 +1,166 @@
+{
+  "name": "Bell24H AI-Powered Scraper Master",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 1
+            }
+          ]
+        }
+      },
+      "id": "hourly-trigger",
+      "name": "Hourly Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT c.*, \n       COUNT(s.id) as current_suppliers,\n       COALESCE(MAX(s.last_scraped_at), '2020-01-01'::timestamp) as last_scraped\nFROM categories c\nLEFT JOIN suppliers s ON s.primary_category_id = c.id\nWHERE c.is_active = true\nGROUP BY c.id\nORDER BY last_scraped ASC, current_suppliers ASC\nLIMIT 10;",
+        "options": {}
+      },
+      "id": "get-categories",
+      "name": "Get Categories to Scrape",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [460, 300],
+      "credentials": {
+        "postgres": {
+          "id": "1",
+          "name": "Bell24H DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery", 
+        "query": "SELECT * FROM sources WHERE is_active = true AND type IN ('govt', 'b2b', 'directory', 'maps');",
+        "options": {}
+      },
+      "id": "get-sources",
+      "name": "Get Active Sources",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [460, 450],
+      "credentials": {
+        "postgres": {
+          "id": "1",
+          "name": "Bell24H DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Combine categories with sources for batch processing\nconst categories = $input.all()[0].json;\nconst sources = $input.all()[1].json;\n\nconst batches = [];\n\n// Create scraping batches\nfor (const category of categories) {\n  for (const source of sources) {\n    // Skip incompatible source-category pairs\n    if (source.type === 'maps' && !category.has_location_data) continue;\n    \n    batches.push({\n      category_id: category.id,\n      category_name: category.name,\n      category_slug: category.slug,\n      source_id: source.id,\n      source_name: source.name,\n      source_type: source.type,\n      source_url: source.base_url,\n      batch_id: `${category.id}-${source.id}-${Date.now()}`,\n      timestamp: new Date().toISOString()\n    });\n  }\n}\n\n// Log scraping start\nconst logEntry = {\n  started_at: new Date().toISOString(),\n  total_batches: batches.length,\n  categories_count: categories.length,\n  sources_count: sources.length\n};\n\nreturn batches;"
+      },
+      "id": "create-batches",
+      "name": "Create Scraping Batches",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 375]
+    },
+    {
+      "parameters": {
+        "workflowId": "={{ $parameter[\"workflowId\"] }}",
+        "workflowData": "={{ $json }}"
+      },
+      "id": "execute-workers",
+      "name": "Execute Category Workers",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [900, 375],
+      "settings": {
+        "workflowId": "category-scraper-ai-worker"
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO scraping_logs (started_at, status, total_batches, n8n_execution_id)\nVALUES (NOW(), 'started', {{ $json.total_batches }}, '{{ $execution.id }}')\nRETURNING id;",
+        "options": {}
+      },
+      "id": "log-start",
+      "name": "Log Scraping Start",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [900, 500],
+      "credentials": {
+        "postgres": {
+          "id": "1",
+          "name": "Bell24H DB"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Hourly Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Categories to Scrape",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Active Sources",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Categories to Scrape": {
+      "main": [
+        [
+          {
+            "node": "Create Scraping Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Active Sources": {
+      "main": [
+        [
+          {
+            "node": "Create Scraping Batches",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Create Scraping Batches": {
+      "main": [
+        [
+          {
+            "node": "Execute Category Workers",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Log Scraping Start",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ai-v1",
+  "meta": {
+    "instanceId": "bell24h-n8n"
+  },
+  "id": "ai-scraper-master",
+  "tags": ["bell24h", "scraping", "ai", "master"]
+}

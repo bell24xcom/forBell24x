@@ -1,0 +1,266 @@
+{
+  "name": "Bell24H AI Scraper Master with Database",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 * * * *"
+            }
+          ]
+        }
+      },
+      "id": "hourly-trigger",
+      "name": "Hourly Trigger",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT c.id, c.name, c.slug, c.priority, c.is_active,\n       s.id as source_id, s.name as source_name, s.url, s.rate_limit_per_minute\nFROM categories c\nCROSS JOIN sources s\nWHERE c.is_active = true\n  AND s.is_active = true\n  AND c.priority >= 5\nORDER BY c.priority DESC, c.name ASC\nLIMIT 20;",
+        "options": {}
+      },
+      "id": "query-categories",
+      "name": "Query Categories & Sources",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Schedule scraping tasks with database integration\nconst dbResults = $input.first().json;\nconst currentTime = new Date();\n\n// Group by category for efficient processing\nconst categoryGroups = {};\ndbResults.forEach(row => {\n  const categoryKey = `${row.slug}_${row.id}`;\n  if (!categoryGroups[categoryKey]) {\n    categoryGroups[categoryKey] = {\n      category_id: row.id,\n      category_name: row.name,\n      category_slug: row.slug,\n      priority: row.priority,\n      sources: []\n    };\n  }\n  \n  categoryGroups[categoryKey].sources.push({\n    id: row.source_id,\n    name: row.source_name,\n    url: row.url,\n    rate_limit: row.rate_limit_per_minute\n  });\n});\n\n// Create scraping tasks\nconst tasks = Object.values(categoryGroups).map(category => {\n  const taskId = `task_${category.category_slug}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;\n  \n  return {\n    task_id: taskId,\n    category_id: category.category_id,\n    category_name: category.category_name,\n    category_slug: category.category_slug,\n    priority: category.priority,\n    sources: category.sources,\n    batch_size: Math.min(50, category.sources.length * 10),\n    max_pages: 5,\n    status: 'pending',\n    created_at: currentTime.toISOString(),\n    estimated_duration: category.sources.length * 2, // 2 minutes per source\n    worker_endpoint: 'http://localhost:5678/webhook/ai-category-worker-complete'\n  };\n});\n\n// Log task creation\nconsole.log(`Created ${tasks.length} scraping tasks for ${Object.keys(categoryGroups).length} categories`);\n\n// Prepare batch insert for database\nconst batchInsertData = tasks.map(task => ({\n  task_id: task.task_id,\n  category_id: task.category_id,\n  status: task.status,\n  batch_size: task.batch_size,\n  max_pages: task.max_pages,\n  created_at: task.created_at,\n  estimated_duration: task.estimated_duration\n}));\n\nreturn [{\n  json: {\n    tasks: tasks,\n    total_tasks: tasks.length,\n    categories_processed: Object.keys(categoryGroups).length,\n    batch_insert_data: batchInsertData,\n    timestamp: currentTime.toISOString()\n  }\n}];"
+      },
+      "id": "schedule-tasks",
+      "name": "Schedule Scraping Tasks",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "schema": "public",
+        "table": "scraping_batches",
+        "columns": "task_id, category_id, status, batch_size, max_pages, created_at, estimated_duration",
+        "values": "={{ $json.batch_insert_data.map(item => `('${item.task_id}', ${item.category_id}, '${item.status}', ${item.batch_size}, ${item.max_pages}, '${item.created_at}', ${item.estimated_duration})`).join(',') }}",
+        "options": {}
+      },
+      "id": "save-batches",
+      "name": "Save Batches to Database",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Dispatch tasks to AI workers\nconst taskData = $input.first().json;\nconst tasks = taskData.tasks;\n\n// Process tasks in parallel (simulate worker dispatch)\nconst dispatchPromises = tasks.map(async (task, index) => {\n  try {\n    // Simulate API call to worker\n    const workerPayload = {\n      task_id: task.task_id,\n      category: task.category_slug,\n      sources: task.sources.map(s => s.name),\n      batch_size: task.batch_size,\n      max_pages: task.max_pages,\n      priority: task.priority\n    };\n    \n    // Simulate processing delay\n    await new Promise(resolve => setTimeout(resolve, 1000 + (index * 500)));\n    \n    // Mock successful response\n    return {\n      task_id: task.task_id,\n      status: 'dispatched',\n      dispatched_at: new Date().toISOString(),\n      worker_response: 'accepted',\n      estimated_completion: new Date(Date.now() + task.estimated_duration * 60000).toISOString()\n    };\n  } catch (error) {\n    return {\n      task_id: task.task_id,\n      status: 'failed',\n      error: error.message,\n      dispatched_at: new Date().toISOString()\n    };\n  }\n});\n\n// Wait for all dispatches to complete\nconst dispatchResults = await Promise.all(dispatchPromises);\n\n// Calculate statistics\nconst successful = dispatchResults.filter(r => r.status === 'dispatched').length;\nconst failed = dispatchResults.filter(r => r.status === 'failed').length;\n\nconsole.log(`Dispatched ${successful} tasks successfully, ${failed} failed`);\n\nreturn [{\n  json: {\n    dispatch_results: dispatchResults,\n    total_dispatched: successful,\n    total_failed: failed,\n    success_rate: (successful / tasks.length) * 100,\n    dispatch_timestamp: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "dispatch-workers",
+      "name": "Dispatch to AI Workers",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": "public",
+        "table": "scraping_batches",
+        "updateKey": "task_id",
+        "columns": "status, dispatched_at, worker_response",
+        "values": "={{ $json.dispatch_results.map(r => `WHEN '${r.task_id}' THEN ('${r.status}', '${r.dispatched_at}', '${r.worker_response || 'error'}')`).join(' ') }}, status = CASE task_id {{ $json.dispatch_results.map(r => `WHEN '${r.task_id}' THEN '${r.status}'`).join(' ') }} END",
+        "where": "task_id IN ({{ $json.dispatch_results.map(r => `'${r.task_id}'`).join(',') }})",
+        "options": {}
+      },
+      "id": "update-batch-status",
+      "name": "Update Batch Status",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [1340, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "error-check",
+              "leftValue": "={{ $json.total_failed }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "check-errors",
+      "name": "Check for Errors",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1560, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "alerts@bell24h.com",
+        "toEmail": "admin@bell24h.com",
+        "subject": "🚨 Scraping Errors Detected - {{ $json.total_failed }} Failed Tasks",
+        "emailType": "html",
+        "message": "<!DOCTYPE html>\n<html>\n<head>\n    <meta charset=\"utf-8\">\n    <title>Scraping Error Alert</title>\n    <style>\n        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }\n        .container { max-width: 600px; margin: 0 auto; padding: 20px; }\n        .header { background: #ef4444; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }\n        .content { background: #fef2f2; padding: 30px; border-radius: 0 0 8px 8px; }\n        .error-details { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ef4444; }\n        .footer { text-align: center; color: #666; font-size: 12px; margin-top: 30px; }\n    </style>\n</head>\n<body>\n    <div class=\"container\">\n        <div class=\"header\">\n            <h1>🚨 Scraping Errors Detected</h1>\n            <p>Immediate Attention Required</p>\n        </div>\n        \n        <div class=\"content\">\n            <h2>Error Summary</h2>\n            \n            <div class=\"error-details\">\n                <h3>Failed Tasks: {{ $json.total_failed }}</h3>\n                <p><strong>Success Rate:</strong> {{ Math.round($json.success_rate) }}%</p>\n                <p><strong>Total Dispatched:</strong> {{ $json.total_dispatched + $json.total_failed }}</p>\n                <p><strong>Timestamp:</strong> {{ $json.dispatch_timestamp }}</p>\n            </div>\n            \n            <h3>Failed Task Details:</h3>\n            <ul>\n                {{ $json.dispatch_results.filter(r => r.status === 'failed').map(r => `<li><strong>${r.task_id}:</strong> ${r.error || 'Unknown error'}</li>`).join('') }}\n            </ul>\n            \n            <div style=\"background: #fef3c7; padding: 15px; border-radius: 6px; margin: 20px 0;\">\n                <h4>🔧 Recommended Actions:</h4>\n                <ul>\n                    <li>Check worker service status</li>\n                    <li>Verify API endpoints are accessible</li>\n                    <li>Review error logs for specific issues</li>\n                    <li>Consider retrying failed tasks</li>\n                </ul>\n            </div>\n        </div>\n        \n        <div class=\"footer\">\n            <p>This is an automated alert from Bell24H Scraping System.</p>\n            <p>© 2024 Bell24H. All rights reserved.</p>\n        </div>\n    </div>\n</body>\n</html>",
+        "options": {}
+      },
+      "id": "error-alert",
+      "name": "Send Error Alert",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [1780, 200]
+    },
+    {
+      "parameters": {
+        "fromEmail": "reports@bell24h.com",
+        "toEmail": "admin@bell24h.com",
+        "subject": "✅ Scraping Success Report - {{ $json.total_dispatched }} Tasks Completed",
+        "emailType": "html",
+        "message": "<!DOCTYPE html>\n<html>\n<head>\n    <meta charset=\"utf-8\">\n    <title>Scraping Success Report</title>\n    <style>\n        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }\n        .container { max-width: 600px; margin: 0 auto; padding: 20px; }\n        .header { background: #10b981; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }\n        .content { background: #f0fdf4; padding: 30px; border-radius: 0 0 8px 8px; }\n        .success-details { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #10b981; }\n        .footer { text-align: center; color: #666; font-size: 12px; margin-top: 30px; }\n    </style>\n</head>\n<body>\n    <div class=\"container\">\n        <div class=\"header\">\n            <h1>✅ Scraping Success Report</h1>\n            <p>All Tasks Completed Successfully</p>\n        </div>\n        \n        <div class=\"content\">\n            <h2>Success Summary</h2>\n            \n            <div class=\"success-details\">\n                <h3>Completed Tasks: {{ $json.total_dispatched }}</h3>\n                <p><strong>Success Rate:</strong> {{ Math.round($json.success_rate) }}%</p>\n                <p><strong>Failed Tasks:</strong> {{ $json.total_failed }}</p>\n                <p><strong>Timestamp:</strong> {{ $json.dispatch_timestamp }}</p>\n            </div>\n            \n            <div style=\"background: #e0e7ff; padding: 15px; border-radius: 6px; margin: 20px 0;\">\n                <h4>📊 Performance Metrics:</h4>\n                <ul>\n                    <li>All scraping tasks dispatched successfully</li>\n                    <li>Workers are processing data as expected</li>\n                    <li>No critical errors detected</li>\n                    <li>System is running optimally</li>\n                </ul>\n            </div>\n            \n            <p>Great job! The scraping system is performing well.</p>\n        </div>\n        \n        <div class=\"footer\">\n            <p>This is an automated report from Bell24H Scraping System.</p>\n            <p>© 2024 Bell24H. All rights reserved.</p>\n        </div>\n    </div>\n</body>\n</html>",
+        "options": {}
+      },
+      "id": "success-report",
+      "name": "Send Success Report",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [1780, 400]
+    }
+  ],
+  "connections": {
+    "Hourly Trigger": {
+      "main": [
+        [
+          {
+            "node": "Query Categories & Sources",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Query Categories & Sources": {
+      "main": [
+        [
+          {
+            "node": "Schedule Scraping Tasks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Scraping Tasks": {
+      "main": [
+        [
+          {
+            "node": "Save Batches to Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Batches to Database": {
+      "main": [
+        [
+          {
+            "node": "Dispatch to AI Workers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dispatch to AI Workers": {
+      "main": [
+        [
+          {
+            "node": "Update Batch Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Batch Status": {
+      "main": [
+        [
+          {
+            "node": "Check for Errors",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check for Errors": {
+      "main": [
+        [
+          {
+            "node": "Send Error Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Success Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "id": "ai-scraper-master-with-db",
+  "tags": [
+    {
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "id": "bell24h",
+      "name": "bell24h"
+    },
+    {
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "id": "scraper",
+      "name": "scraper"
+    },
+    {
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "id": "master",
+      "name": "master"
+    },
+    {
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "id": "database",
+      "name": "database"
+    }
+  ]
+}

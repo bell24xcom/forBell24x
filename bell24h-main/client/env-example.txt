@@ -1,0 +1,8 @@
+DATABASE_URL=postgresql://postgres:lTbKChgEtrkiElIkFNhXuXzxbyqECLPC@shortline.proxy.rlwy.net:45776/railway
+NEXTAUTH_SECRET=REPLACE_WITH_YOUR_32_CHAR_SECRET
+NEXTAUTH_URL=https://bell24h-v1-5wbx5dr5n-vishaals-projects-892b178d.vercel.app
+STRIPE_SECRET_KEY=sk_test_your_test_key
+STRIPE_PUBLISHABLE_KEY=pk_test_your_test_key
+GOOGLE_CLIENT_ID=your_google_oauth_client_id
+GOOGLE_CLIENT_SECRET=your_google_oauth_secret
+# Add any other service keys (SendGrid, AWS S3, etc.) 

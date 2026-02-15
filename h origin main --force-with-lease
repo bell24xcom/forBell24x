@@ -1,0 +1,4 @@
+* [32mmain                         [m f69e14051 Add beautiful blue homepage with complete features and navigation
+  master                       [m c305b3011 Initial migration from Bell24hDashboard
+  railway-final-backup-20250905[m 430aa6701 Strategic Redesign: Implement trust-focused hero section with Thomasnet-inspired search interface - New headline: 'Verified Business Deals. Powered by AI. Trusted by SMEs & Exporters' - Added SearchInterface component with supplier discovery - Created Claim Your Company Free funnel page - Reorganized badges to focus on trust: Supplier Risk Verified, Escrow Secured, Export-Ready, AI-Powered Matching - Differentiated from IndiaMART/Udaan with verification-first approach
+  replit-agent                 [m 27434ac41 Automate build, testing, and deployment workflows for the application

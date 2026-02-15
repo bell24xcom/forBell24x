@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bell24h SSE Tester</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .events {
+            flex: 1;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 20px;
+            background-color: #f9f9f9;
+        }
+        .event {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #fff;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .event.connection {
+            background-color: #e6f7ff;
+        }
+        .event.notification {
+            background-color: #fff1f0;
+        }
+        .event.heartbeat {
+            background-color: #f6ffed;
+            opacity: 0.7;
+        }
+        .event h3 {
+            margin-top: 0;
+            margin-bottom: 5px;
+        }
+        .event p {
+            margin: 0;
+        }
+        .event .timestamp {
+            font-size: 0.8em;
+            color: #999;
+            margin-top: 5px;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        button {
+            padding: 8px 16px;
+            border: none;
+            background-color: #1890ff;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #40a9ff;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .status {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .connected {
+            background-color: #f6ffed;
+            color: #52c41a;
+        }
+        .disconnected {
+            background-color: #fff2f0;
+            color: #ff4d4f;
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 6px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-left: 5px;
+            background-color: #1890ff;
+            color: white;
+        }
+        .timestamp-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8em;
+            color: #999;
+            margin-bottom: 10px;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bell24h SSE Tester</h1>
+        <div id="status" class="status disconnected">Disconnected</div>
+        
+        <div class="controls">
+            <button id="connectBtn">Connect</button>
+            <button id="disconnectBtn" disabled>Disconnect</button>
+            <button id="createNotificationBtn" disabled>Create Test Notification</button>
+            <button id="clearBtn">Clear Events</button>
+        </div>
+        
+        <div class="timestamp-bar">
+            <div>Last Event: <span id="lastEventTime">Never</span></div>
+            <div>Events Received: <span id="eventCount">0</span></div>
+        </div>
+        
+        <h2>Server-Sent Events</h2>
+        <div id="events" class="events"></div>
+    </div>
+
+    <script>
+        // State
+        let eventSource = null;
+        let eventCount = 0;
+        let isConnected = false;
+        let reconnectTimeout = null;
+        const maxReconnectDelay = 10000; // 10 seconds
+        let reconnectDelay = 1000; // Start with 1 second
+        
+        // DOM Elements
+        const statusEl = document.getElementById('status');
+        const eventsEl = document.getElementById('events');
+        const connectBtn = document.getElementById('connectBtn');
+        const disconnectBtn = document.getElementById('disconnectBtn');
+        const createNotificationBtn = document.getElementById('createNotificationBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const lastEventTimeEl = document.getElementById('lastEventTime');
+        const eventCountEl = document.getElementById('eventCount');
+        
+        // Connect to SSE
+        function connect() {
+            // Get the host from the current location
+            const protocol = window.location.protocol;
+            const host = window.location.hostname;
+            const port = 5004; // Default SSE port
+            
+            const url = `${protocol}//${host}:${port}/events`;
+            
+            try {
+                eventSource = new EventSource(url);
+                
+                // Handle connection established
+                eventSource.onopen = () => {
+                    console.log('SSE connection established');
+                    updateStatus('Connected', true);
+                };
+                
+                // Handle connection error
+                eventSource.onerror = (error) => {
+                    console.error('SSE connection error:', error);
+                    
+                    // Close the connection if it's still open
+                    if (eventSource) {
+                        eventSource.close();
+                        eventSource = null;
+                    }
+                    
+                    updateStatus('Disconnected (Error)', false);
+                    
+                    // Try to reconnect after a delay
+                    if (!reconnectTimeout) {
+                        reconnectTimeout = setTimeout(() => {
+                            reconnectTimeout = null;
+                            reconnectDelay = Math.min(reconnectDelay * 1.5, maxReconnectDelay);
+                            console.log(`Attempting to reconnect in ${reconnectDelay / 1000} seconds...`);
+                            connect();
+                        }, reconnectDelay);
+                    }
+                };
+                
+                // Handle message
+                eventSource.onmessage = (event) => {
+                    try {
+                        const data = JSON.parse(event.data);
+                        console.log('SSE message:', data);
+                        addEvent({ ...data, event: 'message' });
+                    } catch (error) {
+                        console.error('Error parsing SSE message:', error);
+                        addEvent({ 
+                            type: 'error',
+                            message: `Failed to parse message: ${event.data}`,
+                            timestamp: new Date().toISOString(),
+                            event: 'error'
+                        });
+                    }
+                };
+                
+                // Handle connection event
+                eventSource.addEventListener('connection', (event) => {
+                    try {
+                        const data = JSON.parse(event.data);
+                        console.log('SSE connection event:', data);
+                        addEvent({ ...data, event: 'connection' });
+                        updateStatus('Connected', true);
+                        
+                        // Reset reconnect delay on successful connection
+                        reconnectDelay = 1000;
+                    } catch (error) {
+                        console.error('Error parsing connection event:', error);
+                    }
+                });
+                
+                // Handle notification event
+                eventSource.addEventListener('notification', (event) => {
+                    try {
+                        const data = JSON.parse(event.data);
+                        console.log('SSE notification event:', data);
+                        addEvent({ ...data, event: 'notification' });
+                    } catch (error) {
+                        console.error('Error parsing notification event:', error);
+                    }
+                });
+                
+                // Handle heartbeat event
+                eventSource.addEventListener('heartbeat', (event) => {
+                    try {
+                        const data = JSON.parse(event.data);
+                        console.log('SSE heartbeat event:', data);
+                        addEvent({ ...data, event: 'heartbeat' });
+                    } catch (error) {
+                        console.error('Error parsing heartbeat event:', error);
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Error creating EventSource:', error);
+                updateStatus('Connection Failed', false);
+            }
+        }
+        
+        // Disconnect from SSE
+        function disconnect() {
+            if (eventSource) {
+                eventSource.close();
+                eventSource = null;
+            }
+            
+            if (reconnectTimeout) {
+                clearTimeout(reconnectTimeout);
+                reconnectTimeout = null;
+            }
+            
+            updateStatus('Disconnected', false);
+        }
+        
+        // Update connection status
+        function updateStatus(message, connected) {
+            statusEl.textContent = message;
+            statusEl.className = `status ${connected ? 'connected' : 'disconnected'}`;
+            
+            isConnected = connected;
+            
+            connectBtn.disabled = connected;
+            disconnectBtn.disabled = !connected;
+            createNotificationBtn.disabled = !connected;
+        }
+        
+        // Add an event to the console
+        function addEvent(data) {
+            const eventEl = document.createElement('div');
+            eventEl.className = `event ${data.event || data.type || 'unknown'}`;
+            
+            // Format the event
+            let title = '';
+            if (data.event === 'notification' || data.type === 'notification') {
+                title = data.title || 'Notification';
+            } else if (data.event === 'connection' || data.type === 'connection') {
+                title = 'Connection Established';
+            } else if (data.event === 'heartbeat' || data.type === 'heartbeat') {
+                title = 'Heartbeat';
+            } else if (data.event === 'error' || data.type === 'error') {
+                title = 'Error';
+            } else {
+                title = data.event || data.type || 'Unknown';
+            }
+            
+            // Create content
+            const content = document.createElement('div');
+            
+            // Create title
+            const titleEl = document.createElement('h3');
+            titleEl.textContent = title;
+            content.appendChild(titleEl);
+            
+            // Create message
+            if (data.message) {
+                const messageEl = document.createElement('p');
+                messageEl.textContent = data.message;
+                content.appendChild(messageEl);
+            }
+            
+            // Create data display (excluding common fields)
+            const displayData = { ...data };
+            delete displayData.type;
+            delete displayData.title;
+            delete displayData.message;
+            delete displayData.timestamp;
+            delete displayData.event;
+            
+            if (Object.keys(displayData).length > 0) {
+                const preEl = document.createElement('pre');
+                preEl.textContent = JSON.stringify(displayData, null, 2);
+                content.appendChild(preEl);
+            }
+            
+            // Create timestamp
+            const timestampEl = document.createElement('div');
+            timestampEl.className = 'timestamp';
+            timestampEl.textContent = formatTimestamp(data.timestamp);
+            content.appendChild(timestampEl);
+            
+            // Add everything to the event element
+            eventEl.appendChild(content);
+            
+            // Update the last event time
+            lastEventTimeEl.textContent = formatTimestamp(data.timestamp);
+            
+            // Update event count
+            if (data.event !== 'heartbeat' && data.type !== 'heartbeat') {
+                eventCount++;
+                eventCountEl.textContent = eventCount;
+            }
+            
+            // Add to the events container
+            eventsEl.prepend(eventEl);
+        }
+        
+        // Format timestamp
+        function formatTimestamp(timestamp) {
+            if (!timestamp) return 'Unknown';
+            
+            try {
+                const date = new Date(timestamp);
+                return date.toLocaleTimeString();
+            } catch (error) {
+                return timestamp;
+            }
+        }
+        
+        // Create a test notification via API
+        async function createTestNotification() {
+            try {
+                const protocol = window.location.protocol;
+                const host = window.location.hostname;
+                const port = 5004; // Default SSE port
+                
+                const response = await fetch(`${protocol}//${host}:${port}/api/notification/create`);
+                const data = await response.json();
+                console.log('Created notification:', data);
+            } catch (error) {
+                console.error('Failed to create notification:', error);
+                addEvent({
+                    type: 'error',
+                    message: `Failed to create notification: ${error.message}`,
+                    timestamp: new Date().toISOString(),
+                    event: 'error'
+                });
+            }
+        }
+        
+        // Event listeners
+        connectBtn.addEventListener('click', connect);
+        disconnectBtn.addEventListener('click', disconnect);
+        createNotificationBtn.addEventListener('click', createTestNotification);
+        clearBtn.addEventListener('click', () => {
+            eventsEl.innerHTML = '';
+        });
+        
+        // Auto-connect if specified in URL
+        if (window.location.search.includes('autoconnect=true')) {
+            connect();
+        }
+    </script>
+</body>
+</html>

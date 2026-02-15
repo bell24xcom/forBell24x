@@ -1,0 +1,123 @@
+// Enhanced Category Schema for Bell24h
+// This adds proper category management to the existing schema
+
+// Category model for hierarchical category management
+model Category {
+  id            String   @id @default(cuid())
+  name          String
+  slug          String   @unique
+  description   String?
+  icon          String?
+  image         String?
+  
+  // Hierarchy
+  parentId      String?
+  parent        Category? @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  subcategories Category[] @relation("CategoryHierarchy")
+  
+  // Business metrics
+  supplierCount Int      @default(0)
+  productCount  Int      @default(0)
+  rfqCount      Int      @default(0)
+  
+  // Status
+  isActive      Boolean  @default(true)
+  isTrending    Boolean  @default(false)
+  sortOrder     Int      @default(0)
+  
+  // SEO
+  metaTitle     String?
+  metaDescription String?
+  keywords      String[]
+  
+  // Timestamps
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relations
+  companies     Company[]
+  products      Product[]
+  rfqs          RFQ[]
+  
+  @@map("categories")
+}
+
+// Subcategory model for detailed categorization
+model Subcategory {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String
+  description String?
+  icon        String?
+  
+  // Parent category
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  
+  // Business metrics
+  supplierCount Int    @default(0)
+  productCount  Int    @default(0)
+  rfqCount      Int    @default(0)
+  
+  // Status
+  isActive    Boolean @default(true)
+  sortOrder   Int     @default(0)
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  companies   Company[]
+  products    Product[]
+  rfqs        RFQ[]
+  
+  @@unique([categoryId, slug])
+  @@map("subcategories")
+}
+
+// Update existing models to reference categories
+// Company model updates
+model Company {
+  // ... existing fields ...
+  
+  // Update category references
+  categoryId    String?
+  category      Category? @relation(fields: [categoryId], references: [id])
+  subcategoryId String?
+  subcategory   Subcategory? @relation(fields: [subcategoryId], references: [id])
+  
+  // Keep legacy fields for migration
+  category    String?  // @deprecated - use categoryId
+  subcategory String?  // @deprecated - use subcategoryId
+}
+
+// Product model updates
+model Product {
+  // ... existing fields ...
+  
+  // Update category references
+  categoryId    String?
+  category      Category? @relation(fields: [categoryId], references: [id])
+  subcategoryId String?
+  subcategory   Subcategory? @relation(fields: [subcategoryId], references: [id])
+  
+  // Keep legacy fields for migration
+  category    String  // @deprecated - use categoryId
+  subcategory String? // @deprecated - use subcategoryId
+}
+
+// RFQ model updates
+model RFQ {
+  // ... existing fields ...
+  
+  // Update category references
+  categoryId    String?
+  category      Category? @relation(fields: [categoryId], references: [id])
+  subcategoryId String?
+  subcategory   Subcategory? @relation(fields: [subcategoryId], references: [id])
+  
+  // Keep legacy fields for migration
+  category    String  // @deprecated - use categoryId
+  subcategory String? // @deprecated - use subcategoryId
+}

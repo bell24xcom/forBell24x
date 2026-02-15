@@ -1,0 +1,53 @@
+User-agent: *
+Allow: /
+
+# Main Sitemaps
+Sitemap: https://bell24h.com/sitemap.xml
+Sitemap: https://bell24h.com/sitemap-main.xml
+Sitemap: https://bell24h.com/sitemap-categories.xml
+Sitemap: https://bell24h.com/sitemap-suppliers.xml
+
+# Country-specific Sitemaps
+Sitemap: https://bell24h.com/sitemap-in.xml
+Sitemap: https://bell24h.de/sitemap-de.xml
+Sitemap: https://bell24h.co.uk/sitemap-gb.xml
+Sitemap: https://bell24h.jp/sitemap-jp.xml
+Sitemap: https://bell24h.ae/sitemap-ae.xml
+Sitemap: https://bell24h.sg/sitemap-sg.xml
+Sitemap: https://bell24h.com.au/sitemap-au.xml
+Sitemap: https://bell24h.com.br/sitemap-br.xml
+
+# Crawl-delay for respectful crawling
+Crawl-delay: 1
+
+# Disallow admin and private areas
+Disallow: /admin/
+Disallow: /api/
+Disallow: /private/
+Disallow: /_next/
+Disallow: /tmp/
+Disallow: /cache/
+Disallow: /node_modules/
+
+# Allow important SEO pages
+Allow: /
+Allow: /categories/
+Allow: /suppliers/
+Allow: /search/
+Allow: /rfq/
+Allow: /about/
+Allow: /contact/
+Allow: /pricing/
+Allow: /help/
+
+# Global B2B Marketplace - Bell24H
+# Supporting 75+ countries with 534,281+ verified suppliers
+# Languages: 25+ including English, Hindi, German, Japanese, Arabic, Portuguese
+# Currencies: USD, EUR, INR, JPY, AED, GBP, AUD, CAD, BRL, SGD
+
+# Host (default for India)
+Host: bell24h.com
+
+# Contact for crawling issues
+# Email: seo@bell24h.com
+# Support: support@bell24h.com 

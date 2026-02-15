@@ -1,0 +1,45 @@
+🚀 QUICK NETLIFY DEPLOYMENT STEPS
+
+1. GO TO: https://app.netlify.com
+2. CLICK: "New site from Git"
+3. SELECT: GitHub → digitex-erp/bell24h
+4. SET BUILD: npm run build
+5. SET PUBLISH: .next
+6. ADD ENVIRONMENT VARIABLES:
+
+DATABASE_URL=postgresql://neondb_owner:npg_K6M8mRhTPpCH@ep-fragrant-smoke-ae00uwml-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+
+MSG91_AUTH_KEY=468517Ak5rJ0vb7NDV68c24863P1
+MSG91_SENDER_ID=BELL24H
+MSG91_TEMPLATE_ID=default
+
+JWT_SECRET=bell24h-jwt-secret-key-2024-production-minimum-32-characters
+NEXTAUTH_SECRET=bell24h-super-secret-key-2024-production
+ENCRYPTION_KEY=bell24h-encryption-key-32-chars-minimum
+
+NODE_ENV=production
+NEXT_PUBLIC_APP_URL=https://your-site-name.netlify.app
+
+ENABLE_ESCROW=false
+ENABLE_AI_FEATURES=false
+ENABLE_BLOCKCHAIN=false
+
+7. CLICK: Deploy site
+8. WAIT: For deployment to complete
+9. TEST: Visit your live URL
+10. START: Generating revenue! 💰
+
+🎯 EXPECTED RESULT:
+✅ Working B2B marketplace
+✅ Mobile OTP authentication
+✅ RFQ submission system
+✅ Admin dashboard
+✅ Revenue generation ready
+
+💰 REVENUE POTENTIAL:
+- RFQ Processing: ₹100-500 per RFQ
+- Lead Generation: ₹50-200 per lead
+- Contact Services: ₹1,000-2,000/month
+- Admin Dashboard: ₹5,000-10,000/month
+
+🚀 READY TO DEPLOY AND START EARNING!

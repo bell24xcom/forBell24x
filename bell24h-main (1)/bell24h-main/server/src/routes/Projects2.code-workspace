@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "../../../.."
+		},
+		{
+			"path": "D:/Vishal Transfer From Laptop/Bell24hDashboard/Bell24hDashboard"
+		}
+	],
+	"settings": {
+		"powershell.cwd": "Projects"
+	}
+}

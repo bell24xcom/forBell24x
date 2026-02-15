@@ -1,0 +1,40 @@
+{
+  "name": "User Onboarding",
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Webhook",
+      "type": "webhook",
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "operation": "sendEmail",
+        "to": "{{ $node[\"Webhook\"].data.email }}",
+        "subject": "Welcome to Bell24H.com!",
+        "body": "Hello {{ $node[\"Webhook\"].data.name }},\n\nWelcome to Bell24H.com! We're excited to have you onboard.\n\nTo get started, check out our supplier dashboard and start submitting RFQs today.\n\nBest,\nThe Bell24H Team"
+      },
+      "name": "Send Welcome Email",
+      "type": "email.smtp",
+      "position": [200, 0]
+    },
+    {
+      "parameters": {
+        "userId": "{{ $node[\"Webhook\"].data.userId }}",
+        "action": "user_registered",
+        "timestamp": "{{ now }}" 
+      },
+      "name": "Log Event",
+      "type": "internal.log",
+      "position": [400, 0]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [["Send Welcome Email", "main", 0, 0]]
+    },
+    "Send Welcome Email": {
+      "main": [["Log Event", "main", 0, 0]]
+    }
+  }
+}

@@ -1,0 +1,1002 @@
+// Complete Enhanced Schema for Bell24h N8N Autonomous Scraping & Marketing System
+// This is the complete schema including all scraping, claims, marketing, and benefits tracking
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model for authentication and user management
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  emailVerified DateTime?
+  name          String?
+  image         String?
+  password      String?   // For credentials provider
+  role          UserRole  @default(BUYER)
+  isActive      Boolean   @default(true)
+  isVerified    Boolean   @default(false)
+  lastLoginAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  // Relations
+  accounts      Account[]
+  sessions      Session[]
+  profile       UserProfile?
+  company       Company?  @relation(fields: [companyId], references: [id])
+  companyId     String?
+  
+  // Business relations
+  rfqs          RFQ[]
+  quotes        Quote[]
+  ordersAsBuyer    Order[] @relation("OrderBuyer")
+  ordersAsSupplier Order[] @relation("OrderSupplier")
+  payments      Payment[]
+  notifications Notification[]
+  auditLogs     AuditLog[]
+  
+  // New relations for scraping system
+  benefitsTracking BenefitsTracking[]
+  
+  @@map("users")
+}
+
+// NextAuth Account model
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+// NextAuth Session model
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+// NextAuth Verification Token model
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// User Profile model for extended user information
+model UserProfile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Personal information
+  firstName   String?
+  lastName    String?
+  phone       String?
+  avatar      String?
+  bio         String?
+  
+  // Business information
+  designation String?
+  department  String?
+  experience  Int?     // Years of experience
+  
+  // Address information
+  address     Json?    // Flexible address structure
+  city        String?
+  state       String?
+  country     String?
+  pincode     String?
+  
+  // Preferences
+  preferences Json?    // User preferences and settings
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("user_profiles")
+}
+
+// Company model for B2B marketplace
+model Company {
+  id            String   @id @default(cuid())
+  name          String
+  email         String?
+  phone         String?
+  website       String?
+  logo          String?
+  description   String?
+  
+  // Business details
+  category      String?
+  subcategory   String?
+  size          CompanySize @default(SMALL)
+  type          CompanyType @default(SUPPLIER)
+  establishedYear String?
+  employeeCount String?
+  annualTurnover String?
+  
+  // Address
+  address       String?
+  city          String?
+  state         String?
+  country       String   @default("India")
+  pincode       String?
+  
+  // Business registration
+  gstNumber     String?
+  cinNumber     String?
+  panNumber     String?
+  
+  // Status
+  isActive      Boolean  @default(true)
+  isVerified    Boolean  @default(false)
+  
+  // Early user benefits
+  earlyUserBenefits Json? // Early user benefits package
+  
+  // Relations
+  users         User[]
+  products      Product[]
+  rfqs          RFQ[]
+  
+  // Timestamps
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@map("companies")
+}
+
+// Scraped Company model for N8N scraping system
+model ScrapedCompany {
+  id            String   @id @default(cuid())
+  name          String
+  email         String?
+  phone         String?
+  website       String?
+  address       String?
+  city          String?
+  state         String?
+  category      String
+  subcategory   String?
+  
+  // Source information
+  source        ScrapingSource
+  sourceUrl     String
+  scrapedAt     DateTime @default(now())
+  
+  // Business details
+  description   String?
+  employeeCount String?
+  establishedYear String?
+  annualTurnover String?
+  gstNumber     String?
+  cinNumber     String?
+  
+  // Verification and scoring
+  isVerified    Boolean  @default(false)
+  trustScore    Int      @default(0)
+  status        ScrapingStatus @default(SCRAPED)
+  claimStatus   ClaimStatus @default(UNCLAIMED)
+  
+  // Claim information
+  claimedAt     DateTime?
+  claimId       String?  @unique
+  
+  // Timestamps
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relations
+  claim         CompanyClaim?
+  marketingResponses MarketingResponse[]
+  crmLead       CrmLead?
+  
+  @@map("scraped_companies")
+}
+
+// Company Claim model for claiming scraped companies
+model CompanyClaim {
+  id                String   @id @default(cuid())
+  scrapedCompanyId  String   @unique
+  scrapedCompany    ScrapedCompany @relation(fields: [scrapedCompanyId], references: [id])
+  
+  // Claimer information
+  claimedBy         String   // Email
+  claimedByName     String
+  claimedByPhone    String
+  claimedByRole     String
+  verificationMethod VerificationMethod
+  
+  // Verification
+  verificationCode  String?
+  isEmailVerified   Boolean  @default(false)
+  isPhoneVerified   Boolean  @default(false)
+  verifiedAt        DateTime?
+  
+  // Documents and info
+  companyDocuments  String[] // Array of document URLs
+  additionalInfo    String?
+  
+  // Status and benefits
+  status            ClaimStatus @default(PENDING)
+  benefits          Json       // Benefits package
+  
+  // Timestamps
+  claimedAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  marketingResponses MarketingResponse[]
+  
+  @@map("company_claims")
+}
+
+// Marketing Campaign model
+model MarketingCampaign {
+  id              String   @id @default(cuid())
+  campaignType    CampaignType
+  targetCompanies String[] // Array of company IDs
+  
+  // Campaign content
+  templateId      String
+  message         String
+  subject         String?
+  
+  // Scheduling
+  scheduledAt     DateTime
+  priority        CampaignPriority @default(MEDIUM)
+  
+  // Status and stats
+  status          CampaignStatus @default(SCHEDULED)
+  stats           Json       // Campaign statistics
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relations
+  responses       MarketingResponse[]
+  
+  @@map("marketing_campaigns")
+}
+
+// Marketing Response model for tracking campaign responses
+model MarketingResponse {
+  id            String   @id @default(cuid())
+  campaignId    String
+  campaign      MarketingCampaign @relation(fields: [campaignId], references: [id])
+  
+  companyId     String?
+  scrapedCompany ScrapedCompany? @relation(fields: [companyId], references: [id])
+  
+  claimId       String?
+  companyClaim  CompanyClaim? @relation(fields: [claimId], references: [id])
+  
+  // Response details
+  responseType  ResponseType
+  status        ResponseStatus
+  message       String?
+  metadata      Json?
+  
+  // Timestamps
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@map("marketing_responses")
+}
+
+// Benefits Tracking model for early user benefits
+model BenefitsTracking {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  
+  // Benefits details
+  benefitType   BenefitType
+  action        BenefitAction
+  value         Float    @default(0)
+  metadata      Json?
+  
+  // Timestamps
+  trackedAt     DateTime @default(now())
+  
+  @@map("benefits_tracking")
+}
+
+// N8N Integration model for connecting with existing workflows
+model N8NIntegration {
+  id              String   @id @default(cuid())
+  workflowType    WorkflowType
+  workflowId      String
+  workflowName    String
+  
+  // Integration configuration
+  config          Json     // Integration configuration
+  webhookUrl      String?  // Webhook URL for this integration
+  apiEndpoint     String?  // API endpoint for data exchange
+  
+  // Status and tracking
+  isActive        Boolean  @default(false)
+  lastConnected   DateTime?
+  lastSync        DateTime?
+  syncStatus      SyncStatus @default(PENDING)
+  
+  // Performance metrics
+  totalRuns       Int      @default(0)
+  successRuns     Int      @default(0)
+  failedRuns      Int      @default(0)
+  lastError       String?
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relations
+  executions      N8NIntegrationExecution[]
+  existingWorkflow ExistingWorkflow?
+  
+  @@unique([workflowType, workflowId])
+  @@map("n8n_integrations")
+}
+
+// N8N Integration Execution model for tracking integration runs
+model N8NIntegrationExecution {
+  id              String   @id @default(cuid())
+  integrationId   String
+  integration     N8NIntegration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+  
+  // Execution details
+  executionType   IntegrationExecutionType
+  status          ExecutionStatus
+  startedAt       DateTime
+  finishedAt      DateTime?
+  duration        Int?     // Duration in milliseconds
+  
+  // Data processed
+  inputData       Json?    // Input data sent to integration
+  outputData      Json?    // Output data received from integration
+  dataProcessed   Int      @default(0)
+  
+  // Results
+  successCount    Int      @default(0)
+  errorCount      Int      @default(0)
+  errorMessage    String?
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  
+  @@map("n8n_integration_executions")
+}
+
+// CRM Lead model for enhanced lead management
+model CrmLead {
+  id              String   @id @default(cuid())
+  
+  // Lead information
+  name            String
+  email           String?
+  phone           String?
+  company         String
+  title           String?
+  
+  // Business details
+  category        String?
+  subcategory     String?
+  industry        String?
+  companySize     String?
+  annualRevenue   String?
+  
+  // Lead scoring and status
+  score           Int      @default(0)
+  status          LeadStatus @default(NEW)
+  source          LeadSource @default(SCRAPING)
+  priority        LeadPriority @default(MEDIUM)
+  
+  // Integration with scraping
+  scrapedCompanyId String? @unique
+  scrapedCompany  ScrapedCompany? @relation(fields: [scrapedCompanyId], references: [id])
+  
+  // CRM workflow integration
+  workflowId      String?
+  workflowStatus  String?
+  lastActivity    DateTime?
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relations
+  activities      CrmLeadActivity[]
+  
+  @@map("crm_leads")
+}
+
+// CRM Lead Activity model for tracking lead interactions
+model CrmLeadActivity {
+  id              String   @id @default(cuid())
+  leadId          String
+  lead            CrmLead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  
+  // Activity details
+  activityType    LeadActivityType
+  subject         String?
+  description     String?
+  outcome         String?
+  
+  // Integration details
+  workflowId      String?
+  executionId     String?
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  
+  @@map("crm_lead_activities")
+}
+
+// Scraping Metrics model for tracking scraping performance
+model ScrapingMetrics {
+  id              String   @id @default(cuid())
+  
+  // Metrics data
+  date            DateTime
+  companiesScraped Int
+  categoriesProcessed Int
+  successRate     Float
+  averageTrustScore Float
+  errorCount      Int      @default(0)
+  
+  // Source breakdown
+  indiamartCount  Int      @default(0)
+  justdialCount   Int      @default(0)
+  tradeindiaCount Int      @default(0)
+  exportersindiaCount Int @default(0)
+  
+  // Performance metrics
+  averageResponseTime Float?
+  totalDataProcessed  BigInt  @default(0)
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  
+  @@unique([date])
+  @@map("scraping_metrics")
+}
+
+// Enhanced Workflow model for existing N8N workflows
+model ExistingWorkflow {
+  id              String   @id @default(cuid())
+  
+  // Workflow identification
+  n8nWorkflowId   String   @unique
+  name            String
+  description     String?
+  workflowType    WorkflowType
+  
+  // Workflow configuration
+  nodes           Int      @default(0)
+  connections     Int      @default(0)
+  isActive        Boolean  @default(true)
+  
+  // Integration status
+  isIntegrated    Boolean  @default(false)
+  integrationId   String?  @unique
+  integration     N8NIntegration? @relation(fields: [integrationId], references: [id])
+  
+  // Performance tracking
+  lastRun         DateTime?
+  totalRuns       Int      @default(0)
+  successRate     Float    @default(0)
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@map("existing_workflows")
+}
+
+// Automation Dashboard model for unified control
+model AutomationDashboard {
+  id              String   @id @default(cuid())
+  
+  // Dashboard configuration
+  name            String
+  description     String?
+  isActive        Boolean  @default(true)
+  
+  // Dashboard metrics
+  totalWorkflows  Int      @default(0)
+  activeWorkflows Int      @default(0)
+  totalRuns       Int      @default(0)
+  successRate     Float    @default(0)
+  
+  // Last 24 hours activity
+  last24Hours     Json     // Activity metrics for last 24 hours
+  
+  // Timestamps
+  lastUpdated     DateTime @default(now())
+  createdAt       DateTime @default(now())
+  
+  @@map("automation_dashboards")
+}
+
+// Product model for marketplace
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  category    String
+  subcategory String?
+  price       Decimal  @db.Decimal(10, 2)
+  currency    String   @default("INR")
+  
+  // Product details
+  specifications Json?  // Flexible specifications
+  images         String[] // Array of image URLs
+  tags           String[] // Array of tags
+  
+  // Inventory
+  stock          Int     @default(0)
+  minOrderQty    Int     @default(1)
+  maxOrderQty    Int?
+  
+  // Status
+  isActive       Boolean @default(true)
+  isFeatured     Boolean @default(false)
+  
+  // Relations
+  companyId      String
+  company        Company @relation(fields: [companyId], references: [id])
+  
+  // Timestamps
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  @@map("products")
+}
+
+// RFQ (Request for Quote) model
+model RFQ {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  category    String
+  subcategory String?
+  
+  // Requirements
+  quantity    Int
+  unit        String?
+  specifications Json?  // Flexible specifications
+  budget      Decimal?  @db.Decimal(10, 2)
+  currency    String    @default("INR")
+  
+  // Timeline
+  deadline    DateTime?
+  urgency     UrgencyLevel @default(MEDIUM)
+  
+  // Status
+  status      RFQStatus @default(OPEN)
+  
+  // Relations
+  buyerId     String
+  buyer       User     @relation(fields: [buyerId], references: [id])
+  companyId   String?
+  company     Company? @relation(fields: [companyId], references: [id])
+  
+  // Voice/Video RFQ
+  audioFile   String?  // Audio file URL
+  videoFile   String?  // Video file URL
+  transcript  String?  // AI-generated transcript
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  quotes      Quote[]
+  
+  @@map("rfqs")
+}
+
+// Quote model for supplier responses
+model Quote {
+  id          String   @id @default(cuid())
+  rfqId       String
+  rfq         RFQ      @relation(fields: [rfqId], references: [id])
+  supplierId  String
+  supplier    User     @relation(fields: [supplierId], references: [id])
+  
+  // Quote details
+  price       Decimal  @db.Decimal(10, 2)
+  currency    String   @default("INR")
+  quantity    Int
+  unit        String?
+  deliveryTime String?
+  validity    DateTime?
+  
+  // Additional information
+  specifications Json?  // Product specifications
+  terms         String? // Terms and conditions
+  notes         String? // Additional notes
+  
+  // Status
+  status      QuoteStatus @default(PENDING)
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("quotes")
+}
+
+// Order model
+model Order {
+  id          String   @id @default(cuid())
+  rfqId       String
+  quoteId     String
+  
+  // Order details
+  quantity    Int
+  price       Decimal  @db.Decimal(10, 2)
+  currency    String   @default("INR")
+  totalAmount Decimal  @db.Decimal(10, 2)
+  
+  // Parties
+  buyerId     String
+  buyer       User     @relation("OrderBuyer", fields: [buyerId], references: [id])
+  supplierId  String
+  supplier    User     @relation("OrderSupplier", fields: [supplierId], references: [id])
+  
+  // Status
+  status      OrderStatus @default(PENDING)
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  payments    Payment[]
+  
+  @@map("orders")
+}
+
+// Payment model for financial transactions
+model Payment {
+  id          String   @id @default(cuid())
+  amount      Decimal  @db.Decimal(10, 2)
+  currency    String   @default("INR")
+  status      PaymentStatus @default(PENDING)
+  
+  // Payment details
+  method      PaymentMethod
+  gateway     String?  // Razorpay, Stripe, etc.
+  transactionId String? @unique
+  gatewayResponse Json? // Gateway response data
+  
+  // Relations
+  orderId     String
+  order       Order    @relation(fields: [orderId], references: [id])
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("payments")
+}
+
+// Notification model for user notifications
+model Notification {
+  id          String   @id @default(cuid())
+  title       String
+  message     String
+  type        NotificationType
+  isRead      Boolean  @default(false)
+  
+  // Relations
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  
+  @@map("notifications")
+}
+
+// Audit Log model for tracking user actions
+model AuditLog {
+  id          String   @id @default(cuid())
+  action      String
+  details     Json?    // Flexible details structure
+  
+  // Relations
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  
+  @@map("audit_logs")
+}
+
+// Enums
+enum UserRole {
+  ADMIN
+  BUYER
+  SUPPLIER
+  MODERATOR
+}
+
+enum CompanySize {
+  MICRO
+  SMALL
+  MEDIUM
+  LARGE
+  ENTERPRISE
+}
+
+enum CompanyType {
+  BUYER
+  SUPPLIER
+  BOTH
+}
+
+enum UrgencyLevel {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum RFQStatus {
+  OPEN
+  CLOSED
+  CANCELLED
+  COMPLETED
+}
+
+enum QuoteStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  EXPIRED
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  RAZORPAY
+  STRIPE
+  BANK_TRANSFER
+  UPI
+  WALLET
+}
+
+enum NotificationType {
+  INFO
+  SUCCESS
+  WARNING
+  ERROR
+  RFQ_RECEIVED
+  QUOTE_RECEIVED
+  ORDER_UPDATE
+  PAYMENT_UPDATE
+}
+
+// Scraping and Marketing Enums
+enum ScrapingSource {
+  INDIAMART
+  JUSTDIAL
+  TRADEINDIA
+  EXPORTERSINDIA
+  GOOGLE_MAPS
+  LINKEDIN
+  OTHER
+}
+
+enum ScrapingStatus {
+  SCRAPED
+  VERIFIED
+  PROCESSED
+  ERROR
+}
+
+enum ClaimStatus {
+  UNCLAIMED
+  CLAIMED
+  PENDING
+  VERIFIED
+  REJECTED
+  EXPIRED
+}
+
+enum VerificationMethod {
+  EMAIL
+  PHONE
+  BOTH
+}
+
+enum CampaignType {
+  EMAIL
+  SMS
+  WHATSAPP
+  PUSH
+}
+
+enum CampaignPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum CampaignStatus {
+  SCHEDULED
+  RUNNING
+  COMPLETED
+  FAILED
+  PAUSED
+}
+
+enum ResponseType {
+  EMAIL_SENT
+  EMAIL_OPENED
+  EMAIL_CLICKED
+  SMS_SENT
+  SMS_DELIVERED
+  SMS_CLICKED
+  WHATSAPP_SENT
+  WHATSAPP_DELIVERED
+  CLAIM_SUBMITTED
+  CLAIM_VERIFIED
+  CONVERSION
+}
+
+enum ResponseStatus {
+  PENDING
+  SENT
+  DELIVERED
+  OPENED
+  CLICKED
+  CONVERTED
+  FAILED
+  BOUNCED
+}
+
+enum BenefitType {
+  FREE_LIFETIME_BASIC
+  FREE_PREMIUM_MONTHS
+  EARLY_USER_BADGE
+  PRIORITY_SUPPORT
+}
+
+enum BenefitAction {
+  ACTIVATED
+  USED
+  EXPIRED
+  RENEWED
+}
+
+enum WorkflowType {
+  EMAIL
+  SMS
+  CRM
+  ANALYTICS
+  ONBOARDING
+  SCRAPING
+  MARKETING
+  VERIFICATION
+}
+
+enum SyncStatus {
+  PENDING
+  SYNCING
+  SYNCED
+  ERROR
+  DISCONNECTED
+}
+
+enum IntegrationExecutionType {
+  WEBHOOK_TRIGGER
+  SCHEDULED_SYNC
+  MANUAL_TRIGGER
+  DATA_PROCESSING
+}
+
+enum ExecutionStatus {
+  PENDING
+  RUNNING
+  SUCCESS
+  FAILED
+  TIMEOUT
+  CANCELLED
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  PROPOSAL
+  NEGOTIATION
+  CLOSED_WON
+  CLOSED_LOST
+}
+
+enum LeadSource {
+  SCRAPING
+  WEBSITE
+  REFERRAL
+  SOCIAL_MEDIA
+  EMAIL_CAMPAIGN
+  SMS_CAMPAIGN
+  DIRECT_CALL
+  OTHER
+}
+
+enum LeadPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum LeadActivityType {
+  EMAIL_SENT
+  EMAIL_OPENED
+  EMAIL_CLICKED
+  SMS_SENT
+  SMS_DELIVERED
+  PHONE_CALL
+  MEETING_SCHEDULED
+  MEETING_COMPLETED
+  PROPOSAL_SENT
+  PROPOSAL_VIEWED
+  NEGOTIATION_STARTED
+  DEAL_CLOSED
+  DEAL_LOST
+  FOLLOW_UP_SCHEDULED
+  NOTE_ADDED
+}

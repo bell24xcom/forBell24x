@@ -1,0 +1,33 @@
+# N8N Dockerfile for Cloud Deployment
+FROM n8nio/n8n:latest
+
+# Set working directory
+WORKDIR /home/node
+
+# Install additional dependencies for Bell24h integration
+USER root
+RUN apk add --no-cache curl jq
+
+# Switch back to node user
+USER node
+
+# Create directories for Bell24h workflows
+RUN mkdir -p /home/node/.n8n/workflows/bell24h
+RUN mkdir -p /home/node/.n8n/credentials/bell24h
+
+# Copy Bell24h workflow templates
+COPY n8n-workflows/ /home/node/.n8n/workflows/bell24h/
+COPY n8n-credentials/ /home/node/.n8n/credentials/bell24h/
+
+# Set proper permissions
+RUN chown -R node:node /home/node/.n8n
+
+# Expose port
+EXPOSE 5678
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:5678/health || exit 1
+
+# Start N8N
+CMD ["n8n", "start"]

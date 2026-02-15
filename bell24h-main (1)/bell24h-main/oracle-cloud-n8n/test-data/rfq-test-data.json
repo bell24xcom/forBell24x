@@ -1,0 +1,26 @@
+{
+  "rfq_id": "RFQ-2024-001",
+  "product_category": "electronics",
+  "quantity": "1000 units",
+  "deadline": "2024-02-15",
+  "specifications": "High-quality electronic components with CE certification, operating temperature -40°C to +85°C, IP65 rating",
+  "priority": "high",
+  "buyer_company": "TechCorp Industries",
+  "buyer_email": "procurement@techcorp.com",
+  "budget_range": "$50,000 - $75,000",
+  "delivery_location": "Mumbai, India",
+  "additional_requirements": [
+    "ISO 9001:2015 certified supplier preferred",
+    "Minimum 5 years experience in electronics manufacturing",
+    "Sample products required before final order",
+    "Warranty period of 2 years minimum"
+  ],
+  "contact_person": {
+    "name": "Rajesh Kumar",
+    "email": "rajesh.kumar@techcorp.com",
+    "phone": "+91-9876543210",
+    "designation": "Procurement Manager"
+  },
+  "created_at": "2024-01-15T10:30:00Z",
+  "status": "active"
+}

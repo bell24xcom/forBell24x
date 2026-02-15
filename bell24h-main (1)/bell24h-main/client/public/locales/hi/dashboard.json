@@ -1,0 +1,12 @@
+{
+  "dashboard_title": "आपका डैशबोर्ड",
+  "welcome_message": "Bell24h में आपका स्वागत है!",
+  "supplier_stats": "सप्लायर आँकड़े",
+  "buyer_stats": "खरीदार आँकड़े",
+  "orders": "ऑर्डर",
+  "products": "उत्पाद",
+  "rfq": "आरएफक्यू",
+  "kyc": "केवाईसी",
+  "analytics": "एनालिटिक्स",
+  "logout": "लॉगआउट"
+}

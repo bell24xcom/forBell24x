@@ -1,0 +1,43 @@
+{
+  "projectType": "typescript",
+  "features": {
+    "codeAnalysis": true,
+    "performanceOptimization": true,
+    "testingAutomation": true,
+    "documentationGeneration": true,
+    "deploymentAssistance": true
+  },
+  "rules": {
+    "enforceTypeSafety": true,
+    "optimizeMemoryUsage": true,
+    "generateTests": true,
+    "requireDocumentation": {
+      "enabled": true,
+      "minCoverage": 90
+    },
+    "enforceBestPractices": {
+      "enabled": true,
+      "rules": ["react-hooks", "jsx-a11y", "import-order"]
+    }
+  },
+  "paths": {
+    "src": "./client/src",
+    "tests": "./client/tests",
+    "docs": "./docs"
+  },
+  "testFrameworks": ["jest", "testing-library"],
+  "ci": {
+    "enabled": true,
+    "provider": "github-actions"
+  },
+  "memoryOptimization": {
+    "enabled": true,
+    "maxBundleSize": "2MB",
+    "analyzeImports": true
+  },
+  "documentation": {
+    "outputDir": "./docs",
+    "formats": ["markdown", "html"],
+    "includeExamples": true
+  }
+}

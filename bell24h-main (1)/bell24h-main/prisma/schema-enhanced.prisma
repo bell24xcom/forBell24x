@@ -1,0 +1,303 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String?  @unique
+  phone     String?  @unique
+  name      String?
+  role      String   @default("user")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  rfqs      RFQ[]
+  orders    Order[]
+}
+
+model Agent {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  role      String   @default("agent")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Enhanced Category System - 50 Main Categories with 8-9 Subcategories each = 400+ Categories
+model Category {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  parentId    String?
+  parent      Category? @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children    Category[] @relation("CategoryHierarchy")
+  level       Int      @default(1) // 1 = Main Category, 2 = Subcategory
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  icon        String?  // Icon for UI
+  color       String?  // Color for UI
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  rfqs        RFQ[]
+  suppliers   Supplier[]
+  
+  @@map("categories")
+}
+
+// RFQ Model with Multi-modal Support
+model RFQ {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  
+  // Multi-modal content
+  textContent String?
+  audioUrl    String?
+  videoUrl    String?
+  audioTranscript String?
+  videoTranscript String?
+  
+  // RFQ Details
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id])
+  subcategoryId String?
+  subcategory Category? @relation("RFQSubcategory", fields: [subcategoryId], references: [id])
+  
+  // Requirements
+  quantity    Int?
+  budget      Float?
+  currency    String   @default("INR")
+  location    String?
+  urgency     String   @default("medium") // low, medium, high
+  specifications Json? // Array of specifications
+  
+  // Status and Tracking
+  status      String   @default("open") // open, in_progress, closed, cancelled
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  
+  // AI Analysis
+  aiAnalysis  Json?    // SHAP, LIME, Perplexity analysis
+  matchScore  Float?   // AI matching score
+  confidence  Float?   // AI confidence score
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  expiresAt   DateTime?
+  
+  // Relations
+  quotes      Quote[]
+  matches     SupplierMatch[]
+  
+  @@map("rfqs")
+}
+
+// Supplier Model
+model Supplier {
+  id          String   @id @default(cuid())
+  name        String
+  email       String   @unique
+  phone       String?
+  website     String?
+  
+  // Business Details
+  companyName String
+  gstNumber  String?
+  panNumber  String?
+  address    String?
+  city       String?
+  state      String?
+  pincode    String?
+  
+  // Verification
+  isGstVerified Boolean @default(false)
+  isPanVerified Boolean @default(false)
+  isPhoneVerified Boolean @default(false)
+  isEmailVerified Boolean @default(false)
+  
+  // Capabilities
+  categories Category[]
+  capabilities Json? // Array of capabilities
+  
+  // Performance Metrics
+  rating     Float   @default(0)
+  totalOrders Int    @default(0)
+  successRate Float  @default(0)
+  responseTime Int   @default(24) // hours
+  trustScore  Float  @default(0)
+  
+  // Pricing
+  priceRange Json? // {min: number, max: number}
+  
+  // Status
+  isActive   Boolean @default(true)
+  isVerified Boolean @default(false)
+  
+  // Timestamps
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  
+  // Relations
+  quotes     Quote[]
+  matches    SupplierMatch[]
+  
+  @@map("suppliers")
+}
+
+// Quote Model
+model Quote {
+  id          String   @id @default(cuid())
+  rfqId       String
+  rfq         RFQ      @relation(fields: [rfqId], references: [id])
+  supplierId  String
+  supplier    Supplier @relation(fields: [supplierId], references: [id])
+  
+  // Quote Details
+  price       Float
+  currency    String   @default("INR")
+  quantity    Int?
+  deliveryTime Int?    // days
+  validity    Int?     // days
+  
+  // Quote Content
+  description String?
+  specifications Json? // Array of specifications
+  terms       String?
+  conditions  String?
+  
+  // Status
+  status      String   @default("pending") // pending, accepted, rejected, expired
+  isSelected  Boolean  @default(false)
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  expiresAt   DateTime?
+  
+  @@map("quotes")
+}
+
+// Supplier Matching Model
+model SupplierMatch {
+  id          String   @id @default(cuid())
+  rfqId       String
+  rfq         RFQ      @relation(fields: [rfqId], references: [id])
+  supplierId  String
+  supplier    Supplier @relation(fields: [supplierId], references: [id])
+  
+  // Matching Details
+  matchScore  Float
+  confidence  Float
+  reasons     Json?    // Array of matching reasons
+  aiAnalysis  Json?    // SHAP, LIME analysis
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  
+  @@unique([rfqId, supplierId])
+  @@map("supplier_matches")
+}
+
+// Order Model
+model Order {
+  id          String   @id @default(cuid())
+  rfqId       String
+  quoteId     String
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  
+  // Order Details
+  totalAmount Float
+  currency    String   @default("INR")
+  quantity    Int
+  
+  // Payment
+  paymentStatus String @default("pending") // pending, paid, failed, refunded
+  paymentMethod String?
+  paymentId    String?
+  
+  // Delivery
+  deliveryAddress String?
+  deliveryStatus  String @default("pending") // pending, shipped, delivered, cancelled
+  trackingNumber  String?
+  
+  // Status
+  status      String   @default("pending") // pending, confirmed, shipped, delivered, cancelled
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("orders")
+}
+
+// Mock RFQ Templates Model
+model MockRFQTemplate {
+  id          String   @id @default(cuid())
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id])
+  
+  // Template Details
+  title       String
+  description String
+  
+  // Multi-modal Content
+  textContent String?
+  audioScript String?
+  videoScript String?
+  
+  // RFQ Parameters
+  quantity    Int?
+  budget      Float?
+  location    String?
+  urgency     String   @default("medium")
+  specifications Json? // Array of specifications
+  
+  // Template Metadata
+  type        String   // text, voice, video
+  difficulty  String   @default("medium") // easy, medium, hard
+  isActive    Boolean  @default(true)
+  
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("mock_rfq_templates")
+}
+
+// Analytics Model
+model Analytics {
+  id          String   @id @default(cuid())
+  
+  // Metrics
+  totalRFQs   Int      @default(0)
+  totalSuppliers Int   @default(0)
+  totalQuotes Int      @default(0)
+  totalOrders Int      @default(0)
+  
+  // AI Metrics
+  avgMatchScore Float  @default(0)
+  avgConfidence Float  @default(0)
+  aiAccuracy   Float   @default(0)
+  
+  // Performance Metrics
+  avgResponseTime Float @default(0)
+  conversionRate  Float @default(0)
+  
+  // Timestamps
+  date        DateTime @default(now())
+  createdAt   DateTime @default(now())
+  
+  @@map("analytics")
+}

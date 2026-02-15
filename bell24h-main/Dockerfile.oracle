@@ -1,0 +1,46 @@
+# Oracle VM Dockerfile - Optimized for production
+# This Dockerfile is for the client directory (Next.js app)
+
+# ---------- deps (WITH devDeps) ----------
+FROM node:20-bullseye-slim AS deps
+WORKDIR /app
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 make g++ openssl ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
+COPY client/package*.json ./
+# include devDeps because Next/Tailwind need them at build time
+ENV NPM_CONFIG_FUND=false NPM_CONFIG_AUDIT=false npm_config_ignore_scripts=true
+RUN npm ci --no-audit --no-fund --legacy-peer-deps
+
+# ---------- builder ----------
+FROM node:20-bullseye-slim AS builder
+WORKDIR /app
+ENV NODE_ENV=production \
+    NEXT_TELEMETRY_DISABLED=1 \
+    NODE_OPTIONS=--max_old_space_size=1536
+COPY --from=deps /app/node_modules ./node_modules
+COPY client/ ./
+COPY prisma ./prisma/
+# Generate Prisma client (no DB needed)
+RUN npx prisma generate || true
+# Build Next.js (needs Tailwind/PostCSS from devDeps)
+RUN npm run build
+# Now remove devDeps to slim runtime
+RUN npm prune --omit=dev
+
+# ---------- runner ----------
+FROM node:20-bullseye-slim AS runner
+WORKDIR /app
+ENV NODE_ENV=production \
+    PORT=3000 \
+    NEXT_TELEMETRY_DISABLED=1
+RUN useradd -m appuser
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/prisma ./prisma
+EXPOSE 3000
+USER appuser
+CMD ["npm","run","start"]
+

@@ -1,0 +1,96 @@
+🔧 MANUAL GITKRAKEN MCP SETUP GUIDE
+====================================
+
+Due to terminal configuration issues, please follow these manual steps:
+
+STEP 1: INSTALL MCP SDK
+=======================
+Open Command Prompt as Administrator and run:
+npm install @modelcontextprotocol/sdk
+
+STEP 2: GET GITKRAKEN API TOKEN
+==============================
+1. Go to: https://app.gitkraken.com/user-profile/tokens
+2. Sign in to your GitKraken account
+3. Click "Create Token"
+4. Name it "Cursor MCP"
+5. Copy the generated token
+
+STEP 3: CONFIGURE ENVIRONMENT
+============================
+1. Open the file "gitkraken.env" in your editor
+2. Replace "your_gitkraken_token_here" with your actual token
+3. Optionally add your workspace ID if you have one
+
+STEP 4: INSTALL DOTENV (if needed)
+=================================
+npm install dotenv
+
+STEP 5: TEST THE SETUP
+=====================
+Run this command:
+node test-gitkraken-mcp.js
+
+You should see:
+✅ MCP SDK is installed
+✅ Configuration files exist
+✅ Git is working
+
+STEP 6: CONFIGURE IN CURSOR
+===========================
+1. Open Cursor Settings (Ctrl/Cmd + ,)
+2. Search for "MCP" or "Model Context Protocol"
+3. Click "Add Server" or "Configure Server"
+4. Use these settings:
+
+Server Name: GitKraken
+Command: node
+Arguments: C:\Users\Sanika\Projects\bell24h\gitkraken-mcp-server.js
+Environment Variables:
+  GITKRAKEN_API_TOKEN=your_actual_token
+  GITKRAKEN_WORKSPACE_ID=your_workspace_id
+
+STEP 7: RESTART CURSOR
+=====================
+1. Close Cursor completely
+2. Wait 10 seconds
+3. Restart Cursor
+4. The GitKraken MCP server should now be available
+
+STEP 8: TEST IN CURSOR
+=====================
+Open Cursor and try:
+- "Show git status" - should show repository status
+- "List git branches" - should show available branches
+- "Show recent commits" - should show commit history
+
+TROUBLESHOOTING
+==============
+If you get "fetch failed":
+1. Check that your API token is correct
+2. Verify all file paths are correct
+3. Make sure Cursor is fully restarted
+4. Check Cursor's MCP configuration
+
+If you get "command not found":
+1. Make sure Node.js is installed and in PATH
+2. Check that npm packages are installed
+3. Verify the gitkraken-mcp-server.js file exists
+
+FILES CREATED
+============
+- gitkraken-mcp-server.js (Main server)
+- mcp-gitkraken.json (Configuration)
+- gitkraken.env (Environment variables)
+- test-gitkraken-mcp.js (Test script)
+- GITKRAKEN_MCP_SETUP_README.md (This guide)
+
+SUPPORT
+=======
+If you encounter issues:
+1. Check the test script output
+2. Verify your GitKraken token is valid
+3. Ensure all dependencies are installed
+4. Check Cursor's MCP configuration
+
+🎉 Once setup is complete, you'll have full Git integration in Cursor!

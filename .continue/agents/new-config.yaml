@@ -1,0 +1,27 @@
+models:
+  - title: DeepSeek Coder (Local)
+    provider: ollama
+    model: deepseek-coder:6.7b
+    apiBase: http://localhost:11434
+  - name: Autodetect
+    provider: ollama
+    model: AUTODETECT
+tabAutocompleteModel:
+  title: DeepSeek Tab
+  provider: ollama
+  model: deepseek-coder:6.7b
+  apiBase: http://localhost:11434
+embeddingsProvider:
+  provider: ollama
+  model: nomic-embed-text
+  apiBase: http://localhost:11434
+customCommands:
+  - name: fix-prisma
+    prompt: "Analyze this Prisma error and provide exact PowerShell commands to fix
+      it. Error: {{{ input }}}"
+    description: Fix Prisma errors
+  - name: implement-auth
+    prompt: Implement MSG91 OTP authentication with JWT for Next.js API routes.
+      Include both send-otp and verify-otp routes.
+    description: Create authentication flow
+allowAnonymousTelemetry: false

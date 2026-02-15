@@ -1,0 +1,1270 @@
+{
+  "timestamp": "2025-09-02T20:25:24.899Z",
+  "expectedPages": 34,
+  "foundPages": 209,
+  "missingPages": [
+    "/categories/textiles-garments",
+    "/categories/pharmaceuticals",
+    "/categories/agricultural-products",
+    "/categories/automotive-parts",
+    "/categories/it-services",
+    "/categories/gems-jewelry",
+    "/categories/handicrafts",
+    "/categories/machinery-equipment",
+    "/categories/chemicals",
+    "/categories/food-processing",
+    "/categories/construction",
+    "/categories/metals-steel",
+    "/categories/plastics",
+    "/categories/paper-packaging",
+    "/categories/rubber",
+    "/categories/ceramics",
+    "/categories/glass",
+    "/categories/wood",
+    "/categories/leather"
+  ],
+  "extraPages": [
+    "/admin",
+    "/api/agents/auth/route",
+    "/api/agents/verify/route",
+    "/api/campaigns/route",
+    "/api/campaigns/:id/route",
+    "/categories/:category",
+    "/layout",
+    "/sitemap",
+    "app/api/voice/rfq/route",
+    "app/api/wallet/route",
+    "app/dashboard/comprehensive/page",
+    "app/dashboard/page",
+    "app/page",
+    "backend/api/controllers/analytics.controller",
+    "backend/api/controllers/auth.controller",
+    "backend/api/controllers/escrow.controller",
+    "backend/api/controllers/logistics.controller",
+    "backend/api/controllers/payment.controller",
+    "backend/api/controllers/rfq.controller",
+    "backend/api/controllers/risk.controller",
+    "backend/api/controllers/supplier.controller",
+    "backend/api/controllers/video.controller",
+    "backend/api/controllers/wallet.controller",
+    "backend/api",
+    "backend/api/middleware/auth.middleware",
+    "backend/api/middleware/error.middleware",
+    "backend/api/routes/analytics.routes",
+    "backend/api/routes/auth.routes",
+    "backend/api/routes/escrow.routes",
+    "backend/api/routes/logistics.routes",
+    "backend/api/routes/payment.routes",
+    "backend/api/routes/rfq.routes",
+    "backend/api/routes/risk.routes",
+    "backend/api/routes/supplier.routes",
+    "backend/api/routes/video.routes",
+    "backend/api/routes/wallet.routes",
+    "backend/api/validators/analytics.validator",
+    "backend/api/validators/auth.validator",
+    "backend/api/validators/escrow.validator",
+    "backend/api/validators/logistics.validator",
+    "backend/api/validators/payment.validator",
+    "backend/api/validators/rfq.validator",
+    "backend/api/validators/risk.validator",
+    "backend/api/validators/supplier.validator",
+    "backend/api/validators/video.validator",
+    "backend/api/validators/wallet.validator",
+    "backend/core/admin/dashboard.controller",
+    "backend/core/admin/dashboard.service",
+    "backend/core/alert/alert.module",
+    "backend/core/auth/decorators/permissions.decorator",
+    "backend/core/auth/decorators/roles.decorator",
+    "backend/core/auth/guards/jwt-auth.guard",
+    "backend/core/auth/guards/permissions.guard",
+    "backend/core/auth/guards/roles.guard",
+    "backend/core/auth/jwt-auth.service",
+    "backend/core/config/cloud.config",
+    "backend/core/entities/event-log.entity",
+    "backend/core/entities/proposal.entity",
+    "backend/core/entities/rfq.entity",
+    "backend/core/entities/transaction-log.entity",
+    "backend/core/erp/edi.processor",
+    "backend/core/erp/oracle.service",
+    "backend/core/erp/transaction.logger",
+    "backend/core/events/events.module",
+    "backend/core/monitoring/monitoring.controller",
+    "backend/core/monitoring/monitoring.module",
+    "backend/core/notification/entities/notification.entity",
+    "backend/core/notification/notification.controller",
+    "backend/core/notification/notification.module",
+    "backend/core/notification/notification.service",
+    "backend/core/payment/razorpayx.service",
+    "backend/core/rfq/ai-matching.service",
+    "backend/core/rfq/dto/create-rfq.dto",
+    "backend/core/rfq/dto/evaluate-proposal.dto",
+    "backend/core/rfq/dto/submit-proposal.dto",
+    "backend/core/rfq/dto/update-rfq.dto",
+    "backend/core/rfq/rfq.controller",
+    "backend/core/rfq/rfq.module",
+    "backend/core/rfq/rfq.service",
+    "backend/core/services/alert.service",
+    "backend/core/services/analytics.service",
+    "backend/core/services/discord.service",
+    "backend/core/services/email.service",
+    "backend/core/services/event.service",
+    "backend/core/services/monitoring.service",
+    "backend/core/services/realtime.service",
+    "backend/core/services/slack.service",
+    "backend/core/services/teams.service",
+    "backend/core/tests/workflow.test",
+    "backend/core/wallet/dto/create-wallet.dto",
+    "backend/core/wallet/dto/deposit.dto",
+    "backend/core/wallet/dto",
+    "backend/core/wallet/dto/transfer.dto",
+    "backend/core/wallet/dto/withdraw.dto",
+    "backend/core/wallet/wallet.service",
+    "components/admin/AnalyticsDashboard",
+    "components/admin/PaymentDashboard",
+    "components/ai/ExplanationHistory",
+    "components/ai/__tests__/ExplanationHistory.a11y.test",
+    "components/ai/__tests__/ExplanationHistory.snapshot.test",
+    "components/auth/AuthModal",
+    "components/AuthModal",
+    "components/dashboard/analytics/AnalyticsOverview",
+    "components/dashboard/analytics/BusinessMetricsChart",
+    "components/dashboard/analytics/ExportControls",
+    "components/dashboard/analytics/PerformanceMetricsChart",
+    "components/dashboard/analytics/UserEngagementChart",
+    "components/dashboard/analytics/__tests__/AnalyticsOverview.test",
+    "components/dashboard/analytics/__tests__/BusinessMetricsChart.test",
+    "components/dashboard/analytics/__tests__/PerformanceMetricsChart.test",
+    "components/dashboard/analytics/__tests__/UserEngagementChart.test",
+    "components/dashboard/categories/CategoryDetail",
+    "components/dashboard/categories/CategoryOverview",
+    "components/dashboard/categories/FeaturedContent",
+    "components/dashboard/categories/__tests__/CategoryDetail.test",
+    "components/dashboard/categories/__tests__/CategoryOverview.test",
+    "components/dashboard/categories/__tests__/FeaturedContent.test",
+    "components/dashboard/comparison/SolutionComparison",
+    "components/dashboard/comparison/__tests__/SolutionComparison.test",
+    "components/dashboard/roi/ROICalculator",
+    "components/dashboard/roi/__tests__/ROICalculator.test",
+    "components/dashboard/shared/ChartContainer",
+    "components/dashboard/shared/DashboardCard",
+    "components/dashboard/shared/ErrorBoundary",
+    "components/dashboard/shared/TimeRangeSelector",
+    "components/dashboard/testimonials/SuccessStories",
+    "components/dashboard/testimonials/__tests__/SuccessStories.test",
+    "components/dashboard/types/categories",
+    "components/dashboard/types",
+    "components/EnterpriseHero",
+    "components/LoginForm",
+    "components/mobile/ShippingForm",
+    "components/mobile/ShippingOptions",
+    "components/mobile/TrackingDisplay",
+    "components/OptimizedImage",
+    "components/RegisterForm",
+    "components/VirtualizedList",
+    "config/security",
+    "controllers/analytics.controller",
+    "controllers/payment.controller",
+    "hooks/useOptimizedFetch",
+    "hooks/useWorker",
+    "hooks/__tests__/useWorker.test",
+    "middleware/analytics.middleware",
+    "middleware/n8nAuth",
+    "middleware/securityMiddleware",
+    "middleware/validation",
+    "models/Conversation",
+    "models/Settings",
+    "pages/mobile/ShippingPage",
+    "routes/analytics.routes",
+    "routes/chatbot",
+    "routes/health",
+    "routes/payment.routes",
+    "routes/voicebot",
+    "routes/whatsapp",
+    "services/AICategoryService",
+    "services/analytics/AnalyticsService",
+    "services/cache/RedisService",
+    "services/categories/CategoryService",
+    "services/chatbot/ChatBotService",
+    "services/i18n/LanguageService",
+    "services/logistics/carriers/DHLService",
+    "services/logistics/carriers/FedExService",
+    "services/logistics/carriers/UPSService",
+    "services/logistics/customs/CustomsService",
+    "services/logistics/LogisticsService",
+    "services/logistics/ml/DeliveryPredictor",
+    "services/logistics/ShippingOptimizer",
+    "services/logistics/TrackingService",
+    "services/monitoring/MonitoringService",
+    "services/monitoring/WinstonLogger",
+    "services/n8n/N8nService",
+    "services/payment/PaymentService",
+    "services/security/SecurityService",
+    "services/storage/S3Service",
+    "services/traffic/load/LoadBalancer",
+    "services/traffic/queue/QueueManager",
+    "services/traffic/routers/CallRouter",
+    "services/traffic/routers/MessageRouter",
+    "services/traffic/TrafficManager",
+    "services/traffic/types",
+    "services/types",
+    "services/voicebot/VoiceBotService",
+    "services/whatsapp/MediaHandler",
+    "services/whatsapp/TemplateManager",
+    "services/whatsapp/WhatsAppService",
+    "tests/logistics/LogisticsService.test",
+    "tests/logistics/TrackingService.test",
+    "tests/services/LogisticsService.test",
+    "tests/services/RFQService.test",
+    "tests/setup",
+    "utils/storage",
+    "__tests__/integration/explanationHistory.integration.test"
+  ],
+  "allPagesPresent": true,
+  "foundPagesList": [
+    {
+      "route": "/about",
+      "file": "about\\page.tsx",
+      "directory": "app"
+    },
+    {
+      "route": "/admin",
+      "file": "admin\\page.tsx",
+      "directory": "app"
+    },
+    {
+      "route": "/api/agents/auth/route",
+      "file": "api\\agents\\auth\\route.ts",
+      "directory": "app"
+    },
+    {
+      "route": "/api/agents/verify/route",
+      "file": "api\\agents\\verify\\route.ts",
+      "directory": "app"
+    },
+    {
+      "route": "/api/campaigns/route",
+      "file": "api\\campaigns\\route.ts",
+      "directory": "app"
+    },
+    {
+      "route": "/api/campaigns/:id/route",
+      "file": "api\\campaigns\\[id]\\route.ts",
+      "directory": "app"
+    },
+    {
+      "route": "/categories/:category",
+      "file": "categories\\[category]\\page.tsx",
+      "directory": "app"
+    },
+    {
+      "route": "/contact",
+      "file": "contact\\page.tsx",
+      "directory": "app"
+    },
+    {
+      "route": "/dashboard/ai-features",
+      "file": "dashboard\\ai-features\\page.tsx",
+      "directory": "app"
+    },
+    {
+      "route": "/fintech",
+      "file": "fintech\\page.tsx",
+      "directory": "app"
+    },
+    {
+      "route": "/help",
+      "file": "help\\page.tsx",
+      "directory": "app"
+    },
+    {
+      "route": "/layout",
+      "file": "layout.tsx",
+      "directory": "app"
+    },
+    {
+      "route": "/login",
+      "file": "login\\page.tsx",
+      "directory": "app"
+    },
+    {
+      "route": "/marketplace",
+      "file": "marketplace\\page.tsx",
+      "directory": "app"
+    },
+    {
+      "route": "/",
+      "file": "page.tsx",
+      "directory": "app"
+    },
+    {
+      "route": "/privacy",
+      "file": "privacy\\page.tsx",
+      "directory": "app"
+    },
+    {
+      "route": "/register",
+      "file": "register\\page.tsx",
+      "directory": "app"
+    },
+    {
+      "route": "/rfq/create",
+      "file": "rfq\\create\\page.tsx",
+      "directory": "app"
+    },
+    {
+      "route": "/sitemap",
+      "file": "sitemap.ts",
+      "directory": "app"
+    },
+    {
+      "route": "/suppliers",
+      "file": "suppliers\\page.tsx",
+      "directory": "app"
+    },
+    {
+      "route": "/terms",
+      "file": "terms\\page.tsx",
+      "directory": "app"
+    },
+    {
+      "route": "/voice-rfq",
+      "file": "voice-rfq\\page.tsx",
+      "directory": "app"
+    },
+    {
+      "route": "/wallet",
+      "file": "wallet\\page.tsx",
+      "directory": "app"
+    },
+    {
+      "route": "app/api/voice/rfq/route",
+      "file": "app\\api\\voice\\rfq\\route.ts",
+      "directory": "src"
+    },
+    {
+      "route": "app/api/wallet/route",
+      "file": "app\\api\\wallet\\route.ts",
+      "directory": "src"
+    },
+    {
+      "route": "app/dashboard/comprehensive/page",
+      "file": "app\\dashboard\\comprehensive\\page.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "app/dashboard/page",
+      "file": "app\\dashboard\\page.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "app/page",
+      "file": "app\\page.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "backend/api/controllers/analytics.controller",
+      "file": "backend\\api\\controllers\\analytics.controller.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/api/controllers/auth.controller",
+      "file": "backend\\api\\controllers\\auth.controller.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/api/controllers/escrow.controller",
+      "file": "backend\\api\\controllers\\escrow.controller.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/api/controllers/logistics.controller",
+      "file": "backend\\api\\controllers\\logistics.controller.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/api/controllers/payment.controller",
+      "file": "backend\\api\\controllers\\payment.controller.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/api/controllers/rfq.controller",
+      "file": "backend\\api\\controllers\\rfq.controller.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/api/controllers/risk.controller",
+      "file": "backend\\api\\controllers\\risk.controller.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/api/controllers/supplier.controller",
+      "file": "backend\\api\\controllers\\supplier.controller.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/api/controllers/video.controller",
+      "file": "backend\\api\\controllers\\video.controller.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/api/controllers/wallet.controller",
+      "file": "backend\\api\\controllers\\wallet.controller.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/api",
+      "file": "backend\\api\\index.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/api/middleware/auth.middleware",
+      "file": "backend\\api\\middleware\\auth.middleware.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/api/middleware/error.middleware",
+      "file": "backend\\api\\middleware\\error.middleware.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/api/routes/analytics.routes",
+      "file": "backend\\api\\routes\\analytics.routes.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/api/routes/auth.routes",
+      "file": "backend\\api\\routes\\auth.routes.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/api/routes/escrow.routes",
+      "file": "backend\\api\\routes\\escrow.routes.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/api/routes/logistics.routes",
+      "file": "backend\\api\\routes\\logistics.routes.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/api/routes/payment.routes",
+      "file": "backend\\api\\routes\\payment.routes.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/api/routes/rfq.routes",
+      "file": "backend\\api\\routes\\rfq.routes.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/api/routes/risk.routes",
+      "file": "backend\\api\\routes\\risk.routes.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/api/routes/supplier.routes",
+      "file": "backend\\api\\routes\\supplier.routes.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/api/routes/video.routes",
+      "file": "backend\\api\\routes\\video.routes.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/api/routes/wallet.routes",
+      "file": "backend\\api\\routes\\wallet.routes.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/api/validators/analytics.validator",
+      "file": "backend\\api\\validators\\analytics.validator.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/api/validators/auth.validator",
+      "file": "backend\\api\\validators\\auth.validator.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/api/validators/escrow.validator",
+      "file": "backend\\api\\validators\\escrow.validator.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/api/validators/logistics.validator",
+      "file": "backend\\api\\validators\\logistics.validator.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/api/validators/payment.validator",
+      "file": "backend\\api\\validators\\payment.validator.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/api/validators/rfq.validator",
+      "file": "backend\\api\\validators\\rfq.validator.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/api/validators/risk.validator",
+      "file": "backend\\api\\validators\\risk.validator.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/api/validators/supplier.validator",
+      "file": "backend\\api\\validators\\supplier.validator.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/api/validators/video.validator",
+      "file": "backend\\api\\validators\\video.validator.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/api/validators/wallet.validator",
+      "file": "backend\\api\\validators\\wallet.validator.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/admin/dashboard.controller",
+      "file": "backend\\core\\admin\\dashboard.controller.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/admin/dashboard.service",
+      "file": "backend\\core\\admin\\dashboard.service.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/alert/alert.module",
+      "file": "backend\\core\\alert\\alert.module.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/auth/decorators/permissions.decorator",
+      "file": "backend\\core\\auth\\decorators\\permissions.decorator.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/auth/decorators/roles.decorator",
+      "file": "backend\\core\\auth\\decorators\\roles.decorator.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/auth/guards/jwt-auth.guard",
+      "file": "backend\\core\\auth\\guards\\jwt-auth.guard.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/auth/guards/permissions.guard",
+      "file": "backend\\core\\auth\\guards\\permissions.guard.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/auth/guards/roles.guard",
+      "file": "backend\\core\\auth\\guards\\roles.guard.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/auth/jwt-auth.service",
+      "file": "backend\\core\\auth\\jwt-auth.service.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/config/cloud.config",
+      "file": "backend\\core\\config\\cloud.config.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/entities/event-log.entity",
+      "file": "backend\\core\\entities\\event-log.entity.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/entities/proposal.entity",
+      "file": "backend\\core\\entities\\proposal.entity.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/entities/rfq.entity",
+      "file": "backend\\core\\entities\\rfq.entity.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/entities/transaction-log.entity",
+      "file": "backend\\core\\entities\\transaction-log.entity.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/erp/edi.processor",
+      "file": "backend\\core\\erp\\edi.processor.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/erp/oracle.service",
+      "file": "backend\\core\\erp\\oracle.service.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/erp/transaction.logger",
+      "file": "backend\\core\\erp\\transaction.logger.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/events/events.module",
+      "file": "backend\\core\\events\\events.module.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/monitoring/monitoring.controller",
+      "file": "backend\\core\\monitoring\\monitoring.controller.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/monitoring/monitoring.module",
+      "file": "backend\\core\\monitoring\\monitoring.module.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/notification/entities/notification.entity",
+      "file": "backend\\core\\notification\\entities\\notification.entity.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/notification/notification.controller",
+      "file": "backend\\core\\notification\\notification.controller.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/notification/notification.module",
+      "file": "backend\\core\\notification\\notification.module.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/notification/notification.service",
+      "file": "backend\\core\\notification\\notification.service.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/payment/razorpayx.service",
+      "file": "backend\\core\\payment\\razorpayx.service.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/rfq/ai-matching.service",
+      "file": "backend\\core\\rfq\\ai-matching.service.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/rfq/dto/create-rfq.dto",
+      "file": "backend\\core\\rfq\\dto\\create-rfq.dto.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/rfq/dto/evaluate-proposal.dto",
+      "file": "backend\\core\\rfq\\dto\\evaluate-proposal.dto.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/rfq/dto/submit-proposal.dto",
+      "file": "backend\\core\\rfq\\dto\\submit-proposal.dto.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/rfq/dto/update-rfq.dto",
+      "file": "backend\\core\\rfq\\dto\\update-rfq.dto.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/rfq/rfq.controller",
+      "file": "backend\\core\\rfq\\rfq.controller.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/rfq/rfq.module",
+      "file": "backend\\core\\rfq\\rfq.module.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/rfq/rfq.service",
+      "file": "backend\\core\\rfq\\rfq.service.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/services/alert.service",
+      "file": "backend\\core\\services\\alert.service.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/services/analytics.service",
+      "file": "backend\\core\\services\\analytics.service.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/services/discord.service",
+      "file": "backend\\core\\services\\discord.service.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/services/email.service",
+      "file": "backend\\core\\services\\email.service.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/services/event.service",
+      "file": "backend\\core\\services\\event.service.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/services/monitoring.service",
+      "file": "backend\\core\\services\\monitoring.service.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/services/realtime.service",
+      "file": "backend\\core\\services\\realtime.service.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/services/slack.service",
+      "file": "backend\\core\\services\\slack.service.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/services/teams.service",
+      "file": "backend\\core\\services\\teams.service.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/tests/workflow.test",
+      "file": "backend\\core\\tests\\workflow.test.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/wallet/dto/create-wallet.dto",
+      "file": "backend\\core\\wallet\\dto\\create-wallet.dto.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/wallet/dto/deposit.dto",
+      "file": "backend\\core\\wallet\\dto\\deposit.dto.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/wallet/dto",
+      "file": "backend\\core\\wallet\\dto\\index.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/wallet/dto/transfer.dto",
+      "file": "backend\\core\\wallet\\dto\\transfer.dto.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/wallet/dto/withdraw.dto",
+      "file": "backend\\core\\wallet\\dto\\withdraw.dto.ts",
+      "directory": "src"
+    },
+    {
+      "route": "backend/core/wallet/wallet.service",
+      "file": "backend\\core\\wallet\\wallet.service.ts",
+      "directory": "src"
+    },
+    {
+      "route": "components/admin/AnalyticsDashboard",
+      "file": "components\\admin\\AnalyticsDashboard.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "components/admin/PaymentDashboard",
+      "file": "components\\admin\\PaymentDashboard.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "components/ai/ExplanationHistory",
+      "file": "components\\ai\\ExplanationHistory.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "components/ai/__tests__/ExplanationHistory.a11y.test",
+      "file": "components\\ai\\__tests__\\ExplanationHistory.a11y.test.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "components/ai/__tests__/ExplanationHistory.snapshot.test",
+      "file": "components\\ai\\__tests__\\ExplanationHistory.snapshot.test.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "components/auth/AuthModal",
+      "file": "components\\auth\\AuthModal.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "components/AuthModal",
+      "file": "components\\AuthModal.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "components/dashboard/analytics/AnalyticsOverview",
+      "file": "components\\dashboard\\analytics\\AnalyticsOverview.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "components/dashboard/analytics/BusinessMetricsChart",
+      "file": "components\\dashboard\\analytics\\BusinessMetricsChart.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "components/dashboard/analytics/ExportControls",
+      "file": "components\\dashboard\\analytics\\ExportControls.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "components/dashboard/analytics/PerformanceMetricsChart",
+      "file": "components\\dashboard\\analytics\\PerformanceMetricsChart.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "components/dashboard/analytics/UserEngagementChart",
+      "file": "components\\dashboard\\analytics\\UserEngagementChart.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "components/dashboard/analytics/__tests__/AnalyticsOverview.test",
+      "file": "components\\dashboard\\analytics\\__tests__\\AnalyticsOverview.test.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "components/dashboard/analytics/__tests__/BusinessMetricsChart.test",
+      "file": "components\\dashboard\\analytics\\__tests__\\BusinessMetricsChart.test.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "components/dashboard/analytics/__tests__/PerformanceMetricsChart.test",
+      "file": "components\\dashboard\\analytics\\__tests__\\PerformanceMetricsChart.test.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "components/dashboard/analytics/__tests__/UserEngagementChart.test",
+      "file": "components\\dashboard\\analytics\\__tests__\\UserEngagementChart.test.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "components/dashboard/categories/CategoryDetail",
+      "file": "components\\dashboard\\categories\\CategoryDetail.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "components/dashboard/categories/CategoryOverview",
+      "file": "components\\dashboard\\categories\\CategoryOverview.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "components/dashboard/categories/FeaturedContent",
+      "file": "components\\dashboard\\categories\\FeaturedContent.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "components/dashboard/categories/__tests__/CategoryDetail.test",
+      "file": "components\\dashboard\\categories\\__tests__\\CategoryDetail.test.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "components/dashboard/categories/__tests__/CategoryOverview.test",
+      "file": "components\\dashboard\\categories\\__tests__\\CategoryOverview.test.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "components/dashboard/categories/__tests__/FeaturedContent.test",
+      "file": "components\\dashboard\\categories\\__tests__\\FeaturedContent.test.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "components/dashboard/comparison/SolutionComparison",
+      "file": "components\\dashboard\\comparison\\SolutionComparison.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "components/dashboard/comparison/__tests__/SolutionComparison.test",
+      "file": "components\\dashboard\\comparison\\__tests__\\SolutionComparison.test.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "components/dashboard/roi/ROICalculator",
+      "file": "components\\dashboard\\roi\\ROICalculator.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "components/dashboard/roi/__tests__/ROICalculator.test",
+      "file": "components\\dashboard\\roi\\__tests__\\ROICalculator.test.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "components/dashboard/shared/ChartContainer",
+      "file": "components\\dashboard\\shared\\ChartContainer.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "components/dashboard/shared/DashboardCard",
+      "file": "components\\dashboard\\shared\\DashboardCard.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "components/dashboard/shared/ErrorBoundary",
+      "file": "components\\dashboard\\shared\\ErrorBoundary.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "components/dashboard/shared/TimeRangeSelector",
+      "file": "components\\dashboard\\shared\\TimeRangeSelector.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "components/dashboard/testimonials/SuccessStories",
+      "file": "components\\dashboard\\testimonials\\SuccessStories.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "components/dashboard/testimonials/__tests__/SuccessStories.test",
+      "file": "components\\dashboard\\testimonials\\__tests__\\SuccessStories.test.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "components/dashboard/types/categories",
+      "file": "components\\dashboard\\types\\categories.ts",
+      "directory": "src"
+    },
+    {
+      "route": "components/dashboard/types",
+      "file": "components\\dashboard\\types\\index.ts",
+      "directory": "src"
+    },
+    {
+      "route": "components/EnterpriseHero",
+      "file": "components\\EnterpriseHero.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "components/LoginForm",
+      "file": "components\\LoginForm.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "components/mobile/ShippingForm",
+      "file": "components\\mobile\\ShippingForm.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "components/mobile/ShippingOptions",
+      "file": "components\\mobile\\ShippingOptions.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "components/mobile/TrackingDisplay",
+      "file": "components\\mobile\\TrackingDisplay.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "components/OptimizedImage",
+      "file": "components\\OptimizedImage.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "components/RegisterForm",
+      "file": "components\\RegisterForm.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "components/VirtualizedList",
+      "file": "components\\VirtualizedList.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "config/security",
+      "file": "config\\security.ts",
+      "directory": "src"
+    },
+    {
+      "route": "controllers/analytics.controller",
+      "file": "controllers\\analytics.controller.ts",
+      "directory": "src"
+    },
+    {
+      "route": "controllers/payment.controller",
+      "file": "controllers\\payment.controller.ts",
+      "directory": "src"
+    },
+    {
+      "route": "hooks/useOptimizedFetch",
+      "file": "hooks\\useOptimizedFetch.ts",
+      "directory": "src"
+    },
+    {
+      "route": "hooks/useWorker",
+      "file": "hooks\\useWorker.ts",
+      "directory": "src"
+    },
+    {
+      "route": "hooks/__tests__/useWorker.test",
+      "file": "hooks\\__tests__\\useWorker.test.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "middleware/analytics.middleware",
+      "file": "middleware\\analytics.middleware.ts",
+      "directory": "src"
+    },
+    {
+      "route": "middleware/n8nAuth",
+      "file": "middleware\\n8nAuth.ts",
+      "directory": "src"
+    },
+    {
+      "route": "middleware/securityMiddleware",
+      "file": "middleware\\securityMiddleware.ts",
+      "directory": "src"
+    },
+    {
+      "route": "middleware/validation",
+      "file": "middleware\\validation.ts",
+      "directory": "src"
+    },
+    {
+      "route": "models/Conversation",
+      "file": "models\\Conversation.ts",
+      "directory": "src"
+    },
+    {
+      "route": "models/Settings",
+      "file": "models\\Settings.ts",
+      "directory": "src"
+    },
+    {
+      "route": "pages/mobile/ShippingPage",
+      "file": "pages\\mobile\\ShippingPage.tsx",
+      "directory": "src"
+    },
+    {
+      "route": "routes/analytics.routes",
+      "file": "routes\\analytics.routes.ts",
+      "directory": "src"
+    },
+    {
+      "route": "routes/chatbot",
+      "file": "routes\\chatbot.ts",
+      "directory": "src"
+    },
+    {
+      "route": "routes/health",
+      "file": "routes\\health.ts",
+      "directory": "src"
+    },
+    {
+      "route": "routes/payment.routes",
+      "file": "routes\\payment.routes.ts",
+      "directory": "src"
+    },
+    {
+      "route": "routes/voicebot",
+      "file": "routes\\voicebot.ts",
+      "directory": "src"
+    },
+    {
+      "route": "routes/whatsapp",
+      "file": "routes\\whatsapp.ts",
+      "directory": "src"
+    },
+    {
+      "route": "services/AICategoryService",
+      "file": "services\\AICategoryService.ts",
+      "directory": "src"
+    },
+    {
+      "route": "services/analytics/AnalyticsService",
+      "file": "services\\analytics\\AnalyticsService.ts",
+      "directory": "src"
+    },
+    {
+      "route": "services/cache/RedisService",
+      "file": "services\\cache\\RedisService.ts",
+      "directory": "src"
+    },
+    {
+      "route": "services/categories/CategoryService",
+      "file": "services\\categories\\CategoryService.ts",
+      "directory": "src"
+    },
+    {
+      "route": "services/chatbot/ChatBotService",
+      "file": "services\\chatbot\\ChatBotService.ts",
+      "directory": "src"
+    },
+    {
+      "route": "services/i18n/LanguageService",
+      "file": "services\\i18n\\LanguageService.ts",
+      "directory": "src"
+    },
+    {
+      "route": "services/logistics/carriers/DHLService",
+      "file": "services\\logistics\\carriers\\DHLService.ts",
+      "directory": "src"
+    },
+    {
+      "route": "services/logistics/carriers/FedExService",
+      "file": "services\\logistics\\carriers\\FedExService.ts",
+      "directory": "src"
+    },
+    {
+      "route": "services/logistics/carriers/UPSService",
+      "file": "services\\logistics\\carriers\\UPSService.ts",
+      "directory": "src"
+    },
+    {
+      "route": "services/logistics/customs/CustomsService",
+      "file": "services\\logistics\\customs\\CustomsService.ts",
+      "directory": "src"
+    },
+    {
+      "route": "services/logistics/LogisticsService",
+      "file": "services\\logistics\\LogisticsService.ts",
+      "directory": "src"
+    },
+    {
+      "route": "services/logistics/ml/DeliveryPredictor",
+      "file": "services\\logistics\\ml\\DeliveryPredictor.ts",
+      "directory": "src"
+    },
+    {
+      "route": "services/logistics/ShippingOptimizer",
+      "file": "services\\logistics\\ShippingOptimizer.ts",
+      "directory": "src"
+    },
+    {
+      "route": "services/logistics/TrackingService",
+      "file": "services\\logistics\\TrackingService.ts",
+      "directory": "src"
+    },
+    {
+      "route": "services/monitoring/MonitoringService",
+      "file": "services\\monitoring\\MonitoringService.ts",
+      "directory": "src"
+    },
+    {
+      "route": "services/monitoring/WinstonLogger",
+      "file": "services\\monitoring\\WinstonLogger.ts",
+      "directory": "src"
+    },
+    {
+      "route": "services/n8n/N8nService",
+      "file": "services\\n8n\\N8nService.ts",
+      "directory": "src"
+    },
+    {
+      "route": "services/payment/PaymentService",
+      "file": "services\\payment\\PaymentService.ts",
+      "directory": "src"
+    },
+    {
+      "route": "services/security/SecurityService",
+      "file": "services\\security\\SecurityService.ts",
+      "directory": "src"
+    },
+    {
+      "route": "services/storage/S3Service",
+      "file": "services\\storage\\S3Service.ts",
+      "directory": "src"
+    },
+    {
+      "route": "services/traffic/load/LoadBalancer",
+      "file": "services\\traffic\\load\\LoadBalancer.ts",
+      "directory": "src"
+    },
+    {
+      "route": "services/traffic/queue/QueueManager",
+      "file": "services\\traffic\\queue\\QueueManager.ts",
+      "directory": "src"
+    },
+    {
+      "route": "services/traffic/routers/CallRouter",
+      "file": "services\\traffic\\routers\\CallRouter.ts",
+      "directory": "src"
+    },
+    {
+      "route": "services/traffic/routers/MessageRouter",
+      "file": "services\\traffic\\routers\\MessageRouter.ts",
+      "directory": "src"
+    },
+    {
+      "route": "services/traffic/TrafficManager",
+      "file": "services\\traffic\\TrafficManager.ts",
+      "directory": "src"
+    },
+    {
+      "route": "services/traffic/types",
+      "file": "services\\traffic\\types.ts",
+      "directory": "src"
+    },
+    {
+      "route": "services/types",
+      "file": "services\\types.ts",
+      "directory": "src"
+    },
+    {
+      "route": "services/voicebot/VoiceBotService",
+      "file": "services\\voicebot\\VoiceBotService.ts",
+      "directory": "src"
+    },
+    {
+      "route": "services/whatsapp/MediaHandler",
+      "file": "services\\whatsapp\\MediaHandler.ts",
+      "directory": "src"
+    },
+    {
+      "route": "services/whatsapp/TemplateManager",
+      "file": "services\\whatsapp\\TemplateManager.ts",
+      "directory": "src"
+    },
+    {
+      "route": "services/whatsapp/WhatsAppService",
+      "file": "services\\whatsapp\\WhatsAppService.ts",
+      "directory": "src"
+    },
+    {
+      "route": "tests/logistics/LogisticsService.test",
+      "file": "tests\\logistics\\LogisticsService.test.ts",
+      "directory": "src"
+    },
+    {
+      "route": "tests/logistics/TrackingService.test",
+      "file": "tests\\logistics\\TrackingService.test.ts",
+      "directory": "src"
+    },
+    {
+      "route": "tests/services/LogisticsService.test",
+      "file": "tests\\services\\LogisticsService.test.ts",
+      "directory": "src"
+    },
+    {
+      "route": "tests/services/RFQService.test",
+      "file": "tests\\services\\RFQService.test.ts",
+      "directory": "src"
+    },
+    {
+      "route": "tests/setup",
+      "file": "tests\\setup.ts",
+      "directory": "src"
+    },
+    {
+      "route": "utils/storage",
+      "file": "utils\\storage.ts",
+      "directory": "src"
+    },
+    {
+      "route": "__tests__/integration/explanationHistory.integration.test",
+      "file": "__tests__\\integration\\explanationHistory.integration.test.ts",
+      "directory": "src"
+    }
+  ]
+}

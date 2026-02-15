@@ -1,0 +1,140 @@
+{
+  "name": "Nano Banana AI Enrichment",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "nano-banana-enrichment",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Enrichment Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "webhookId": "nano-banana-enrichment-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Nano Banana AI Enrichment - Advanced data enhancement\nconst inputData = $input.first().json;\nconst startTime = Date.now();\n\nconsole.log('Starting Nano Banana enrichment for:', inputData.company_name || inputData.url);\n\n// Extract company information from input\nconst companyData = {\n  name: inputData.company_name || inputData.name || 'Unknown Company',\n  website: inputData.website || inputData.url || '',\n  description: inputData.description || '',\n  industry: inputData.industry || inputData.category || '',\n  location: inputData.location || '',\n  contact_email: inputData.email || inputData.contact_email || '',\n  phone: inputData.phone || inputData.contact_phone || '',\n  raw_data: inputData\n};\n\n// Website scraping function\nasync function scrapeWebsite(url) {\n  if (!url || !url.startsWith('http')) {\n    return { error: 'Invalid URL provided' };\n  }\n  \n  try {\n    // Mock website scraping (replace with actual scraping logic)\n    const mockScrapedData = {\n      title: `${companyData.name} - Official Website`,\n      description: `Leading ${companyData.industry || 'manufacturing'} company specializing in quality products and services.`,\n      keywords: [companyData.industry, 'manufacturing', 'supplier', 'quality', 'reliable'],\n      social_links: {\n        linkedin: `https://linkedin.com/company/${companyData.name.toLowerCase().replace(/\\s+/g, '-')}`,\n        facebook: `https://facebook.com/${companyData.name.toLowerCase().replace(/\\s+/g, '')}`,\n        twitter: `https://twitter.com/${companyData.name.toLowerCase().replace(/\\s+/g, '')}`\n      },\n      contact_info: {\n        email: companyData.contact_email || `info@${companyData.name.toLowerCase().replace(/\\s+/g, '')}.com`,\n        phone: companyData.phone || '+91-XXXXXXXXXX',\n        address: companyData.location || 'Address not available'\n      },\n      products_services: [\n        `${companyData.industry} Products`,\n        'Custom Manufacturing',\n        'Quality Assurance',\n        'Export Services'\n      ],\n      certifications: ['ISO 9001:2015', 'ISO 14001:2015', 'CE Marking'],\n      established_year: Math.floor(Math.random() * 30) + 1990,\n      employee_count: Math.floor(Math.random() * 1000) + 10,\n      annual_revenue: `$${(Math.random() * 50 + 1).toFixed(1)}M`,\n      scraped_at: new Date().toISOString()\n    };\n    \n    return mockScrapedData;\n  } catch (error) {\n    return { error: `Scraping failed: ${error.message}` };\n  }\n}\n\n// Image extraction function\nasync function extractImages(url) {\n  if (!url || !url.startsWith('http')) {\n    return [];\n  }\n  \n  try {\n    // Mock image extraction (replace with actual image extraction logic)\n    const mockImages = [\n      {\n        url: `https://example.com/images/${companyData.name.toLowerCase().replace(/\\s+/g, '-')}-logo.png`,\n        type: 'logo',\n        alt_text: `${companyData.name} Logo`,\n        dimensions: '200x200',\n        file_size: '15KB'\n      },\n      {\n        url: `https://example.com/images/${companyData.name.toLowerCase().replace(/\\s+/g, '-')}-facility.jpg`,\n        type: 'facility',\n        alt_text: `${companyData.name} Manufacturing Facility`,\n        dimensions: '800x600',\n        file_size: '125KB'\n      },\n      {\n        url: `https://example.com/images/${companyData.name.toLowerCase().replace(/\\s+/g, '-')}-products.jpg`,\n        type: 'products',\n        alt_text: `${companyData.name} Product Range`,\n        dimensions: '1024x768',\n        file_size: '200KB'\n      }\n    ];\n    \n    return mockImages;\n  } catch (error) {\n    return [];\n  }\n}\n\n// Execute enrichment processes\nconst websiteData = await scrapeWebsite(companyData.website);\nconst images = await extractImages(companyData.website);\n\n// Prepare enrichment result\nconst enrichmentResult = {\n  original_data: companyData,\n  website_analysis: websiteData,\n  extracted_images: images,\n  processing_time: Date.now() - startTime,\n  status: 'enriched'\n};\n\nconsole.log(`Enrichment completed in ${enrichmentResult.processing_time}ms`);\n\nreturn [{ json: enrichmentResult }];"
+      },
+      "id": "website-scraping",
+      "name": "Website Scraping & Analysis",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4",
+        "options": {
+          "temperature": 0.2,
+          "maxTokens": 1500
+        },
+        "prompt": "You are Nano Banana, an advanced AI assistant specializing in business data enrichment and analysis for Bell24H marketplace.\n\nAnalyze the following company data and provide comprehensive insights:\n\n**Company Information:**\n- Name: {{ $json.original_data.name }}\n- Website: {{ $json.original_data.website }}\n- Industry: {{ $json.original_data.industry }}\n- Location: {{ $json.original_data.location }}\n\n**Website Analysis:**\n{{ $json.website_analysis }}\n\n**Extracted Images:**\n{{ $json.extracted_images }}\n\nPlease provide a comprehensive analysis in JSON format:\n{\n  \"company_profile\": {\n    \"business_type\": \"string\",\n    \"market_position\": \"string\",\n    \"key_strengths\": [\"string\"],\n    \"growth_potential\": \"high|medium|low\",\n    \"credibility_score\": number,\n    \"professional_rating\": number\n  },\n  \"market_analysis\": {\n    \"target_markets\": [\"string\"],\n    \"competitive_advantages\": [\"string\"],\n    \"market_opportunities\": [\"string\"],\n    \"risk_factors\": [\"string\"]\n  },\n  \"engagement_strategy\": {\n    \"recommended_approach\": \"string\",\n    \"key_contact_points\": [\"string\"],\n    \"value_propositions\": [\"string\"],\n    \"follow_up_actions\": [\"string\"]\n  },\n  \"seo_optimization\": {\n    \"primary_keywords\": [\"string\"],\n    \"meta_description\": \"string\",\n    \"content_suggestions\": [\"string\"],\n    \"search_visibility\": \"high|medium|low\"\n  },\n  \"data_quality\": {\n    \"completeness_score\": number,\n    \"accuracy_confidence\": number,\n    \"verification_status\": \"verified|partial|unverified\",\n    \"missing_data\": [\"string\"]\n  }\n}\n\nProvide detailed, actionable insights that will help Bell24H effectively engage with this supplier."
+      },
+      "id": "nano-banana-analysis",
+      "name": "Nano Banana AI Analysis",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Process Nano Banana analysis and create final enriched profile\nconst enrichmentData = $input.first().json;\nconst aiAnalysis = $input.first().json.ai_analysis || {};\n\n// Parse AI analysis if it's a string\nlet parsedAnalysis = aiAnalysis;\nif (typeof aiAnalysis === 'string') {\n  try {\n    parsedAnalysis = JSON.parse(aiAnalysis);\n  } catch (e) {\n    console.log('Failed to parse AI analysis:', e);\n    parsedAnalysis = {\n      company_profile: {\n        business_type: 'Manufacturing',\n        credibility_score: 75,\n        professional_rating: 80\n      },\n      data_quality: {\n        completeness_score: 70,\n        accuracy_confidence: 0.8\n      }\n    };\n  }\n}\n\n// Create comprehensive supplier profile\nconst enrichedProfile = {\n  // Basic Information\n  company_id: `supplier_${Date.now()}`,\n  company_name: enrichmentData.original_data.name,\n  website: enrichmentData.original_data.website,\n  industry: enrichmentData.original_data.industry,\n  location: enrichmentData.original_data.location,\n  \n  // Contact Information\n  contact: {\n    email: enrichmentData.website_analysis?.contact_info?.email || enrichmentData.original_data.contact_email,\n    phone: enrichmentData.website_analysis?.contact_info?.phone || enrichmentData.original_data.phone,\n    address: enrichmentData.website_analysis?.contact_info?.address || enrichmentData.original_data.location\n  },\n  \n  // Business Profile\n  business_profile: {\n    business_type: parsedAnalysis.company_profile?.business_type || 'Manufacturing',\n    market_position: parsedAnalysis.company_profile?.market_position || 'Established',\n    key_strengths: parsedAnalysis.company_profile?.key_strengths || [],\n    growth_potential: parsedAnalysis.company_profile?.growth_potential || 'medium',\n    credibility_score: parsedAnalysis.company_profile?.credibility_score || 75,\n    professional_rating: parsedAnalysis.company_profile?.professional_rating || 80\n  },\n  \n  // Market Analysis\n  market_analysis: {\n    target_markets: parsedAnalysis.market_analysis?.target_markets || [],\n    competitive_advantages: parsedAnalysis.market_analysis?.competitive_advantages || [],\n    market_opportunities: parsedAnalysis.market_analysis?.market_opportunities || [],\n    risk_factors: parsedAnalysis.market_analysis?.risk_factors || []\n  },\n  \n  // Engagement Strategy\n  engagement_strategy: {\n    recommended_approach: parsedAnalysis.engagement_strategy?.recommended_approach || 'Standard outreach',\n    key_contact_points: parsedAnalysis.engagement_strategy?.key_contact_points || [],\n    value_propositions: parsedAnalysis.engagement_strategy?.value_propositions || [],\n    follow_up_actions: parsedAnalysis.engagement_strategy?.follow_up_actions || []\n  },\n  \n  // SEO & Marketing\n  seo_optimization: {\n    primary_keywords: parsedAnalysis.seo_optimization?.primary_keywords || [],\n    meta_description: parsedAnalysis.seo_optimization?.meta_description || '',\n    content_suggestions: parsedAnalysis.seo_optimization?.content_suggestions || [],\n    search_visibility: parsedAnalysis.seo_optimization?.search_visibility || 'medium'\n  },\n  \n  // Data Quality\n  data_quality: {\n    completeness_score: parsedAnalysis.data_quality?.completeness_score || 70,\n    accuracy_confidence: parsedAnalysis.data_quality?.accuracy_confidence || 0.8,\n    verification_status: parsedAnalysis.data_quality?.verification_status || 'partial',\n    missing_data: parsedAnalysis.data_quality?.missing_data || []\n  },\n  \n  // Media Assets\n  media_assets: {\n    logo: enrichmentData.extracted_images?.find(img => img.type === 'logo') || null,\n    facility_images: enrichmentData.extracted_images?.filter(img => img.type === 'facility') || [],\n    product_images: enrichmentData.extracted_images?.filter(img => img.type === 'products') || [],\n    total_images: enrichmentData.extracted_images?.length || 0\n  },\n  \n  // Website Analysis\n  website_analysis: {\n    title: enrichmentData.website_analysis?.title || '',\n    description: enrichmentData.website_analysis?.description || '',\n    keywords: enrichmentData.website_analysis?.keywords || [],\n    social_links: enrichmentData.website_analysis?.social_links || {},\n    products_services: enrichmentData.website_analysis?.products_services || [],\n    certifications: enrichmentData.website_analysis?.certifications || [],\n    established_year: enrichmentData.website_analysis?.established_year || null,\n    employee_count: enrichmentData.website_analysis?.employee_count || null,\n    annual_revenue: enrichmentData.website_analysis?.annual_revenue || null\n  },\n  \n  // Processing Metadata\n  processing: {\n    enriched_by: 'Nano Banana AI',\n    enrichment_version: '1.0',\n    processing_time: enrichmentData.processing_time,\n    enriched_at: new Date().toISOString(),\n    status: 'enriched'\n  },\n  \n  // Final Score\n  final_score: Math.round(\n    (parsedAnalysis.company_profile?.credibility_score || 75) * 0.4 +\n    (parsedAnalysis.data_quality?.completeness_score || 70) * 0.3 +\n    (parsedAnalysis.company_profile?.professional_rating || 80) * 0.3\n  )\n};\n\nconsole.log(`Nano Banana enrichment completed for ${enrichedProfile.company_name}`);\nconsole.log(`Final score: ${enrichedProfile.final_score}/100`);\n\nreturn [{ json: enrichedProfile }];"
+      },
+      "id": "create-profile",
+      "name": "Create Enriched Profile",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"status\": \"success\", \"message\": \"Nano Banana enrichment completed\", \"company_name\": $json.company_name, \"final_score\": $json.final_score, \"data_quality\": $json.data_quality.completeness_score, \"processing_time\": $json.processing.processing_time, \"enriched_at\": $json.processing.enriched_at } }}"
+      },
+      "id": "enrichment-response",
+      "name": "Enrichment Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1120, 300]
+    }
+  ],
+  "connections": {
+    "Enrichment Webhook": {
+      "main": [
+        [
+          {
+            "node": "Website Scraping & Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Website Scraping & Analysis": {
+      "main": [
+        [
+          {
+            "node": "Nano Banana AI Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nano Banana AI Analysis": {
+      "main": [
+        [
+          {
+            "node": "Create Enriched Profile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Enriched Profile": {
+      "main": [
+        [
+          {
+            "node": "Enrichment Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "id": "nano-banana-enrichment",
+  "tags": [
+    {
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "id": "bell24h",
+      "name": "bell24h"
+    },
+    {
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "id": "nano-banana",
+      "name": "nano-banana"
+    },
+    {
+      "createdAt": "2024-01-01T00:00-00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "id": "enrichment",
+      "name": "enrichment"
+    }
+  ]
+}

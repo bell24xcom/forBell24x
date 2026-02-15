@@ -1,0 +1,144 @@
+name: Auto Categories & SEO Optimization
+
+on:
+  schedule:
+    - cron: "0 2 * * *"  # Run nightly at 2 AM
+  workflow_dispatch:  # Allow manual trigger
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/**'
+      - 'src/app/**'
+
+jobs:
+  generate-categories:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          
+      - name: Install dependencies
+        run: |
+          pip install requests
+          
+      - name: Generate categories
+        run: |
+          cd scripts
+          python3 generate_categories.py
+          
+      - name: Commit generated categories
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add auto-categories.json
+          git commit -m "Auto-generated categories $(date)" || echo "No changes to commit"
+          
+      - name: Push changes
+        run: |
+          git push origin main
+          
+  seo-optimization:
+    runs-on: ubuntu-latest
+    needs: generate-categories
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build application
+        run: npm run build
+        env:
+          NEXT_PUBLIC_GA_MEASUREMENT_ID: ${{ secrets.GA_MEASUREMENT_ID }}
+          
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'
+          
+  backlink-campaign:
+    runs-on: ubuntu-latest
+    needs: seo-optimization
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          
+      - name: Install dependencies
+        run: |
+          pip install requests
+          
+      - name: Run backlink campaign
+        run: |
+          cd scripts
+          python3 bulk-directory-submit.py \
+            --site_url "https://bell24h-v1.vercel.app" \
+            --email "contact@bell24h.com" \
+            --submissions_per_day 10 \
+            --output_file "backlink-results.json"
+        env:
+          SITE_URL: "https://bell24h-v1.vercel.app"
+          CONTACT_EMAIL: "contact@bell24h.com"
+          
+      - name: Upload backlink results
+        uses: actions/upload-artifact@v3
+        with:
+          name: backlink-results
+          path: scripts/backlink-results.json
+          
+  seo-report:
+    runs-on: ubuntu-latest
+    needs: [generate-categories, seo-optimization, backlink-campaign]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Download backlink results
+        uses: actions/download-artifact@v3
+        with:
+          name: backlink-results
+          path: scripts/
+          
+      - name: Generate SEO report
+        run: |
+          echo "📊 Bell24h SEO Optimization Report" > seo-report.md
+          echo "Generated: $(date)" >> seo-report.md
+          echo "" >> seo-report.md
+          echo "## 🎯 Categories Generated" >> seo-report.md
+          echo "- Total Categories: $(jq '.total_categories' scripts/auto-categories.json)" >> seo-report.md
+          echo "- Total Subcategories: $(jq '.total_subcategories' scripts/auto-categories.json)" >> seo-report.md
+          echo "" >> seo-report.md
+          echo "## 🔗 Backlink Campaign Results" >> seo-report.md
+          echo "- Total Submissions: $(jq '.summary.total_submissions' scripts/backlink-results.json)" >> seo-report.md
+          echo "- Success Rate: $(jq '.summary.success_rate' scripts/backlink-results.json)%" >> seo-report.md
+          echo "" >> seo-report.md
+          echo "## 📈 Expected SEO Impact" >> seo-report.md
+          echo "- Improved Google indexing" >> seo-report.md
+          echo "- Enhanced category pages" >> seo-report.md
+          echo "- Increased backlink profile" >> seo-report.md
+          echo "- Better search rankings" >> seo-report.md
+          
+      - name: Upload SEO report
+        uses: actions/upload-artifact@v3
+        with:
+          name: seo-report
+          path: seo-report.md 

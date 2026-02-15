@@ -1,0 +1,36 @@
+﻿# Dependencies
+node_modules/
+.next/
+out/
+build/
+dist/
+
+# Python
+venv/
+**/__pycache__/
+*.pyc
+.Python
+env/
+ENV/
+
+# Large files
+*.zip
+*.tar.gz
+*.rar
+
+# Environment
+.env
+.env.local
+.env.*.local
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Vercel
+.vercel/

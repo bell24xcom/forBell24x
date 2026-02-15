@@ -1,0 +1,254 @@
+{
+  "name": "Bell24H Integration",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "webhook",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"event\"]}}",
+              "operation": "equal",
+              "value2": "rfq.created"
+            }
+          ]
+        }
+      },
+      "name": "RFQ Created?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        450,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"event\"]}}",
+              "operation": "equal",
+              "value2": "escrow.released"
+            }
+          ]
+        }
+      },
+      "name": "Escrow Released?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        450,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"event\"]}}",
+              "operation": "equal",
+              "value2": "user.registered"
+            }
+          ]
+        }
+      },
+      "name": "User Registered?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        450,
+        700
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{$env.BELL24H_API_URL}}/api/rfq/notify",
+        "options": {
+          "body": {
+            "rfqId": "={{$json[\"data\"][\"rfqId\"]}}",
+            "supplierId": "={{$json[\"data\"][\"supplierId\"]}}",
+            "status": "={{$json[\"data\"][\"status\"]}}"
+          }
+        }
+      },
+      "name": "Notify RFQ",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        650,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{$env.BELL24H_API_URL}}/api/escrow/notify",
+        "options": {
+          "body": {
+            "transactionId": "={{$json[\"data\"][\"transactionId\"]}}",
+            "amount": "={{$json[\"data\"][\"amount\"]}}",
+            "status": "={{$json[\"data\"][\"status\"]}}"
+          }
+        }
+      },
+      "name": "Notify Escrow",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        650,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{$env.BELL24H_API_URL}}/api/users/notify",
+        "options": {
+          "body": {
+            "userId": "={{$json[\"data\"][\"userId\"]}}",
+            "email": "={{$json[\"data\"][\"email\"]}}",
+            "status": "={{$json[\"data\"][\"status\"]}}"
+          }
+        }
+      },
+      "name": "Notify User",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        650,
+        600
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{$env.BELL24H_API_URL}}/api/analytics/log",
+        "options": {
+          "body": {
+            "event": "={{$json[\"event\"]}}",
+            "data": "={{$json[\"data\"]}}",
+            "timestamp": "={{$now}}"
+          }
+        }
+      },
+      "name": "Log Analytics",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        850,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "RFQ Created?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RFQ Created?": {
+      "main": [
+        [
+          {
+            "node": "Notify RFQ",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Escrow Released?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Escrow Released?": {
+      "main": [
+        [
+          {
+            "node": "Notify Escrow",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "User Registered?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "User Registered?": {
+      "main": [
+        [
+          {
+            "node": "Notify User",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Analytics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify RFQ": {
+      "main": [
+        [
+          {
+            "node": "Log Analytics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Escrow": {
+      "main": [
+        [
+          {
+            "node": "Log Analytics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify User": {
+      "main": [
+        [
+          {
+            "node": "Log Analytics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+} 

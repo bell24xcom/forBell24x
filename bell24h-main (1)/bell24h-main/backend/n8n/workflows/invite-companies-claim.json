@@ -1,0 +1,204 @@
+{
+  "name": "Invite Companies to Claim Profiles",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 24
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://bell24h.com/api/suppliers?claimStatus=UNCLAIMED&limit=500",
+        "options": {}
+      },
+      "id": "fetch-unclaimed",
+      "name": "Fetch Unclaimed Companies",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const companies = $input.all();\nconst selected = companies.slice(0, 1000); // Send 1000 invites per day\nreturn selected.map(item => item.json);"
+      },
+      "id": "limit-companies",
+      "name": "Limit to 1000",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "batchSize": 10,
+        "options": {}
+      },
+      "id": "split-batch",
+      "name": "Split in Batches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.msg91.com/api/v5/flow/",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "authkey",
+              "value": "={{ $env.MSG91_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "template_id",
+              "value": "={{ $env.MSG91_INVITE_TEMPLATE_ID }}"
+            },
+            {
+              "name": "sender",
+              "value": "BELL24"
+            },
+            {
+              "name": "mobiles",
+              "value": "={{ $json.phone }}"
+            },
+            {
+              "name": "VAR1",
+              "value": "={{ $json.name }}"
+            },
+            {
+              "name": "VAR2",
+              "value": "=https://bell24h.com/suppliers/{{ $json.id }}"
+            },
+            {
+              "name": "VAR3",
+              "value": "={{ $json.category }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "send-sms",
+      "name": "Send Invitation SMS",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.sendgrid.com/v3/mail/send",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.SENDGRID_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "personalizations",
+              "value": "=[{\"to\":[{\"email\":\"{{ $json.email }}\"}],\"subject\":\"Claim Your Company Profile on BELL24h\"}]"
+            },
+            {
+              "name": "from",
+              "value": "={\"email\":\"noreply@bell24h.com\"}"
+            },
+            {
+              "name": "content",
+              "value": "=[{\"type\":\"text/html\",\"value\":\"<p>Hi {{ $json.name }},</p><p>Claim your free company profile on BELL24h - India's #1 B2B platform!</p><p><a href='https://bell24h.com/suppliers/{{ $json.id }}'>Claim Your Profile</a></p>\"}]"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "send-email",
+      "name": "Send Invitation Email",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1050, 500]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://sheets.googleapis.com/v4/spreadsheets/{{ $env.GOOGLE_SHEET_ID }}/values/A1:append",
+        "authentication": "oAuth2",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "values",
+              "value": "=[[\"{{ $json.id }}\",\"{{ $json.name }}\",\"{{ $json.phone }}\",\"{{ $json.email }}\",\"INVITED\",\"{{ $now }}\"]]"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "log-to-sheet",
+      "name": "Log to Google Sheets",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1250, 300]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [[{"node": "Fetch Unclaimed Companies", "type": "main", "index": 0}]]
+    },
+    "Fetch Unclaimed Companies": {
+      "main": [[{"node": "Limit to 1000", "type": "main", "index": 0}]]
+    },
+    "Limit to 1000": {
+      "main": [[{"node": "Split in Batches", "type": "main", "index": 0}]]
+    },
+    "Split in Batches": {
+      "main": [
+        [
+          {"node": "Send Invitation SMS", "type": "main", "index": 0},
+          {"node": "Send Invitation Email", "type": "main", "index": 0}
+        ]
+      ]
+    },
+    "Send Invitation SMS": {
+      "main": [[{"node": "Log to Google Sheets", "type": "main", "index": 0}]]
+    },
+    "Send Invitation Email": {
+      "main": [[{"node": "Log to Google Sheets", "type": "main", "index": 0}]]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2025-11-09T12:00:00.000Z",
+  "versionId": "1"
+}
+

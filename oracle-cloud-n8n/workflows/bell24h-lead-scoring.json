@@ -1,0 +1,165 @@
+{
+  "name": "Bell24h Lead Scoring",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lead-scored",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-lead-scored",
+      "name": "Lead Scored Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "webhookId": "lead-scored"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.score }}",
+              "operation": "largerEqual",
+              "value2": 80
+            }
+          ]
+        }
+      },
+      "id": "check-high-score",
+      "name": "Check High Score",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "sales@bell24h.com",
+        "toEmail": "sales@bell24h.com",
+        "subject": "High-Value Lead Alert: {{ $json.companyName }}",
+        "message": "A high-value lead has been identified:\n\nCompany: {{ $json.companyName }}\nScore: {{ $json.score }}/100\nIndustry: {{ $json.industry }}\nContact: {{ $json.contactEmail }}\nPhone: {{ $json.contactPhone }}\n\nRecommended Actions:\n1. Immediate follow-up call\n2. Send personalized proposal\n3. Schedule demo\n\nLead Details: https://www.bell24h.com/admin/crm",
+        "options": {}
+      },
+      "id": "send-high-value-alert",
+      "name": "Send High-Value Alert",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [680, 200]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.score }}",
+              "operation": "largerEqual",
+              "value2": 60
+            }
+          ]
+        }
+      },
+      "id": "check-medium-score",
+      "name": "Check Medium Score",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [680, 400]
+    },
+    {
+      "parameters": {
+        "fromEmail": "noreply@bell24h.com",
+        "toEmail": "={{ $json.contactEmail }}",
+        "subject": "Welcome to Bell24h - Your B2B Marketplace",
+        "message": "Hi {{ $json.contactName }},\n\nThank you for your interest in Bell24h! We're excited to help {{ $json.companyName }} grow through our AI-powered B2B marketplace.\n\nWhat we offer:\n• AI-powered supplier matching\n• Real-time RFQ management\n• Secure escrow payments\n• Analytics and insights\n\nGet started: https://www.bell24h.com/auth/register\n\nBest regards,\nThe Bell24h Team",
+        "options": {}
+      },
+      "id": "send-welcome-email",
+      "name": "Send Welcome Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [900, 400]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"success\": true, \"message\": \"Lead processed successfully\"}"
+      },
+      "id": "webhook-response",
+      "name": "Webhook Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1120, 300]
+    }
+  ],
+  "connections": {
+    "webhook-lead-scored": {
+      "main": [
+        [
+          {
+            "node": "check-high-score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check-high-score": {
+      "main": [
+        [
+          {
+            "node": "send-high-value-alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "check-medium-score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check-medium-score": {
+      "main": [
+        [
+          {
+            "node": "send-welcome-email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "send-high-value-alert": {
+      "main": [
+        [
+          {
+            "node": "webhook-response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "send-welcome-email": {
+      "main": [
+        [
+          {
+            "node": "webhook-response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {},
+  "versionId": "1",
+  "id": "bell24h-lead-scoring",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}

@@ -1,0 +1,124 @@
+{
+  "name": "Bell24H Neon Database Configuration",
+  "version": "1.0.0",
+  "description": "Configuration for Neon PostgreSQL database setup for Bell24H B2B Marketplace",
+  "database": {
+    "provider": "postgresql",
+    "host": "ep-xxx-xxx.us-east-1.aws.neon.tech",
+    "port": 5432,
+    "database": "neondb",
+    "username": "username",
+    "password": "password",
+    "ssl": true,
+    "connectionString": "postgresql://username:password@ep-xxx-xxx.us-east-1.aws.neon.tech/neondb?sslmode=require"
+  },
+  "n8n": {
+    "database": {
+      "provider": "postgresql",
+      "host": "ep-xxx-xxx.us-east-1.aws.neon.tech",
+      "port": 5432,
+      "database": "n8n",
+      "username": "username",
+      "password": "password",
+      "ssl": true,
+      "connectionString": "postgresql://username:password@ep-xxx-xxx.us-east-1.aws.neon.tech/n8n?sslmode=require"
+    },
+    "redis": {
+      "host": "ep-xxx-xxx.us-east-1.aws.neon.tech",
+      "port": 6379,
+      "password": "password",
+      "connectionString": "redis://username:password@ep-xxx-xxx.us-east-1.aws.neon.tech:6379"
+    }
+  },
+  "apiKeys": {
+    "razorpay": {
+      "keyId": "rzp_test_1234567890",
+      "keySecret": "secret_1234567890",
+      "webhookSecret": "webhook_secret_1234567890"
+    },
+    "shiprocket": {
+      "apiKey": "ship_1234567890",
+      "apiSecret": "secret_1234567890",
+      "baseUrl": "https://apiv2.shiprocket.in"
+    },
+    "sendgrid": {
+      "apiKey": "SG.1234567890",
+      "fromEmail": "noreply@bell24h.com",
+      "fromName": "Bell24H"
+    },
+    "whatsapp": {
+      "accessToken": "whatsapp_1234567890",
+      "phoneNumberId": "1234567890",
+      "businessAccountId": "1234567890"
+    },
+    "slack": {
+      "botToken": "xoxb-1234567890-1234567890",
+      "signingSecret": "signing_secret_1234567890"
+    },
+    "aws": {
+      "accessKeyId": "AKIA1234567890",
+      "secretAccessKey": "secret_1234567890",
+      "region": "us-east-1"
+    }
+  },
+  "workflows": [
+    {
+      "name": "RFQ Auto-Processing",
+      "description": "Automatically processes incoming RFQs and matches with suppliers",
+      "status": "active",
+      "triggers": ["webhook"],
+      "integrations": ["razorpay", "sendgrid", "whatsapp"]
+    },
+    {
+      "name": "Supplier Onboarding",
+      "description": "Automated KYC verification and supplier profile creation",
+      "status": "active",
+      "triggers": ["form"],
+      "integrations": ["sendgrid", "whatsapp", "aws"]
+    },
+    {
+      "name": "Payment Processing",
+      "description": "Handles escrow payments and wallet transactions",
+      "status": "active",
+      "triggers": ["webhook"],
+      "integrations": ["razorpay", "slack"]
+    },
+    {
+      "name": "Market Intelligence",
+      "description": "Collects market data and generates insights",
+      "status": "active",
+      "triggers": ["schedule"],
+      "integrations": ["aws", "slack"]
+    },
+    {
+      "name": "Email Notifications",
+      "description": "Sends automated emails for RFQ updates and matches",
+      "status": "active",
+      "triggers": ["event"],
+      "integrations": ["sendgrid"]
+    },
+    {
+      "name": "Data Synchronization",
+      "description": "Syncs data between Bell24H and external systems",
+      "status": "active",
+      "triggers": ["schedule"],
+      "integrations": ["aws", "slack"]
+    }
+  ],
+  "setupInstructions": {
+    "step1": "Go to https://neon.tech and create a new project",
+    "step2": "Copy the connection string from your Neon dashboard",
+    "step3": "Update the DATABASE_URL in env.production with your actual credentials",
+    "step4": "Run 'node scripts/setup-neon-database.js' to set up the database",
+    "step5": "Deploy the updated configuration to Vercel",
+    "step6": "Test the API integrations in the admin panel"
+  },
+  "environmentVariables": {
+    "DATABASE_URL": "postgresql://username:password@ep-xxx-xxx.us-east-1.aws.neon.tech/neondb?sslmode=require",
+    "N8N_DATABASE_URL": "postgresql://username:password@ep-xxx-xxx.us-east-1.aws.neon.tech/n8n?sslmode=require",
+    "REDIS_URL": "redis://username:password@ep-xxx-xxx.us-east-1.aws.neon.tech:6379",
+    "N8N_WEBHOOK_URL": "https://www.bell24h.com/webhook",
+    "N8N_API_URL": "https://n8n.bell24h.com/api",
+    "N8N_API_KEY": "bell24h-n8n-api-key-2024"
+  }
+}

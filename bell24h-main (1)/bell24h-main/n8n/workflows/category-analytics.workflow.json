@@ -1,0 +1,217 @@
+{
+  "name": "Category Analytics Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 */6 * * *"
+            }
+          ]
+        }
+      },
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{$env.BELL24H_API_URL}}/api/categories/analytics",
+        "options": {
+          "headers": {
+            "Authorization": "Bearer {{$env.BELL24H_API_TOKEN}}",
+            "Content-Type": "application/json"
+          }
+        }
+      },
+      "name": "Fetch Category Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Process category analytics data\nconst categories = $input.all();\nconst analytics = [];\n\nfor (const category of categories) {\n  const data = category.json;\n  \n  // Calculate performance metrics\n  const performance = {\n    categoryId: data.id,\n    categoryName: data.name,\n    supplierCount: data.supplierCount,\n    productCount: data.productCount,\n    rfqCount: data.rfqCount,\n    mockOrderCount: data.mockOrderCount,\n    \n    // Calculate trends\n    supplierGrowth: data.supplierCount > 1000 ? 'High' : 'Medium',\n    rfqActivity: data.rfqCount > 100 ? 'Active' : 'Low',\n    orderVolume: data.mockOrderCount > 50 ? 'High' : 'Low',\n    \n    // Calculate engagement score\n    engagementScore: Math.round(\n      (data.rfqCount * 0.4 + data.mockOrderCount * 0.6) / 10\n    ),\n    \n    // Determine if trending\n    isTrending: data.rfqCount > 200 && data.mockOrderCount > 100,\n    \n    // Last updated\n    lastUpdated: new Date().toISOString()\n  };\n  \n  analytics.push(performance);\n}\n\n// Sort by engagement score\nanalytics.sort((a, b) => b.engagementScore - a.engagementScore);\n\n// Get top 10 categories\nconst topCategories = analytics.slice(0, 10);\n\n// Get trending categories\nconst trendingCategories = analytics.filter(cat => cat.isTrending);\n\nreturn [{\n  json: {\n    totalCategories: analytics.length,\n    topCategories: topCategories,\n    trendingCategories: trendingCategories,\n    averageEngagement: Math.round(\n      analytics.reduce((sum, cat) => sum + cat.engagementScore, 0) / analytics.length\n    ),\n    timestamp: new Date().toISOString()\n  }\n}];"
+      },
+      "name": "Process Analytics",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{$env.BELL24H_API_URL}}/api/categories/update-trending",
+        "options": {
+          "method": "POST",
+          "headers": {
+            "Authorization": "Bearer {{$env.BELL24H_API_TOKEN}}",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "trendingCategories": "={{$json.trendingCategories}}",
+            "topCategories": "={{$json.topCategories}}",
+            "timestamp": "={{$json.timestamp}}"
+          }
+        }
+      },
+      "name": "Update Trending Categories",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [850, 200]
+    },
+    {
+      "parameters": {
+        "url": "={{$env.BELL24H_API_URL}}/api/analytics/category-performance",
+        "options": {
+          "method": "POST",
+          "headers": {
+            "Authorization": "Bearer {{$env.BELL24H_API_TOKEN}}",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "analytics": "={{$json}}",
+            "timestamp": "={{$json.timestamp}}"
+          }
+        }
+      },
+      "name": "Log Analytics",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [850, 400]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$json.trendingCategories.length}}",
+              "operation": "larger",
+              "value2": 5
+            }
+          ]
+        }
+      },
+      "name": "High Activity?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "operation": "sendEmail",
+        "to": "admin@bell24h.com",
+        "subject": "Category Analytics Report - High Activity Detected",
+        "body": "High activity detected in categories:\n\nTrending Categories:\n{{$json.trendingCategories.map(cat => `- ${cat.categoryName}: ${cat.engagementScore} engagement score`).join('\\n')}}\n\nTop Categories:\n{{$json.topCategories.map(cat => `- ${cat.categoryName}: ${cat.supplierCount} suppliers, ${cat.rfqCount} RFQs`).join('\\n')}}\n\nAverage Engagement Score: {{$json.averageEngagement}}\n\nReport generated at: {{$json.timestamp}}"
+      },
+      "name": "Send Alert Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [1250, 200]
+    },
+    {
+      "parameters": {
+        "url": "={{$env.BELL24H_API_URL}}/api/notifications/category-update",
+        "options": {
+          "method": "POST",
+          "headers": {
+            "Authorization": "Bearer {{$env.BELL24H_API_TOKEN}}",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "message": "Category analytics updated successfully",
+            "trendingCount": "={{$json.trendingCategories.length}}",
+            "totalCategories": "={{$json.totalCategories}}",
+            "timestamp": "={{$json.timestamp}}"
+          }
+        }
+      },
+      "name": "Send Notification",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [1250, 400]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch Category Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Category Data": {
+      "main": [
+        [
+          {
+            "node": "Process Analytics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Analytics": {
+      "main": [
+        [
+          {
+            "node": "Update Trending Categories",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Log Analytics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Trending Categories": {
+      "main": [
+        [
+          {
+            "node": "High Activity?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Analytics": {
+      "main": [
+        [
+          {
+            "node": "High Activity?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "High Activity?": {
+      "main": [
+        [
+          {
+            "node": "Send Alert Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

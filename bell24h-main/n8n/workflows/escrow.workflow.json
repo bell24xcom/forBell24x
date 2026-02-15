@@ -1,0 +1,66 @@
+{
+  "name": "Escrow Released",
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Webhook",
+      "type": "webhook",
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "sendEmail",
+        "to": "{{ $node[\"Webhook\"].data.sellerEmail }}",
+        "subject": "Escrow Released – Transaction ID: {{ $node[\"Webhook\"].data.transactionId }}",
+        "body": "The escrow for transaction {{ $node[\"Webhook\"].data.transactionId }} has been successfully released."
+      },
+      "name": "Send Email",
+      "type": "email.smtp",
+      "position": [
+        200,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "http://analytics.bell24h.com/log",
+        "method": "POST",
+        "body": {
+          "transactionId": "{{ $node[\"Webhook\"].data.transactionId }}",
+          "status": "escrow_released"
+        }
+      },
+      "name": "Log Analytics",
+      "type": "http.request",
+      "position": [
+        400,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          "Send Email",
+          "main",
+          0,
+          0
+        ]
+      ]
+    },
+    "Send Email": {
+      "main": [
+        [
+          "Log Analytics",
+          "main",
+          0,
+          0
+        ]
+      ]
+    }
+  }
+}

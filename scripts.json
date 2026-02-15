@@ -1,0 +1,5 @@
+{
+  "dev": "tsx server/index.ts",
+  "build": "vite build",
+  "db:push": "drizzle-kit push"
+}

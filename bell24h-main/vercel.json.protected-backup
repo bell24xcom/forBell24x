@@ -1,0 +1,34 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "framework": "nextjs",
+  "rewrites": [
+    {
+      "source": "/sitemap.xml",
+      "destination": "/api/sitemap"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/category/:slug",
+      "destination": "/categories/:slug",
+      "permanent": true
+    },
+    {
+      "source": "/category/:category/:subcategory",
+      "destination": "/categories/:category/:subcategory", 
+      "permanent": true
+    }
+  ],
+  "headers": [
+    {
+      "source": "/categories/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600, s-maxage=86400"
+        }
+      ]
+    }
+  ]
+} 

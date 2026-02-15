@@ -1,0 +1,28 @@
+🛠️ UPDATE NAMESERVERS: Use CORRECT Cloudflare Nameservers
+
+PROBLEM: Wrong nameservers in Namecheap
+SOLUTION: Update to your assigned Cloudflare nameservers
+
+STEP 1: Update Nameservers in Namecheap
+1. Go to: https://ap.www.namecheap.com/domains/domaincontrolpanel/bell24h.com/advancedns
+2. Find the nameserver section
+3. Replace current nameservers with:
+   - charles.ns.cloudflare.com
+   - sureena.ns.cloudflare.com
+4. Click "Save Changes"
+
+STEP 2: Activate in Cloudflare
+1. Go back to Cloudflare dashboard
+2. Click "Continue to activation" button
+3. Should show "Valid Configuration"
+
+STEP 3: Test Domain
+- Wait 5-30 minutes
+- Go to www.bell24h.com
+- Should show your Bell24h site
+
+EXACT VALUES TO ENTER:
+- Nameserver 1: charles.ns.cloudflare.com
+- Nameserver 2: sureena.ns.cloudflare.com
+
+IMPORTANT: Use YOUR assigned nameservers, not generic ones.
