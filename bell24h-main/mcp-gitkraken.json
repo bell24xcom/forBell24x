@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "gitkraken": {
+      "command": "node",
+      "args": [
+        "gitkraken-mcp-server.js"
+      ],
+      "env": {
+        "NODE_ENV": "development",
+        "GITKRAKEN_API_TOKEN": "${GITKRAKEN_API_TOKEN}",
+        "GITKRAKEN_WORKSPACE_ID": "${GITKRAKEN_WORKSPACE_ID}"
+      },
+      "cwd": "${workspaceFolder}"
+    }
+  }
+}

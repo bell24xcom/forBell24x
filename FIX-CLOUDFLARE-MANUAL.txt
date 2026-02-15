@@ -1,0 +1,41 @@
+========================================
+BELL24h - Manual Cloudflare Fix Commands
+========================================
+
+Run these commands ONE BY ONE in PowerShell:
+
+1. Navigate to your repo:
+   cd C:\Users\Sanika\Projects\bell24h
+
+2. Remove submodules:
+   git submodule deinit --all -f
+
+3. Remove .gitmodules file (if exists):
+   git rm -f .gitmodules
+
+4. Remove .git/modules folder (if exists):
+   Remove-Item -Recurse -Force .git\modules
+
+5. Stage changes:
+   git add .
+
+6. Commit changes:
+   git commit -m "Fix: Remove submodules for Cloudflare"
+
+7. Push to GitHub:
+   git push origin main
+
+========================================
+THEN IN CLOUDFLARE DASHBOARD:
+========================================
+
+1. Go to: https://dash.cloudflare.com
+2. Pages > Your Project > Settings
+3. Click "Clear build cache"
+4. Go to Deployments tab
+5. Click "Retry deployment"
+
+========================================
+DONE! Your site will deploy successfully.
+========================================
+

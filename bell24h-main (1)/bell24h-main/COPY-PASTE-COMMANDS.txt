@@ -1,0 +1,86 @@
+========================================
+EMERGENCY 502 FIX - COPY-PASTE COMMANDS
+========================================
+
+STEP 1: SSH into Oracle VM
+---------------------------
+ssh ubuntu@80.225.192.248
+
+
+STEP 2: Copy-Paste These Commands
+----------------------------------
+# Navigate to project
+cd ~/bell24h || (mkdir -p ~/bell24h && cd ~/bell24h)
+
+# Stop old container
+docker stop bell24h 2>/dev/null || true
+docker rm bell24h 2>/dev/null || true
+
+# Pull latest code
+if [ -d .git ]; then
+    git fetch origin main
+    git reset --hard origin/main
+else
+    git clone https://github.com/digitex-erp/bell24h . || true
+fi
+
+# Check/create .env.production
+if [ ! -f client/.env.production ]; then
+    echo "⚠️  .env.production NOT FOUND! Creating template..."
+    cat > client/.env.production << 'ENVEOF'
+NODE_ENV=production
+DATABASE_URL=postgresql://your_user:your_password@your_host:5432/your_db
+NEXTAUTH_URL=https://bell24h.com
+NEXTAUTH_SECRET=please-change-this-to-random-secret
+NEXT_PUBLIC_APP_URL=https://bell24h.com
+ENVEOF
+    echo "⚠️  Please edit client/.env.production with real values!"
+    echo "Run: nano client/.env.production"
+    echo "Then run the script again or continue manually."
+fi
+
+# Build Docker image
+docker build -t bell24h:latest -f Dockerfile .
+
+# Start container
+docker run -d \
+  --name bell24h \
+  --restart always \
+  -p 3000:3000 \
+  --env-file client/.env.production \
+  bell24h:latest
+
+# Wait for startup
+sleep 15
+
+# Check status
+docker ps | grep bell24h
+
+# Check logs
+docker logs --tail 30 bell24h
+
+# Test health
+curl http://localhost:3000/api/health
+
+# Reload Nginx
+sudo nginx -t && sudo systemctl reload nginx
+
+# Final test
+curl -I http://localhost:3000
+
+
+STEP 3: Verify Site Works
+--------------------------
+Wait 2-3 minutes, then test:
+- https://bell24h.com
+- https://bell24h.com/auth/demo-login
+
+
+If Still 502, Check Logs:
+--------------------------
+docker logs -f bell24h
+sudo tail -f /var/log/nginx/error.log
+
+
+========================================
+

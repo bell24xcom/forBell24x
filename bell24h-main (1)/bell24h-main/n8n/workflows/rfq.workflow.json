@@ -1,0 +1,58 @@
+{
+  "name": "Send Supplier Alert",
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Webhook",
+      "type": "webhook",
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "sendEmail",
+        "to": "{{ $node[\"Webhook\"].data.to }}",
+        "subject": "New RFQ from Bell24H.com",
+        "body": "You have a new RFQ:\n\n{{ $node[\"Webhook\"].data.message }}"
+      },
+      "name": "Send Email",
+      "type": "email.smtp",
+      "position": [
+        200,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "ws://bell24h.com/socket",
+        "message": "{\n  \"event\": \"new_rfq\",\n  \"rfqId\": \"{{ $node[\"Webhook\"].data.rfqId }}\"\n}"
+      },
+      "name": "Broadcast Update",
+      "type": "websocket.send",
+      "position": [
+        400,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          "Send Email",
+          "main",
+          0,
+          0
+        ],
+        [
+          "Broadcast Update",
+          "main",
+          0,
+          0
+        ]
+      ]
+    }
+  }
+}

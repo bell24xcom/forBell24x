@@ -1,0 +1,189 @@
+{
+  "name": "Bell24H RFQ Notification Complete",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "rfq-notification",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "RFQ Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "webhookId": "rfq-notification-webhook"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "validation-1",
+              "leftValue": "={{ $json.rfq_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists"
+              }
+            },
+            {
+              "id": "validation-2", 
+              "leftValue": "={{ $json.supplier_email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists"
+              }
+            },
+            {
+              "id": "validation-3",
+              "leftValue": "={{ $json.product_category }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "data-validation",
+      "name": "Validate RFQ Data",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Enhanced supplier matching logic\nconst rfqData = $input.first().json;\n\n// Mock supplier database query (replace with actual DB call)\nconst matchingSuppliers = [\n  {\n    id: 'supplier_001',\n    name: 'TechCorp Industries',\n    email: rfqData.supplier_email,\n    category: rfqData.product_category,\n    rating: 4.8,\n    response_time: '2 hours',\n    location: 'Mumbai, India'\n  },\n  {\n    id: 'supplier_002', \n    name: 'Global Manufacturing Ltd',\n    email: 'contact@globalmfg.com',\n    category: rfqData.product_category,\n    rating: 4.6,\n    response_time: '4 hours',\n    location: 'Delhi, India'\n  }\n];\n\n// Filter suppliers by category and availability\nconst relevantSuppliers = matchingSuppliers.filter(supplier => \n  supplier.category === rfqData.product_category\n);\n\n// Sort by rating and response time\nconst sortedSuppliers = relevantSuppliers.sort((a, b) => {\n  if (a.rating !== b.rating) return b.rating - a.rating;\n  return a.response_time.localeCompare(b.response_time);\n});\n\n// Prepare notification data\nconst notificationData = {\n  rfq_id: rfqData.rfq_id,\n  product_category: rfqData.product_category,\n  quantity: rfqData.quantity || 'Not specified',\n  deadline: rfqData.deadline || 'ASAP',\n  specifications: rfqData.specifications || 'Standard specifications',\n  suppliers: sortedSuppliers,\n  timestamp: new Date().toISOString(),\n  priority: rfqData.priority || 'normal'\n};\n\nreturn [{ json: notificationData }];"
+      },
+      "id": "supplier-matching",
+      "name": "Match Suppliers",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 200]
+    },
+    {
+      "parameters": {
+        "fromEmail": "noreply@bell24h.com",
+        "toEmail": "={{ $json.suppliers[0].email }}",
+        "subject": "New RFQ Opportunity - {{ $json.product_category }} | Bell24H",
+        "emailType": "html",
+        "message": "<!DOCTYPE html>\n<html>\n<head>\n    <meta charset=\"utf-8\">\n    <title>New RFQ Opportunity</title>\n    <style>\n        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }\n        .container { max-width: 600px; margin: 0 auto; padding: 20px; }\n        .header { background: #7c3aed; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }\n        .content { background: #f8fafc; padding: 30px; border-radius: 0 0 8px 8px; }\n        .rfq-details { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #7c3aed; }\n        .cta-button { display: inline-block; background: #7c3aed; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin: 20px 0; }\n        .footer { text-align: center; color: #666; font-size: 12px; margin-top: 30px; }\n        .priority-high { border-left-color: #ef4444; }\n        .priority-medium { border-left-color: #f59e0b; }\n        .priority-low { border-left-color: #10b981; }\n    </style>\n</head>\n<body>\n    <div class=\"container\">\n        <div class=\"header\">\n            <h1>🔔 New RFQ Opportunity</h1>\n            <p>Bell24H Supplier Network</p>\n        </div>\n        \n        <div class=\"content\">\n            <h2>Hello {{ $json.suppliers[0].name }}!</h2>\n            \n            <p>We have a new Request for Quote (RFQ) that matches your expertise in <strong>{{ $json.product_category }}</strong>.</p>\n            \n            <div class=\"rfq-details priority-{{ $json.priority }}\">\n                <h3>📋 RFQ Details</h3>\n                <ul>\n                    <li><strong>RFQ ID:</strong> {{ $json.rfq_id }}</li>\n                    <li><strong>Product Category:</strong> {{ $json.product_category }}</li>\n                    <li><strong>Quantity:</strong> {{ $json.quantity }}</li>\n                    <li><strong>Deadline:</strong> {{ $json.deadline }}</li>\n                    <li><strong>Specifications:</strong> {{ $json.specifications }}</li>\n                    <li><strong>Priority:</strong> <span style=\"text-transform: capitalize;\">{{ $json.priority }}</span></li>\n                </ul>\n            </div>\n            \n            <p><strong>Why you received this:</strong> Your company has been identified as a qualified supplier for this category with excellent ratings and response times.</p>\n            \n            <div style=\"text-align: center;\">\n                <a href=\"https://bell24h.com/supplier/rfq/{{ $json.rfq_id }}\" class=\"cta-button\">\n                    View Full RFQ Details\n                </a>\n            </div>\n            \n            <div style=\"background: #e0e7ff; padding: 15px; border-radius: 6px; margin: 20px 0;\">\n                <h4>💡 Quick Response Tips:</h4>\n                <ul>\n                    <li>Review the specifications carefully</li>\n                    <li>Provide competitive pricing</li>\n                    <li>Include lead times and delivery options</li>\n                    <li>Highlight your competitive advantages</li>\n                </ul>\n            </div>\n            \n            <p>Best regards,<br>\n            <strong>Bell24H Team</strong><br>\n            <em>Connecting Global Suppliers with Quality Buyers</em></p>\n        </div>\n        \n        <div class=\"footer\">\n            <p>This email was sent to {{ $json.suppliers[0].email }} because you're a registered supplier on Bell24H.</p>\n            <p>© 2024 Bell24H. All rights reserved.</p>\n        </div>\n    </div>\n</body>\n</html>",
+        "options": {}
+      },
+      "id": "send-notification",
+      "name": "Send RFQ Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [900, 200]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"status\": \"success\", \"message\": \"RFQ notification sent successfully\", \"rfq_id\": $json.rfq_id, \"suppliers_notified\": $json.suppliers.length, \"timestamp\": $json.timestamp } }}"
+      },
+      "id": "success-response",
+      "name": "Success Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1120, 200]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"status\": \"error\", \"message\": \"Invalid RFQ data provided\", \"required_fields\": [\"rfq_id\", \"supplier_email\", \"product_category\"], \"received\": $json } }}"
+      },
+      "id": "error-response",
+      "name": "Error Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [680, 400]
+    }
+  ],
+  "connections": {
+    "RFQ Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate RFQ Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate RFQ Data": {
+      "main": [
+        [
+          {
+            "node": "Match Suppliers",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Match Suppliers": {
+      "main": [
+        [
+          {
+            "node": "Send RFQ Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send RFQ Notification": {
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "id": "rfq-notification-complete",
+  "tags": [
+    {
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "id": "bell24h",
+      "name": "bell24h"
+    },
+    {
+      "createdAt": "2024-01-01T00:00:00.000Z", 
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "id": "rfq",
+      "name": "rfq"
+    }
+  ]
+}

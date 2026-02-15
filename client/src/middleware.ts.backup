@@ -1,0 +1,102 @@
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
+
+const protectedPaths = [
+  '/dashboard',
+  '/dashboard/*',
+  '/admin',
+  '/admin/*',
+  '/rfq/create',
+  '/wallet',
+  '/settings',
+  '/rfq',
+  '/voice-rfq',
+  '/video-rfq',
+  '/ai-matching',
+  '/analytics',
+  '/predictive-analytics',
+  '/supplier-risk',
+  '/logistics',
+  '/showcase',
+  '/reports',
+  '/planning',
+  '/chatbot',
+  '/help',
+  '/kyc',
+  '/kyc-compliance',
+  '/esg',
+  '/ecgc',
+  '/comprehensive',
+  '/ai-features',
+  '/advanced-analytics',
+  '/invoice-discounting',
+  '/negotiations',
+  '/rfqs',
+  '/suppliers/dashboard',
+]
+
+const publicPaths = [
+  '/',
+  '/suppliers',
+  '/marketplace',
+  '/about',
+  '/contact',
+  '/auth/login',
+  '/auth/register',
+  '/pricing',
+  '/business-categories',
+  '/categories',
+  '/categories-dashboard',
+  '/rfqs',
+  '/negotiation',
+  '/trading',
+  '/registration',
+  '/legal/terms-of-service',
+  '/legal/privacy-policy',
+  '/legal/pricing-policy',
+  '/legal/shipping-policy',
+  '/legal/cancellation-refund-policy',
+]
+
+export function middleware(request: NextRequest) {
+  const path = request.nextUrl.pathname
+  
+  // Skip middleware for API routes, static files, and Next.js internals
+  if (
+    path.startsWith('/api/') ||
+    path.startsWith('/_next/') ||
+    path.startsWith('/favicon.ico') ||
+    path.includes('.')
+  ) {
+    return NextResponse.next()
+  }
+  
+  // Check if path is protected
+  const isProtected = protectedPaths.some(p => 
+    p.endsWith('*') 
+      ? path.startsWith(p.replace('/*', ''))
+      : path === p
+  )
+  
+  if (isProtected) {
+    // Check for authentication token/session
+    const token = request.cookies.get('auth-token')?.value
+    const session = request.cookies.get('next-auth.session-token')?.value
+    const userToken = request.cookies.get('user-token')?.value
+    
+    if (!token && !session && !userToken) {
+      // Redirect to login with return URL
+      const loginUrl = new URL('/auth/login', request.url)
+      loginUrl.searchParams.set('callbackUrl', path)
+      return NextResponse.redirect(loginUrl)
+    }
+  }
+  
+  return NextResponse.next()
+}
+
+export const config = {
+  matcher: [
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\\..*).*)',
+  ],
+}

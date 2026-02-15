@@ -1,0 +1,188 @@
+{
+  "name": "Bell24h - India's Leading B2B Marketplace",
+  "short_name": "Bell24h",
+  "description": "India's most advanced AI-powered B2B marketplace with GST integration, UPI payments, and voice RFQ creation",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#667eea",
+  "theme_color": "#764ba2",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["business", "productivity", "shopping"],
+  "icons": [
+    {
+      "src": "/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/homepage-mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Bell24h Homepage - Mobile View"
+    },
+    {
+      "src": "/screenshots/dashboard-mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Bell24h Dashboard - Mobile View"
+    },
+    {
+      "src": "/screenshots/rfq-mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "RFQ Creation - Mobile View"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Create RFQ",
+      "short_name": "New RFQ",
+      "description": "Create a new Request for Quotation",
+      "url": "/rfq/create",
+      "icons": [
+        {
+          "src": "/icons/rfq-icon-96x96.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "My Dashboard",
+      "short_name": "Dashboard",
+      "description": "Access your business dashboard",
+      "url": "/dashboard",
+      "icons": [
+        {
+          "src": "/icons/dashboard-icon-96x96.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Voice Search",
+      "short_name": "Voice",
+      "description": "Search products using voice input",
+      "url": "/voice-search",
+      "icons": [
+        {
+          "src": "/icons/voice-icon-96x96.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "GST Calculator",
+      "short_name": "GST Calc",
+      "description": "Calculate GST for your transactions",
+      "url": "/gst-calculator",
+      "icons": [
+        {
+          "src": "/icons/gst-icon-96x96.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "related_applications": [
+    {
+      "platform": "webapp",
+      "url": "https://bell24h-v1.vercel.app"
+    }
+  ],
+  "prefer_related_applications": false,
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
+  "handle_links": "preferred",
+  "capture_links": "new-client",
+  "file_handlers": [
+    {
+      "action": "/upload",
+      "accept": {
+        "application/pdf": [".pdf"],
+        "image/*": [".jpg", ".jpeg", ".png", ".webp"]
+      }
+    }
+  ],
+  "protocol_handlers": [
+    {
+      "protocol": "web+bell24h",
+      "url": "/?protocol=%s"
+    }
+  ],
+  "share_target": {
+    "action": "/share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
+  "permissions": [
+    "geolocation",
+    "notifications",
+    "camera",
+    "microphone"
+  ],
+  "features": [
+    "cross-origin-isolated",
+    "payment",
+    "web-share"
+  ]
+}

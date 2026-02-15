@@ -1,0 +1,130 @@
+{
+  "name": "Bell24h RFQ Notification",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "rfq-created",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-rfq-created",
+      "name": "RFQ Created Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "webhookId": "rfq-created"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.category }}",
+              "operation": "isNotEmpty"
+            }
+          ]
+        }
+      },
+      "id": "check-rfq-data",
+      "name": "Check RFQ Data",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://www.bell24h.com/api/suppliers",
+        "options": {
+          "queryParameters": {
+            "category": "={{ $json.category }}",
+            "subcategory": "={{ $json.subcategory }}"
+          }
+        }
+      },
+      "id": "get-matching-suppliers",
+      "name": "Get Matching Suppliers",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [680, 200]
+    },
+    {
+      "parameters": {
+        "fromEmail": "noreply@bell24h.com",
+        "toEmail": "={{ $json.email }}",
+        "subject": "New RFQ Opportunity: {{ $json.title }}",
+        "message": "A new RFQ has been posted that matches your business:\n\nTitle: {{ $json.title }}\nCategory: {{ $json.category }}\nBudget: {{ $json.budget }} {{ $json.currency }}\nDeadline: {{ $json.deadline }}\n\nView and respond at: https://www.bell24h.com/rfq/{{ $json.id }}",
+        "options": {}
+      },
+      "id": "send-email-notification",
+      "name": "Send Email Notification",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [900, 200]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\"success\": true, \"message\": \"RFQ notification sent successfully\"}"
+      },
+      "id": "webhook-response",
+      "name": "Webhook Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1120, 300]
+    }
+  ],
+  "connections": {
+    "webhook-rfq-created": {
+      "main": [
+        [
+          {
+            "node": "check-rfq-data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check-rfq-data": {
+      "main": [
+        [
+          {
+            "node": "get-matching-suppliers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get-matching-suppliers": {
+      "main": [
+        [
+          {
+            "node": "send-email-notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "send-email-notification": {
+      "main": [
+        [
+          {
+            "node": "webhook-response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {},
+  "versionId": "1",
+  "id": "bell24h-rfq-notification",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}

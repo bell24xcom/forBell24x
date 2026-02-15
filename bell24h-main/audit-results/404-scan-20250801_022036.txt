@@ -1,0 +1,55 @@
+Getting links from: https://bell24h-v1.vercel.app/
+├───OK─── https://bell24h-v1.vercel.app/supplier/SUP001
+├───OK─── https://bell24h-v1.vercel.app/fintech
+├───OK─── https://bell24h-v1.vercel.app/wallet
+├───OK─── https://bell24h-v1.vercel.app/register
+├───OK─── https://bell24h-v1.vercel.app/rfq/create
+├───OK─── https://bell24h-v1.vercel.app/marketplace
+├───OK─── https://bell24h-v1.vercel.app/about
+├───OK─── https://bell24h-v1.vercel.app/contact
+├───OK─── https://bell24h-v1.vercel.app/privacy
+├───OK─── https://bell24h-v1.vercel.app/terms
+├───OK─── https://bell24h-v1.vercel.app/help
+Finished! 42 links found. 31 excluded. 0 broken.
+
+Getting links from: https://bell24h-v1.vercel.app/supplier/SUP001
+├─BROKEN─ https://bell24h-v1.vercel.app/supplier-covers/steel-facility.jpg (HTTP_404)
+└─BROKEN─ https://bell24h-v1.vercel.app/supplier-logos/msi-logo.png (HTTP_404)
+Finished! 24 links found. 22 excluded. 2 broken.
+
+Getting links from: https://bell24h-v1.vercel.app/fintech
+Finished! 21 links found. 21 excluded. 0 broken.
+
+Getting links from: https://bell24h-v1.vercel.app/wallet
+Finished! 21 links found. 21 excluded. 0 broken.
+
+Getting links from: https://bell24h-v1.vercel.app/register
+└───OK─── https://bell24h-v1.vercel.app/login
+Finished! 22 links found. 21 excluded. 0 broken.
+
+Getting links from: https://bell24h-v1.vercel.app/rfq/create
+Finished! 21 links found. 21 excluded. 0 broken.
+
+Getting links from: https://bell24h-v1.vercel.app/marketplace
+Finished! 21 links found. 21 excluded. 0 broken.
+
+Getting links from: https://bell24h-v1.vercel.app/about
+Finished! 22 links found. 22 excluded. 0 broken.
+
+Getting links from: https://bell24h-v1.vercel.app/contact
+Finished! 22 links found. 22 excluded. 0 broken.
+
+Getting links from: https://bell24h-v1.vercel.app/privacy
+Finished! 21 links found. 21 excluded. 0 broken.
+
+Getting links from: https://bell24h-v1.vercel.app/terms
+Finished! 21 links found. 21 excluded. 0 broken.
+
+Getting links from: https://bell24h-v1.vercel.app/help
+Finished! 21 links found. 21 excluded. 0 broken.
+
+Getting links from: https://bell24h-v1.vercel.app/login
+Finished! 22 links found. 22 excluded. 0 broken.
+
+Finished! 301 links found. 287 excluded. 2 broken.
+Elapsed time: 14 seconds

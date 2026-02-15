@@ -1,0 +1,52 @@
+name: Deploy Bell24h to Vercel (Simple)
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Generate Prisma client
+      run: npx prisma generate
+      
+    - name: Build application
+      run: npm run build
+      
+    - name: Deploy to Vercel
+      uses: amondnet/vercel-action@v25
+      with:
+        vercel-token: ${{ secrets.VERCEL_TOKEN }}
+        vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+        vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+        vercel-args: '--prod'
+        working-directory: ./
+        
+    - name: Deploy Status
+      if: always()
+      run: |
+        if [ "${{ job.status }}" == "success" ]; then
+          echo "✅ Deployment successful!"
+          echo "🌐 Production URL: https://www.bell24h.com"
+        else
+          echo "❌ Deployment failed!"
+          exit 1
+        fi

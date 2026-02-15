@@ -1,0 +1,212 @@
+{
+  "name": "Mock Order Generation Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 */4 * * *"
+            }
+          ]
+        }
+      },
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{$env.BELL24H_API_URL}}/api/categories",
+        "options": {
+          "headers": {
+            "Authorization": "Bearer {{$env.BELL24H_API_TOKEN}}",
+            "Content-Type": "application/json"
+          }
+        }
+      },
+      "name": "Fetch Categories",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate mock orders for categories\nconst categories = $input.all();\nconst mockOrders = [];\n\n// Indian company names for realistic data\nconst buyers = [\n  'Mahindra & Mahindra Ltd',\n  'Tata Motors Ltd',\n  'Reliance Industries Ltd',\n  'Adani Group',\n  'Bharti Airtel Ltd',\n  'Infosys Ltd',\n  'TCS Ltd',\n  'Wipro Ltd',\n  'HDFC Bank Ltd',\n  'ICICI Bank Ltd',\n  'State Bank of India',\n  'Bajaj Auto Ltd',\n  'Hero MotoCorp Ltd',\n  'Maruti Suzuki India Ltd',\n  'Asian Paints Ltd',\n  'ITC Ltd',\n  'Hindustan Unilever Ltd',\n  'Nestle India Ltd',\n  'Procter & Gamble India',\n  'Godrej Consumer Products Ltd'\n];\n\nconst suppliers = [\n  'Pro Solutions India',\n  'Expert Services Pvt Ltd',\n  'Quality Suppliers Co',\n  'Reliable Partners Ltd',\n  'Trusted Vendors Inc',\n  'Premium Solutions',\n  'Elite Services Ltd',\n  'Top Suppliers Co',\n  'Best Quality Corp',\n  'Superior Services Ltd',\n  'Advanced Solutions',\n  'Innovation Hub Ltd',\n  'TechCorp Solutions',\n  'Smart Services Ltd',\n  'Future Suppliers Co'\n];\n\n// Order titles by category\nconst orderTitles = {\n  'agriculture': [\n    'Tractor Parts Supply Contract',\n    'Irrigation System Installation',\n    'Fertilizer Supply Agreement',\n    'Seeds & Saplings Order',\n    'Farm Equipment Maintenance'\n  ],\n  'automobile': [\n    'Auto Parts Manufacturing',\n    'Vehicle Component Supply',\n    'Engine Parts Contract',\n    'Tire Supply Agreement',\n    'Car Accessories Order'\n  ],\n  'electronics': [\n    'Electronic Components Supply',\n    'Circuit Board Manufacturing',\n    'Sensor Installation Contract',\n    'Battery Supply Agreement',\n    'Display Panel Order'\n  ],\n  'textiles': [\n    'Fabric Supply Contract',\n    'Garment Manufacturing',\n    'Textile Machinery Order',\n    'Yarn Supply Agreement',\n    'Dyeing Services Contract'\n  ],\n  'construction': [\n    'Building Materials Supply',\n    'Cement Supply Contract',\n    'Steel Structure Order',\n    'Tiles Supply Agreement',\n    'Construction Equipment Rental'\n  ]\n};\n\n// Generate 2-3 mock orders per category\nfor (const category of categories) {\n  const categoryData = category.json;\n  const categoryId = categoryData.id;\n  const categoryName = categoryData.name;\n  \n  // Get order titles for this category or use generic ones\n  const titles = orderTitles[categoryId] || [\n    `${categoryName} Supply Contract`,\n    `${categoryName} Manufacturing Agreement`,\n    `${categoryName} Service Contract`,\n    `${categoryName} Equipment Order`,\n    `${categoryName} Maintenance Contract`\n  ];\n  \n  const orderCount = Math.floor(Math.random() * 2) + 2; // 2-3 orders\n  \n  for (let i = 0; i < orderCount; i++) {\n    const buyer = buyers[Math.floor(Math.random() * buyers.length)];\n    const supplier = suppliers[Math.floor(Math.random() * suppliers.length)];\n    const title = titles[Math.floor(Math.random() * titles.length)];\n    \n    // Generate realistic order value (in INR)\n    const baseValue = Math.floor(Math.random() * 5000000) + 100000;\n    const value = Math.round(baseValue / 1000) * 1000; // Round to nearest 1000\n    \n    // Generate order status with weighted distribution\n    const statusRand = Math.random();\n    let status;\n    if (statusRand < 0.4) status = 'completed';\n    else if (statusRand < 0.7) status = 'in_progress';\n    else status = 'pending';\n    \n    // Generate dates\n    const createdAt = new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000);\n    const completedAt = status === 'completed' ? \n      new Date(createdAt.getTime() + Math.random() * 15 * 24 * 60 * 60 * 1000) : \n      null;\n    \n    const mockOrder = {\n      id: `${categoryId.toUpperCase()}-${String(i + 1).padStart(3, '0')}-${Date.now()}`,\n      title: title,\n      description: `Supply of ${categoryName.toLowerCase()} products and services for ${buyer}`,\n      value: value,\n      currency: 'INR',\n      status: status,\n      buyer: buyer,\n      supplier: supplier,\n      category: categoryName,\n      subcategory: categoryData.subcategories?.[Math.floor(Math.random() * (categoryData.subcategories?.length || 1))]?.name || 'General',\n      categoryId: categoryId,\n      createdAt: createdAt.toISOString().split('T')[0],\n      completedAt: completedAt ? completedAt.toISOString().split('T')[0] : null,\n      updatedAt: new Date().toISOString()\n    };\n    \n    mockOrders.push(mockOrder);\n  }\n}\n\n// Return mock orders in batches for processing\nconst batchSize = 10;\nconst batches = [];\nfor (let i = 0; i < mockOrders.length; i += batchSize) {\n  batches.push({\n    json: {\n      mockOrders: mockOrders.slice(i, i + batchSize),\n      totalOrders: mockOrders.length,\n      batchNumber: Math.floor(i / batchSize) + 1,\n      totalBatches: Math.ceil(mockOrders.length / batchSize),\n      timestamp: new Date().toISOString()\n    }\n  });\n}\n\nreturn batches;"
+      },
+      "name": "Generate Mock Orders",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{$env.BELL24H_API_URL}}/api/mock-orders",
+        "options": {
+          "method": "POST",
+          "headers": {
+            "Authorization": "Bearer {{$env.BELL24H_API_TOKEN}}",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "mockOrders": "={{$json.mockOrders}}",
+            "batchNumber": "={{$json.batchNumber}}",
+            "totalBatches": "={{$json.totalBatches}}",
+            "timestamp": "={{$json.timestamp}}"
+          }
+        }
+      },
+      "name": "Create Mock Orders",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{$env.BELL24H_API_URL}}/api/categories/update-stats",
+        "options": {
+          "method": "POST",
+          "headers": {
+            "Authorization": "Bearer {{$env.BELL24H_API_TOKEN}}",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "totalOrders": "={{$json.totalOrders}}",
+            "timestamp": "={{$json.timestamp}}"
+          }
+        }
+      },
+      "name": "Update Category Stats",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$json.totalOrders}}",
+              "operation": "larger",
+              "value2": 50
+            }
+          ]
+        }
+      },
+      "name": "High Order Volume?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1250, 300]
+    },
+    {
+      "parameters": {
+        "operation": "sendEmail",
+        "to": "admin@bell24h.com",
+        "subject": "Mock Order Generation Report - High Volume",
+        "body": "High volume of mock orders generated:\n\nTotal Orders: {{$json.totalOrders}}\nBatch Number: {{$json.batchNumber}} of {{$json.totalBatches}}\n\nThis indicates high activity in the marketplace.\n\nGenerated at: {{$json.timestamp}}"
+      },
+      "name": "Send Volume Alert",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [1450, 200]
+    },
+    {
+      "parameters": {
+        "url": "={{$env.BELL24H_API_URL}}/api/notifications/mock-orders-updated",
+        "options": {
+          "method": "POST",
+          "headers": {
+            "Authorization": "Bearer {{$env.BELL24H_API_TOKEN}}",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "message": "Mock orders updated successfully",
+            "totalOrders": "={{$json.totalOrders}}",
+            "timestamp": "={{$json.timestamp}}"
+          }
+        }
+      },
+      "name": "Send Notification",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [1450, 400]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch Categories",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Categories": {
+      "main": [
+        [
+          {
+            "node": "Generate Mock Orders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Mock Orders": {
+      "main": [
+        [
+          {
+            "node": "Create Mock Orders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Mock Orders": {
+      "main": [
+        [
+          {
+            "node": "Update Category Stats",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Category Stats": {
+      "main": [
+        [
+          {
+            "node": "High Order Volume?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "High Order Volume?": {
+      "main": [
+        [
+          {
+            "node": "Send Volume Alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

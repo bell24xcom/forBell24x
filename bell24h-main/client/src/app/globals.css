@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-[#0a1128] text-white min-h-screen;
+    background: #0a1128;
+    background-attachment: fixed;
+  }
+
+  /* Remove ALL gradients */
+  * {
+    background-image: none !important;
+  }
+}
+
+/* Override any inline gradients */
+.bg-gradient-to-br, .bg-gradient-to-r, [style*="gradient"] {
+  background: #0a1128 !important;
+}
+
+/* Kill purple cards */
+.prose, .card, .demo-card, [class*="bg-purple"], [class*="bg-gradient"] {
+  @apply bg-gray-900/80 border border-white/10 !important;
+  backdrop-filter: blur(12px);
+}
+
+/* Stats section */
+.stats-grid > div {
+  @apply bg-gray-900/90 border border-cyan-500/20;
+}
+
+/* Sitewide selection color for brand experience */
+::selection {
+  background: #0070f3;
+  color: #fff;
+}
+::-moz-selection {
+  background: #0070f3;
+  color: #fff;
+}
+
+/* Input field contrast fix - WCAG AA compliant (4.5:1 ratio) */
+input[type="text"],
+input[type="tel"],
+input[type="email"],
+input[type="number"],
+input[type="password"],
+textarea {
+  color: #111827 !important; /* Dark gray - 21:1 contrast on white */
+  background-color: #ffffff !important;
+}
+
+input[type="text"]::placeholder,
+input[type="tel"]::placeholder,
+input[type="email"]::placeholder,
+input[type="number"]::placeholder,
+input[type="password"]::placeholder,
+textarea::placeholder {
+  color: #6b7280 !important; /* Medium gray - 7:1 contrast on white */
+}
+
+/* Ensure input focus states are visible */
+input:focus,
+textarea:focus {
+  border-color: #0070f3 !important;
+  outline: 2px solid #0070f3 !important;
+  outline-offset: 2px !important;
+}

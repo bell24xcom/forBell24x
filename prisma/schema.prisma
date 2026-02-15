@@ -1,0 +1,266 @@
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["jsonProtocol"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// Enhanced User model for production
+model User {
+  id          String   @id @default(cuid())
+  email       String?  @unique
+  phone       String?  @unique
+  name        String?
+  role        UserRole @default(SUPPLIER)
+  isActive    Boolean  @default(true)
+  isVerified  Boolean  @default(false)
+  company     String?
+  gstNumber   String?
+  location    String?
+  avatar      String?
+  preferences Json?
+  lastLoginAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  rfqs        RFQ[]
+  quotes      Quote[]
+  buyerTransactions Transaction[] @relation("BuyerTransactions")
+  supplierTransactions Transaction[] @relation("SupplierTransactions")
+  otpVerifications OTPVerification[]
+  leads       Lead[]
+  notifications Notification[]
+
+  @@map("users")
+}
+
+// OTP Verification for authentication
+model OTPVerification {
+  id         String   @id @default(cuid())
+  phone      String   @unique
+  otp        String
+  expiresAt  DateTime
+  attempts   Int      @default(0)
+  isVerified Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  user       User?    @relation(fields: [phone], references: [phone])
+
+  @@map("otp_verifications")
+}
+
+// Category for RFQ classification (aligns API with schema)
+model Category {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  rfqs        RFQ[]
+
+  @@map("categories")
+}
+
+// Webhook log for n8n / external integrations
+model Webhook {
+  id         String   @id @default(cuid())
+  eventType  String   @map("event_type")
+  payload    Json
+  status     String   @default("pending")
+  createdAt  DateTime @default(now())
+
+  @@map("webhooks")
+}
+
+// RFQ (Request for Quotation) model
+model RFQ {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  category    String   // legacy string (e.g. slug); kept for backward compat
+  categoryId  String?  @map("category_id")
+  type        String?  // optional; used by API
+  quantity    String
+  unit        String   @default("units")
+  minBudget   Float?
+  maxBudget   Float?
+  timeline    String
+  requirements String?
+  urgency     RFQUrgency @default(NORMAL)
+  status      RFQStatus @default(ACTIVE)
+  location    String?
+  tags        String[]
+  isPublic    Boolean  @default(true)
+  expiresAt   DateTime?
+  priority    Int      @default(3)
+  estimatedValue Float?
+  views       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  createdBy   String   @map("created_by")
+  user        User     @relation(fields: [createdBy], references: [id])
+  categoryRel Category? @relation(fields: [categoryId], references: [id])
+  quotes      Quote[]
+  transactions Transaction[]
+
+  @@map("rfqs")
+}
+
+// Quote model for supplier responses
+model Quote {
+  id          String   @id @default(cuid())
+  rfqId       String   @map("rfq_id")
+  supplierId  String   @map("supplier_id")
+  price       Float
+  quantity    String
+  timeline    String
+  description String?
+  terms       String?
+  status      QuoteStatus @default(PENDING)
+  isAccepted  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  rfq         RFQ      @relation(fields: [rfqId], references: [id])
+  supplier    User     @relation(fields: [supplierId], references: [id])
+  transactions Transaction[]
+
+  @@map("quotes")
+}
+
+// Transaction model for payments
+model Transaction {
+  id          String   @id @default(cuid())
+  rfqId       String   @map("rfq_id")
+  quoteId     String?  @map("quote_id")
+  buyerId     String   @map("buyer_id")
+  supplierId  String   @map("supplier_id")
+  amount      Float
+  currency    String   @default("INR")
+  status      TransactionStatus @default(PENDING)
+  paymentMethod String?
+  paymentId   String?  @map("payment_id")
+  escrowId    String?  @map("escrow_id")
+  metadata    Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  rfq         RFQ      @relation(fields: [rfqId], references: [id])
+  quote       Quote?   @relation(fields: [quoteId], references: [id])
+  buyer       User     @relation("BuyerTransactions", fields: [buyerId], references: [id])
+  supplier    User     @relation("SupplierTransactions", fields: [supplierId], references: [id])
+
+  @@map("transactions")
+}
+
+// Lead model for potential customers
+model Lead {
+  id          String   @id @default(cuid())
+  name        String
+  email       String?
+  phone       String?
+  company     String?
+  message     String?
+  source      String?
+  status      LeadStatus @default(NEW)
+  assignedTo  String?  @map("assigned_to")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  createdBy   String?  @map("created_by")
+  user        User?    @relation(fields: [createdBy], references: [id])
+
+  @@map("leads")
+}
+
+// Notification model
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  title     String
+  message   String
+  type      NotificationType
+  isRead    Boolean  @default(false)
+  data      Json?
+  createdAt DateTime @default(now())
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("notifications")
+}
+
+// Enums
+enum UserRole {
+  SUPPLIER
+  BUYER
+  ADMIN
+  AGENT
+}
+
+enum RFQStatus {
+  DRAFT
+  ACTIVE
+  QUOTED
+  COMPLETED
+  CANCELLED
+  EXPIRED
+}
+
+enum RFQUrgency {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum QuoteStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  EXPIRED
+}
+
+enum TransactionStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELLED
+  REFUNDED
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  PROPOSAL
+  NEGOTIATION
+  CLOSED_WON
+  CLOSED_LOST
+}
+
+enum NotificationType {
+  INFO
+  SUCCESS
+  WARNING
+  ERROR
+  RFQ_CREATED
+  QUOTE_RECEIVED
+  TRANSACTION_UPDATE
+  SYSTEM_ALERT
+}

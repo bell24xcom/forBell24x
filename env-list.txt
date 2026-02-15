@@ -1,0 +1,22 @@
+ENVIRONMENT VARIABLES FOR NETLIFY DEPLOYMENT
+Copy and paste these into Netlify Dashboard > Site settings > Environment variables
+
+DATABASE_URL=postgresql://neondb_owner:npg_K6M8mRhTPpCH@ep-fragrant-smoke-ae00uwml-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+
+MSG91_AUTH_KEY=468517Ak5rJ0vb7NDV68c24863P1
+MSG91_SENDER_ID=BELL24H
+MSG91_TEMPLATE_ID=default
+
+JWT_SECRET=bell24h-jwt-secret-key-2024-production-minimum-32-characters
+NEXTAUTH_SECRET=bell24h-super-secret-key-2024-production
+ENCRYPTION_KEY=bell24h-encryption-key-32-chars-minimum
+
+NODE_ENV=production
+NEXT_PUBLIC_APP_URL=https://your-site-name.netlify.app
+
+ENABLE_ESCROW=false
+ENABLE_AI_FEATURES=false
+ENABLE_BLOCKCHAIN=false
+
+RATE_LIMIT_MAX_REQUESTS=100
+RATE_LIMIT_WINDOW_MS=900000

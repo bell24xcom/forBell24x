@@ -1,0 +1,68 @@
+# Exclude large caches and local artifacts from Cloudflare Pages uploads
+# This prevents the 25MB file size limit error
+
+# Next.js caches (these can be huge)
+.next/cache/
+client/.next/cache/
+**/.next/cache/
+**/cache/
+
+# Webpack caches
+cache/
+client/cache/
+**/cache/webpack/
+**/cache/webpack/client-production/
+
+# Build outputs that shouldn't be uploaded
+.vercel/
+.vercel/output/
+.netlify/
+dist/
+build/
+
+# Cloudflare/Wrangler local state
+.wrangler/
+.wrangler-state/
+.dev.vars
+
+# Test artifacts
+coverage/
+.nyc_output/
+cypress/videos/
+cypress/screenshots/
+**/coverage/
+
+# Common local artifacts
+node_modules/
+**/node_modules/
+.pnp/
+.pnp.js
+
+# Logs and temp files
+*.log
+*.tmp
+*.temp
+logs/
+**/*.log
+
+# IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Large binary files
+*.node
+*.dat
+*.db
+*.sqlite
+*.zip
+*.tar.gz
+
+# Prisma dev databases
+prisma/dev.db
+prisma/*.db
+prisma/*.sqlite
+

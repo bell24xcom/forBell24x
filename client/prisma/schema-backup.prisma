@@ -1,0 +1,326 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id                       String             @id @default(cuid())
+  email                    String?            @unique
+  phone                    String?            @unique
+  name                     String?
+  hashedPassword           String?
+  role                     UserRole           @default(BUYER)
+  companyname              String?
+  isemailverified          Boolean            @default(false)
+  phoneVerified            Boolean            @default(false)
+  trustScore               Int                @default(0)
+  lastLoginAt              DateTime?
+  verificationMethod       String?            @default("phone_otp")
+  createdAt                DateTime           @default(now())
+  updatedAt                DateTime           @updatedAt
+  roles                    String[]           @default(["buyer"])
+  trafficTier              TrafficTier        @default(FREE)
+  showcaseEnabled          Boolean            @default(false)
+  logoUrl                  String?
+  brandName                String?
+  about                    String?
+  msmeCertUrl              String?
+  msmeCertNumber           String?
+  razorpay_contact_id      String?            @map("razorpay_contact_id")
+  razorpay_fund_account_id String?            @map("razorpay_fund_account_id")
+  bank_account_number      String?            @map("bank_account_number")
+  bank_ifsc_code           String?            @map("bank_ifsc_code")
+  bank_account_holder      String?            @map("bank_account_holder")
+  bank_account_type        String?            @default("savings") @map("bank_account_type")
+  products                 Product[]
+  rfqs                     RFQ[]
+  sessions                 Session[]
+  trafficAnalytics         TrafficAnalytics[]
+  wallet                   Wallet?
+  crmLeads                 CrmLead[] // CRM relation
+  otps                     OTP[] // Phone/Email OTPs
+}
+
+model Wallet {
+  id               String        @id @default(cuid())
+  userid           String        @unique @map("userid")
+  balance          Float         @default(0)
+  totalbalance     Float         @default(0)
+  availablebalance Float         @default(0)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  transactions     Transaction[]
+  user             User          @relation(fields: [userid], references: [id], onDelete: Cascade)
+}
+
+model Transaction {
+  id            String   @id @default(cuid())
+  walletid      String   @map("walletid")
+  transactionid String   @unique @map("transactionid")
+  amount        Float
+  currency      String   @default("INR")
+  type          String
+  status        String   @default("PENDING")
+  description   String?
+  metadata      Json?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  wallet        Wallet   @relation(fields: [walletid], references: [id], onDelete: Cascade)
+}
+
+model Product {
+  id               String             @id @default(cuid())
+  name             String
+  brand            String
+  logoUrl          String?
+  description      String
+  images           String[]
+  basePrice        Float
+  trafficPrice     Float
+  msmePrice        Float?
+  category         String
+  subcategory      String?
+  specifications   Json?
+  userId           String
+  userRole         UserRole
+  views            Int                @default(0)
+  impressions      Int                @default(0)
+  rfqCount         Int                @default(0)
+  isActive         Boolean            @default(true)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  user             User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rfqs             RFQ[]
+  trafficAnalytics TrafficAnalytics[]
+}
+
+model RFQ {
+  id                 String        @id @default(cuid())
+  title              String
+  description        String
+  category           String
+  subcategory        String?
+  quantity           Int
+  deadline           DateTime?
+  status             RFQStatus     @default(OPEN)
+  priority           Priority      @default(MEDIUM)
+  aiSuggestions      Json?
+  riskScore          Float?
+  marketTrend        Json?
+  competitorAnalysis Json?
+  buyerId            String
+  productId          String?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+  buyer              User          @relation(fields: [buyerId], references: [id], onDelete: Cascade)
+  product            Product?      @relation(fields: [productId], references: [id])
+  responses          RFQResponse[]
+}
+
+model RFQResponse {
+  id                 String         @id @default(cuid())
+  rfqId              String
+  supplierId         String
+  price              Float
+  quantity           Int
+  deliveryTime       Int
+  description        String?
+  status             ResponseStatus @default(PENDING)
+  aiScore            Float?
+  negotiationHistory Json?
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  rfq                RFQ            @relation(fields: [rfqId], references: [id], onDelete: Cascade)
+}
+
+model TrafficAnalytics {
+  id          String   @id @default(cuid())
+  userId      String
+  productId   String?
+  page        String
+  impressions Int      @default(0)
+  clicks      Int      @default(0)
+  conversions Int      @default(0)
+  date        DateTime @default(now())
+  product     Product? @relation(fields: [productId], references: [id])
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model OTP {
+  id        String   @id @default(cuid())
+  phone     String?
+  email     String?
+  otp       String
+  type      String // 'phone' or 'email'
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([phone, type])
+  @@index([email, type])
+  @@index([expiresAt])
+}
+
+// CRM Models for Marketing Campaign Tracking
+model CrmLead {
+  id          Int        @id @default(autoincrement())
+  name        String
+  email       String
+  company     String?
+  phone       String?
+  source      String // 'linkedin', 'gst-scraping', 'medium', 'whatsapp', 'reddit'
+  status      LeadStatus @default(NEW)
+  priority    Priority   @default(MEDIUM)
+  assignedTo  String?
+  notes       String?
+  utmSource   String?    @map("utm_source")
+  utmCampaign String?    @map("utm_campaign")
+  utmMedium   String?    @map("utm_medium")
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // Link to your existing user if they convert
+  convertedUserId String?
+  convertedUser   User?   @relation(fields: [convertedUserId], references: [id])
+
+  // CRM relations
+  activities LeadActivity[]
+
+  @@map("crm_leads")
+}
+
+model MarketingCampaign {
+  id               Int            @id @default(autoincrement())
+  name             String
+  type             String // 'gst-scraping', 'linkedin', 'whatsapp', 'email', 'sms'
+  status           CampaignStatus @default(ACTIVE)
+  targetCount      Int            @default(0)
+  completedCount   Int            @default(0)
+  responseCount    Int            @default(0)
+  signupCount      Int            @default(0)
+  costSpent        Float          @default(0)
+  revenueGenerated Float          @default(0)
+  startedAt        DateTime       @default(now())
+  endedAt          DateTime?
+
+  @@map("marketing_campaigns")
+}
+
+model LeadActivity {
+  id        Int      @id @default(autoincrement())
+  leadId    Int
+  lead      CrmLead  @relation(fields: [leadId], references: [id])
+  activity  String // 'email_sent', 'demo_booked', 'followed_up', 'converted'
+  details   String?
+  createdAt DateTime @default(now())
+
+  @@map("lead_activities")
+}
+
+model PressInquiry {
+  id             Int       @id @default(autoincrement())
+  journalistName String    @map("journalist_name")
+  publication    String
+  email          String
+  subject        String
+  message        String?
+  status         String    @default("pending") // 'pending', 'responded', 'published'
+  priority       String    @default("medium") // 'high', 'medium', 'low'
+  receivedAt     DateTime  @default(now())
+  respondedAt    DateTime?
+
+  @@map("press_inquiries")
+}
+
+model ContentPerformance {
+  id          Int      @id @default(autoincrement())
+  title       String
+  platform    String // 'medium', 'linkedin', 'reddit', 'twitter'
+  url         String
+  publishedAt DateTime @default(now())
+  views       Int      @default(0)
+  clicks      Int      @default(0)
+  signups     Int      @default(0)
+  ctr         Float    @default(0)
+  conversion  Float    @default(0)
+
+  @@map("content_performance")
+}
+
+enum UserRole {
+  BUYER
+  SUPPLIER
+  MSME
+  MANUFACTURER
+  ADMIN
+}
+
+enum TrafficTier {
+  FREE
+  BRONZE
+  SILVER
+  GOLD
+  PLATINUM
+}
+
+enum RFQStatus {
+  OPEN
+  IN_PROGRESS
+  CLOSED
+  CANCELLED
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum ResponseStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  NEGOTIATING
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  DEMO_SCHEDULED
+  PROPOSAL_SENT
+  NEGOTIATING
+  CONVERTED
+  LOST
+}
+
+enum CampaignStatus {
+  ACTIVE
+  PAUSED
+  COMPLETED
+  DRAFT
+}

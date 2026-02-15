@@ -1,0 +1,21 @@
+{
+  "welcome": "स्वागत है",
+  "login": "लॉगिन करें",
+  "register": "रजिस्टर करें",
+  "logout": "लॉगआउट",
+  "dashboard": "डैशबोर्ड",
+  "marketplace": "मार्केटप्लेस",
+  "suppliers": "सप्लायर्स",
+  "buyers": "खरीदार",
+  "products": "उत्पाद",
+  "orders": "ऑर्डर",
+  "analytics": "एनालिटिक्स",
+  "profile": "प्रोफाइल",
+  "settings": "सेटिंग्स",
+  "help": "सहायता",
+  "contact": "संपर्क करें",
+  "search": "खोजें",
+  "language": "भाषा",
+  "hindi": "हिंदी",
+  "english": "अंग्रेज़ी"
+} 

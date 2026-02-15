@@ -1,0 +1,57 @@
+{
+  "lead_id": "LEAD-2024-001",
+  "company_name": "Global Manufacturing Solutions",
+  "industry": "machinery",
+  "company_size": "large",
+  "website": "https://globalmfg.com",
+  "location": "Pune, Maharashtra, India",
+  "contact": {
+    "name": "Priya Sharma",
+    "email": "priya.sharma@globalmfg.com",
+    "phone": "+91-9876543210",
+    "linkedin": "https://linkedin.com/in/priyasharma",
+    "designation": "Business Development Manager"
+  },
+  "business_details": {
+    "established_year": 2010,
+    "employee_count": 500,
+    "annual_revenue": "$25M",
+    "main_products": [
+      "Industrial Machinery",
+      "CNC Equipment",
+      "Automation Systems",
+      "Quality Control Equipment"
+    ],
+    "target_markets": [
+      "India",
+      "Southeast Asia",
+      "Middle East",
+      "Africa"
+    ]
+  },
+  "engagement_history": {
+    "previous_interactions": 3,
+    "last_contact": "2024-01-10T14:30:00Z",
+    "response_time": "2 hours",
+    "interest_level": "high",
+    "communication_preference": "email"
+  },
+  "qualification_criteria": {
+    "budget_range": "$100,000 - $500,000",
+    "decision_timeline": "3-6 months",
+    "decision_makers": [
+      "CEO",
+      "Procurement Head",
+      "Technical Director"
+    ],
+    "pain_points": [
+      "Finding reliable suppliers",
+      "Quality assurance",
+      "Timely delivery",
+      "Competitive pricing"
+    ]
+  },
+  "source": "website_inquiry",
+  "created_at": "2024-01-15T09:15:00Z",
+  "status": "new"
+}

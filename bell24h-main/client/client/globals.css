@@ -1,0 +1,31 @@
+/* Compact navigation spacing */
+.nav-compact {
+  height: 64px;
+  min-height: 64px;
+}
+
+/* Smooth transitions */
+.nav-link {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Compact mobile menu */
+@media (max-width: 768px) {
+  .nav-compact {
+    height: auto;
+    min-height: 60px;
+  }
+}
+
+/* Better button spacing */
+.btn-compact {
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Improved hover effects */
+.hover-lift:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}

@@ -1,0 +1,5 @@
+[33m2be2e9e9a[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m Phone OTP authentication integrated - Ready for customers
+[33m2111ea365[m Fix Vercel deployment: Add git remote and push all fixes
+[33m1e67d112b[m Fix Vercel deployment: Update vercel.json and next.config.js for proper Next.js detection
+[33m06c9f3cf2[m Fix Vercel deployment: Remove type module and add vercel.json config
+[33m3284db755[m Deploy new Bell24h design with strategic redesign and trust focus

@@ -1,0 +1,521 @@
+{
+  "timestamp": "2025-09-02T16:35:00.561Z",
+  "localhost": {
+    "pages": [
+      {
+        "file": "layout.tsx",
+        "route": "layout",
+        "directory": "app",
+        "fullPath": "C:\\Users\\Sanika\\Projects\\bell24h\\app\\layout.tsx",
+        "size": 471,
+        "modified": "2025-09-02T06:52:56.495Z"
+      },
+      {
+        "file": "page.tsx",
+        "route": "page",
+        "directory": "app",
+        "fullPath": "C:\\Users\\Sanika\\Projects\\bell24h\\app\\page.tsx",
+        "size": 1433,
+        "modified": "2025-07-19T23:57:34.050Z"
+      },
+      {
+        "file": "mobile\\ShippingPage.tsx",
+        "route": "mobile/ShippingPage",
+        "directory": "src/pages",
+        "fullPath": "C:\\Users\\Sanika\\Projects\\bell24h\\src\\pages\\mobile\\ShippingPage.tsx",
+        "size": 5193,
+        "modified": "2025-09-01T09:28:51.450Z"
+      }
+    ],
+    "total": 3
+  },
+  "vercel": {
+    "pages": [
+      {
+        "route": "",
+        "url": "https://bell24h-v1.vercel.app",
+        "source": "sitemap"
+      },
+      {
+        "route": "/marketplace",
+        "url": "https://bell24h-v1.vercel.app/marketplace",
+        "source": "sitemap"
+      },
+      {
+        "route": "/suppliers",
+        "url": "https://bell24h-v1.vercel.app/suppliers",
+        "source": "sitemap"
+      },
+      {
+        "route": "/rfq/create",
+        "url": "https://bell24h-v1.vercel.app/rfq/create",
+        "source": "sitemap"
+      },
+      {
+        "route": "/register",
+        "url": "https://bell24h-v1.vercel.app/register",
+        "source": "sitemap"
+      },
+      {
+        "route": "/login",
+        "url": "https://bell24h-v1.vercel.app/login",
+        "source": "sitemap"
+      },
+      {
+        "route": "/categories/textiles-garments",
+        "url": "https://bell24h-v1.vercel.app/categories/textiles-garments",
+        "source": "sitemap"
+      },
+      {
+        "route": "/categories/pharmaceuticals",
+        "url": "https://bell24h-v1.vercel.app/categories/pharmaceuticals",
+        "source": "sitemap"
+      },
+      {
+        "route": "/categories/agricultural-products",
+        "url": "https://bell24h-v1.vercel.app/categories/agricultural-products",
+        "source": "sitemap"
+      },
+      {
+        "route": "/categories/automotive-parts",
+        "url": "https://bell24h-v1.vercel.app/categories/automotive-parts",
+        "source": "sitemap"
+      },
+      {
+        "route": "/categories/it-services",
+        "url": "https://bell24h-v1.vercel.app/categories/it-services",
+        "source": "sitemap"
+      },
+      {
+        "route": "/categories/gems-jewelry",
+        "url": "https://bell24h-v1.vercel.app/categories/gems-jewelry",
+        "source": "sitemap"
+      },
+      {
+        "route": "/categories/handicrafts",
+        "url": "https://bell24h-v1.vercel.app/categories/handicrafts",
+        "source": "sitemap"
+      },
+      {
+        "route": "/categories/machinery-equipment",
+        "url": "https://bell24h-v1.vercel.app/categories/machinery-equipment",
+        "source": "sitemap"
+      },
+      {
+        "route": "/categories/chemicals",
+        "url": "https://bell24h-v1.vercel.app/categories/chemicals",
+        "source": "sitemap"
+      },
+      {
+        "route": "/categories/food-processing",
+        "url": "https://bell24h-v1.vercel.app/categories/food-processing",
+        "source": "sitemap"
+      },
+      {
+        "route": "/categories/construction",
+        "url": "https://bell24h-v1.vercel.app/categories/construction",
+        "source": "sitemap"
+      },
+      {
+        "route": "/categories/metals-steel",
+        "url": "https://bell24h-v1.vercel.app/categories/metals-steel",
+        "source": "sitemap"
+      },
+      {
+        "route": "/categories/plastics",
+        "url": "https://bell24h-v1.vercel.app/categories/plastics",
+        "source": "sitemap"
+      },
+      {
+        "route": "/categories/paper-packaging",
+        "url": "https://bell24h-v1.vercel.app/categories/paper-packaging",
+        "source": "sitemap"
+      },
+      {
+        "route": "/categories/rubber",
+        "url": "https://bell24h-v1.vercel.app/categories/rubber",
+        "source": "sitemap"
+      },
+      {
+        "route": "/categories/ceramics",
+        "url": "https://bell24h-v1.vercel.app/categories/ceramics",
+        "source": "sitemap"
+      },
+      {
+        "route": "/categories/glass",
+        "url": "https://bell24h-v1.vercel.app/categories/glass",
+        "source": "sitemap"
+      },
+      {
+        "route": "/categories/wood",
+        "url": "https://bell24h-v1.vercel.app/categories/wood",
+        "source": "sitemap"
+      },
+      {
+        "route": "/categories/leather",
+        "url": "https://bell24h-v1.vercel.app/categories/leather",
+        "source": "sitemap"
+      },
+      {
+        "route": "/dashboard/ai-features",
+        "url": "https://bell24h-v1.vercel.app/dashboard/ai-features",
+        "source": "sitemap"
+      },
+      {
+        "route": "/fintech",
+        "url": "https://bell24h-v1.vercel.app/fintech",
+        "source": "sitemap"
+      },
+      {
+        "route": "/wallet",
+        "url": "https://bell24h-v1.vercel.app/wallet",
+        "source": "sitemap"
+      },
+      {
+        "route": "/voice-rfq",
+        "url": "https://bell24h-v1.vercel.app/voice-rfq",
+        "source": "sitemap"
+      },
+      {
+        "route": "/about",
+        "url": "https://bell24h-v1.vercel.app/about",
+        "source": "sitemap"
+      },
+      {
+        "route": "/contact",
+        "url": "https://bell24h-v1.vercel.app/contact",
+        "source": "sitemap"
+      },
+      {
+        "route": "/privacy",
+        "url": "https://bell24h-v1.vercel.app/privacy",
+        "source": "sitemap"
+      },
+      {
+        "route": "/terms",
+        "url": "https://bell24h-v1.vercel.app/terms",
+        "source": "sitemap"
+      },
+      {
+        "route": "/help",
+        "url": "https://bell24h-v1.vercel.app/help",
+        "source": "sitemap"
+      }
+    ],
+    "total": 34
+  },
+  "comparison": {
+    "missingInVercel": [
+      {
+        "route": "layout",
+        "localhostPage": {
+          "file": "layout.tsx",
+          "route": "layout",
+          "directory": "app",
+          "fullPath": "C:\\Users\\Sanika\\Projects\\bell24h\\app\\layout.tsx",
+          "size": 471,
+          "modified": "2025-09-02T06:52:56.495Z"
+        }
+      },
+      {
+        "route": "page",
+        "localhostPage": {
+          "file": "page.tsx",
+          "route": "page",
+          "directory": "app",
+          "fullPath": "C:\\Users\\Sanika\\Projects\\bell24h\\app\\page.tsx",
+          "size": 1433,
+          "modified": "2025-07-19T23:57:34.050Z"
+        }
+      },
+      {
+        "route": "mobile/ShippingPage",
+        "localhostPage": {
+          "file": "mobile\\ShippingPage.tsx",
+          "route": "mobile/ShippingPage",
+          "directory": "src/pages",
+          "fullPath": "C:\\Users\\Sanika\\Projects\\bell24h\\src\\pages\\mobile\\ShippingPage.tsx",
+          "size": 5193,
+          "modified": "2025-09-01T09:28:51.450Z"
+        }
+      }
+    ],
+    "missingInLocal": [
+      {
+        "route": "",
+        "vercelPage": {
+          "route": "",
+          "url": "https://bell24h-v1.vercel.app",
+          "source": "sitemap"
+        }
+      },
+      {
+        "route": "/marketplace",
+        "vercelPage": {
+          "route": "/marketplace",
+          "url": "https://bell24h-v1.vercel.app/marketplace",
+          "source": "sitemap"
+        }
+      },
+      {
+        "route": "/suppliers",
+        "vercelPage": {
+          "route": "/suppliers",
+          "url": "https://bell24h-v1.vercel.app/suppliers",
+          "source": "sitemap"
+        }
+      },
+      {
+        "route": "/rfq/create",
+        "vercelPage": {
+          "route": "/rfq/create",
+          "url": "https://bell24h-v1.vercel.app/rfq/create",
+          "source": "sitemap"
+        }
+      },
+      {
+        "route": "/register",
+        "vercelPage": {
+          "route": "/register",
+          "url": "https://bell24h-v1.vercel.app/register",
+          "source": "sitemap"
+        }
+      },
+      {
+        "route": "/login",
+        "vercelPage": {
+          "route": "/login",
+          "url": "https://bell24h-v1.vercel.app/login",
+          "source": "sitemap"
+        }
+      },
+      {
+        "route": "/categories/textiles-garments",
+        "vercelPage": {
+          "route": "/categories/textiles-garments",
+          "url": "https://bell24h-v1.vercel.app/categories/textiles-garments",
+          "source": "sitemap"
+        }
+      },
+      {
+        "route": "/categories/pharmaceuticals",
+        "vercelPage": {
+          "route": "/categories/pharmaceuticals",
+          "url": "https://bell24h-v1.vercel.app/categories/pharmaceuticals",
+          "source": "sitemap"
+        }
+      },
+      {
+        "route": "/categories/agricultural-products",
+        "vercelPage": {
+          "route": "/categories/agricultural-products",
+          "url": "https://bell24h-v1.vercel.app/categories/agricultural-products",
+          "source": "sitemap"
+        }
+      },
+      {
+        "route": "/categories/automotive-parts",
+        "vercelPage": {
+          "route": "/categories/automotive-parts",
+          "url": "https://bell24h-v1.vercel.app/categories/automotive-parts",
+          "source": "sitemap"
+        }
+      },
+      {
+        "route": "/categories/it-services",
+        "vercelPage": {
+          "route": "/categories/it-services",
+          "url": "https://bell24h-v1.vercel.app/categories/it-services",
+          "source": "sitemap"
+        }
+      },
+      {
+        "route": "/categories/gems-jewelry",
+        "vercelPage": {
+          "route": "/categories/gems-jewelry",
+          "url": "https://bell24h-v1.vercel.app/categories/gems-jewelry",
+          "source": "sitemap"
+        }
+      },
+      {
+        "route": "/categories/handicrafts",
+        "vercelPage": {
+          "route": "/categories/handicrafts",
+          "url": "https://bell24h-v1.vercel.app/categories/handicrafts",
+          "source": "sitemap"
+        }
+      },
+      {
+        "route": "/categories/machinery-equipment",
+        "vercelPage": {
+          "route": "/categories/machinery-equipment",
+          "url": "https://bell24h-v1.vercel.app/categories/machinery-equipment",
+          "source": "sitemap"
+        }
+      },
+      {
+        "route": "/categories/chemicals",
+        "vercelPage": {
+          "route": "/categories/chemicals",
+          "url": "https://bell24h-v1.vercel.app/categories/chemicals",
+          "source": "sitemap"
+        }
+      },
+      {
+        "route": "/categories/food-processing",
+        "vercelPage": {
+          "route": "/categories/food-processing",
+          "url": "https://bell24h-v1.vercel.app/categories/food-processing",
+          "source": "sitemap"
+        }
+      },
+      {
+        "route": "/categories/construction",
+        "vercelPage": {
+          "route": "/categories/construction",
+          "url": "https://bell24h-v1.vercel.app/categories/construction",
+          "source": "sitemap"
+        }
+      },
+      {
+        "route": "/categories/metals-steel",
+        "vercelPage": {
+          "route": "/categories/metals-steel",
+          "url": "https://bell24h-v1.vercel.app/categories/metals-steel",
+          "source": "sitemap"
+        }
+      },
+      {
+        "route": "/categories/plastics",
+        "vercelPage": {
+          "route": "/categories/plastics",
+          "url": "https://bell24h-v1.vercel.app/categories/plastics",
+          "source": "sitemap"
+        }
+      },
+      {
+        "route": "/categories/paper-packaging",
+        "vercelPage": {
+          "route": "/categories/paper-packaging",
+          "url": "https://bell24h-v1.vercel.app/categories/paper-packaging",
+          "source": "sitemap"
+        }
+      },
+      {
+        "route": "/categories/rubber",
+        "vercelPage": {
+          "route": "/categories/rubber",
+          "url": "https://bell24h-v1.vercel.app/categories/rubber",
+          "source": "sitemap"
+        }
+      },
+      {
+        "route": "/categories/ceramics",
+        "vercelPage": {
+          "route": "/categories/ceramics",
+          "url": "https://bell24h-v1.vercel.app/categories/ceramics",
+          "source": "sitemap"
+        }
+      },
+      {
+        "route": "/categories/glass",
+        "vercelPage": {
+          "route": "/categories/glass",
+          "url": "https://bell24h-v1.vercel.app/categories/glass",
+          "source": "sitemap"
+        }
+      },
+      {
+        "route": "/categories/wood",
+        "vercelPage": {
+          "route": "/categories/wood",
+          "url": "https://bell24h-v1.vercel.app/categories/wood",
+          "source": "sitemap"
+        }
+      },
+      {
+        "route": "/categories/leather",
+        "vercelPage": {
+          "route": "/categories/leather",
+          "url": "https://bell24h-v1.vercel.app/categories/leather",
+          "source": "sitemap"
+        }
+      },
+      {
+        "route": "/dashboard/ai-features",
+        "vercelPage": {
+          "route": "/dashboard/ai-features",
+          "url": "https://bell24h-v1.vercel.app/dashboard/ai-features",
+          "source": "sitemap"
+        }
+      },
+      {
+        "route": "/fintech",
+        "vercelPage": {
+          "route": "/fintech",
+          "url": "https://bell24h-v1.vercel.app/fintech",
+          "source": "sitemap"
+        }
+      },
+      {
+        "route": "/wallet",
+        "vercelPage": {
+          "route": "/wallet",
+          "url": "https://bell24h-v1.vercel.app/wallet",
+          "source": "sitemap"
+        }
+      },
+      {
+        "route": "/voice-rfq",
+        "vercelPage": {
+          "route": "/voice-rfq",
+          "url": "https://bell24h-v1.vercel.app/voice-rfq",
+          "source": "sitemap"
+        }
+      },
+      {
+        "route": "/about",
+        "vercelPage": {
+          "route": "/about",
+          "url": "https://bell24h-v1.vercel.app/about",
+          "source": "sitemap"
+        }
+      },
+      {
+        "route": "/contact",
+        "vercelPage": {
+          "route": "/contact",
+          "url": "https://bell24h-v1.vercel.app/contact",
+          "source": "sitemap"
+        }
+      },
+      {
+        "route": "/privacy",
+        "vercelPage": {
+          "route": "/privacy",
+          "url": "https://bell24h-v1.vercel.app/privacy",
+          "source": "sitemap"
+        }
+      },
+      {
+        "route": "/terms",
+        "vercelPage": {
+          "route": "/terms",
+          "url": "https://bell24h-v1.vercel.app/terms",
+          "source": "sitemap"
+        }
+      },
+      {
+        "route": "/help",
+        "vercelPage": {
+          "route": "/help",
+          "url": "https://bell24h-v1.vercel.app/help",
+          "source": "sitemap"
+        }
+      }
+    ],
+    "differentVersions": [],
+    "totalLocalPages": 3,
+    "totalVercelPages": 34
+  }
+}

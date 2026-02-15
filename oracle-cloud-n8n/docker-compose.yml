@@ -1,0 +1,92 @@
+version: '3.8'
+
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: bell24h-n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      # N8N Configuration
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_ADMIN_PASSWORD}
+      
+      # Database Configuration (Neon)
+      - DB_TYPE=postgresql
+      - DB_POSTGRESDB_HOST=${DB_HOST}
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE=${DB_NAME}
+      - DB_POSTGRESDB_USER=${DB_USER}
+      - DB_POSTGRESDB_PASSWORD=${DB_PASSWORD}
+      - DB_POSTGRESDB_SSL_ENABLED=true
+      
+      # Application Configuration
+      - N8N_HOST=${N8N_HOST}
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=https
+      - WEBHOOK_URL=${WEBHOOK_URL}
+      
+      # Security
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+      - N8N_JWT_SECRET=${N8N_JWT_SECRET}
+      
+      # Bell24h Integration
+      - BELL24H_API_URL=https://www.bell24h.com/api
+      - BELL24H_API_KEY=${BELL24H_API_KEY}
+      - BELL24H_WEBHOOK_SECRET=${BELL24H_WEBHOOK_SECRET}
+      
+      # Email Configuration
+      - N8N_EMAIL_MODE=smtp
+      - N8N_SMTP_HOST=${SMTP_HOST}
+      - N8N_SMTP_PORT=${SMTP_PORT}
+      - N8N_SMTP_USER=${SMTP_USER}
+      - N8N_SMTP_PASS=${SMTP_PASS}
+      - N8N_SMTP_SENDER=${SMTP_SENDER}
+      
+      # Redis Configuration (Upstash)
+      - REDIS_URL=${REDIS_URL}
+      
+      # Logging
+      - N8N_LOG_LEVEL=info
+      - N8N_LOG_OUTPUT=console
+      
+      # Performance
+      - N8N_METRICS=true
+      - N8N_DIAGNOSTICS_ENABLED=true
+      
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./workflows:/home/node/.n8n/workflows
+      - ./credentials:/home/node/.n8n/credentials
+    networks:
+      - bell24h-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5678/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  nginx:
+    image: nginx:alpine
+    container_name: bell24h-n8n-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./ssl:/etc/nginx/ssl
+    depends_on:
+      - n8n
+    networks:
+      - bell24h-network
+
+volumes:
+  n8n_data:
+
+networks:
+  bell24h-network:
+    driver: bridge

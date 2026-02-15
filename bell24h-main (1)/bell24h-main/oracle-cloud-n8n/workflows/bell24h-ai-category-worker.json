@@ -1,0 +1,201 @@
+{
+  "name": "Bell24H AI Category Worker",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ai-category-worker",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Worker Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "webhookId": "ai-category-worker-webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "// AI Category Worker - Scrape and process supplier data\nconst taskData = $input.first().json;\nconst startTime = Date.now();\n\nconsole.log(`Starting AI worker for category: ${taskData.category}`);\n\n// Mock scraping function (replace with actual scraping logic)\nasync function scrapeSuppliers(category, sources, batchSize, maxPages) {\n  const suppliers = [];\n  \n  // Simulate scraping from different sources\n  for (const source of sources) {\n    console.log(`Scraping ${source} for ${category}...`);\n    \n    // Mock data generation based on category\n    const mockSuppliers = generateMockSuppliers(category, source, batchSize);\n    suppliers.push(...mockSuppliers);\n    \n    // Simulate processing delay\n    await new Promise(resolve => setTimeout(resolve, 1000));\n  }\n  \n  return suppliers;\n}\n\nfunction generateMockSuppliers(category, source, count) {\n  const suppliers = [];\n  const categoryData = {\n    electronics: {\n      companies: ['TechCorp', 'ElectroMax', 'Digital Solutions', 'Smart Systems', 'Innovation Labs'],\n      products: ['Microcontrollers', 'Sensors', 'Displays', 'Power Supplies', 'Connectors']\n    },\n    machinery: {\n      companies: ['Industrial Works', 'Machine Masters', 'Precision Tools', 'Heavy Equipment Co', 'Automation Systems'],\n      products: ['CNC Machines', 'Industrial Robots', 'Conveyor Systems', 'Packaging Equipment', 'Assembly Lines']\n    },\n    textiles: {\n      companies: ['Fabric World', 'Textile Mills', 'Fashion Forward', 'Cotton Works', 'Silk Industries'],\n      products: ['Cotton Fabric', 'Silk Materials', 'Synthetic Fibers', 'Denim', 'Knitted Goods']\n    },\n    chemicals: {\n      companies: ['ChemCorp', 'Pharma Solutions', 'Industrial Chemicals', 'Lab Supplies', 'Chemical Works'],\n      products: ['Industrial Chemicals', 'Pharmaceutical Ingredients', 'Laboratory Reagents', 'Cleaning Agents', 'Specialty Chemicals']\n    },\n    automotive: {\n      companies: ['Auto Parts Co', 'Vehicle Systems', 'Car Components', 'Motor Works', 'Automotive Solutions'],\n      products: ['Engine Parts', 'Brake Systems', 'Electrical Components', 'Body Parts', 'Interior Accessories']\n    }\n  };\n  \n  const catData = categoryData[category] || categoryData.electronics;\n  \n  for (let i = 0; i < Math.min(count, 20); i++) {\n    const companyName = catData.companies[i % catData.companies.length] + ` ${i + 1}`;\n    const product = catData.products[i % catData.products.length];\n    \n    suppliers.push({\n      id: `${source}_${category}_${i + 1}`,\n      company_name: companyName,\n      category: category,\n      source: source,\n      products: [product],\n      email: `contact@${companyName.toLowerCase().replace(/\\s+/g, '')}.com`,\n      phone: `+91-${Math.floor(Math.random() * 9000000000) + 1000000000}`,\n      website: `https://${companyName.toLowerCase().replace(/\\s+/g, '')}.com`,\n      location: getRandomLocation(),\n      established_year: Math.floor(Math.random() * 30) + 1990,\n      employee_count: Math.floor(Math.random() * 1000) + 10,\n      certifications: getRandomCertifications(),\n      raw_data: {\n        scraped_at: new Date().toISOString(),\n        source_url: `https://${source}.com/search?category=${category}&page=${Math.floor(i/10) + 1}`,\n        confidence_score: Math.random() * 0.3 + 0.7 // 0.7-1.0\n      }\n    });\n  }\n  \n  return suppliers;\n}\n\nfunction getRandomLocation() {\n  const locations = [\n    'Mumbai, Maharashtra, India',\n    'Delhi, India',\n    'Bangalore, Karnataka, India',\n    'Chennai, Tamil Nadu, India',\n    'Kolkata, West Bengal, India',\n    'Pune, Maharashtra, India',\n    'Hyderabad, Telangana, India',\n    'Ahmedabad, Gujarat, India'\n  ];\n  return locations[Math.floor(Math.random() * locations.length)];\n}\n\nfunction getRandomCertifications() {\n  const certs = ['ISO 9001', 'ISO 14001', 'OHSAS 18001', 'CE Marking', 'RoHS Compliant', 'FDA Approved'];\n  const numCerts = Math.floor(Math.random() * 3) + 1;\n  return certs.sort(() => 0.5 - Math.random()).slice(0, numCerts);\n}\n\n// Execute scraping\nconst scrapingResult = await scrapeSuppliers(\n  taskData.category,\n  taskData.sources,\n  taskData.batch_size,\n  taskData.max_pages\n);\n\nconsole.log(`Found ${scrapingResult.length} suppliers for ${taskData.category}`);\n\nreturn [{ json: {\n  task_id: taskData.task_id,\n  category: taskData.category,\n  suppliers_found: scrapingResult.length,\n  suppliers_data: scrapingResult,\n  processing_time: Date.now() - startTime,\n  status: 'scraped'\n} }];"
+      },
+      "id": "scrape-suppliers",
+      "name": "Scrape Suppliers",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4",
+        "options": {
+          "temperature": 0.3,
+          "maxTokens": 1000
+        },
+        "prompt": "You are an AI assistant specializing in supplier data classification and enrichment for Bell24H, a B2B marketplace.\n\nAnalyze the following supplier data and provide:\n1. **Category Classification**: Primary and secondary categories\n2. **Quality Score**: Rate from 1-100 based on completeness, credibility, and business potential\n3. **Business Insights**: Key strengths, potential concerns, and market positioning\n4. **Lead Priority**: High/Medium/Low based on business potential\n5. **Recommended Actions**: Next steps for engagement\n\nSupplier Data:\n- Company: {{ $json.suppliers_data[0].company_name }}\n- Category: {{ $json.suppliers_data[0].category }}\n- Products: {{ $json.suppliers_data[0].products.join(', ') }}\n- Location: {{ $json.suppliers_data[0].location }}\n- Website: {{ $json.suppliers_data[0].website }}\n- Employee Count: {{ $json.suppliers_data[0].employee_count }}\n- Established: {{ $json.suppliers_data[0].established_year }}\n- Certifications: {{ $json.suppliers_data[0].certifications.join(', ') }}\n\nProvide your analysis in JSON format:\n{\n  \"primary_category\": \"string\",\n  \"secondary_categories\": [\"string\"],\n  \"quality_score\": number,\n  \"business_insights\": {\n    \"strengths\": [\"string\"],\n    \"concerns\": [\"string\"],\n    \"market_position\": \"string\"\n  },\n  \"lead_priority\": \"high|medium|low\",\n  \"recommended_actions\": [\"string\"],\n  \"confidence\": number\n}"
+      },
+      "id": "ai-classification",
+      "name": "AI Classification",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1,
+      "position": [680, 200]
+    },
+    {
+      "parameters": {
+        "url": "https://maps.googleapis.com/maps/api/geocode/json",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "address",
+              "value": "={{ $json.suppliers_data[0].location }}"
+            },
+            {
+              "name": "key",
+              "value": "YOUR_GOOGLE_MAPS_API_KEY"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "geocode-location",
+      "name": "Geocode Location",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [680, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Process AI classification and location data\nconst supplierData = $input.first().json.suppliers_data[0];\nconst aiAnalysis = $input.first().json.ai_analysis || {};\nconst locationData = $input.first().json.location_data || {};\n\n// Parse AI analysis if it's a string\nlet parsedAnalysis = aiAnalysis;\nif (typeof aiAnalysis === 'string') {\n  try {\n    parsedAnalysis = JSON.parse(aiAnalysis);\n  } catch (e) {\n    console.log('Failed to parse AI analysis:', e);\n    parsedAnalysis = {\n      primary_category: supplierData.category,\n      quality_score: 70,\n      lead_priority: 'medium',\n      confidence: 0.8\n    };\n  }\n}\n\n// Extract coordinates from Google Maps response\nlet coordinates = null;\nif (locationData.results && locationData.results.length > 0) {\n  const location = locationData.results[0].geometry.location;\n  coordinates = {\n    lat: location.lat,\n    lng: location.lng\n  };\n}\n\n// Enhanced supplier profile\nconst enhancedSupplier = {\n  // Original data\n  ...supplierData,\n  \n  // AI enhancements\n  ai_analysis: {\n    primary_category: parsedAnalysis.primary_category || supplierData.category,\n    secondary_categories: parsedAnalysis.secondary_categories || [],\n    quality_score: parsedAnalysis.quality_score || 70,\n    business_insights: parsedAnalysis.business_insights || {},\n    lead_priority: parsedAnalysis.lead_priority || 'medium',\n    recommended_actions: parsedAnalysis.recommended_actions || [],\n    confidence: parsedAnalysis.confidence || 0.8,\n    analyzed_at: new Date().toISOString()\n  },\n  \n  // Location enhancements\n  location_data: {\n    coordinates: coordinates,\n    formatted_address: locationData.results?.[0]?.formatted_address || supplierData.location,\n    place_id: locationData.results?.[0]?.place_id || null,\n    geocoded_at: new Date().toISOString()\n  },\n  \n  // Processing metadata\n  processing: {\n    task_id: $input.first().json.task_id,\n    processed_at: new Date().toISOString(),\n    processing_time: $input.first().json.processing_time,\n    status: 'enhanced'\n  }\n};\n\n// Calculate final score\nconst finalScore = Math.round(\n  (enhancedSupplier.ai_analysis.quality_score * 0.7) +\n  (enhancedSupplier.raw_data.confidence_score * 100 * 0.3)\n);\n\nenhancedSupplier.final_score = finalScore;\n\nconsole.log(`Enhanced supplier: ${enhancedSupplier.company_name} (Score: ${finalScore})`);\n\nreturn [{ json: enhancedSupplier }];"
+      },
+      "id": "enhance-supplier",
+      "name": "Enhance Supplier Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Process all suppliers and prepare final results\nconst allInputs = $input.all();\nconst taskId = allInputs[0].json.task_id;\nconst category = allInputs[0].json.category;\nconst startTime = allInputs[0].json.processing_time;\n\nconst enhancedSuppliers = allInputs.map(input => input.json);\n\n// Calculate statistics\nconst stats = {\n  total_suppliers: enhancedSuppliers.length,\n  high_priority: enhancedSuppliers.filter(s => s.ai_analysis.lead_priority === 'high').length,\n  medium_priority: enhancedSuppliers.filter(s => s.ai_analysis.lead_priority === 'medium').length,\n  low_priority: enhancedSuppliers.filter(s => s.ai_analysis.lead_priority === 'low').length,\n  average_score: Math.round(enhancedSuppliers.reduce((sum, s) => sum + s.final_score, 0) / enhancedSuppliers.length),\n  geocoded_locations: enhancedSuppliers.filter(s => s.location_data.coordinates).length,\n  processing_time: Date.now() - startTime\n};\n\n// Prepare response\nconst response = {\n  task_id: taskId,\n  category: category,\n  status: 'completed',\n  suppliers_found: stats.total_suppliers,\n  suppliers_processed: stats.total_suppliers,\n  suppliers_data: enhancedSuppliers,\n  statistics: stats,\n  errors: 0,\n  processing_time: stats.processing_time,\n  completed_at: new Date().toISOString()\n};\n\nconsole.log(`Completed processing ${stats.total_suppliers} suppliers for ${category}`);\nconsole.log(`High priority: ${stats.high_priority}, Medium: ${stats.medium_priority}, Low: ${stats.low_priority}`);\n\nreturn [{ json: response }];"
+      },
+      "id": "finalize-results",
+      "name": "Finalize Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}"
+      },
+      "id": "worker-response",
+      "name": "Worker Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1340, 300]
+    }
+  ],
+  "connections": {
+    "Worker Webhook": {
+      "main": [
+        [
+          {
+            "node": "Scrape Suppliers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scrape Suppliers": {
+      "main": [
+        [
+          {
+            "node": "AI Classification",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Geocode Location",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Classification": {
+      "main": [
+        [
+          {
+            "node": "Enhance Supplier Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Geocode Location": {
+      "main": [
+        [
+          {
+            "node": "Enhance Supplier Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enhance Supplier Data": {
+      "main": [
+        [
+          {
+            "node": "Finalize Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Finalize Results": {
+      "main": [
+        [
+          {
+            "node": "Worker Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "id": "ai-category-worker",
+  "tags": [
+    {
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "id": "bell24h",
+      "name": "bell24h"
+    },
+    {
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "id": "ai",
+      "name": "ai"
+    },
+    {
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "id": "worker",
+      "name": "worker"
+    }
+  ]
+}

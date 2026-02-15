@@ -1,0 +1,84 @@
+BELL24H AUTOMATED DEPLOYMENT - COPY & PASTE COMMANDS
+==================================================
+
+STEP 1: Open PowerShell as Administrator and run these commands one by one:
+
+1. Navigate to project:
+cd C:\Users\Sanika\Projects\bell24h
+
+2. Install Vercel CLI globally:
+npm install -g vercel
+
+3. Use npx to run Vercel (this bypasses PATH issues):
+npx vercel login
+
+4. Deploy to production:
+npx vercel --prod
+
+STEP 2: During deployment, answer these prompts:
+- Set up and deploy? → Type: Y
+- Which scope? → Press Enter (select your account)
+- Link to existing project? → Type: N
+- Project name? → Type: bell24h
+- Directory? → Press Enter (use current directory)
+- Override settings? → Type: N
+
+STEP 3: After deployment, note your URL (something like: https://bell24h-xxx.vercel.app)
+
+STEP 4: Go to Vercel Dashboard and add environment variables:
+1. Open: https://vercel.com/dashboard
+2. Click on your "bell24h" project
+3. Go to "Settings" tab
+4. Click "Environment Variables"
+5. Add these variables for "Production" environment:
+
+NEXTAUTH_URL=https://bell24h-xxx.vercel.app
+NEXTAUTH_SECRET=bell24h-super-secret-key-32-chars-minimum-required
+JWT_SECRET=bell24h-jwt-secret-key-32-chars-minimum
+DATABASE_URL=postgresql://neondb_owner:npg_K6M8mRhTPpCH@ep-fragrant-smoke-ae00uwml-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+MSG91_AUTH_KEY=468517Ak5rJ0vb7NDV68c24863P1
+MSG91_SENDER_ID=BELL24H
+API_SECRET_KEY=bell24h-api-secret-key-2024
+ENCRYPTION_KEY=bell24h-encryption-key-32-chars-minimum
+NODE_ENV=production
+NEXT_PUBLIC_APP_NAME=BELL24H
+NEXT_PUBLIC_APP_URL=https://bell24h-xxx.vercel.app
+NEXT_TELEMETRY_DISABLED=1
+
+STEP 5: After adding environment variables, redeploy:
+npx vercel --prod
+
+STEP 6: Test your deployment:
+1. Visit your URL: https://bell24h-xxx.vercel.app
+2. Test health check: https://bell24h-xxx.vercel.app/api/health
+3. Test mobile OTP: https://bell24h-xxx.vercel.app/auth/phone-email
+
+STEP 7: Start revenue generation by sending this WhatsApp message to 20 contacts:
+
+Hi [Name],
+
+Are you looking to onboard new suppliers safely? 🛡️
+We're offering a **Supplier Verification Service** at just **₹2,000**!
+
+✅ Prevent fraud
+✅ Verify GST/PAN details  
+✅ Get a comprehensive report in 48 hours
+
+Visit our service page: https://bell24h-xxx.vercel.app/services/verification/order
+
+Reply 'YES' to this message to get started or learn more!
+
+Best,
+Team Bell24h
+
+SUCCESS INDICATORS:
+✅ Deployment URL is live
+✅ Health check returns 200 OK
+✅ Mobile OTP received successfully
+✅ Admin dashboard loads properly
+✅ Supplier verification page accessible
+
+REVENUE PROJECTION:
+- Week 1: ₹10,000+ (5 verifications)
+- Week 2: ₹20,000+ (10 verifications)
+- Month 1: ₹80,000+ (40 verifications)

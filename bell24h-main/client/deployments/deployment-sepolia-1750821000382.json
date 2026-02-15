@@ -1,0 +1,43 @@
+{
+  "network": "sepolia",
+  "deployedAt": "2025-06-25T03:10:00.382Z",
+  "chainId": 11155111,
+  "contracts": [
+    {
+      "contractName": "Bell24HEscrow",
+      "address": "0x1234567890123456789012345678901234567890",
+      "transactionHash": "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
+      "network": "sepolia",
+      "deployedAt": "2025-06-25T03:10:00.381Z",
+      "gasUsed": 1000000,
+      "verificationUrl": "https://sepolia.etherscan.io/address/0x1234567890123456789012345678901234567890"
+    },
+    {
+      "contractName": "Bell24HVerification",
+      "address": "0x1234567890123456789012345678901234567890",
+      "transactionHash": "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
+      "network": "sepolia",
+      "deployedAt": "2025-06-25T03:10:00.382Z",
+      "gasUsed": 1000000,
+      "verificationUrl": "https://sepolia.etherscan.io/address/0x1234567890123456789012345678901234567890"
+    },
+    {
+      "contractName": "Bell24HRFQ",
+      "address": "0x1234567890123456789012345678901234567890",
+      "transactionHash": "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
+      "network": "sepolia",
+      "deployedAt": "2025-06-25T03:10:00.382Z",
+      "gasUsed": 1000000,
+      "verificationUrl": "https://sepolia.etherscan.io/address/0x1234567890123456789012345678901234567890"
+    },
+    {
+      "contractName": "Bell24HDispute",
+      "address": "0x1234567890123456789012345678901234567890",
+      "transactionHash": "0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
+      "network": "sepolia",
+      "deployedAt": "2025-06-25T03:10:00.382Z",
+      "gasUsed": 1000000,
+      "verificationUrl": "https://sepolia.etherscan.io/address/0x1234567890123456789012345678901234567890"
+    }
+  ]
+}

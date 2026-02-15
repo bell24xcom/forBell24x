@@ -1,0 +1,72 @@
+# Cloudflare Pages ignore file
+# This file tells Cloudflare Pages which files to exclude from deployment
+
+# Webpack cache (the 99MB file causing the error)
+cache/
+**/cache/
+cache/webpack/
+**/cache/webpack/
+cache/webpack/client-production/
+**/cache/webpack/client-production/
+
+# Next.js caches
+.next/cache/
+**/.next/cache/
+.next/cache/**
+**/.next/cache/**
+
+# Build caches
+.cache/
+**/.cache/
+
+# Node modules
+node_modules/
+**/node_modules/
+
+# Build outputs that shouldn't be uploaded
+.vercel/
+.vercel/output/
+.netlify/
+dist/
+build/
+
+# Cloudflare/Wrangler local state
+.wrangler/
+.wrangler-state/
+.dev.vars
+
+# Test artifacts
+coverage/
+.nyc_output/
+cypress/videos/
+cypress/screenshots/
+**/coverage/
+
+# Logs and temp files
+*.log
+*.tmp
+*.temp
+logs/
+**/*.log
+
+# IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Large binary files
+*.node
+*.dat
+*.db
+*.sqlite
+*.zip
+*.tar.gz
+
+# Prisma dev databases
+prisma/dev.db
+prisma/*.db
+prisma/*.sqlite
+

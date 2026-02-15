@@ -1,0 +1,19 @@
+{
+  "id": "lead-001",
+  "email": "ceo@techstartup.com",
+  "contactName": "Sarah Johnson",
+  "phone": "+91-87654-32109",
+  "companyName": "TechStartup Innovations",
+  "companySize": "50-200 employees",
+  "industry": "Technology",
+  "score": 85,
+  "budget": "₹10,00,000 - ₹25,00,000",
+  "timeline": "Q1 2025",
+  "source": "Website Contact Form",
+  "lastActivity": "2025-01-03T10:30:00Z",
+  "interests": ["B2B Software", "Automation Tools", "Cloud Solutions"],
+  "painPoints": ["Manual processes", "Lack of integration", "Scalability issues"],
+  "decisionMakers": ["CEO", "CTO", "Head of Operations"],
+  "competitors": ["Competitor A", "Competitor B"],
+  "notes": "High-value prospect with immediate need. Very responsive to communications."
+}

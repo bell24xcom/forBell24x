@@ -1,0 +1,20 @@
+# Cursor IDE Configuration
+alias npm='npm'
+alias node='node'
+alias git='git'
+alias npx='npx'
+alias vercel='npx vercel'
+alias prisma='npx prisma'
+
+# Direct execution functions
+run() {
+    exec "$@"
+}
+
+direct() {
+    exec "$@"
+}
+
+# Override problematic commands
+alias q=''
+alias 'q '=''

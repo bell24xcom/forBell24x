@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  bell24h-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bell24h-prod
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app/models:/app/app/models:ro
+      - ./data:/app/data:ro
+      - ./logs:/var/log/bell24h
+    environment:
+      - PYTHONUNBUFFERED=1
+      - ENVIRONMENT=production
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - bell24h-network
+
+networks:
+  bell24h-network:
+    driver: bridge
+

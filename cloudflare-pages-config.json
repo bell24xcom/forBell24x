@@ -1,0 +1,37 @@
+{
+  "build_config": {
+    "build_command": "cd client && npm install && npm run build",
+    "destination_dir": ".next",
+    "root_dir": "client",
+    "web_analytics_tag": null,
+    "web_analytics_token": null,
+    "watch_patterns": []
+  },
+  "deployment_configs": {
+    "preview": {
+      "env_vars": {
+        "NODE_ENV": "development"
+      }
+    },
+    "production": {
+      "env_vars": {
+        "NODE_ENV": "production",
+        "NEXT_PUBLIC_APP_URL": "https://bell24h.com",
+        "NEXT_PUBLIC_API_URL": "https://bell24h.com/api"
+      }
+    }
+  },
+  "framework": "nextjs",
+  "node_version": "18",
+  "source": {
+    "type": "github",
+    "config": {
+      "owner": "digitex-erp",
+      "repo_name": "bell24h",
+      "production_branch": "main",
+      "pr_comments_enabled": true,
+      "deployments_enabled": true
+    }
+  }
+}
+

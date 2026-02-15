@@ -1,0 +1,274 @@
+{
+  "name": "Category SEO Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 0 */3 * *"
+            }
+          ]
+        }
+      },
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{$env.BELL24H_API_URL}}/api/categories",
+        "options": {
+          "headers": {
+            "Authorization": "Bearer {{$env.BELL24H_API_TOKEN}}",
+            "Content-Type": "application/json"
+          }
+        }
+      },
+      "name": "Fetch Categories",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Generate SEO-optimized content for categories\nconst categories = $input.all();\nconst seoUpdates = [];\n\n// SEO templates for different category types\nconst seoTemplates = {\n  'agriculture': {\n    keywords: ['agriculture equipment', 'farming supplies', 'seeds', 'fertilizers', 'irrigation', 'tractor parts', 'organic farming', 'agricultural machinery'],\n    metaTitle: '{categoryName} Equipment & Supplies - Bell24h B2B Marketplace',\n    metaDescription: 'Find verified {categoryName} suppliers for farming equipment, seeds, fertilizers, irrigation systems, and organic farming tools. {supplierCount}+ suppliers, 24-hour RFQ response.'\n  },\n  'automobile': {\n    keywords: ['auto parts', 'car components', 'engine parts', 'tires', 'automotive accessories', 'vehicle parts', 'lubricants', 'car maintenance'],\n    metaTitle: '{categoryName} Parts & Components - Bell24h B2B Marketplace',\n    metaDescription: 'Source auto parts, engine components, tires, and automotive accessories from {supplierCount}+ verified suppliers. 24-hour RFQ response for automotive industry.'\n  },\n  'electronics': {\n    keywords: ['electronic components', 'circuit boards', 'sensors', 'batteries', 'displays', 'semiconductors', 'electronic devices', 'tech components'],\n    metaTitle: '{categoryName} Components & Devices - Bell24h B2B Marketplace',\n    metaDescription: 'Source electronic components, circuit boards, sensors, and electronic devices from {supplierCount}+ verified suppliers. 24-hour RFQ response for electronics industry.'\n  },\n  'textiles': {\n    keywords: ['textile materials', 'fabrics', 'garments', 'yarn', 'textile machinery', 'clothing', 'fashion', 'textile industry'],\n    metaTitle: '{categoryName} Materials & Fabrics - Bell24h B2B Marketplace',\n    metaDescription: 'Source textile materials, fabrics, garments, and yarn from {supplierCount}+ verified suppliers. 24-hour RFQ response for textile industry.'\n  },\n  'construction': {\n    keywords: ['construction materials', 'building supplies', 'cement', 'steel', 'tiles', 'construction equipment', 'building materials', 'construction industry'],\n    metaTitle: '{categoryName} Materials & Equipment - Bell24h B2B Marketplace',\n    metaDescription: 'Source construction materials, building supplies, cement, steel, and construction equipment from {supplierCount}+ verified suppliers. 24-hour RFQ response for construction industry.'\n  }\n};\n\n// Default SEO template\nconst defaultTemplate = {\n  keywords: ['{categoryName} suppliers', 'manufacturers', 'wholesale', 'b2b', 'verified suppliers', 'gst verified', 'ai trust score', 'made in india'],\n  metaTitle: '{categoryName} - Bell24h B2B Marketplace',\n  metaDescription: 'Source {categoryName} from {supplierCount}+ verified suppliers. 24-hour RFQ response, escrow-secured payments, GST-verified suppliers.'\n};\n\nfor (const category of categories) {\n  const categoryData = category.json;\n  const categoryId = categoryData.id;\n  const categoryName = categoryData.name;\n  \n  // Get SEO template for this category or use default\n  const template = seoTemplates[categoryId] || defaultTemplate;\n  \n  // Generate keywords based on category and subcategories\n  const baseKeywords = template.keywords;\n  const subcategoryKeywords = categoryData.subcategories?.map(sub => sub.name.toLowerCase()) || [];\n  const allKeywords = [...baseKeywords, ...subcategoryKeywords].slice(0, 10); // Limit to 10 keywords\n  \n  // Generate meta title and description\n  const metaTitle = template.metaTitle\n    .replace('{categoryName}', categoryName)\n    .replace('{supplierCount}', categoryData.supplierCount?.toLocaleString() || '1000+');\n    \n  const metaDescription = template.metaDescription\n    .replace('{categoryName}', categoryName)\n    .replace('{supplierCount}', categoryData.supplierCount?.toLocaleString() || '1000+');\n  \n  // Generate additional SEO content\n  const seoContent = {\n    categoryId: categoryId,\n    categoryName: categoryName,\n    slug: categoryData.slug,\n    \n    // Meta tags\n    metaTitle: metaTitle,\n    metaDescription: metaDescription,\n    keywords: allKeywords,\n    \n    // Open Graph tags\n    ogTitle: metaTitle,\n    ogDescription: metaDescription,\n    ogImage: `https://www.bell24h.com/images/categories/${categoryId}.jpg`,\n    ogUrl: `https://www.bell24h.com/categories/${categoryId}`,\n    \n    // Twitter Card tags\n    twitterTitle: metaTitle,\n    twitterDescription: metaDescription,\n    twitterImage: `https://www.bell24h.com/images/categories/${categoryId}.jpg`,\n    \n    // Structured data\n    structuredData: {\n      \"@context\": \"https://schema.org\",\n      \"@type\": \"Organization\",\n      \"name\": \"Bell24h\",\n      \"url\": \"https://www.bell24h.com\",\n      \"description\": \"India's Fastest B2B Match-Making Engine for MSMEs\",\n      \"offers\": {\n        \"@type\": \"Offer\",\n        \"description\": `${categoryName} products and services`,\n        \"category\": categoryName,\n        \"availability\": \"https://schema.org/InStock\"\n      }\n    },\n    \n    // Additional SEO fields\n    canonicalUrl: `https://www.bell24h.com/categories/${categoryId}`,\n    robots: 'index, follow',\n    language: 'en',\n    geoRegion: 'IN',\n    geoCountry: 'India',\n    \n    // Business-specific tags\n    businessCategory: categoryName,\n    supplierCount: categoryData.supplierCount,\n    productCount: categoryData.productCount,\n    rfqCount: categoryData.rfqCount,\n    \n    // Trust and security tags\n    trustEscrow: 'ICICI Bank Partner',\n    trustVerification: 'GST & PAN Verified',\n    trustAIScoring: 'AI Trust-Score',\n    trustMadeInIndia: 'Made in India 🇮🇳',\n    \n    // Update timestamp\n    lastUpdated: new Date().toISOString(),\n    seoScore: Math.floor(Math.random() * 20) + 80 // Simulate SEO score 80-100\n  };\n  \n  seoUpdates.push(seoContent);\n}\n\n// Return SEO updates in batches\nconst batchSize = 5;\nconst batches = [];\nfor (let i = 0; i < seoUpdates.length; i += batchSize) {\n  batches.push({\n    json: {\n      seoUpdates: seoUpdates.slice(i, i + batchSize),\n      totalCategories: seoUpdates.length,\n      batchNumber: Math.floor(i / batchSize) + 1,\n      totalBatches: Math.ceil(seoUpdates.length / batchSize),\n      timestamp: new Date().toISOString()\n    }\n  });\n}\n\nreturn batches;"
+      },
+      "name": "Generate SEO Content",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{$env.BELL24H_API_URL}}/api/categories/seo-update",
+        "options": {
+          "method": "POST",
+          "headers": {
+            "Authorization": "Bearer {{$env.BELL24H_API_TOKEN}}",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "seoUpdates": "={{$json.seoUpdates}}",
+            "batchNumber": "={{$json.batchNumber}}",
+            "totalBatches": "={{$json.totalBatches}}",
+            "timestamp": "={{$json.timestamp}}"
+          }
+        }
+      },
+      "name": "Update SEO Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://www.google.com/ping?sitemap=https://www.bell24h.com/sitemap.xml",
+        "options": {
+          "method": "GET",
+          "headers": {
+            "User-Agent": "Bell24h-SEO-Bot/1.0"
+          }
+        }
+      },
+      "name": "Submit to Google",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [1050, 200]
+    },
+    {
+      "parameters": {
+        "url": "https://www.bing.com/ping?sitemap=https://www.bell24h.com/sitemap.xml",
+        "options": {
+          "method": "GET",
+          "headers": {
+            "User-Agent": "Bell24h-SEO-Bot/1.0"
+          }
+        }
+      },
+      "name": "Submit to Bing",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [1050, 400]
+    },
+    {
+      "parameters": {
+        "url": "={{$env.BELL24H_API_URL}}/api/seo/generate-sitemap",
+        "options": {
+          "method": "POST",
+          "headers": {
+            "Authorization": "Bearer {{$env.BELL24H_API_TOKEN}}",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "categories": "={{$json.seoUpdates}}",
+            "timestamp": "={{$json.timestamp}}"
+          }
+        }
+      },
+      "name": "Generate Sitemap",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [1250, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$json.totalCategories}}",
+              "operation": "larger",
+              "value2": 40
+            }
+          ]
+        }
+      },
+      "name": "High Category Count?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1450, 300]
+    },
+    {
+      "parameters": {
+        "operation": "sendEmail",
+        "to": "admin@bell24h.com",
+        "subject": "SEO Update Report - High Category Count",
+        "body": "SEO updates completed for high category count:\n\nTotal Categories: {{$json.totalCategories}}\nBatch Number: {{$json.batchNumber}} of {{$json.totalBatches}}\n\nSEO optimization completed for all categories.\n\nUpdated at: {{$json.timestamp}}"
+      },
+      "name": "Send SEO Report",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [1650, 200]
+    },
+    {
+      "parameters": {
+        "url": "={{$env.BELL24H_API_URL}}/api/notifications/seo-updated",
+        "options": {
+          "method": "POST",
+          "headers": {
+            "Authorization": "Bearer {{$env.BELL24H_API_TOKEN}}",
+            "Content-Type": "application/json"
+          },
+          "body": {
+            "message": "SEO updates completed successfully",
+            "totalCategories": "={{$json.totalCategories}}",
+            "timestamp": "={{$json.timestamp}}"
+          }
+        }
+      },
+      "name": "Send Notification",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [1650, 400]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch Categories",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Categories": {
+      "main": [
+        [
+          {
+            "node": "Generate SEO Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate SEO Content": {
+      "main": [
+        [
+          {
+            "node": "Update SEO Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update SEO Data": {
+      "main": [
+        [
+          {
+            "node": "Submit to Google",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Submit to Bing",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Generate Sitemap",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Submit to Google": {
+      "main": [
+        [
+          {
+            "node": "High Category Count?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Submit to Bing": {
+      "main": [
+        [
+          {
+            "node": "High Category Count?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Sitemap": {
+      "main": [
+        [
+          {
+            "node": "High Category Count?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "High Category Count?": {
+      "main": [
+        [
+          {
+            "node": "Send SEO Report",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,620 @@
+'use client';
+import { useState, useEffect } from 'react';
+import { CheckCircle, Shield, Zap, Phone, ArrowRight, Search, Building, Users, TrendingUp, Star, Play, Mic, FileText, Clock, Eye, Settings } from 'lucide-react';
+import CategoriesSection from './components/CategoriesSection';
+
+// Add CSS for animation delays and line clamp
+const styles = `
+  .animation-delay-1000 { animation-delay: 1s; }
+  .animation-delay-2000 { animation-delay: 2s; }
+  .animation-delay-3000 { animation-delay: 3s; }
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+`;
+
+// Live RFQs Section Component
+function LiveRFQsSection() {
+  const [liveRFQs, setLiveRFQs] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchLiveRFQs();
+    // Refresh every 30 seconds
+    const interval = setInterval(fetchLiveRFQs, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const fetchLiveRFQs = async () => {
+    try {
+      const response = await fetch('/api/rfq/live?limit=6');
+      const data = await response.json();
+      if (data.success) {
+        setLiveRFQs(data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching live RFQs:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getTypeIcon = (type: string) => {
+    switch (type) {
+      case 'video': return <Play className="w-4 h-4" />;
+      case 'voice': return <Mic className="w-4 h-4" />;
+      default: return <FileText className="w-4 h-4" />;
+    }
+  };
+
+  const getTypeColor = (type: string) => {
+    switch (type) {
+      case 'video': return 'bg-red-100 text-red-600';
+      case 'voice': return 'bg-blue-100 text-blue-600';
+      default: return 'bg-gray-100 text-gray-600';
+    }
+  };
+
+  const getUrgencyColor = (urgency: string) => {
+    switch (urgency) {
+      case 'URGENT': return 'bg-red-500';
+      case 'HIGH': return 'bg-orange-500';
+      case 'MEDIUM': return 'bg-yellow-500';
+      default: return 'bg-green-500';
+    }
+  };
+
+  if (loading) {
+    return (
+      <section className="py-16 bg-white rounded-2xl shadow-xl mb-20">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading live RFQs...</p>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="py-16 bg-white rounded-2xl shadow-xl mb-20">
+      <div className="text-center mb-12">
+        <h2 className="text-5xl font-bold text-gray-900 mb-4">Live RFQs</h2>
+        <p className="text-xl text-gray-600">Real-time requests from verified buyers across India</p>
+        <div className="flex justify-center items-center gap-4 mt-4">
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+            <span className="text-sm text-gray-600">Live Updates</span>
+          </div>
+          <div className="text-sm text-gray-500">•</div>
+          <div className="text-sm text-gray-600">{liveRFQs.length} Active RFQs</div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {liveRFQs.map((rfq: any) => (
+          <div key={rfq.id} className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-6 border border-gray-200 hover:shadow-lg transition-all duration-300">
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <div className={`p-2 rounded-lg ${getTypeColor(rfq.type)}`}>
+                  {getTypeIcon(rfq.type)}
+                </div>
+                <span className="text-sm font-medium text-gray-600 capitalize">{rfq.type} RFQ</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className={`w-2 h-2 rounded-full ${getUrgencyColor(rfq.urgency)}`}></div>
+                <span className="text-xs font-medium text-gray-500">{rfq.urgency}</span>
+              </div>
+            </div>
+
+            <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">{rfq.title}</h3>
+            <p className="text-gray-600 text-sm mb-4 line-clamp-2">{rfq.description}</p>
+
+            <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+              <div className="flex items-center gap-1">
+                <Building className="w-4 h-4" />
+                <span>{rfq.buyer.name}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Clock className="w-4 h-4" />
+                <span>{rfq.timeAgo}</span>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between mb-4">
+              <div className="text-lg font-bold text-indigo-600">
+                ₹{(rfq.budget / 100000).toFixed(1)}L
+              </div>
+              <div className="text-sm text-gray-500">
+                {rfq.category}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4 text-sm text-gray-500">
+                <div className="flex items-center gap-1">
+                  <Users className="w-4 h-4" />
+                  <span>{rfq.quotes} quotes</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Eye className="w-4 h-4" />
+                  <span>{rfq.views} views</span>
+                </div>
+              </div>
+              <button className="bg-gradient-to-r from-indigo-600 to-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:from-indigo-700 hover:to-emerald-700 transition-all duration-300">
+                View Details
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="text-center mt-8">
+        <button className="bg-white text-indigo-600 border-2 border-indigo-600 px-8 py-3 rounded-lg font-semibold hover:bg-indigo-50 transition-all duration-300">
+          View All Live RFQs
+        </button>
+      </div>
+    </section>
+  );
+}
+
+export default function HomePage() {
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [loginStep, setLoginStep] = useState('phone'); // 'phone' | 'otp' | 'success'
+  const [phone, setPhone] = useState('');
+  const [otp, setOtp] = useState('');
+  const [demoOTP, setDemoOTP] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSendOTP = async () => {
+    if (!/^[6-9]\d{9}$/.test(phone)) {
+      setError('Please enter a valid 10-digit mobile number');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      // Generate demo OTP for testing
+      const generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
+      setDemoOTP(generatedOTP);
+
+      console.log(`📱 OTP for +91${phone}: ${generatedOTP}`);
+      setLoginStep('otp');
+    } catch (err) {
+      setError('Failed to send OTP. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyOTP = async () => {
+    if (otp !== demoOTP) {
+      setError('Invalid OTP. Please try again.');
+      return;
+    }
+
+    // Success - redirect to dashboard
+    setLoginStep('success');
+    setTimeout(() => {
+      window.location.href = '/dashboard';
+    }, 2000);
+  };
+
+  const resetLogin = () => {
+    setLoginStep('phone');
+    setPhone('');
+    setOtp('');
+    setDemoOTP('');
+    setError('');
+    setShowLoginModal(false);
+  };
+
+  return (
+    <>
+      <style dangerouslySetInnerHTML={{ __html: styles }} />
+      <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-emerald-50">
+      {/* Navigation - Exact Match to First Image */}
+      <nav className="bg-white shadow-lg sticky top-0 z-50">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between h-20">
+            <div className="flex items-center gap-8">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-gradient-to-r from-indigo-600 to-emerald-600 rounded-lg flex items-center justify-center text-white font-bold text-2xl shadow-lg">
+                  B
+                </div>
+                <div>
+                  <div className="font-bold text-2xl bg-gradient-to-r from-indigo-600 to-emerald-600 bg-clip-text text-transparent">
+                    Bell24h
+                  </div>
+                  <div className="text-sm text-gray-600 font-medium">Verified B2B Platform</div>
+                </div>
+              </div>
+              <div className="hidden md:flex items-center gap-8">
+                <a href="/suppliers" className="text-gray-700 hover:text-indigo-600 font-medium transition-colors">Suppliers</a>
+                <a href="/rfq/create" className="text-gray-700 hover:text-indigo-600 font-medium transition-colors">Post RFQ</a>
+                <a href="/wallet" className="text-gray-700 hover:text-indigo-600 font-medium transition-colors">Wallet</a>
+                <a href="/about" className="text-gray-700 hover:text-indigo-600 font-medium transition-colors">About</a>
+                <a href="/admin" className="text-gray-700 hover:text-indigo-600 font-medium transition-colors flex items-center gap-1">
+                  <Settings className="w-4 h-4" />
+                  Admin
+                </a>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <button 
+                onClick={() => setShowLoginModal(true)}
+                className="text-gray-700 hover:text-indigo-600 font-medium transition-colors"
+              >
+                📱 Mobile Login
+              </button>
+              <button 
+                onClick={() => setShowLoginModal(true)}
+                className="px-8 py-3 bg-gradient-to-r from-indigo-600 to-emerald-600 hover:from-indigo-700 hover:to-emerald-700 text-white rounded-lg font-semibold text-lg shadow-lg transition-all duration-300 transform hover:scale-105"
+              >
+                Get Started
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section - Exact Match to First Image with 3D Background */}
+      <main className="container mx-auto px-4 py-20 text-center relative overflow-hidden">
+        {/* 3D Background Elements */}
+        <div className="absolute inset-0 -z-10">
+          <div className="absolute top-20 left-10 w-32 h-32 bg-gradient-to-r from-indigo-200 to-emerald-200 rounded-full opacity-20 animate-pulse"></div>
+          <div className="absolute top-40 right-20 w-24 h-24 bg-gradient-to-r from-emerald-200 to-blue-200 rounded-full opacity-30 animate-pulse animation-delay-1000"></div>
+          <div className="absolute bottom-40 left-1/4 w-20 h-20 bg-gradient-to-r from-purple-200 to-indigo-200 rounded-full opacity-25 animate-pulse animation-delay-2000"></div>
+          <div className="absolute top-60 right-1/3 w-16 h-16 bg-gradient-to-r from-blue-200 to-purple-200 rounded-full opacity-20 animate-pulse animation-delay-3000"></div>
+        </div>
+        <h1 className="text-7xl md:text-8xl font-bold mb-8 leading-tight">
+          <span className="bg-gradient-to-r from-indigo-600 to-emerald-600 bg-clip-text text-transparent">
+            Post RFQ. Get 3 Verified Quotes in 24 Hours
+          </span>
+        </h1>
+        
+        <p className="text-2xl md:text-3xl text-gray-700 mb-8 max-w-5xl mx-auto font-medium">
+          200 live data signals—GST, credit, logistics, ESG—to match you with 3 pre-qualified suppliers. 
+          <span className="text-indigo-600 font-semibold"> Escrow-secured payments</span> until goods arrive.
+        </p>
+
+        {/* Trust Layer - Exact Match to First Image */}
+        <div className="flex justify-center gap-6 mb-12 flex-wrap">
+          <span className="px-6 py-3 bg-green-100 text-green-800 rounded-full text-xl font-bold flex items-center gap-3 shadow-md">
+            ✅ Escrow-Secured (ICICI Bank Partner)
+          </span>
+          <span className="px-6 py-3 bg-blue-100 text-blue-800 rounded-full text-xl font-bold flex items-center gap-3 shadow-md">
+            ✅ GST & PAN Verified
+          </span>
+          <span className="px-6 py-3 bg-purple-100 text-purple-800 rounded-full text-xl font-bold flex items-center gap-3 shadow-md">
+            ✅ AI Trust-Score
+          </span>
+        </div>
+
+        {/* Social Proof Strip - Exact Match to First Image */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16 max-w-4xl mx-auto">
+          <div className="bg-white rounded-lg p-6 shadow-lg">
+            <div className="text-3xl font-bold text-indigo-600">4,321</div>
+            <div className="text-gray-600 font-medium">RFQs processed yesterday</div>
+          </div>
+          <div className="bg-white rounded-lg p-6 shadow-lg">
+            <div className="text-3xl font-bold text-emerald-600">98%</div>
+            <div className="text-gray-600 font-medium">Escrow success rate</div>
+          </div>
+          <div className="bg-white rounded-lg p-6 shadow-lg">
+            <div className="text-3xl font-bold text-purple-600">12,400</div>
+            <div className="text-gray-600 font-medium">Verified suppliers</div>
+          </div>
+          <div className="bg-white rounded-lg p-6 shadow-lg">
+            <div className="text-3xl font-bold text-blue-600">50+</div>
+            <div className="text-gray-600 font-medium">Product categories</div>
+          </div>
+        </div>
+
+        {/* Main CTA Section - Exact Match to First Image */}
+        <div className="max-w-4xl mx-auto bg-white p-8 rounded-2xl shadow-2xl mb-20">
+          <h2 className="text-3xl font-bold text-gray-900 mb-6">Start Your RFQ Journey</h2>
+          <div className="flex flex-col lg:flex-row gap-4">
+            <input 
+              type="text" 
+              placeholder="What are you looking for? (e.g., Steel Pipes, Cotton Fabric, Electronics)" 
+              className="flex-1 px-6 py-4 text-xl outline-none border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-indigo-200 focus:border-indigo-500 transition-all"
+            />
+            <button className="bg-gradient-to-r from-indigo-600 to-emerald-600 text-white px-10 py-4 rounded-xl text-xl font-bold hover:from-indigo-700 hover:to-emerald-700 transition-all duration-300 shadow-lg transform hover:scale-105">
+              🚀 Start My RFQ Now
+            </button>
+          </div>
+          <div className="flex justify-center mt-6">
+            <button className="bg-white text-indigo-600 border-2 border-indigo-600 px-10 py-4 rounded-xl text-xl font-bold hover:bg-indigo-50 transition-all duration-300 shadow-lg">
+              ▶️ Watch 2-Min Demo
+            </button>
+          </div>
+        </div>
+
+        {/* How It Works Section */}
+        <section className="py-16 bg-white rounded-2xl shadow-xl mb-20">
+          <h2 className="text-5xl font-bold mb-16 text-gray-900">How Bell24h Works</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 px-8">
+            <div className="flex flex-col items-center text-center">
+              <div className="w-24 h-24 bg-gradient-to-r from-indigo-500 to-indigo-600 text-white rounded-full flex items-center justify-center text-4xl font-bold mb-6 shadow-lg">
+                1
+              </div>
+              <h3 className="text-3xl font-bold mb-4 text-gray-800">Post Your RFQ</h3>
+              <p className="text-xl text-gray-600 leading-relaxed">
+                Submit by voice, video, or text. Our AI understands your requirements and matches with verified suppliers.
+              </p>
+            </div>
+            <div className="flex flex-col items-center text-center">
+              <div className="w-24 h-24 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-full flex items-center justify-center text-4xl font-bold mb-6 shadow-lg">
+                2
+              </div>
+              <h3 className="text-3xl font-bold mb-4 text-gray-800">Get 3 Verified Quotes</h3>
+              <p className="text-xl text-gray-600 leading-relaxed">
+                Receive AI-scored, GST-verified supplier quotes within 24 hours. 200+ data points analyzed.
+              </p>
+            </div>
+            <div className="flex flex-col items-center text-center">
+              <div className="w-24 h-24 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-full flex items-center justify-center text-4xl font-bold mb-6 shadow-lg">
+                3
+              </div>
+              <h3 className="text-3xl font-bold mb-4 text-gray-800">Secure Escrow Payment</h3>
+              <p className="text-xl text-gray-600 leading-relaxed">
+                Payment held in ICICI escrow until goods arrive. Full protection guaranteed.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* 400+ Categories Section */}
+        <CategoriesSection />
+
+        {/* Live RFQs Section */}
+        <LiveRFQsSection />
+
+        {/* AI Features Highlight */}
+        <section className="py-16 bg-gradient-to-r from-indigo-100 to-emerald-100 rounded-2xl mb-20">
+          <h2 className="text-5xl font-bold mb-8 text-gray-900">AI-Powered B2B Engine</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 px-8">
+            <div className="text-center">
+              <div className="text-4xl mb-4">🤖</div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">AI Matching</h3>
+              <p className="text-gray-600">200+ data points analysis</p>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl mb-4">🎤</div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">Voice RFQ</h3>
+              <p className="text-gray-600">Speak your requirements</p>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl mb-4">📊</div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">Trust Scoring</h3>
+              <p className="text-gray-600">AI-generated risk assessment</p>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl mb-4">💳</div>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">Smart Escrow</h3>
+              <p className="text-gray-600">Automated payment protection</p>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-white py-16">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            <div className="col-span-1 md:col-span-2">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 bg-gradient-to-r from-indigo-600 to-emerald-600 rounded-lg flex items-center justify-center text-white font-bold text-2xl">
+                  B
+                </div>
+                <div>
+                  <div className="text-3xl font-bold bg-gradient-to-r from-indigo-400 to-emerald-400 bg-clip-text text-transparent">
+                    Bell24h
+                  </div>
+                  <div className="text-gray-400">India's Fastest B2B Match-Making Engine for MSMEs</div>
+                </div>
+              </div>
+              <p className="text-gray-300 text-lg mb-4">
+                Trusted by 12,400+ verified suppliers across India. Escrow-secured transactions worth ₹100+ crores processed.
+              </p>
+              <div className="flex items-center gap-2 text-yellow-400">
+                <span className="text-2xl">🇮🇳</span>
+                <span className="font-semibold">Made in India</span>
+              </div>
+            </div>
+            
+            <div>
+              <h3 className="font-bold text-xl mb-4 text-white">Quick Links</h3>
+              <ul className="space-y-2 text-gray-300">
+                <li><a href="/suppliers" className="hover:text-white transition-colors">Find Suppliers</a></li>
+                <li><a href="/rfq/create" className="hover:text-white transition-colors">Post RFQ</a></li>
+                <li><a href="/wallet" className="hover:text-white transition-colors">Wallet</a></li>
+                <li><a href="/escrow" className="hover:text-white transition-colors">Escrow</a></li>
+                <li><a href="/payment" className="hover:text-white transition-colors">Payment</a></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 className="font-bold text-xl mb-4 text-white">Support</h3>
+              <ul className="space-y-2 text-gray-300">
+                <li><a href="/help" className="hover:text-white transition-colors">Help Center</a></li>
+                <li><a href="/contact" className="hover:text-white transition-colors">Contact Us</a></li>
+                <li><a href="/terms" className="hover:text-white transition-colors">Terms of Service</a></li>
+                <li><a href="/privacy" className="hover:text-white transition-colors">Privacy Policy</a></li>
+                <li><a href="/about" className="hover:text-white transition-colors">About Us</a></li>
+              </ul>
+            </div>
+          </div>
+          
+          <div className="border-t border-gray-700 pt-8 text-center">
+            <p className="text-gray-400">© 2024 Bell24h.com. All rights reserved. | Escrow Partner: ICICI Bank | GST: 123456789</p>
+          </div>
+        </div>
+      </footer>
+
+      {/* Mobile OTP Login Modal */}
+      {showLoginModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 relative">
+            {/* Close Button */}
+            <button
+              onClick={resetLogin}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl"
+            >
+              ×
+            </button>
+
+            {/* Header */}
+            <div className="text-center mb-8">
+              <div className="w-16 h-16 bg-gradient-to-r from-indigo-600 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-white font-bold text-2xl">B</span>
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900">Bell24h Login</h2>
+              <p className="text-gray-600 mt-2">
+                {loginStep === 'phone' && 'Enter your mobile number'}
+                {loginStep === 'otp' && 'Enter the OTP sent to your phone'}
+                {loginStep === 'success' && 'Login successful!'}
+              </p>
+            </div>
+
+            {/* Demo OTP Display */}
+            {demoOTP && loginStep === 'otp' && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                <div className="text-center">
+                  <h3 className="text-sm font-medium text-yellow-800">Demo OTP</h3>
+                  <p className="text-3xl font-bold text-yellow-900 mt-1">{demoOTP}</p>
+                  <p className="text-xs text-yellow-700 mt-1">Use this code for testing</p>
+                </div>
+              </div>
+            )}
+
+            {/* Error Message */}
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                <p className="text-red-800 text-center">{error}</p>
+              </div>
+            )}
+
+            {/* Phone Input Step */}
+            {loginStep === 'phone' && (
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Mobile Number
+                  </label>
+                  <div className="flex">
+                    <span className="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 text-gray-500">
+                      +91
+                    </span>
+                    <input
+                      type="tel"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                      placeholder="9876543210"
+                      className="flex-1 px-4 py-3 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none text-lg"
+                      maxLength={10}
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Enter your 10-digit mobile number to receive OTP
+                  </p>
+                </div>
+
+                <button
+                  onClick={handleSendOTP}
+                  disabled={loading || phone.length !== 10}
+                  className="w-full bg-gradient-to-r from-indigo-600 to-emerald-600 text-white py-3 rounded-lg font-semibold text-lg hover:from-indigo-700 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+                >
+                  {loading ? '📱 Sending OTP...' : '📱 Send OTP'}
+                </button>
+
+                <div className="text-center">
+                  <p className="text-xs text-gray-500">
+                    By continuing, you agree to Bell24h's Terms & Privacy Policy
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* OTP Input Step */}
+            {loginStep === 'otp' && (
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Enter OTP
+                  </label>
+                  <input
+                    type="text"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    placeholder="123456"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none text-center text-2xl font-bold tracking-widest"
+                    maxLength={6}
+                  />
+                  <p className="text-xs text-gray-500 mt-1 text-center">
+                    OTP sent to +91 {phone} • Valid for 5 minutes
+                  </p>
+                </div>
+
+                <button
+                  onClick={handleVerifyOTP}
+                  disabled={loading || otp.length !== 6}
+                  className="w-full bg-gradient-to-r from-indigo-600 to-emerald-600 text-white py-3 rounded-lg font-semibold text-lg hover:from-indigo-700 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+                >
+                  {loading ? '🔓 Verifying...' : '🔓 Verify & Login'}
+                </button>
+
+                <div className="flex justify-between text-sm">
+                  <button
+                    onClick={() => setLoginStep('phone')}
+                    className="text-indigo-600 hover:text-indigo-800"
+                  >
+                    ← Change Number
+                  </button>
+                  <button
+                    onClick={handleSendOTP}
+                    disabled={loading}
+                    className="text-indigo-600 hover:text-indigo-800"
+                  >
+                    Resend OTP
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Success Step */}
+            {loginStep === 'success' && (
+              <div className="text-center space-y-6">
+                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+                  <span className="text-green-600 text-4xl">✅</span>
+                </div>
+                
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Login Successful!</h3>
+                  <p className="text-gray-600">Welcome to Bell24h! Redirecting to dashboard...</p>
+                </div>
+
+                <div className="bg-green-50 rounded-lg p-4">
+                  <p className="text-green-800 text-sm">
+                    📱 Phone: +91 {phone} verified successfully
+                  </p>
+                </div>
+
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="bg-green-600 h-2 rounded-full animate-pulse w-full"></div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+      </div>
+    </>
+  );
+}

@@ -1,0 +1,19 @@
+{
+  "protectedFiles": [
+    "app/admin/**/*.tsx",
+    "components/admin/**/*.tsx",
+    "api/admin/**/*.ts"
+  ],
+  "requireConfirmation": true,
+  "createBackups": true,
+  "testFirst": true,
+  "backupDirectory": "backups",
+  "auditRequired": true,
+  "mergeStrategy": "enhance",
+  "safetyChecks": [
+    "backupBeforeMerge",
+    "auditBeforeMerge",
+    "testAfterMerge",
+    "verifyNoOverwrites"
+  ]
+}

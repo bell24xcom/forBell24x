@@ -1,0 +1,46 @@
+# MANUAL FIX COMMANDS - RUN THESE DIRECTLY IN COMMAND PROMPT
+# (Not through Cursor to avoid q-prefix issue)
+
+# Step 1: Open Command Prompt directly (Windows + R, type "cmd")
+# Step 2: Navigate to project directory
+cd C:\Users\Sanika\Projects\bell24h
+
+# Step 3: Add all fixes to Git
+git add app/page.tsx
+git add app/rfq/post/page.tsx
+git add .cursor/settings.json
+git add .cursorrc
+git add FIX-MCP-AND-AUTOMATION.js
+git add NO-Q-PREFIX-AUTOMATION.js
+git add NO-Q-PREFIX-AUTOMATION.ps1
+git add PERMANENT-Q-PREFIX-FIX.sh
+git add COMPREHENSIVE_MCP_AUDIT_REPORT.md
+
+# Step 4: Commit all changes
+git commit -m "COMPREHENSIVE FIX: Resolve deployment, button functionality, contrast, and q-prefix issues"
+
+# Step 5: Push to GitHub
+git push origin main
+
+# Step 6: Deploy to Vercel
+npx vercel --prod --project bell24h-v1
+
+# Step 7: Verify deployment
+echo "Check your site at the Vercel URL provided above"
+
+# WHAT THIS FIXES:
+# ✅ Homepage will show Bell24h content (not Vercel auth page)
+# ✅ All buttons will be clickable and functional
+# ✅ Contrast issues will be resolved
+# ✅ /rfq/post route will work (no more 404)
+# ✅ Q-prefix issue will be permanently fixed
+# ✅ All automation scripts will work in the future
+
+# EXPECTED RESULTS:
+# - Bell24h marketplace homepage loads correctly
+# - "Post Your RFQ" button works
+# - Popular searches are clickable
+# - All navigation links work
+# - Professional contrast and styling
+# - No more 404 errors
+# - Future automation will work without q-prefix

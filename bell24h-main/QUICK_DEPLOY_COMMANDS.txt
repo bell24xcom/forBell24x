@@ -1,0 +1,63 @@
+BELL24H QUICK DEPLOYMENT COMMANDS
+================================
+
+1. Open PowerShell as Administrator
+
+2. Navigate to project:
+   cd C:\Users\Sanika\Projects\bell24h
+
+3. Install Vercel CLI:
+   npm install -g vercel
+
+4. Login to Vercel:
+   vercel login
+
+5. Deploy to production:
+   vercel --prod
+
+6. Add environment variables in Vercel Dashboard:
+   https://vercel.com/dashboard
+
+7. Redeploy with environment variables:
+   vercel --prod
+
+ENVIRONMENT VARIABLES TO ADD:
+============================
+NEXTAUTH_URL=https://your-app-name.vercel.app
+NEXTAUTH_SECRET=bell24h-super-secret-key-32-chars-minimum-required
+JWT_SECRET=bell24h-jwt-secret-key-32-chars-minimum
+DATABASE_URL=postgresql://neondb_owner:npg_K6M8mRhTPpCH@ep-fragrant-smoke-ae00uwml-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+MSG91_AUTH_KEY=468517Ak5rJ0vb7NDV68c24863P1
+MSG91_SENDER_ID=BELL24H
+API_SECRET_KEY=bell24h-api-secret-key-2024
+ENCRYPTION_KEY=bell24h-encryption-key-32-chars-minimum
+NODE_ENV=production
+NEXT_PUBLIC_APP_NAME=BELL24H
+NEXT_PUBLIC_APP_URL=https://your-app-name.vercel.app
+NEXT_TELEMETRY_DISABLED=1
+
+TEST URLS AFTER DEPLOYMENT:
+===========================
+Main Site: https://your-app-name.vercel.app
+Health Check: https://your-app-name.vercel.app/api/health
+Authentication: https://your-app-name.vercel.app/auth/phone-email
+Admin Dashboard: https://your-app-name.vercel.app/admin
+Supplier Verification: https://your-app-name.vercel.app/services/verification/order
+
+WHATSAPP MARKETING MESSAGE:
+===========================
+Hi [Name],
+
+Are you looking to onboard new suppliers safely? 🛡️
+We're offering a **Supplier Verification Service** at just **₹2,000**!
+
+✅ Prevent fraud
+✅ Verify GST/PAN details  
+✅ Get a comprehensive report in 48 hours
+
+Visit our service page: https://your-app-name.vercel.app/services/verification/order
+
+Reply 'YES' to this message to get started or learn more!
+
+Best,
+Team Bell24h

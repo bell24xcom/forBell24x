@@ -1,0 +1,385 @@
+// Enhanced Schema for N8N Integration with Existing Workflows
+// This adds integration tables to connect scraping system with existing N8N workflows
+
+// N8N Integration model for connecting with existing workflows
+model N8NIntegration {
+  id              String   @id @default(cuid())
+  workflowType    WorkflowType
+  workflowId      String
+  workflowName    String
+  
+  // Integration configuration
+  config          Json     // Integration configuration
+  webhookUrl      String?  // Webhook URL for this integration
+  apiEndpoint     String?  // API endpoint for data exchange
+  
+  // Status and tracking
+  isActive        Boolean  @default(false)
+  lastConnected   DateTime?
+  lastSync        DateTime?
+  syncStatus      SyncStatus @default(PENDING)
+  
+  // Performance metrics
+  totalRuns       Int      @default(0)
+  successRuns     Int      @default(0)
+  failedRuns      Int      @default(0)
+  lastError       String?
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relations
+  executions      N8NIntegrationExecution[]
+  
+  @@unique([workflowType, workflowId])
+  @@map("n8n_integrations")
+}
+
+// N8N Integration Execution model for tracking integration runs
+model N8NIntegrationExecution {
+  id              String   @id @default(cuid())
+  integrationId   String
+  integration     N8NIntegration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+  
+  // Execution details
+  executionType   IntegrationExecutionType
+  status          ExecutionStatus
+  startedAt       DateTime
+  finishedAt      DateTime?
+  duration        Int?     // Duration in milliseconds
+  
+  // Data processed
+  inputData       Json?    // Input data sent to integration
+  outputData      Json?    // Output data received from integration
+  dataProcessed   Int      @default(0)
+  
+  // Results
+  successCount    Int      @default(0)
+  errorCount      Int      @default(0)
+  errorMessage    String?
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  
+  @@map("n8n_integration_executions")
+}
+
+// CRM Lead model for enhanced lead management
+model CrmLead {
+  id              String   @id @default(cuid())
+  
+  // Lead information
+  name            String
+  email           String?
+  phone           String?
+  company         String
+  title           String?
+  
+  // Business details
+  category        String?
+  subcategory     String?
+  industry        String?
+  companySize     String?
+  annualRevenue   String?
+  
+  // Lead scoring and status
+  score           Int      @default(0)
+  status          LeadStatus @default(NEW)
+  source          LeadSource @default(SCRAPING)
+  priority        LeadPriority @default(MEDIUM)
+  
+  // Integration with scraping
+  scrapedCompanyId String? @unique
+  scrapedCompany  ScrapedCompany? @relation(fields: [scrapedCompanyId], references: [id])
+  
+  // CRM workflow integration
+  workflowId      String?
+  workflowStatus  String?
+  lastActivity    DateTime?
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relations
+  activities      CrmLeadActivity[]
+  
+  @@map("crm_leads")
+}
+
+// CRM Lead Activity model for tracking lead interactions
+model CrmLeadActivity {
+  id              String   @id @default(cuid())
+  leadId          String
+  lead            CrmLead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  
+  // Activity details
+  activityType    LeadActivityType
+  subject         String?
+  description     String?
+  outcome         String?
+  
+  // Integration details
+  workflowId      String?
+  executionId     String?
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  
+  @@map("crm_lead_activities")
+}
+
+// Scraping Metrics model for tracking scraping performance
+model ScrapingMetrics {
+  id              String   @id @default(cuid())
+  
+  // Metrics data
+  date            DateTime
+  companiesScraped Int
+  categoriesProcessed Int
+  successRate     Float
+  averageTrustScore Float
+  errorCount      Int      @default(0)
+  
+  // Source breakdown
+  indiamartCount  Int      @default(0)
+  justdialCount   Int      @default(0)
+  tradeindiaCount Int      @default(0)
+  exportersindiaCount Int @default(0)
+  
+  // Performance metrics
+  averageResponseTime Float?
+  totalDataProcessed  BigInt  @default(0)
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  
+  @@unique([date])
+  @@map("scraping_metrics")
+}
+
+// Enhanced Workflow model for existing N8N workflows
+model ExistingWorkflow {
+  id              String   @id @default(cuid())
+  
+  // Workflow identification
+  n8nWorkflowId   String   @unique
+  name            String
+  description     String?
+  workflowType    WorkflowType
+  
+  // Workflow configuration
+  nodes           Int      @default(0)
+  connections     Int      @default(0)
+  isActive        Boolean  @default(true)
+  
+  // Integration status
+  isIntegrated    Boolean  @default(false)
+  integrationId   String?  @unique
+  integration     N8NIntegration? @relation(fields: [integrationId], references: [id])
+  
+  // Performance tracking
+  lastRun         DateTime?
+  totalRuns       Int      @default(0)
+  successRate     Float    @default(0)
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@map("existing_workflows")
+}
+
+// Automation Dashboard model for unified control
+model AutomationDashboard {
+  id              String   @id @default(cuid())
+  
+  // Dashboard configuration
+  name            String
+  description     String?
+  isActive        Boolean  @default(true)
+  
+  // Dashboard metrics
+  totalWorkflows  Int      @default(0)
+  activeWorkflows Int      @default(0)
+  totalRuns       Int      @default(0)
+  successRate     Float    @default(0)
+  
+  // Last 24 hours activity
+  last24Hours     Json     // Activity metrics for last 24 hours
+  
+  // Timestamps
+  lastUpdated     DateTime @default(now())
+  createdAt       DateTime @default(now())
+  
+  @@map("automation_dashboards")
+}
+
+// Enhanced Enums
+enum WorkflowType {
+  EMAIL
+  SMS
+  CRM
+  ANALYTICS
+  ONBOARDING
+  SCRAPING
+  MARKETING
+  VERIFICATION
+}
+
+enum SyncStatus {
+  PENDING
+  SYNCING
+  SYNCED
+  ERROR
+  DISCONNECTED
+}
+
+enum IntegrationExecutionType {
+  WEBHOOK_TRIGGER
+  SCHEDULED_SYNC
+  MANUAL_TRIGGER
+  DATA_PROCESSING
+}
+
+enum ExecutionStatus {
+  PENDING
+  RUNNING
+  SUCCESS
+  FAILED
+  TIMEOUT
+  CANCELLED
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  PROPOSAL
+  NEGOTIATION
+  CLOSED_WON
+  CLOSED_LOST
+}
+
+enum LeadSource {
+  SCRAPING
+  WEBSITE
+  REFERRAL
+  SOCIAL_MEDIA
+  EMAIL_CAMPAIGN
+  SMS_CAMPAIGN
+  DIRECT_CALL
+  OTHER
+}
+
+enum LeadPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum LeadActivityType {
+  EMAIL_SENT
+  EMAIL_OPENED
+  EMAIL_CLICKED
+  SMS_SENT
+  SMS_DELIVERED
+  PHONE_CALL
+  MEETING_SCHEDULED
+  MEETING_COMPLETED
+  PROPOSAL_SENT
+  PROPOSAL_VIEWED
+  NEGOTIATION_STARTED
+  DEAL_CLOSED
+  DEAL_LOST
+  FOLLOW_UP_SCHEDULED
+  NOTE_ADDED
+}
+
+// Update existing models to include integration relations
+
+// Update ScrapedCompany to include CRM relation
+model ScrapedCompany {
+  id            String   @id @default(cuid())
+  name          String
+  email         String?
+  phone         String?
+  website       String?
+  address       String?
+  city          String?
+  state         String?
+  category      String
+  subcategory   String?
+  
+  // Source information
+  source        ScrapingSource
+  sourceUrl     String
+  scrapedAt     DateTime @default(now())
+  
+  // Business details
+  description   String?
+  employeeCount String?
+  establishedYear String?
+  annualTurnover String?
+  gstNumber     String?
+  cinNumber     String?
+  
+  // Verification and scoring
+  isVerified    Boolean  @default(false)
+  trustScore    Int      @default(0)
+  status        ScrapingStatus @default(SCRAPED)
+  claimStatus   ClaimStatus @default(UNCLAIMED)
+  
+  // Claim information
+  claimedAt     DateTime?
+  claimId       String?  @unique
+  
+  // Timestamps
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relations
+  claim         CompanyClaim?
+  marketingResponses MarketingResponse[]
+  crmLead       CrmLead? // Add CRM lead relation
+  
+  @@map("scraped_companies")
+}
+
+// Update N8NIntegration to include workflow relation
+model N8NIntegration {
+  id              String   @id @default(cuid())
+  workflowType    WorkflowType
+  workflowId      String
+  workflowName    String
+  
+  // Integration configuration
+  config          Json     // Integration configuration
+  webhookUrl      String?  // Webhook URL for this integration
+  apiEndpoint     String?  // API endpoint for data exchange
+  
+  // Status and tracking
+  isActive        Boolean  @default(false)
+  lastConnected   DateTime?
+  lastSync        DateTime?
+  syncStatus      SyncStatus @default(PENDING)
+  
+  // Performance metrics
+  totalRuns       Int      @default(0)
+  successRuns     Int      @default(0)
+  failedRuns      Int      @default(0)
+  lastError       String?
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relations
+  executions      N8NIntegrationExecution[]
+  existingWorkflow ExistingWorkflow? // Add existing workflow relation
+  
+  @@unique([workflowType, workflowId])
+  @@map("n8n_integrations")
+}

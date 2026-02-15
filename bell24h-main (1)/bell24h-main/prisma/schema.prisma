@@ -1,0 +1,119 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id         Int      @id @default(autoincrement())
+  email      String   @unique
+  name       String?
+  phone      String?
+  company    String?
+  role       String   @default("buyer") // buyer | supplier | admin
+  createdAt  DateTime @default(now()) @map("created_at")
+  rfqs       Rfq[]
+  quotes     Quote[]  @relation("SupplierQuotes")
+  messages   Message[] @relation("UserMessages")
+
+  @@map("users")
+}
+
+model Category {
+  id          Int      @id @default(autoincrement())
+  name        String
+  slug        String   @unique
+  icon        String
+  description String
+  rfqCount    Int      @default(0) @map("rfq_count")
+  createdAt   DateTime @default(now()) @map("created_at")
+  rfqs        Rfq[]
+
+  @@map("categories")
+}
+
+model Rfq {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @map("user_id")
+  categoryId  Int      @map("category_id")
+  title       String
+  description String
+  type        String // voice | video | text
+  status      String @default("active")
+  location    String
+  quantity    String?
+  quotesCount Int     @default(0) @map("quotes_count")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user        User     @relation(fields: [userId], references: [id])
+  category    Category @relation(fields: [categoryId], references: [id])
+  quotes      Quote[]
+  messages    Message[]
+
+  @@map("rfqs")
+}
+
+model Quote {
+  id          Int      @id @default(autoincrement())
+  rfqId       Int      @map("rfq_id")
+  supplierId  Int      @map("supplier_id")
+  price       Decimal? @db.Decimal(10,2)
+  description String?
+  deliveryTime String? @map("delivery_time")
+  status      String   @default("pending")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  rfq         Rfq      @relation(fields: [rfqId], references: [id])
+  supplier    User     @relation("SupplierQuotes", fields: [supplierId], references: [id])
+
+  @@map("quotes")
+}
+
+model Message {
+  id         Int      @id @default(autoincrement())
+  rfqId      Int      @map("rfq_id")
+  senderId   Int      @map("sender_id")
+  receiverId Int      @map("receiver_id")
+  message    String
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  rfq        Rfq      @relation(fields: [rfqId], references: [id])
+  sender     User     @relation("UserMessages", fields: [senderId], references: [id])
+
+  @@map("messages")
+}
+
+model Webhook {
+  id          Int      @id @default(autoincrement())
+  eventType   String   @map("event_type") // e.g., rfq.created, quote.submitted
+  payload     Json
+  status      String   @default("pending")
+  retryCount  Int      @default(0) @map("retry_count")
+  createdAt   DateTime @default(now()) @map("created_at")
+  sentAt      DateTime?
+
+  @@map("webhooks")
+}
+
+model Subscription {
+  id            String    @id @default(uuid())
+  userId        String    @map("user_id")
+  planId        String    @map("plan_id") // free | pro | enterprise
+  billingCycle  String    @map("billing_cycle") // monthly | yearly
+  amount        Decimal   @db.Decimal(10,2)
+  status        String    @default("PENDING") // PENDING | ACTIVE | CANCELLED | EXPIRED
+  razorpayOrderId String? @map("razorpay_order_id")
+  razorpayPaymentId String? @map("razorpay_payment_id")
+  startDate     DateTime  @map("start_date")
+  endDate        DateTime  @map("end_date")
+  isEarlyAdopter Boolean  @default(false) @map("is_early_adopter")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([status])
+  @@map("subscriptions")
+}

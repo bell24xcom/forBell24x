@@ -1,0 +1,5 @@
+# Prevent Git from processing submodules
+* submodule=unset
+BELL24H-ULTIMATE-FIX-2025-09-30 submodule=unset
+toolhive-studio submodule=unset
+netlify-deploy submodule=unset

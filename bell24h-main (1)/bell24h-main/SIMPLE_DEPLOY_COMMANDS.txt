@@ -1,0 +1,30 @@
+🚀 SIMPLE COPY-PASTE DEPLOYMENT COMMANDS
+
+Copy and paste these commands one by one in PowerShell:
+
+1. Build the project:
+npm run build
+
+2. Open Vercel dashboard:
+Start-Process "https://vercel.com/new"
+
+3. Manual steps in browser:
+- Click "Import Git Repository"
+- Find "digitex-erp/bell24h-production"
+- Click "Import"
+- Go to Settings → Environment Variables
+- Add the environment variables
+- Click "Deploy"
+
+Environment Variables to add:
+DATABASE_URL=postgresql://username:password@host:port/database
+MSG91_AUTH_KEY=468517Ak5rJ0vb7NDV68c24863P1
+MSG91_SENDER_ID=BELL24H
+RESEND_API_KEY=re_dGNCnq2P_9Rc29SZYvTCasdhvLCQG2Zx4
+FROM_EMAIL=noreply@bell24h.com
+JWT_SECRET=your_super_secret_jwt_key_minimum_32_characters_long
+NEXTAUTH_URL=https://your-app.vercel.app
+NEXTAUTH_SECRET=your_nextauth_secret_here
+NODE_ENV=production
+
+Result: Your site will be live at https://your-project-name.vercel.app

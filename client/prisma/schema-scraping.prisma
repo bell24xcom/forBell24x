@@ -1,0 +1,312 @@
+// Enhanced Schema for N8N Scraping & Marketing System
+// This adds scraping, claims, and marketing tables to the existing schema
+
+// Scraped Company model for N8N scraping system
+model ScrapedCompany {
+  id            String   @id @default(cuid())
+  name          String
+  email         String?
+  phone         String?
+  website       String?
+  address       String?
+  city          String?
+  state         String?
+  category      String
+  subcategory   String?
+  
+  // Source information
+  source        ScrapingSource
+  sourceUrl     String
+  scrapedAt     DateTime @default(now())
+  
+  // Business details
+  description   String?
+  employeeCount String?
+  establishedYear String?
+  annualTurnover String?
+  gstNumber     String?
+  cinNumber     String?
+  
+  // Verification and scoring
+  isVerified    Boolean  @default(false)
+  trustScore    Int      @default(0)
+  status        ScrapingStatus @default(SCRAPED)
+  claimStatus   ClaimStatus @default(UNCLAIMED)
+  
+  // Claim information
+  claimedAt     DateTime?
+  claimId       String?  @unique
+  
+  // Timestamps
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relations
+  claim         CompanyClaim?
+  marketingResponses MarketingResponse[]
+  
+  @@map("scraped_companies")
+}
+
+// Company Claim model for claiming scraped companies
+model CompanyClaim {
+  id                String   @id @default(cuid())
+  scrapedCompanyId  String   @unique
+  scrapedCompany    ScrapedCompany @relation(fields: [scrapedCompanyId], references: [id])
+  
+  // Claimer information
+  claimedBy         String   // Email
+  claimedByName     String
+  claimedByPhone    String
+  claimedByRole     String
+  verificationMethod VerificationMethod
+  
+  // Verification
+  verificationCode  String?
+  isEmailVerified   Boolean  @default(false)
+  isPhoneVerified   Boolean  @default(false)
+  verifiedAt        DateTime?
+  
+  // Documents and info
+  companyDocuments  String[] // Array of document URLs
+  additionalInfo    String?
+  
+  // Status and benefits
+  status            ClaimStatus @default(PENDING)
+  benefits          Json       // Benefits package
+  
+  // Timestamps
+  claimedAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  marketingResponses MarketingResponse[]
+  
+  @@map("company_claims")
+}
+
+// Marketing Campaign model
+model MarketingCampaign {
+  id              String   @id @default(cuid())
+  campaignType    CampaignType
+  targetCompanies String[] // Array of company IDs
+  
+  // Campaign content
+  templateId      String
+  message         String
+  subject         String?
+  
+  // Scheduling
+  scheduledAt     DateTime
+  priority        CampaignPriority @default(MEDIUM)
+  
+  // Status and stats
+  status          CampaignStatus @default(SCHEDULED)
+  stats           Json       // Campaign statistics
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relations
+  responses       MarketingResponse[]
+  
+  @@map("marketing_campaigns")
+}
+
+// Marketing Response model for tracking campaign responses
+model MarketingResponse {
+  id            String   @id @default(cuid())
+  campaignId    String
+  campaign      MarketingCampaign @relation(fields: [campaignId], references: [id])
+  
+  companyId     String?
+  scrapedCompany ScrapedCompany? @relation(fields: [companyId], references: [id])
+  
+  claimId       String?
+  companyClaim  CompanyClaim? @relation(fields: [claimId], references: [id])
+  
+  // Response details
+  responseType  ResponseType
+  status        ResponseStatus
+  message       String?
+  metadata      Json?
+  
+  // Timestamps
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@map("marketing_responses")
+}
+
+// N8N Workflow model for tracking automation workflows
+model N8NWorkflow {
+  id              String   @id @default(cuid())
+  name            String
+  description     String?
+  workflowType    WorkflowType
+  
+  // Workflow configuration
+  config          Json     // Workflow configuration
+  isActive        Boolean  @default(true)
+  lastRunAt       DateTime?
+  nextRunAt       DateTime?
+  
+  // Statistics
+  totalRuns       Int      @default(0)
+  successRuns     Int      @default(0)
+  failedRuns      Int      @default(0)
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@map("n8n_workflows")
+}
+
+// N8N Execution model for tracking workflow executions
+model N8NExecution {
+  id              String   @id @default(cuid())
+  workflowId      String
+  workflow        N8NWorkflow @relation(fields: [workflowId], references: [id])
+  
+  // Execution details
+  status          ExecutionStatus
+  startedAt       DateTime
+  finishedAt      DateTime?
+  duration        Int?     // Duration in milliseconds
+  
+  // Results
+  dataProcessed   Int      @default(0)
+  successCount    Int      @default(0)
+  errorCount      Int      @default(0)
+  errorMessage    String?
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  
+  @@map("n8n_executions")
+}
+
+// Enums
+enum ScrapingSource {
+  INDIAMART
+  JUSTDIAL
+  TRADEINDIA
+  EXPORTERSINDIA
+  GOOGLE_MAPS
+  LINKEDIN
+  OTHER
+}
+
+enum ScrapingStatus {
+  SCRAPED
+  VERIFIED
+  PROCESSED
+  ERROR
+}
+
+enum ClaimStatus {
+  UNCLAIMED
+  CLAIMED
+  PENDING
+  VERIFIED
+  REJECTED
+  EXPIRED
+}
+
+enum VerificationMethod {
+  EMAIL
+  PHONE
+  BOTH
+}
+
+enum CampaignType {
+  EMAIL
+  SMS
+  WHATSAPP
+  PUSH
+}
+
+enum CampaignPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum CampaignStatus {
+  SCHEDULED
+  RUNNING
+  COMPLETED
+  FAILED
+  PAUSED
+}
+
+enum ResponseType {
+  EMAIL_SENT
+  EMAIL_OPENED
+  EMAIL_CLICKED
+  SMS_SENT
+  SMS_DELIVERED
+  SMS_CLICKED
+  WHATSAPP_SENT
+  WHATSAPP_DELIVERED
+  CLAIM_SUBMITTED
+  CLAIM_VERIFIED
+  CONVERSION
+}
+
+enum ResponseStatus {
+  PENDING
+  SENT
+  DELIVERED
+  OPENED
+  CLICKED
+  CONVERTED
+  FAILED
+  BOUNCED
+}
+
+enum WorkflowType {
+  SCRAPING
+  MARKETING
+  VERIFICATION
+  ANALYTICS
+  CLEANUP
+}
+
+enum ExecutionStatus {
+  RUNNING
+  SUCCESS
+  FAILED
+  TIMEOUT
+}
+
+// Update N8NWorkflow to include executions relation
+model N8NWorkflow {
+  id              String   @id @default(cuid())
+  name            String
+  description     String?
+  workflowType    WorkflowType
+  
+  // Workflow configuration
+  config          Json     // Workflow configuration
+  isActive        Boolean  @default(true)
+  lastRunAt       DateTime?
+  nextRunAt       DateTime?
+  
+  // Statistics
+  totalRuns       Int      @default(0)
+  successRuns     Int      @default(0)
+  failedRuns      Int      @default(0)
+  
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relations
+  executions      N8NExecution[]
+  
+  @@map("n8n_workflows")
+}

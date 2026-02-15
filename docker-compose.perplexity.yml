@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  perplexity-ask:
+    build:
+      context: .
+      dockerfile: Dockerfile.perplexity
+    container_name: perplexity-ask
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - PERPLEXITY_API_KEY=${PERPLEXITY_API_KEY}
+    volumes:
+      - ./.env:/usr/src/app/.env:ro

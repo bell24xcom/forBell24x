@@ -1,0 +1,39 @@
+# Bell24h Supplier Verification Marketing Messages
+
+## Primary Message (Send to 20 contacts today):
+Hi [Name], I'm offering supplier verification service at ₹2,000. 
+Prevent fraud with GST/PAN verification. 
+48-hour delivery. Visit bell24h.com
+Reply YES to order.
+
+## Follow-up Message (After 24 hours):
+Hi [Name], did you see my message about supplier verification? 
+Many businesses lose money to fake suppliers. 
+Our verification prevents this. ₹2,000 only.
+Reply YES if interested.
+
+## Closing Message (After 48 hours):
+Hi [Name], last message about supplier verification. 
+Price: ₹2,000, Delivery: 48 hours.
+If not interested, just reply NO and I won't message again.
+Otherwise reply YES to order.
+
+## Contact List Template:
+1. [Name] - [Phone] - [Company] - Response: [YES/NO/PENDING]
+2. [Name] - [Phone] - [Company] - Response: [YES/NO/PENDING]
+3. [Name] - [Phone] - [Company] - Response: [YES/NO/PENDING]
+... (continue for 20 contacts)
+
+## Success Metrics:
+- Messages sent: __/20
+- Responses received: __/20
+- Orders placed: __/20
+- Conversion rate: __%
+- Revenue generated: ₹__
+
+## Notes:
+- Send during business hours (10 AM - 6 PM)
+- Personalize with recipient's name
+- Track all responses in this file
+- Follow up within 24-48 hours
+- Don't spam - respect NO responses

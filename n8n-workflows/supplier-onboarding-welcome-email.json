@@ -1,0 +1,63 @@
+{
+  "name": "Supplier Onboarding - Welcome Email",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "supplier-welcome-email",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "supplier-welcome-email"
+    },
+    {
+      "parameters": {
+        "operation": "sendEmail",
+        "fromEmail": "welcome@bell24h.com",
+        "toEmail": "={{ $json.body.email }}",
+        "subject": "Welcome to Bell24h, {{ $json.body.name }}!",
+        "text": "Welcome to Bell24h! Complete your profile to start receiving RFQs.",
+        "html": "<html><body><h1>Welcome to Bell24h, {{ $json.body.name }}!</h1><p>Complete your profile: <a href='https://bell24h.com/supplier/profile/edit'>Click here</a></p></body></html>"
+      },
+      "id": "send-email",
+      "name": "Send Welcome Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": true, \"message\": \"Welcome email sent\" } }}"
+      },
+      "id": "respond",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [650, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{ "node": "Send Welcome Email", "type": "main", "index": 0 }]]
+    },
+    "Send Welcome Email": {
+      "main": [[{ "node": "Respond to Webhook", "type": "main", "index": 0 }]]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2025-11-16T00:00:00.000Z",
+  "versionId": "1"
+}
+

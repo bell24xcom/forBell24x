@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>AI Insights Demo</title>
+  </head>
+  <body>
+    <h1>AI Insights Demo</h1>
+    <div id="shap"></div>
+    <script>
+  // Fetch explanations from the same-origin API path
+  fetch('/api/v1/ai/explain-match/1', { method: 'POST' })
+    .then(r => {
+      if (!r.ok) throw new Error('HTTP ' + r.status)
+      return r.json()
+    })
+    .then(data => {
+      const container = document.getElementById('shap')
+      const explanations = data.explanations || []
+      explanations.forEach((d, i) => {
+        const p = document.createElement('p')
+        p.setAttribute('data-testid', `feature-${i}`)
+        p.textContent = `${d.feature}: ${d.importance} (${d.contribution})`
+        container.appendChild(p)
+      })
+    })
+    .catch(e => {
+      const err = document.createElement('div')
+      err.setAttribute('data-testid', 'error')
+      err.textContent = `Error: ${e.message}`
+      const container = document.getElementById('shap')
+      container.appendChild(err)
+    })
+    </script>
+  </body>
+</html>

@@ -1,0 +1,114 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Set up environment variables
+      run: |
+        echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/test_db?schema=public" >> .env
+        echo "NODE_ENV=test" >> .env
+    
+    - name: Run tests
+      run: npm test
+      
+    - name: Upload coverage to Codecov
+      if: github.event_name != 'pull_request' && secrets.CODECOV_TOKEN != ''
+      uses: codecov/codecov-action@v3
+      with:
+        token: ${{ secrets.CODECOV_TOKEN || '' }}
+        file: ./coverage/lcov.info
+        flags: unittests
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Build application
+      run: npm run build
+      
+    - name: Run MCP code analysis
+      run: npx @mcp/server-code-analysis --ci
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Check for deploy token
+      id: check_deploy_token
+      run: |
+        if [ -z "${{ secrets.DEPLOY_TOKEN }}" ]; then
+          echo "DEPLOY_TOKEN is not set"
+          echo "deploy_available=false" >> $GITHUB_OUTPUT
+        else
+          echo "DEPLOY_TOKEN is set"
+          echo "deploy_available=true" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Deploy to production
+      if: steps.check_deploy_token.outputs.deploy_available == 'true'
+      run: |
+        echo "Deploying to production..."
+        # Example: npm run deploy
+        echo "Deployment would happen here with the provided token"
+      env:
+        DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+        NODE_ENV: production

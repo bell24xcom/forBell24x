@@ -1,0 +1,27 @@
+🛠️ DNS SETUP FOR www.bell24h.com
+
+PROBLEM: DNS is managed in cPanel, not Namecheap
+SOLUTION: Transfer DNS back to Namecheap BasicDNS
+
+STEP 1: Transfer DNS to Namecheap
+1. In Namecheap Advanced DNS page
+2. Look for "Change DNS Type" link (red text)
+3. Click "Change DNS Type"
+4. Select "Namecheap BasicDNS"
+5. Click "Save Changes"
+
+STEP 2: Add CNAME Record
+1. After DNS transfer, look for "ADD NEW RECORD" button
+2. Click it
+3. Select "CNAME Record" from dropdown
+4. Enter:
+   - Host: www
+   - Value: c2d4dfd06805fbcd.vercel-dns-017.com
+   - TTL: Automatic
+5. Click "Save"
+
+STEP 3: Wait for propagation (5-30 minutes)
+
+STEP 4: Test your domain www.bell24h.com
+
+ALTERNATIVE: If you have cPanel access, add the CNAME record there instead.

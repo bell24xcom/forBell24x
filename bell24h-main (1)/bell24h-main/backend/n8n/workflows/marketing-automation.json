@@ -1,0 +1,289 @@
+{
+  "name": "Marketing - New Supplier Onboarding",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "supplier-new",
+        "httpMethod": "POST",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-supplier-new",
+      "name": "Webhook - New Supplier",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "supplier-new-webhook"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"status\": \"received\", \"supplier_id\": $json.id, \"name\": $json.name } }}",
+        "options": {}
+      },
+      "id": "respond-to-webhook-supplier",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "url": "=https://api.msg91.com/api/v5/flow/",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "authkey",
+              "value": "={{ $env.MSG91_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"template_id\": \"{{ $env.MSG91_WELCOME_TEMPLATE_ID }}\",\n  \"sender\": \"BELL24\",\n  \"mobiles\": [\"{{ $json.mobile || $json.phone }}\"],\n  \"VAR1\": \"{{ $json.name || 'Supplier' }}\",\n  \"VAR2\": \"https://bell24h.com/verify/{{ $json.id }}\"\n}",
+        "options": {}
+      },
+      "id": "msg91-welcome",
+      "name": "MSG91 Welcome SMS",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "amount": 24,
+        "unit": "hours"
+      },
+      "id": "wait-24h",
+      "name": "Wait 24h",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "url": "=https://api.bell24h.com/api/suppliers/{{ $('Webhook - New Supplier').item.json.id }}/verified",
+        "method": "GET",
+        "options": {}
+      },
+      "id": "check-verified",
+      "name": "Check Verified",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "check-verified-status",
+              "leftValue": "={{ $json.verified }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-verified",
+      "name": "IF Verified",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1250, 300]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": "={{ $env.GOOGLE_SHEETS_SUPPLIERS_ID }}",
+        "sheetName": "Active Suppliers",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Supplier ID": "={{ $('Webhook - New Supplier').item.json.id }}",
+            "Name": "={{ $('Webhook - New Supplier').item.json.name }}",
+            "Mobile": "={{ $('Webhook - New Supplier').item.json.mobile || $('Webhook - New Supplier').item.json.phone }}",
+            "Verified": "Yes",
+            "Verified At": "={{ $now.toISO() }}",
+            "Status": "Active"
+          }
+        },
+        "options": {}
+      },
+      "id": "add-to-active",
+      "name": "Google Sheets - Add to Active",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.2,
+      "position": [1450, 250],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "google-sheets-credential",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.msg91.com/api/v5/flow/",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "authkey",
+              "value": "={{ $env.MSG91_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"template_id\": \"{{ $env.MSG91_VERIFICATION_REMINDER_TEMPLATE_ID }}\",\n  \"sender\": \"BELL24\",\n  \"mobiles\": [\"{{ $('Webhook - New Supplier').item.json.mobile || $('Webhook - New Supplier').item.json.phone }}\"],\n  \"VAR1\": \"{{ $('Webhook - New Supplier').item.json.name }}\",\n  \"VAR2\": \"https://bell24h.com/verify/{{ $('Webhook - New Supplier').item.json.id }}\"\n}",
+        "options": {}
+      },
+      "id": "msg91-reminder",
+      "name": "MSG91 - Reminder SMS",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1450, 350]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": "={{ $env.GOOGLE_SHEETS_SUPPLIERS_ID }}",
+        "sheetName": "Pending Verification",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Supplier ID": "={{ $('Webhook - New Supplier').item.json.id }}",
+            "Name": "={{ $('Webhook - New Supplier').item.json.name }}",
+            "Mobile": "={{ $('Webhook - New Supplier').item.json.mobile || $('Webhook - New Supplier').item.json.phone }}",
+            "Reminder Sent": "={{ $now.toISO() }}",
+            "Status": "Pending"
+          }
+        },
+        "options": {}
+      },
+      "id": "add-to-pending",
+      "name": "Google Sheets - Flag Pending",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.2,
+      "position": [1650, 350],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "google-sheets-credential",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook - New Supplier": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "MSG91 Welcome SMS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MSG91 Welcome SMS": {
+      "main": [
+        [
+          {
+            "node": "Wait 24h",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 24h": {
+      "main": [
+        [
+          {
+            "node": "Check Verified",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Verified": {
+      "main": [
+        [
+          {
+            "node": "IF Verified",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Verified": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Add to Active",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "MSG91 - Reminder SMS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MSG91 - Reminder SMS": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Flag Pending",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "createdAt": "2025-11-09T00:00:00.000Z",
+      "updatedAt": "2025-11-09T00:00:00.000Z",
+      "id": "marketing-automation",
+      "name": "Marketing Automation"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2025-11-09T00:00:00.000Z",
+  "versionId": "1"
+}
+

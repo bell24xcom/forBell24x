@@ -1,0 +1,21 @@
+{
+  "id": "rfq-001",
+  "title": "Industrial Equipment Supply - Manufacturing Plant",
+  "description": "We are looking for reliable suppliers of industrial equipment for our new manufacturing plant. Requirements include heavy machinery, conveyor systems, and safety equipment.",
+  "category": "Industrial Equipment",
+  "email": "procurement@manufacturingcorp.com",
+  "contactName": "John Smith",
+  "phone": "+91-98765-43210",
+  "companyName": "Manufacturing Corp Ltd",
+  "budget": "₹50,00,000 - ₹1,00,00,000",
+  "deadline": "2025-12-31",
+  "location": "Mumbai, Maharashtra",
+  "quantity": "1 complete plant setup",
+  "specifications": {
+    "machinery": ["CNC Machines", "Conveyor Systems", "Safety Equipment"],
+    "certifications": ["ISO 9001", "CE Marking"],
+    "warranty": "2 years minimum"
+  },
+  "preferredSuppliers": ["Local suppliers preferred", "Established companies only"],
+  "additionalRequirements": "Installation and training services required"
+}

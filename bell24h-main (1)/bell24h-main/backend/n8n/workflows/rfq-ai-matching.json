@@ -1,0 +1,367 @@
+{
+  "name": "RFQ AI Matching + SHAP + Winner Selection",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "rfq-new",
+        "httpMethod": "POST",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-rfq-new",
+      "name": "Webhook - New RFQ",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "rfq-new-webhook"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"status\": \"received\", \"rfq_id\": $json.id } }}",
+        "options": {}
+      },
+      "id": "respond-to-webhook",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "url": "=https://api.bell24h.com/api/v1/ai/explain-match/1",
+        "authentication": "none",
+        "method": "POST",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "price",
+              "value": "={{ $json.price || 125000 }}"
+            },
+            {
+              "name": "lead_time",
+              "value": "={{ $json.lead_time || 7 }}"
+            },
+            {
+              "name": "supplier_rating",
+              "value": "={{ $json.supplier_rating || 4.8 }}"
+            },
+            {
+              "name": "distance_km",
+              "value": "={{ $json.distance_km || 89 }}"
+            },
+            {
+              "name": "past_on_time_rate",
+              "value": "={{ $json.past_on_time_rate || 0.97 }}"
+            },
+            {
+              "name": "rfq_length",
+              "value": "={{ $json.rfq_length || 100 }}"
+            },
+            {
+              "name": "buyer_tier",
+              "value": "={{ $json.buyer_tier || 2 }}"
+            },
+            {
+              "name": "quantity",
+              "value": "={{ $json.quantity || 300 }}"
+            },
+            {
+              "name": "urgency_score",
+              "value": "={{ $json.urgency_score || 0.8 }}"
+            },
+            {
+              "name": "region",
+              "value": "={{ $json.region || 1 }}"
+            },
+            {
+              "name": "past_success_rate",
+              "value": "={{ $json.past_success_rate || 0.95 }}"
+            },
+            {
+              "name": "negotiations_count",
+              "value": "={{ $json.negotiations_count || 3 }}"
+            },
+            {
+              "name": "previous_orders",
+              "value": "={{ $json.previous_orders || 28 }}"
+            },
+            {
+              "name": "multimodal_rfq",
+              "value": "={{ $json.multimodal_rfq || 1 }}"
+            },
+            {
+              "name": "transcript_length",
+              "value": "={{ $json.transcript_length || 325 }}"
+            },
+            {
+              "name": "industry_type",
+              "value": "={{ $json.industry_type || 1 }}"
+            },
+            {
+              "name": "quoted_suppliers",
+              "value": "={{ $json.quoted_suppliers || 9 }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "id": "call-shap-api",
+      "name": "Call SHAP API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "extract-rfq-id",
+              "name": "rfq_id",
+              "value": "={{ $('Webhook - New RFQ').item.json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "extract-shap-score",
+              "name": "shap_score",
+              "value": "={{ $json.feature_importance || {} }}",
+              "type": "object"
+            },
+            {
+              "id": "extract-model-used",
+              "name": "model_used",
+              "value": "={{ $json.model_used || false }}",
+              "type": "boolean"
+            },
+            {
+              "id": "extract-prediction",
+              "name": "prediction",
+              "value": "={{ $json.prediction || 0.85 }}",
+              "type": "number"
+            },
+            {
+              "id": "extract-top-features",
+              "name": "top_features",
+              "value": "={{ Object.entries($json.feature_importance || {}).sort((a, b) => Math.abs(b[1]) - Math.abs(a[1])).slice(0, 5).map(([name, value]) => ({ name, importance: value })) }}",
+              "type": "array"
+            },
+            {
+              "id": "determine-winner",
+              "name": "winner_supplier_id",
+              "value": "={{ $('Webhook - New RFQ').item.json.supplier_id || 1 }}",
+              "type": "number"
+            },
+            {
+              "id": "extract-winner-phone",
+              "name": "winner_phone",
+              "value": "={{ $('Webhook - New RFQ').item.json.supplier_phone || '+919819049523' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "extract-winner",
+      "name": "Extract Winner + SHAP Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.2,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "url": "=https://api.msg91.com/api/v5/flow/",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "authkey",
+              "value": "={{ $env.MSG91_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"template_id\": \"{{ $env.MSG91_RFQ_WINNER_TEMPLATE_ID }}\",\n  \"sender\": \"BELL24\",\n  \"mobiles\": [\"{{ $json.winner_phone }}\"],\n  \"VAR1\": \"{{ $json.rfq_id }}\",\n  \"VAR2\": \"{{ $json.prediction }}\"\n}",
+        "options": {}
+      },
+      "id": "msg91-winner-sms",
+      "name": "MSG91 - Winner SMS",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1050, 250]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": "={{ $env.GOOGLE_SHEETS_RFQ_LOG_ID }}",
+        "sheetName": "RFQ Winners",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "RFQ ID": "={{ $json.rfq_id }}",
+            "Supplier ID": "={{ $json.winner_supplier_id }}",
+            "Prediction Score": "={{ $json.prediction }}",
+            "Model Used": "={{ $json.model_used }}",
+            "Top Feature 1": "={{ $json.top_features[0]?.name || 'N/A' }}",
+            "Top Feature 1 Importance": "={{ $json.top_features[0]?.importance || 0 }}",
+            "Timestamp": "={{ $now.toISO() }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "google-sheets-log",
+      "name": "Google Sheets - Log Win",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.2,
+      "position": [1050, 350],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "google-sheets-credential",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "check-model-used",
+              "leftValue": "={{ $json.model_used }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-model-used",
+      "name": "IF Model Used",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1250, 300]
+    },
+    {
+      "parameters": {
+        "url": "=https://api.bell24h.com/api/v1/ai/explain",
+        "method": "POST",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "rfq_id",
+              "value": "={{ $('Extract Winner + SHAP Data').item.json.rfq_id }}"
+            },
+            {
+              "name": "generate_report",
+              "value": "true"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "generate-report",
+      "name": "Generate SHAP Report",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1450, 250]
+    }
+  ],
+  "connections": {
+    "Webhook - New RFQ": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Call SHAP API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call SHAP API": {
+      "main": [
+        [
+          {
+            "node": "Extract Winner + SHAP Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Winner + SHAP Data": {
+      "main": [
+        [
+          {
+            "node": "MSG91 - Winner SMS",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Google Sheets - Log Win",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "IF Model Used",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Model Used": {
+      "main": [
+        [
+          {
+            "node": "Generate SHAP Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "createdAt": "2025-11-09T00:00:00.000Z",
+      "updatedAt": "2025-11-09T00:00:00.000Z",
+      "id": "rfq-automation",
+      "name": "RFQ Automation"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2025-11-09T00:00:00.000Z",
+  "versionId": "1"
+}
+

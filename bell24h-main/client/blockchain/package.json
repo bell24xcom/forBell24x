@@ -1,0 +1,32 @@
+{
+  "name": "bell24h-blockchain",
+  "version": "1.0.0",
+  "description": "Bell24h Smart Contracts",
+  "main": "index.js",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy:polygon": "hardhat run scripts/deploy.js --network polygon",
+    "deploy:mumbai": "hardhat run scripts/deploy.js --network polygonMumbai",
+    "verify:polygon": "hardhat verify --network polygon",
+    "verify:mumbai": "hardhat verify --network polygonMumbai",
+    "coverage": "hardhat coverage",
+    "gas-report": "REPORT_GAS=true hardhat test"
+  },
+  "dependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^3.0.0",
+    "@nomicfoundation/hardhat-verify": "^1.1.0",
+    "@openzeppelin/contracts": "^4.9.3",
+    "hardhat": "^2.17.0",
+    "hardhat-gas-reporter": "^1.0.9",
+    "solidity-coverage": "^0.8.5"
+  },
+  "keywords": [
+    "blockchain",
+    "smart-contracts",
+    "ethereum",
+    "polygon"
+  ],
+  "author": "Bell24h Team",
+  "license": "MIT"
+}

@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bell24h WebSocket Tester</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .notifications {
+            flex: 1;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 20px;
+            background-color: #f9f9f9;
+        }
+        .notification {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #fff;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .notification.system {
+            background-color: #e6f7ff;
+        }
+        .notification.echo {
+            background-color: #f6ffed;
+        }
+        .notification h3 {
+            margin-top: 0;
+            margin-bottom: 5px;
+        }
+        .notification p {
+            margin: 0;
+        }
+        .notification .timestamp {
+            font-size: 0.8em;
+            color: #999;
+            margin-top: 5px;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            padding: 8px 16px;
+            border: none;
+            background-color: #1890ff;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #40a9ff;
+        }
+        .input-row {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .status {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .connected {
+            background-color: #f6ffed;
+            color: #52c41a;
+        }
+        .disconnected {
+            background-color: #fff2f0;
+            color: #ff4d4f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bell24h WebSocket Tester</h1>
+        <div id="status" class="status disconnected">Disconnected</div>
+        
+        <div class="controls">
+            <button id="connectBtn">Connect</button>
+            <button id="disconnectBtn" disabled>Disconnect</button>
+            <button id="createNotificationBtn" disabled>Create Test Notification</button>
+            <button id="clearBtn">Clear Console</button>
+        </div>
+        
+        <h2>Send Message</h2>
+        <div class="input-row">
+            <input type="text" id="messageType" placeholder="Message Type (e.g., rfq_update, bid_placed, ping)">
+        </div>
+        <div class="input-row">
+            <input type="text" id="messageData" placeholder="Message Data (JSON)">
+            <button id="sendBtn" disabled>Send</button>
+        </div>
+        
+        <h2>Notifications</h2>
+        <div id="notifications" class="notifications"></div>
+    </div>
+
+    <script>
+        let socket = null;
+        
+        // DOM Elements
+        const statusEl = document.getElementById('status');
+        const notificationsEl = document.getElementById('notifications');
+        const connectBtn = document.getElementById('connectBtn');
+        const disconnectBtn = document.getElementById('disconnectBtn');
+        const createNotificationBtn = document.getElementById('createNotificationBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const sendBtn = document.getElementById('sendBtn');
+        const messageTypeInput = document.getElementById('messageType');
+        const messageDataInput = document.getElementById('messageData');
+        
+        // Connect to WebSocket
+        function connect() {
+            // Get the host from the current location
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const host = window.location.hostname;
+            const port = 8080; // Use the WS_PORT from your server
+            
+            socket = new WebSocket(`${protocol}//${host}:${port}`);
+            
+            socket.addEventListener('open', (event) => {
+                updateStatus('Connected', true);
+            });
+            
+            socket.addEventListener('message', (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    addNotification(data);
+                } catch (err) {
+                    addNotification({
+                        type: 'error',
+                        message: `Failed to parse message: ${event.data}`,
+                        timestamp: new Date().toISOString()
+                    });
+                }
+            });
+            
+            socket.addEventListener('close', (event) => {
+                updateStatus('Disconnected', false);
+            });
+            
+            socket.addEventListener('error', (event) => {
+                console.error('WebSocket error:', event);
+                addNotification({
+                    type: 'error',
+                    message: 'WebSocket error occurred',
+                    timestamp: new Date().toISOString()
+                });
+                updateStatus('Error: Connection failed', false);
+            });
+        }
+        
+        // Disconnect from WebSocket
+        function disconnect() {
+            if (socket) {
+                socket.close();
+                socket = null;
+            }
+        }
+        
+        // Update connection status
+        function updateStatus(message, isConnected) {
+            statusEl.textContent = message;
+            statusEl.className = `status ${isConnected ? 'connected' : 'disconnected'}`;
+            
+            connectBtn.disabled = isConnected;
+            disconnectBtn.disabled = !isConnected;
+            createNotificationBtn.disabled = !isConnected;
+            sendBtn.disabled = !isConnected;
+        }
+        
+        // Add a notification to the console
+        function addNotification(data) {
+            const notificationEl = document.createElement('div');
+            notificationEl.className = `notification ${data.type}`;
+            
+            let title = '';
+            if (data.type === 'notification') {
+                title = data.title || 'Notification';
+            } else if (data.type === 'system') {
+                title = 'System';
+            } else if (data.type === 'echo') {
+                title = 'Echo';
+            } else if (data.type === 'connection_established') {
+                title = 'Connection Established';
+                
+                // Handle received recent notifications
+                if (data.recentNotifications && data.recentNotifications.length > 0) {
+                    setTimeout(() => {
+                        data.recentNotifications.forEach(notification => {
+                            addNotification(notification);
+                        });
+                    }, 100);
+                }
+            } else {
+                title = data.type || 'Unknown';
+            }
+            
+            const content = `
+                <h3>${title}</h3>
+                <p>${data.message || JSON.stringify(data)}</p>
+                <div class="timestamp">${formatTimestamp(data.timestamp)}</div>
+            `;
+            
+            notificationEl.innerHTML = content;
+            notificationsEl.prepend(notificationEl);
+        }
+        
+        // Format timestamp
+        function formatTimestamp(timestamp) {
+            if (!timestamp) return '';
+            
+            try {
+                const date = new Date(timestamp);
+                return date.toLocaleTimeString();
+            } catch (err) {
+                return timestamp;
+            }
+        }
+        
+        // Create a test notification via API
+        async function createTestNotification() {
+            try {
+                const response = await fetch('/api/notification/create');
+                const data = await response.json();
+                console.log('Created notification:', data);
+            } catch (err) {
+                console.error('Failed to create notification:', err);
+                addNotification({
+                    type: 'error',
+                    message: `Failed to create notification: ${err.message}`,
+                    timestamp: new Date().toISOString()
+                });
+            }
+        }
+        
+        // Send a message
+        function sendMessage() {
+            if (!socket || socket.readyState !== WebSocket.OPEN) {
+                addNotification({
+                    type: 'error',
+                    message: 'Not connected to WebSocket server',
+                    timestamp: new Date().toISOString()
+                });
+                return;
+            }
+            
+            const type = messageTypeInput.value.trim();
+            if (!type) {
+                addNotification({
+                    type: 'error',
+                    message: 'Message type is required',
+                    timestamp: new Date().toISOString()
+                });
+                return;
+            }
+            
+            let data = {};
+            try {
+                const dataStr = messageDataInput.value.trim();
+                if (dataStr) {
+                    data = JSON.parse(dataStr);
+                }
+            } catch (err) {
+                addNotification({
+                    type: 'error',
+                    message: `Invalid JSON data: ${err.message}`,
+                    timestamp: new Date().toISOString()
+                });
+                return;
+            }
+            
+            const message = {
+                type,
+                data
+            };
+            
+            socket.send(JSON.stringify(message));
+            addNotification({
+                type: 'sent',
+                message: `Sent: ${JSON.stringify(message)}`,
+                timestamp: new Date().toISOString()
+            });
+            
+            // Clear inputs
+            messageDataInput.value = '';
+        }
+        
+        // Event listeners
+        connectBtn.addEventListener('click', connect);
+        disconnectBtn.addEventListener('click', disconnect);
+        createNotificationBtn.addEventListener('click', createTestNotification);
+        clearBtn.addEventListener('click', () => {
+            notificationsEl.innerHTML = '';
+        });
+        
+        sendBtn.addEventListener('click', sendMessage);
+        messageDataInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', (event) => {
+            // Ctrl+Enter to send message
+            if (event.ctrlKey && event.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        // Initialize ping interval to keep connection alive
+        let pingInterval = null;
+        
+        function startPingInterval() {
+            stopPingInterval();
+            pingInterval = setInterval(() => {
+                if (socket && socket.readyState === WebSocket.OPEN) {
+                    socket.send(JSON.stringify({ type: 'ping' }));
+                }
+            }, 30000); // 30 seconds
+        }
+        
+        function stopPingInterval() {
+            if (pingInterval) {
+                clearInterval(pingInterval);
+                pingInterval = null;
+            }
+        }
+        
+        // Update status based on connection state
+        connectBtn.addEventListener('click', () => {
+            startPingInterval();
+        });
+        
+        disconnectBtn.addEventListener('click', () => {
+            stopPingInterval();
+        });
+        
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            disconnect();
+            stopPingInterval();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+{
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
+      "env": {
+        "GITHUB_TOKEN": "${GITHUB_TOKEN}",
+        "REPO_OWNER": "Bell-repogit",
+        "REPO_NAME": "Bell24HDashboard"
+      }
+    },
+    "documentation": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@mcp/server-documentation"
+      ],
+      "env": {
+        "DOCS_PATH": "./docs",
+        "DOCS_PORT": "8080",
+        "AUTO_RELOAD": "true"
+      }
+    },
+    "code-analysis": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@mcp/server-code-analysis"
+      ],
+      "env": {
+        "RULESET": "typescript-react",
+        "THRESHOLD": "warning"
+      }
+    },
+    "testing": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@mcp/server-testing"
+      ],
+      "env": {
+        "TEST_DIR": "./tests",
+        "COVERAGE_DIR": "./coverage",
+        "WATCH_MODE": "true"
+      }
+    },
+    "ci-cd": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-server-cicd"
+      ],
+      "env": {
+        "PLATFORM": "github-actions",
+        "BUILD_SCRIPT": "npm run build",
+        "TEST_SCRIPT": "npm test"
+      }
+    },
+    "monitoring": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-server-monitoring"
+      ],
+      "env": {
+        "METRICS_PORT": "9090",
+        "HEALTH_CHECK_PATH": "/health",
+        "LOG_LEVEL": "info",
+        "PROMETHEUS_ENABLED": "true",
+        "GRAFANA_DASHBOARD": "./monitoring/grafana/dashboards",
+        "METRICS_INTERVAL": "15000",
+        "ALERT_MANAGER_URL": "http://localhost:9093",
+        "ENABLE_LOGGING": "true"
+      }
+    }
+  }
+}

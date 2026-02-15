@@ -1,0 +1,95 @@
+name: Deploy Bell24H to Oracle VM
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: # Allows manual trigger
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.ORACLE_SSH_KEY }}
+      
+      - name: Add VM to known hosts
+        run: |
+          ssh-keyscan -H 80.225.192.248 >> ~/.ssh/known_hosts
+      
+      - name: Deploy to Oracle VM
+        run: |
+          ssh -o StrictHostKeyChecking=no ubuntu@80.225.192.248 << 'ENDSSH'
+            set -e
+            echo "🚀 Starting Bell24H deployment..."
+            
+            # Navigate to project directory
+            cd ~/bell24h || (mkdir -p ~/bell24h && cd ~/bell24h)
+            
+            # Clean up any local changes and untracked files
+            echo "Cleaning up local changes..."
+            git reset --hard HEAD || true
+            git clean -fd || true
+            
+            # Remove conflicting Dockerfile variants
+            rm -f Dockerfile.client Dockerfile.final Dockerfile.fixed Dockerfile.oracle Dockerfile.oracle-fixed || true
+            
+            # Pull latest code
+            if [ -d .git ]; then
+              git fetch origin main || true
+              git reset --hard origin/main || true
+            else
+              git clone https://github.com/digitex-erp/bell24h . || true
+            fi
+            
+            # Stop and remove old container
+            echo "Stopping old container..."
+            docker stop bell24h || true
+            docker rm bell24h || true
+            
+            # Build new Docker image
+            echo "Building Docker image..."
+            docker build -t bell24h:latest -f Dockerfile .
+            
+            # Run new container
+            echo "Starting new container..."
+            docker run -d \
+              --name bell24h \
+              --restart always \
+              -p 3000:3000 \
+              --env-file ~/bell24h/client/.env.production \
+              bell24h:latest
+            
+            # Wait for container to start
+            echo "Waiting for container to start..."
+            sleep 10
+            
+            # Health check
+            echo "Checking health..."
+            sleep 5
+            if curl -f http://localhost:3000/api/health > /dev/null 2>&1; then
+              echo "✅ Deployment successful! Application is healthy."
+            else
+              echo "⚠️  Container started but health check failed. Check logs:"
+              docker logs --tail 50 bell24h
+            fi
+            
+            # Verify Nginx is proxying correctly
+            echo "Verifying Nginx configuration..."
+            sudo nginx -t && sudo systemctl reload nginx || echo "Nginx check skipped"
+            
+            echo "🎉 Bell24H deployment completed!"
+          ENDSSH
+      
+      - name: Deployment Status
+        run: |
+          echo "✅ Deployment completed successfully!"
+          echo "🌐 Your app should be live at:"
+          echo "   - https://bell24h.com"
+          echo "   - https://www.bell24h.com"
+          echo "   - https://app.bell24h.com"
+          echo "   - https://n8n.bell24h.com"

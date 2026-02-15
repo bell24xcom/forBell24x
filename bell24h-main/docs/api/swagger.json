@@ -1,0 +1,223 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Bell24H.com API Documentation",
+    "version": "1.0.0",
+    "description": "API documentation for Bell24H.com - RFQ and Logistics Management System"
+  },
+  "servers": [
+    {
+      "url": "https://api.bell24h.com",
+      "description": "Production server"
+    },
+    {
+      "url": "https://staging-api.bell24h.com",
+      "description": "Staging server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "RFQ",
+      "description": "Request for Quote operations"
+    },
+    {
+      "name": "Logistics",
+      "description": "Shipping and logistics operations"
+    },
+    {
+      "name": "Suppliers",
+      "description": "Supplier management operations"
+    },
+    {
+      "name": "Analytics",
+      "description": "Analytics and reporting operations"
+    }
+  ],
+  "paths": {
+    "/api/rfq": {
+      "post": {
+        "tags": ["RFQ"],
+        "summary": "Create a new RFQ",
+        "description": "Creates a new Request for Quote with the provided details",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RFQRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "RFQ created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RFQResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/logistics/shipping": {
+      "post": {
+        "tags": ["Logistics"],
+        "summary": "Get shipping options",
+        "description": "Retrieves available shipping options based on package details",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ShippingRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Shipping options retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShippingResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "RFQRequest": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Title of the RFQ"
+          },
+          "description": {
+            "type": "string",
+            "description": "Detailed description of the requirements"
+          },
+          "deadline": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Submission deadline"
+          },
+          "budget": {
+            "type": "number",
+            "description": "Maximum budget for the project"
+          }
+        },
+        "required": ["title", "description", "deadline"]
+      },
+      "RFQResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["draft", "published", "closed"]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ShippingRequest": {
+        "type": "object",
+        "properties": {
+          "origin": {
+            "$ref": "#/components/schemas/Location"
+          },
+          "destination": {
+            "$ref": "#/components/schemas/Location"
+          },
+          "package": {
+            "$ref": "#/components/schemas/PackageDetails"
+          }
+        },
+        "required": ["origin", "destination", "package"]
+      },
+      "Location": {
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "postalCode": {
+            "type": "string"
+          }
+        }
+      },
+      "PackageDetails": {
+        "type": "object",
+        "properties": {
+          "weight": {
+            "type": "number"
+          },
+          "dimensions": {
+            "type": "object",
+            "properties": {
+              "length": {
+                "type": "number"
+              },
+              "width": {
+                "type": "number"
+              },
+              "height": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      },
+      "ShippingResponse": {
+        "type": "object",
+        "properties": {
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ShippingOption"
+            }
+          }
+        }
+      },
+      "ShippingOption": {
+        "type": "object",
+        "properties": {
+          "carrier": {
+            "type": "string"
+          },
+          "service": {
+            "type": "string"
+          },
+          "cost": {
+            "type": "number"
+          },
+          "estimatedDelivery": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    }
+  }
+} 

@@ -1,0 +1,137 @@
+import { NextResponse } from 'next/server';
+
+export async function GET() {
+  // Mock data for supplier risk assessment
+  const riskAssessmentData = [
+    {
+      id: 1,
+      name: 'TechCorp Industries',
+      category: 'Electronics',
+      riskScore: 23,
+      riskLevel: 'low',
+      financialHealth: 92,
+      deliveryHistory: 96,
+      qualityScore: 94,
+      complianceScore: 89,
+      marketStability: 88,
+      lastAssessment: '2024-01-15',
+      trend: 'improving',
+      recommendations: ['Maintain current quality standards', 'Consider expanding to new markets'],
+      nextReviewDate: '2024-04-15'
+    },
+    {
+      id: 2,
+      name: 'Global Manufacturing Ltd',
+      category: 'Automotive',
+      riskScore: 67,
+      riskLevel: 'medium',
+      financialHealth: 58,
+      deliveryHistory: 72,
+      qualityScore: 68,
+      complianceScore: 65,
+      marketStability: 62,
+      lastAssessment: '2024-01-10',
+      trend: 'declining',
+      recommendations: ['Improve financial stability', 'Enhance quality control processes', 'Strengthen compliance'],
+      nextReviewDate: '2024-02-10'
+    },
+    {
+      id: 3,
+      name: 'Precision Parts Co',
+      category: 'Machinery',
+      riskScore: 18,
+      riskLevel: 'low',
+      financialHealth: 95,
+      deliveryHistory: 98,
+      qualityScore: 96,
+      complianceScore: 92,
+      marketStability: 94,
+      lastAssessment: '2024-01-12',
+      trend: 'stable',
+      recommendations: ['Continue excellent performance', 'Share best practices with other suppliers'],
+      nextReviewDate: '2024-04-12'
+    },
+    {
+      id: 4,
+      name: 'Innovation Labs',
+      category: 'Pharmaceuticals',
+      riskScore: 45,
+      riskLevel: 'medium',
+      financialHealth: 78,
+      deliveryHistory: 82,
+      qualityScore: 85,
+      complianceScore: 88,
+      marketStability: 72,
+      lastAssessment: '2024-01-08',
+      trend: 'improving',
+      recommendations: ['Focus on market stability', 'Maintain compliance standards'],
+      nextReviewDate: '2024-03-08'
+    },
+    {
+      id: 5,
+      name: 'Quality First Manufacturing',
+      category: 'Textiles',
+      riskScore: 34,
+      riskLevel: 'low',
+      financialHealth: 85,
+      deliveryHistory: 88,
+      qualityScore: 91,
+      complianceScore: 87,
+      marketStability: 82,
+      lastAssessment: '2024-01-14',
+      trend: 'stable',
+      recommendations: ['Monitor market conditions', 'Maintain quality standards'],
+      nextReviewDate: '2024-04-14'
+    },
+    {
+      id: 6,
+      name: 'Rapid Solutions Inc',
+      category: 'Electronics',
+      riskScore: 78,
+      riskLevel: 'high',
+      financialHealth: 45,
+      deliveryHistory: 62,
+      qualityScore: 58,
+      complianceScore: 52,
+      marketStability: 48,
+      lastAssessment: '2024-01-05',
+      trend: 'declining',
+      recommendations: ['Immediate financial review required', 'Implement quality improvement plan', 'Address compliance issues'],
+      nextReviewDate: '2024-01-20'
+    },
+    {
+      id: 7,
+      name: 'Steady Supply Co',
+      category: 'Chemicals',
+      riskScore: 89,
+      riskLevel: 'critical',
+      financialHealth: 32,
+      deliveryHistory: 45,
+      qualityScore: 42,
+      complianceScore: 38,
+      marketStability: 35,
+      lastAssessment: '2024-01-02',
+      trend: 'declining',
+      recommendations: ['Immediate intervention required', 'Consider supplier replacement', 'Financial restructuring needed'],
+      nextReviewDate: '2024-01-15'
+    },
+    {
+      id: 8,
+      name: 'Reliable Components',
+      category: 'Automotive',
+      riskScore: 28,
+      riskLevel: 'low',
+      financialHealth: 88,
+      deliveryHistory: 91,
+      qualityScore: 89,
+      complianceScore: 85,
+      marketStability: 86,
+      lastAssessment: '2024-01-11',
+      trend: 'improving',
+      recommendations: ['Continue current performance', 'Explore new opportunities'],
+      nextReviewDate: '2024-04-11'
+    }
+  ];
+
+  return NextResponse.json(riskAssessmentData);
+}

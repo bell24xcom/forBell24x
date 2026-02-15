@@ -1,0 +1,33 @@
+# Cursor IDE Terminal Command Rules
+
+## CRITICAL: Terminal Command Execution
+When executing terminal commands:
+1. NEVER add quotes around batch file names
+2. Write commands as: filename.bat
+3. DO NOT write: "filename.bat" or 'filename.bat'
+4. Use direct execution: .\filename.bat
+5. For git commands, execute them directly without quotes
+6. NEVER add "q" prefix to any commands
+
+## Alternative Execution Method
+If terminal execution fails due to prefix issues:
+- Create PowerShell scripts instead of direct execution
+- Use: powershell -ExecutionPolicy Bypass -File script.ps1
+- Never wrap commands in quotes
+
+## Git Commands
+Execute git commands as:
+- git add -A
+- git commit -m "message"
+- git push origin main
+
+## Batch File Execution
+Execute batch files as:
+- .\filename.bat
+- NOT: "q"filename.bat
+
+## Project-Specific Rules
+- Use existing components (Header.tsx, Footer.tsx, AuthModal.tsx)
+- Mobile OTP only - no email authentication
+- Solid colors only - no gradients
+- Deploy to Vercel via git push

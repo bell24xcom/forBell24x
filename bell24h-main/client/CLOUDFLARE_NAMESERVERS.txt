@@ -1,0 +1,24 @@
+🛠️ CLOUDFLARE NAMESERVERS FOR bell24h.com
+
+PROBLEM: Invalid nameservers in Cloudflare
+SOLUTION: Update nameservers in Namecheap to Cloudflare
+
+STEP 1: Get Cloudflare Nameservers
+- roxy.ns.cloudflare.com
+- zara.ns.cloudflare.com
+
+STEP 2: Update in Namecheap
+1. Go to: https://ap.www.namecheap.com/domains/domaincontrolpanel/bell24h.com/advancedns
+2. Click "Change DNS Type"
+3. Select "Custom DNS"
+4. Enter these nameservers:
+   - roxy.ns.cloudflare.com
+   - zara.ns.cloudflare.com
+5. Click "Save"
+
+STEP 3: Wait for DNS Transfer
+- Wait 5-30 minutes
+- Cloudflare will show "Valid Configuration"
+- www.bell24h.com will work
+
+ALTERNATIVE: If you can't find nameserver option, contact Namecheap support.

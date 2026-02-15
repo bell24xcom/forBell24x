@@ -1,0 +1,83 @@
+{
+  "name": "Supplier Onboarding - Welcome SMS",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "supplier-welcome-sms",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "supplier-welcome-sms"
+    },
+    {
+      "parameters": {
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "url": "https://api.msg91.com/api/v5/flow/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "authkey",
+              "value": "={{ $env.MSG91_AUTH_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "template_id",
+              "value": "supplier_welcome"
+            },
+            {
+              "name": "recipients",
+              "value": "={{ [{ \"mobiles\": $json.body.phone, \"name\": $json.body.name }] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "send-sms",
+      "name": "Send Welcome SMS",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": true, \"message\": \"Welcome SMS sent\" } }}"
+      },
+      "id": "respond",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [650, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{ "node": "Send Welcome SMS", "type": "main", "index": 0 }]]
+    },
+    "Send Welcome SMS": {
+      "main": [[{ "node": "Respond to Webhook", "type": "main", "index": 0 }]]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2025-11-16T00:00:00.000Z",
+  "versionId": "1"
+}
+

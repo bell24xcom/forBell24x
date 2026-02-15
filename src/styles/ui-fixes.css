@@ -1,0 +1,187 @@
+/* Bell24h UI/UX Fixes */
+
+/* Layout Fixes */
+.layout-fix-container {
+  width: 100%;
+  min-height: 100vh;
+}
+
+.header-fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+  z-index: 1000;
+  padding: 1rem 0;
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.logo-section h1 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #1f2937;
+  margin: 0;
+}
+
+.search-categories-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+  max-width: 600px;
+}
+
+.search-container {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  position: relative;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.search-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.search-button {
+  position: absolute;
+  right: 0.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  transition: background-color 0.2s;
+}
+
+.search-button:hover {
+  background-color: #f3f4f6;
+}
+
+.categories-container {
+  min-width: 150px;
+}
+
+.categories-select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  background: white;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.categories-select:focus {
+  border-color: #3b82f6;
+}
+
+/* Supplier Profile Fixes */
+.supplier-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.btn-contact-supplier,
+.btn-create-rfq {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.875rem;
+}
+
+.btn-contact-supplier {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.btn-contact-supplier:hover {
+  background-color: #2563eb;
+}
+
+.btn-contact-supplier:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.btn-create-rfq {
+  background-color: #10b981;
+  color: white;
+}
+
+.btn-create-rfq:hover {
+  background-color: #059669;
+}
+
+.btn-create-rfq:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* Authentication Fixes */
+.loading-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  font-size: 1.125rem;
+  color: #6b7280;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .header-content {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .search-categories-section {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .supplier-actions {
+    flex-direction: column;
+  }
+}
+
+/* Hide login button when authenticated */
+.authenticated .login-button {
+  display: none;
+}
+
+/* Show dashboard when authenticated */
+.authenticated .welcome-screen {
+  display: none;
+}
+
+.authenticated .dashboard {
+  display: block;
+}

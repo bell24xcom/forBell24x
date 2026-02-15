@@ -1,0 +1,13 @@
+{
+  "rpcUrl": "https://polygon-mumbai.infura.io/v3/YOUR_INFURA_KEY",
+  "chainId": 80001,
+  "tradeEscrowAddress": "0x0000000000000000000000000000000000000000",
+  "gstnApiUrl": "https://api.gstn.sandbox.gov.in/v1",
+  "logisticsApiUrl": "https://api.logistics-provider.com/v1",
+  "ondcApiUrl": "https://api.ondc.org/v1",
+  "pollingInterval": 60000,
+  "retryAttempts": 3,
+  "logLevel": "info",
+  "useMsgQueue": false,
+  "msgQueueUrl": "amqp://localhost"
+}

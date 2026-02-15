@@ -1,0 +1,9 @@
+# Vercel Environment Variables for bell24h-v1
+# Add these in Vercel Dashboard → Settings → Environment Variables
+
+DATABASE_URL=postgresql://neondb_owner:npg_0Duqdxs3RoyA@ep-super-wind-a1c1ni4n-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+RAZORPAY_KEY_ID=rzp_live_RJjxcgaBo9j0UA
+RAZORPAY_KEY_SECRET=lwTxLReQSkVL7lbrr39XSoyG
+NEXTAUTH_SECRET=bell24h_neon_production_secret_2024
+NEXTAUTH_URL=https://www.bell24h.com
+NODE_ENV=production
