@@ -1,27 +1,24 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
 import './globals.css'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 
-const inter = Inter({ subsets: ['latin'] })
-
 export const metadata: Metadata = {
-  title: 'Bell24h - India\'s Fastest B2B Marketplace',
-  description: 'Connect with verified suppliers and buyers across India with AI-powered matching and secure escrow payments.',
-  keywords: 'B2B marketplace, suppliers, buyers, India, RFQ, escrow, AI matching',
-  authors: [{ name: 'Bell24h Team' }],
+  title: "Bell24H - India's #1 B2B Supplier Marketplace | Voice, Video & Text RFQs",
+  description: 'Connect with 10,000+ verified suppliers across 450+ categories. Post RFQs via voice, video, or text. AI-powered matching for Indian businesses.',
+  keywords: 'B2B marketplace, suppliers India, RFQ, voice RFQ, video RFQ, AI matching, procurement, verified suppliers, 450 categories',
+  authors: [{ name: 'BELL Technology Pvt. Ltd.' }],
   openGraph: {
-    title: 'Bell24h - India\'s Fastest B2B Marketplace',
-    description: 'Connect with verified suppliers and buyers across India',
+    title: "Bell24H - India's #1 B2B Supplier Marketplace",
+    description: 'Connect with 10,000+ verified suppliers. Post RFQs via voice, video, or text.',
     url: 'https://www.bell24h.com',
-    siteName: 'Bell24h',
+    siteName: 'Bell24H',
     images: [
       {
         url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'Bell24h B2B Marketplace',
+        alt: 'Bell24H - B2B Supplier Marketplace',
       },
     ],
     locale: 'en_IN',
@@ -29,8 +26,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Bell24h - India\'s Fastest B2B Marketplace',
-    description: 'Connect with verified suppliers and buyers across India',
+    title: "Bell24H - India's #1 B2B Supplier Marketplace",
+    description: 'Connect with 10,000+ verified suppliers. Post RFQs via voice, video, or text.',
     images: ['/og-image.jpg'],
   },
   robots: {
@@ -52,10 +49,10 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
+    <html lang="en" className="scroll-smooth">
+      <body className="font-sans bg-[#0F172A] text-white antialiased">
         <Header />
-        <main>
+        <main className="min-h-screen">
           {children}
         </main>
         <Footer />
