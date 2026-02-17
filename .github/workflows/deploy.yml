@@ -43,7 +43,7 @@ jobs:
               git fetch origin main || true
               git reset --hard origin/main || true
             else
-              git clone https://github.com/digitex-erp/bell24h . || true
+              git clone https://github.com/bell24xcom/forBell24x . || true
             fi
             
             # Stop and remove old container
@@ -57,11 +57,16 @@ jobs:
             
             # Run new container
             echo "Starting new container..."
+            # Use root .env.production (client/ subfolder is legacy path)
+            ENV_FILE=~/bell24h/.env.production
+            if [ ! -f "$ENV_FILE" ]; then
+              ENV_FILE=~/bell24h/client/.env.production
+            fi
             docker run -d \
               --name bell24h \
               --restart always \
               -p 3000:3000 \
-              --env-file ~/bell24h/client/.env.production \
+              --env-file "$ENV_FILE" \
               bell24h:latest
             
             # Wait for container to start
