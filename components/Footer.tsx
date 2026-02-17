@@ -36,7 +36,7 @@ export default function Footer() {
           <div>
             <h4 className="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-4">Product</h4>
             <ul className="space-y-2.5">
-              <li><Link href="/post-rfq" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">Post RFQ</Link></li>
+              <li><Link href="/rfq/create" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">Post RFQ</Link></li>
               <li><Link href="/suppliers" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">Find Suppliers</Link></li>
               <li><Link href="/categories" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">Browse Categories</Link></li>
               <li><Link href="/pricing" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">Pricing</Link></li>
@@ -49,7 +49,7 @@ export default function Footer() {
             <ul className="space-y-2.5">
               <li><Link href="/about" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">About Us</Link></li>
               <li><Link href="/contact" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">Contact</Link></li>
-              <li><Link href="/help-center" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">Help Center</Link></li>
+              <li><Link href="/help" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">Help Center</Link></li>
             </ul>
           </div>
 
@@ -59,7 +59,7 @@ export default function Footer() {
             <ul className="space-y-2.5">
               <li><Link href="/privacy" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">Privacy Policy</Link></li>
               <li><Link href="/terms" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">Terms of Service</Link></li>
-              <li><Link href="/refund" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">Refund Policy</Link></li>
+              <li><Link href="/refund-policy" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">Refund Policy</Link></li>
               <li><Link href="/shipping" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">Shipping Policy</Link></li>
               <li><Link href="/cookies" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">Cookie Policy</Link></li>
             </ul>

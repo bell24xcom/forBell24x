@@ -72,15 +72,15 @@ export default function RegisterPage() {
     return (
       <>
         <Header />
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12">
+        <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center py-12">
           <div className="max-w-md w-full text-center">
             <div className="mx-auto h-12 w-12 bg-green-600 rounded-lg flex items-center justify-center mb-4">
               <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Registration Successful!</h2>
-            <p className="text-gray-600 mb-6">
+            <h2 className="text-3xl font-bold text-white mb-4">Registration Successful!</h2>
+            <p className="text-slate-400 mb-6">
               Your account has been created successfully. You will be redirected to the login page shortly.
             </p>
             <Link href="/login" className="btn-primary">
@@ -96,31 +96,31 @@ export default function RegisterPage() {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-gray-50 py-12">
+      <div className="min-h-screen bg-[var(--bg-primary)] py-12">
         <div className="max-w-2xl mx-auto px-4">
-          <div className="bg-white rounded-lg shadow-md p-8">
+          <div className="bg-slate-800/50 rounded-lg border border-slate-700/50 shadow-md p-8">
             <div className="text-center mb-8">
               <div className="mx-auto h-12 w-12 bg-blue-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-xl">B</span>
               </div>
-              <h2 className="mt-4 text-3xl font-extrabold text-gray-900">
+              <h2 className="mt-4 text-3xl font-extrabold text-white">
                 Create your account
               </h2>
-              <p className="mt-2 text-gray-600">
+              <p className="mt-2 text-slate-400">
                 Join thousands of businesses on Bell24h
               </p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
               {error && (
-                <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg">
+                <div className="bg-red-900/30 border border-red-500/50 text-red-400 px-4 py-3 rounded-lg">
                   {error}
                 </div>
               )}
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="name" className="block text-sm font-medium text-slate-300">
                     Full Name *
                   </label>
                   <input
@@ -135,7 +135,7 @@ export default function RegisterPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="company" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="company" className="block text-sm font-medium text-slate-300">
                     Company Name *
                   </label>
                   <input
@@ -152,7 +152,7 @@ export default function RegisterPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="email" className="block text-sm font-medium text-slate-300">
                     Email Address *
                   </label>
                   <input
@@ -167,7 +167,7 @@ export default function RegisterPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="phone" className="block text-sm font-medium text-slate-300">
                     Phone Number *
                   </label>
                   <input
@@ -184,7 +184,7 @@ export default function RegisterPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">
+                <label className="block text-sm font-medium text-slate-300 mb-3">
                   I am a *
                 </label>
                 <div className="grid grid-cols-2 gap-4">
@@ -199,15 +199,15 @@ export default function RegisterPage() {
                     />
                     <div className={`p-4 border-2 rounded-lg cursor-pointer transition-colors ${
                       formData.userType === 'buyer'
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-300 hover:border-gray-400'
+                        ? 'border-blue-500 bg-blue-500/10'
+                        : 'border-slate-600 hover:border-slate-500'
                     }`}>
                       <div className="text-center">
-                        <svg className="w-8 h-8 mx-auto mb-2 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                        <svg className="w-8 h-8 mx-auto mb-2 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                         </svg>
-                        <div className="font-medium">Buyer</div>
-                        <div className="text-sm text-gray-500">Looking for products/services</div>
+                        <div className="font-medium text-white">Buyer</div>
+                        <div className="text-sm text-slate-400">Looking for products/services</div>
                       </div>
                     </div>
                   </label>
@@ -223,15 +223,15 @@ export default function RegisterPage() {
                     />
                     <div className={`p-4 border-2 rounded-lg cursor-pointer transition-colors ${
                       formData.userType === 'supplier'
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-300 hover:border-gray-400'
+                        ? 'border-blue-500 bg-blue-500/10'
+                        : 'border-slate-600 hover:border-slate-500'
                     }`}>
                       <div className="text-center">
-                        <svg className="w-8 h-8 mx-auto mb-2 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                        <svg className="w-8 h-8 mx-auto mb-2 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                         </svg>
-                        <div className="font-medium">Supplier</div>
-                        <div className="text-sm text-gray-500">Selling products/services</div>
+                        <div className="font-medium text-white">Supplier</div>
+                        <div className="text-sm text-slate-400">Selling products/services</div>
                       </div>
                     </div>
                   </label>
@@ -240,7 +240,7 @@ export default function RegisterPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label htmlFor="category" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="category" className="block text-sm font-medium text-slate-300">
                     Business Category
                   </label>
                   <select
@@ -263,7 +263,7 @@ export default function RegisterPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="location" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="location" className="block text-sm font-medium text-slate-300">
                     Location
                   </label>
                   <input
@@ -296,9 +296,9 @@ export default function RegisterPage() {
               </div>
 
               <div className="text-center">
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-slate-400">
                   Already have an account?{' '}
-                  <Link href="/login" className="font-medium text-blue-600 hover:text-blue-500">
+                  <Link href="/login" className="font-medium text-blue-400 hover:text-blue-300">
                     Sign in
                   </Link>
                 </p>

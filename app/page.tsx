@@ -76,7 +76,7 @@ function HeroSection() {
         {/* Primary CTA */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
           <Link
-            href="/post-rfq"
+            href="/rfq/create"
             className="inline-flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold px-8 py-3.5 rounded-lg text-lg transition-all duration-200 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40"
           >
             Post Your RFQ Free
@@ -306,7 +306,7 @@ function FinalCTASection() {
           Join thousands of businesses already using Bell24H to find verified suppliers faster.
         </p>
         <Link
-          href="/post-rfq"
+          href="/rfq/create"
           className="inline-flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold px-8 py-3.5 rounded-lg text-lg transition-all duration-200 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40"
         >
           Post Your First RFQ Free
