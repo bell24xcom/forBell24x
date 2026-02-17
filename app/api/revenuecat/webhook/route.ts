@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
-import { subscriptionService } from '../../services/subscription-service';
+import { subscriptionService } from '@/services/subscription-service';
 
 export async function POST(request: NextRequest) {
   const signature = request.headers.get('RevenueCat-Signature');

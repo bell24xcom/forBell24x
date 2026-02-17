@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* Bell24h Global Color System */
 /* Single Dark Blue Theme - IndieHackers Inspired */
 /* Date: February 16, 2026 */
