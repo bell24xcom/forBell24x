@@ -63,13 +63,13 @@ export default function HeaderSearchCompact() {
           <div className="nav-section">
             {/* Desktop Navigation */}
             <nav className="nav-desktop">
-              <Link href="/demo-rfqs" className="nav-link">
+              <Link href="/rfq" className="nav-link">
                 Demo RFQs
               </Link>
-              <Link href="/post-rfq" className="nav-link">
+              <Link href="/rfq/create" className="nav-link">
                 Post RFQ
               </Link>
-              <Link href="/browse-rfqs" className="nav-link">
+              <Link href="/rfq" className="nav-link">
                 Browse RFQs
               </Link>
               <Link href="/suppliers" className="nav-link">
@@ -105,13 +105,13 @@ export default function HeaderSearchCompact() {
         {/* Mobile Menu Dropdown */}
         {isMenuOpen && (
           <div className="mobile-menu">
-            <Link href="/demo-rfqs" className="mobile-menu-link">
+            <Link href="/rfq" className="mobile-menu-link">
               Demo RFQs
             </Link>
-            <Link href="/post-rfq" className="mobile-menu-link">
+            <Link href="/rfq/create" className="mobile-menu-link">
               Post RFQ
             </Link>
-            <Link href="/browse-rfqs" className="mobile-menu-link">
+            <Link href="/rfq" className="mobile-menu-link">
               Browse RFQs
             </Link>
             <Link href="/suppliers" className="mobile-menu-link">
