@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 // Get list of RFQs with filtering and pagination
 export async function GET(request: NextRequest) {
   try {
