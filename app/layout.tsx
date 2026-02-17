@@ -4,9 +4,9 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 
 export const metadata: Metadata = {
-  title: 'Bell24h - India\'s Fastest B2B Marketplace',
-  description: 'Connect with verified suppliers and buyers across India with AI-powered matching and secure escrow payments.',
-  keywords: 'B2B marketplace, suppliers, buyers, India, RFQ, escrow, AI matching',
+  title: "Bell24H - India's #1 Voice & Video RFQ Marketplace",
+  description: 'Post RFQs via voice, video, or text. Get bids in 24 hours. AI-powered matching with verified suppliers.',
+  keywords: 'B2B marketplace, suppliers, buyers, India, RFQ, voice RFQ, video RFQ, escrow, AI matching',
   authors: [{ name: 'Bell24h Team' }],
   openGraph: {
     title: 'Bell24h - India\'s Fastest B2B Marketplace',
@@ -49,10 +49,10 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className="font-sans">
+    <html lang="en" className="scroll-smooth">
+      <body className="font-sans bg-[#0a1128] text-white antialiased">
         <Header />
-        <main>
+        <main className="min-h-screen">
           {children}
         </main>
         <Footer />
