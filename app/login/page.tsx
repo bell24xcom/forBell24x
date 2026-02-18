@@ -88,30 +88,30 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12">
+    <div className="min-h-screen bg-[#0F172A] flex items-center justify-center py-12">
         <div className="max-w-md w-full space-y-8">
           <div>
             <div className="mx-auto h-12 w-12 bg-blue-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-xl">B</span>
             </div>
-            <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            <h2 className="mt-6 text-center text-3xl font-extrabold text-white">
               {step === 'phone' ? 'Sign in to your account' : 'Verify OTP'}
             </h2>
-            <p className="mt-2 text-center text-sm text-gray-600">
+            <p className="mt-2 text-center text-sm text-slate-400">
               {step === 'phone' ? 'Enter your phone number to receive OTP' : 'Enter the OTP sent to your phone'}
             </p>
           </div>
 
-          <form className="mt-8 space-y-6" onSubmit={step === 'phone' ? handleSendOTP : handleVerifyOTP}>
+          <form className="mt-8 space-y-6 bg-slate-800 p-8 rounded-xl border border-slate-700/50" onSubmit={step === 'phone' ? handleSendOTP : handleVerifyOTP}>
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg">
+              <div className="bg-red-900/30 border border-red-500/40 text-red-300 px-4 py-3 rounded-lg">
                 {error}
               </div>
             )}
 
             {step === 'phone' ? (
               <div>
-                <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="phone" className="block text-sm font-medium text-slate-300">
                   Phone Number
                 </label>
                 <div className="mt-1">
@@ -123,13 +123,13 @@ export default function LoginPage() {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="+91-9876543210"
-                    className="input-field"
+                    className="w-full px-4 py-3 bg-slate-700/60 border border-slate-600/50 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
               </div>
             ) : (
               <div>
-                <label htmlFor="otp" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="otp" className="block text-sm font-medium text-slate-300">
                   OTP Code
                 </label>
                 <div className="mt-1">
@@ -142,10 +142,10 @@ export default function LoginPage() {
                     onChange={(e) => setOtp(e.target.value)}
                     placeholder="Enter 6-digit OTP"
                     maxLength={6}
-                    className="input-field"
+                    className="w-full px-4 py-3 bg-slate-700/60 border border-slate-600/50 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
-                <p className="mt-2 text-sm text-gray-600">
+                <p className="mt-2 text-sm text-slate-400">
                   OTP sent to {phone}
                 </p>
               </div>
@@ -155,11 +155,11 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
-                  <div className="flex items-center justify-center">
-                    <div className="loading-spinner mr-2"></div>
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                     {step === 'phone' ? 'Sending OTP...' : 'Verifying...'}
                   </div>
                 ) : (
@@ -173,7 +173,7 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setStep('phone')}
-                  className="text-sm text-blue-600 hover:text-blue-500"
+                  className="text-sm text-blue-400 hover:text-blue-300"
                 >
                   Change phone number
                 </button>
@@ -181,9 +181,9 @@ export default function LoginPage() {
             )}
 
             <div className="text-center">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-slate-400">
                 Don't have an account?{' '}
-                <Link href="/register" className="font-medium text-blue-600 hover:text-blue-500">
+                <Link href="/register" className="font-medium text-blue-400 hover:text-blue-300">
                   Sign up
                 </Link>
               </p>
