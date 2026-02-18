@@ -1,11 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 
-export default function MarketplacePage() {
+function MarketplaceContent() {
   const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -31,10 +29,10 @@ export default function MarketplacePage() {
     // Get search parameters from URL
     const query = searchParams.get('q') || '';
     const category = searchParams.get('category') || 'all';
-    
+
     setSearchQuery(query);
     setSelectedCategory(category);
-    
+
     // Load initial data
     loadData(query, category);
   }, [searchParams]);
@@ -106,7 +104,7 @@ export default function MarketplacePage() {
             <p className="text-lg text-gray-600 mb-8">
               Find products, suppliers, and RFQs all in one place
             </p>
-            
+
             {/* Search Bar */}
             <form onSubmit={handleSearch} className="max-w-4xl mx-auto mb-8">
               <div className="flex flex-col md:flex-row gap-4">
@@ -233,16 +231,16 @@ export default function MarketplacePage() {
                             <div className="text-gray-400 text-4xl">📦</div>
                           )}
                         </div>
-                        
+
                         <div className="flex items-start justify-between mb-2">
                           <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">{product.name}</h3>
                           <span className="text-2xl font-bold text-blue-600">
                             ₹{product.price?.toLocaleString() || 'N/A'}
                           </span>
                         </div>
-                        
+
                         <p className="text-sm text-gray-600 mb-2 line-clamp-2">{product.description}</p>
-                        
+
                         <div className="flex items-center justify-between mb-4">
                           <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded">
                             {product.category}
@@ -252,7 +250,7 @@ export default function MarketplacePage() {
                             <span className="text-sm text-gray-600 ml-1">{product.supplier?.rating || 'N/A'}</span>
                           </div>
                         </div>
-                        
+
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="text-sm font-medium text-gray-900">{product.supplier?.company || 'Unknown'}</p>
@@ -291,7 +289,7 @@ export default function MarketplacePage() {
                             </div>
                           </div>
                         </div>
-                        
+
                         <div className="space-y-2 mb-4">
                           <p className="text-sm text-gray-600">
                             <span className="font-medium">Location:</span> {supplier.location}
@@ -300,7 +298,7 @@ export default function MarketplacePage() {
                             <span className="font-medium">Category:</span> {supplier.category}
                           </p>
                         </div>
-                        
+
                         <button className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
                           View Profile
                         </button>
@@ -334,7 +332,7 @@ export default function MarketplacePage() {
                             </span>
                           </div>
                         </div>
-                        
+
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-4 text-sm text-gray-500">
                             <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">
@@ -368,5 +366,17 @@ export default function MarketplacePage() {
           </div>
         </section>
       </div>
-    );
+  );
+}
+
+export default function MarketplacePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <p className="text-gray-600">Loading marketplace...</p>
+      </div>
+    }>
+      <MarketplaceContent />
+    </Suspense>
+  );
 }
