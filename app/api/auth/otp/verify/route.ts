@@ -87,14 +87,14 @@ export async function POST(request: NextRequest) {
           company: 'New Company',
           role: 'SUPPLIER',
           isActive: true,
-          verified: true,
+          isVerified: true,
         },
       });
       authLogger.info('New user created', { userId: user.id, phone: `${phone.slice(0, 5)}*****` });
     } else {
       user = await prisma.user.update({
         where: { id: user.id },
-        data: { verified: true, isActive: true },
+        data: { isVerified: true, isActive: true },
       });
     }
 
@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
         phone: user.phone,
         company: user.company,
         role: user.role,
-        verified: user.verified,
+        isVerified: user.isVerified,
       },
       token,
     };
