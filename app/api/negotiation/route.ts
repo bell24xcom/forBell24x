@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { verifyToken } from '@/lib/jwt';
 import { aiClient } from '@/lib/ai-client';
+import { onQuoteAccepted, onQuoteRejected, onCounterOffer } from '@/lib/orchestration';
 
 const prisma = new PrismaClient();
 
@@ -74,11 +75,34 @@ export async function POST(request: NextRequest) {
         where: { id: quoteId },
         data: { status: 'ACCEPTED', isAccepted: true },
       });
+      // Fetch supplier email for notification
+      prisma.user.findUnique({ where: { id: quote.supplierId }, select: { id: true, name: true, email: true } })
+        .then(supplier => {
+          if (!supplier) return;
+          const buyer = { id: userId, name: null };
+          onQuoteAccepted(
+            { id: quote.id, price: quote.price },
+            { id: quote.rfq.id, title: quote.rfq.title },
+            supplier,
+            buyer
+          );
+        }).catch(err => console.error('[Orchestration] onQuoteAccepted:', err));
+
     } else if (action === 'reject' && isBuyer) {
       updated = await prisma.quote.update({
         where: { id: quoteId },
         data: { status: 'REJECTED' },
       });
+      prisma.user.findUnique({ where: { id: quote.supplierId }, select: { id: true, name: true, email: true } })
+        .then(supplier => {
+          if (!supplier) return;
+          onQuoteRejected(
+            { id: quote.id, price: quote.price },
+            { id: quote.rfq.id, title: quote.rfq.title },
+            supplier
+          );
+        }).catch(err => console.error('[Orchestration] onQuoteRejected:', err));
+
     } else if (action === 'counter' && isSupplier) {
       if (!counterPrice) {
         return NextResponse.json(
@@ -119,6 +143,17 @@ export async function POST(request: NextRequest) {
           terms: noteText,
         },
       });
+      // Notify buyer of counter offer
+      prisma.user.findUnique({ where: { id: quote.rfq.createdBy }, select: { id: true, name: true, email: true } })
+        .then(buyer => {
+          if (!buyer) return;
+          onCounterOffer(
+            { id: updated!.id, price: updated!.price, timeline: updated!.timeline },
+            { id: quote.rfq.id, title: quote.rfq.title, createdBy: quote.rfq.createdBy },
+            buyer
+          );
+        }).catch(err => console.error('[Orchestration] onCounterOffer:', err));
+
     } else {
       return NextResponse.json(
         { success: false, error: 'Invalid action for your role' },
