@@ -100,88 +100,87 @@ export default function LoginPage() {
           margin: 0;
           padding: 0;
         }
-        
-        body {
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-          line-height: 1.6;
-          color: #1a1a1a;
-          background: #ffffff;
-        }
-        
+
         .login-container {
           min-height: 100vh;
-          background: #ffffff;
+          background: #0F172A;
           display: flex;
           align-items: center;
           justify-content: center;
           padding: 20px;
         }
-        
+
         .login-card {
           max-width: 400px;
           width: 100%;
-          background: #ffffff;
+          background: #1e293b;
           padding: 40px;
-          border-radius: 8px;
-          box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+          border-radius: 12px;
+          border: 1px solid rgba(100, 116, 139, 0.3);
+          box-shadow: 0 4px 32px rgba(0,0,0,0.4);
         }
-        
+
         .brand-header {
           text-align: center;
           margin-bottom: 32px;
         }
-        
+
         .brand-name {
           font-size: 32px;
           font-weight: bold;
-          color: #1a1a1a;
+          color: #ffffff;
           margin-bottom: 8px;
         }
-        
+
         .welcome-title {
           font-size: 24px;
           font-weight: bold;
-          color: #1a1a1a;
+          color: #ffffff;
           margin-bottom: 8px;
         }
-        
+
         .welcome-subtitle {
           font-size: 16px;
-          color: #666666;
+          color: #94a3b8;
         }
-        
+
         .form-group {
           margin-bottom: 20px;
         }
-        
+
         .form-label {
           display: block;
           font-size: 14px;
           font-weight: 500;
-          color: #1a1a1a;
+          color: #e2e8f0;
           margin-bottom: 8px;
         }
-        
+
         .form-input {
           width: 100%;
           padding: 12px 16px;
-          border: 1px solid #d1d5db;
+          border: 1px solid rgba(100, 116, 139, 0.5);
           border-radius: 6px;
           font-size: 16px;
-          background: #ffffff;
+          color: #ffffff;
+          background: rgba(30, 41, 59, 0.6);
           transition: border-color 0.3s;
         }
-        
+
+        .form-input::placeholder {
+          color: #64748b;
+        }
+
         .form-input:focus {
           outline: none;
-          border-color: #6366f1;
-          box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+          border-color: #3b82f6;
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
         }
-        
+
         .btn-primary {
           width: 100%;
           padding: 12px;
-          background: #6366f1;
+          background: #3b82f6;
           color: white;
           border: none;
           border-radius: 6px;
@@ -190,46 +189,45 @@ export default function LoginPage() {
           cursor: pointer;
           transition: background 0.3s;
         }
-        
+
         .btn-primary:hover:not(:disabled) {
-          background: #5856eb;
+          background: #2563eb;
         }
-        
+
         .btn-primary:disabled {
-          background: #9ca3af;
+          background: #475569;
           cursor: not-allowed;
         }
-        
+
         .btn-secondary {
           width: 100%;
           padding: 12px;
-          background: #ffffff;
-          color: #374151;
-          border: 1px solid #d1d5db;
+          background: transparent;
+          color: #e2e8f0;
+          border: 1px solid rgba(100, 116, 139, 0.5);
           border-radius: 6px;
           font-size: 16px;
           font-weight: 500;
           cursor: pointer;
           transition: all 0.3s;
         }
-        
+
         .btn-secondary:hover:not(:disabled) {
-          background: #f9fafb;
-          border-color: #9ca3af;
+          background: rgba(100, 116, 139, 0.15);
+          border-color: #64748b;
         }
-        
+
         .btn-secondary:disabled {
-          background: #f3f4f6;
-          color: #9ca3af;
+          opacity: 0.5;
           cursor: not-allowed;
         }
-        
+
         .divider {
           position: relative;
           text-align: center;
           margin: 24px 0;
         }
-        
+
         .divider::before {
           content: '';
           position: absolute;
@@ -237,85 +235,88 @@ export default function LoginPage() {
           left: 0;
           right: 0;
           height: 1px;
-          background: #e5e7eb;
+          background: rgba(100, 116, 139, 0.3);
         }
-        
+
         .divider-text {
-          background: #ffffff;
+          background: #1e293b;
           padding: 0 16px;
-          color: #6b7280;
+          color: #64748b;
           font-size: 14px;
+          position: relative;
         }
-        
+
         .error-message {
-          background: #fef2f2;
-          border: 1px solid #fecaca;
-          color: #dc2626;
+          background: rgba(220, 38, 38, 0.15);
+          border: 1px solid rgba(220, 38, 38, 0.4);
+          color: #fca5a5;
           padding: 12px;
           border-radius: 6px;
           font-size: 14px;
           margin-bottom: 20px;
         }
-        
+
         .demo-otp {
-          background: #fffbeb;
-          border: 1px solid #fed7aa;
-          color: #92400e;
+          background: rgba(251, 191, 36, 0.1);
+          border: 1px solid rgba(251, 191, 36, 0.3);
+          color: #fcd34d;
           padding: 16px;
           border-radius: 6px;
           text-align: center;
           margin-bottom: 20px;
         }
-        
+
         .demo-otp-title {
           font-size: 12px;
           font-weight: 500;
           margin-bottom: 4px;
         }
-        
+
         .demo-otp-code {
           font-size: 24px;
           font-weight: bold;
           letter-spacing: 4px;
         }
-        
+
         .demo-otp-subtitle {
           font-size: 11px;
           margin-top: 4px;
           opacity: 0.8;
         }
-        
+
         .signup-link {
           text-align: center;
           margin-top: 24px;
         }
-        
+
         .signup-link-text {
-          color: #6b7280;
+          color: #64748b;
           font-size: 14px;
         }
-        
+
         .signup-link-button {
-          color: #8b5cf6;
+          color: #60a5fa;
           text-decoration: none;
           font-weight: 500;
         }
-        
+
         .signup-link-button:hover {
-          color: #7c3aed;
+          color: #93c5fd;
         }
-        
+
         .back-link {
-          color: #6366f1;
+          color: #60a5fa;
+          background: none;
+          border: none;
           text-decoration: none;
           font-size: 14px;
           cursor: pointer;
         }
-        
+
         .back-link:hover {
-          color: #5856eb;
+          color: #93c5fd;
         }
-        
+
         .loading-spinner {
           display: inline-block;
           width: 16px;
@@ -325,24 +326,18 @@ export default function LoginPage() {
           border-top-color: transparent;
           animation: spin 1s ease-in-out infinite;
         }
-        
+
         @keyframes spin {
           to { transform: rotate(360deg); }
         }
-        
+
         @media (max-width: 480px) {
           .login-card {
             padding: 24px;
             margin: 10px;
           }
-          
-          .brand-name {
-            font-size: 28px;
-          }
-          
-          .welcome-title {
-            font-size: 20px;
-          }
+          .brand-name { font-size: 28px; }
+          .welcome-title { font-size: 20px; }
         }
       `}</style>
 

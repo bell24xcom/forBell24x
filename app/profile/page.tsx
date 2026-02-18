@@ -37,11 +37,11 @@ export default function ProfilePage() {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-gray-50">
-        <section className="bg-white py-12">
+      <div className="min-h-screen bg-[#0F172A]">
+        <section className="bg-slate-800/60 border-b border-slate-700/50 py-12">
           <div className="container mx-auto px-4">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">Profile</h1>
-            <p className="text-lg text-gray-600">
+            <h1 className="text-4xl font-bold text-white mb-4">Profile</h1>
+            <p className="text-lg text-slate-400">
               Manage your account settings and preferences
             </p>
           </div>
@@ -50,14 +50,14 @@ export default function ProfilePage() {
         <section className="py-12">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
-              <div className="bg-white rounded-lg shadow mb-8">
-                <div className="border-b border-gray-200">
-                  <nav className="-mb-px flex space-x-8 px-6">
+              <div className="bg-slate-800 rounded-xl border border-slate-700/50 shadow mb-8">
+                <div className="border-b border-slate-700/50">
+                  <nav className="-mb-px flex space-x-8 px-6 overflow-x-auto">
                     {tabs.map((tab) => (
                       <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={'py-4 px-1 border-b-2 font-medium text-sm ' + (activeTab === tab.id ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300')}
+                        className={'py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ' + (activeTab === tab.id ? 'border-blue-500 text-blue-400' : 'border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-500')}
                       >
                         <span className="mr-2">{tab.icon}</span>
                         {tab.label}
@@ -71,7 +71,7 @@ export default function ProfilePage() {
                     <form onSubmit={handleSubmit} className="space-y-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                          <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                          <label htmlFor="name" className="block text-sm font-medium text-slate-300 mb-2">
                             Full Name
                           </label>
                           <input
@@ -80,12 +80,12 @@ export default function ProfilePage() {
                             name="name"
                             value={profileData.name}
                             onChange={handleChange}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="w-full px-4 py-3 bg-slate-700/60 border border-slate-600/50 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           />
                         </div>
 
                         <div>
-                          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                          <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-2">
                             Email
                           </label>
                           <input
@@ -94,12 +94,12 @@ export default function ProfilePage() {
                             name="email"
                             value={profileData.email}
                             onChange={handleChange}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="w-full px-4 py-3 bg-slate-700/60 border border-slate-600/50 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           />
                         </div>
 
                         <div>
-                          <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+                          <label htmlFor="phone" className="block text-sm font-medium text-slate-300 mb-2">
                             Phone
                           </label>
                           <input
@@ -108,12 +108,12 @@ export default function ProfilePage() {
                             name="phone"
                             value={profileData.phone}
                             onChange={handleChange}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="w-full px-4 py-3 bg-slate-700/60 border border-slate-600/50 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           />
                         </div>
 
                         <div>
-                          <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-2">
+                          <label htmlFor="location" className="block text-sm font-medium text-slate-300 mb-2">
                             Location
                           </label>
                           <input
@@ -122,7 +122,7 @@ export default function ProfilePage() {
                             name="location"
                             value={profileData.location}
                             onChange={handleChange}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="w-full px-4 py-3 bg-slate-700/60 border border-slate-600/50 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                           />
                         </div>
                       </div>
@@ -140,25 +140,25 @@ export default function ProfilePage() {
 
                   {activeTab === 'company' && (
                     <div className="text-center py-12">
-                      <div className="text-gray-400 text-6xl mb-4">🏢</div>
-                      <h3 className="text-xl font-semibold text-gray-900 mb-2">Company Settings</h3>
-                      <p className="text-gray-600">Company management features coming soon</p>
+                      <div className="text-slate-500 text-6xl mb-4">🏢</div>
+                      <h3 className="text-xl font-semibold text-white mb-2">Company Settings</h3>
+                      <p className="text-slate-400">Company management features coming soon</p>
                     </div>
                   )}
 
                   {activeTab === 'settings' && (
                     <div className="text-center py-12">
-                      <div className="text-gray-400 text-6xl mb-4">⚙️</div>
-                      <h3 className="text-xl font-semibold text-gray-900 mb-2">Account Settings</h3>
-                      <p className="text-gray-600">Account settings features coming soon</p>
+                      <div className="text-slate-500 text-6xl mb-4">⚙️</div>
+                      <h3 className="text-xl font-semibold text-white mb-2">Account Settings</h3>
+                      <p className="text-slate-400">Account settings features coming soon</p>
                     </div>
                   )}
 
                   {activeTab === 'billing' && (
                     <div className="text-center py-12">
-                      <div className="text-gray-400 text-6xl mb-4">💳</div>
-                      <h3 className="text-xl font-semibold text-gray-900 mb-2">Billing & Payments</h3>
-                      <p className="text-gray-600">Billing features coming soon</p>
+                      <div className="text-slate-500 text-6xl mb-4">💳</div>
+                      <h3 className="text-xl font-semibold text-white mb-2">Billing & Payments</h3>
+                      <p className="text-slate-400">Billing features coming soon</p>
                     </div>
                   )}
                 </div>
