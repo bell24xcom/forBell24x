@@ -1,100 +1,52 @@
-name: Deploy Bell24H to Oracle VM
+# Bell24H Deployment
+# Vercel handles auto-deployment when connected to the GitHub repo.
+# No GitHub Actions workflow needed — Vercel deploys on every push to main.
+#
+# Previous setup: Oracle VM at 80.225.192.248 (expired Feb 2026)
+# Current setup: Vercel (https://vercel.com)
+#
+# To set up:
+# 1. Go to https://vercel.com/new
+# 2. Import bell24xcom/forBell24x
+# 3. Set environment variables in Vercel dashboard
+# 4. Add bell24h.com as custom domain
+# 5. Vercel auto-deploys on push to main
+
+name: Verify Build
 
 on:
   push:
     branches: [ main ]
-  workflow_dispatch: # Allows manual trigger
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  deploy:
+  build-check:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
-      
-      - name: Setup SSH
-        uses: webfactory/ssh-agent@v0.7.0
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          ssh-private-key: ${{ secrets.ORACLE_SSH_KEY }}
-      
-      - name: Add VM to known hosts
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Build
+        run: npm run build
+        env:
+          NODE_ENV: production
+          NEXT_PUBLIC_SITE_URL: https://www.bell24h.com
+
+      - name: Build Status
+        if: success()
         run: |
-          ssh-keyscan -H 80.225.192.248 >> ~/.ssh/known_hosts
-      
-      - name: Deploy to Oracle VM
-        run: |
-          ssh -o StrictHostKeyChecking=no ubuntu@80.225.192.248 << 'ENDSSH'
-            set -e
-            echo "🚀 Starting Bell24H deployment..."
-            
-            # Navigate to project directory
-            cd ~/bell24h || (mkdir -p ~/bell24h && cd ~/bell24h)
-            
-            # Clean up any local changes and untracked files
-            echo "Cleaning up local changes..."
-            git reset --hard HEAD || true
-            git clean -fd || true
-            
-            # Remove conflicting Dockerfile variants
-            rm -f Dockerfile.client Dockerfile.final Dockerfile.fixed Dockerfile.oracle Dockerfile.oracle-fixed || true
-            
-            # Pull latest code
-            if [ -d .git ]; then
-              git fetch origin main || true
-              git reset --hard origin/main || true
-            else
-              git clone https://github.com/bell24xcom/forBell24x . || true
-            fi
-            
-            # Stop and remove old container
-            echo "Stopping old container..."
-            docker stop bell24h || true
-            docker rm bell24h || true
-            
-            # Build new Docker image
-            echo "Building Docker image..."
-            docker build -t bell24h:latest -f Dockerfile .
-            
-            # Run new container
-            echo "Starting new container..."
-            # Use root .env.production (client/ subfolder is legacy path)
-            ENV_FILE=~/bell24h/.env.production
-            if [ ! -f "$ENV_FILE" ]; then
-              ENV_FILE=~/bell24h/client/.env.production
-            fi
-            docker run -d \
-              --name bell24h \
-              --restart always \
-              -p 3000:3000 \
-              --env-file "$ENV_FILE" \
-              bell24h:latest
-            
-            # Wait for container to start
-            echo "Waiting for container to start..."
-            sleep 10
-            
-            # Health check
-            echo "Checking health..."
-            sleep 5
-            if curl -f http://localhost:3000/api/health > /dev/null 2>&1; then
-              echo "✅ Deployment successful! Application is healthy."
-            else
-              echo "⚠️  Container started but health check failed. Check logs:"
-              docker logs --tail 50 bell24h
-            fi
-            
-            # Verify Nginx is proxying correctly
-            echo "Verifying Nginx configuration..."
-            sudo nginx -t && sudo systemctl reload nginx || echo "Nginx check skipped"
-            
-            echo "🎉 Bell24H deployment completed!"
-          ENDSSH
-      
-      - name: Deployment Status
-        run: |
-          echo "✅ Deployment completed successfully!"
-          echo "🌐 Your app should be live at:"
-          echo "   - https://bell24h.com"
-          echo "   - https://www.bell24h.com"
-          echo "   - https://app.bell24h.com"
-          echo "   - https://n8n.bell24h.com"
+          echo "Build successful! Vercel will deploy automatically."
+          echo "Live at: https://bell24h.com"
