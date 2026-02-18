@@ -101,7 +101,7 @@ export default function MyQuotesPage() {
       const res = await fetch('/api/rfq/quotes', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ quoteId, action: 'accept' }),
+        body: JSON.stringify({ quoteId, status: 'ACCEPTED' }),
       });
       const data = await res.json();
       if (!data.success) throw new Error(data.error ?? 'Failed to accept quote');
