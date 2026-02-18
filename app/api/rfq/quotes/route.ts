@@ -147,7 +147,7 @@ export async function PUT(req: NextRequest) {
     });
 
     // If quote is selected, mark others as rejected
-    if (status === 'SELECTED') {
+    if (status === 'ACCEPTED') {
       await prisma.quote.updateMany({
         where: {
           rfqId: quote.rfqId,
