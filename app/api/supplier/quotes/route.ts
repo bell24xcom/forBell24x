@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { verifyToken } from '@/lib/jwt';
-import { onQuoteSubmitted } from '@/lib/orchestration';
+import { onQuoteSubmitted, checkDailyLimit } from '@/lib/orchestration';
 
 const prisma = new PrismaClient();
 
@@ -92,6 +92,16 @@ export async function POST(request: NextRequest) {
     }
 
     const supplierId = payload.userId;
+
+    // Rate limit: max 20 quotes per supplier per day
+    const limitCheck = await checkDailyLimit(supplierId, 'quote', 20);
+    if (!limitCheck.allowed) {
+      return NextResponse.json(
+        { success: false, error: `Daily quote limit reached (${limitCheck.count}/${limitCheck.limit}). Try again tomorrow.` },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const { rfqId, price, quantity, timeline, description, terms } = body;
 

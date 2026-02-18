@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { verifyToken } from '@/lib/jwt';
-import { onRFQCreated } from '@/lib/orchestration';
+import { onRFQCreated, checkDailyLimit } from '@/lib/orchestration';
 
 const prisma = new PrismaClient();
 
@@ -39,6 +39,15 @@ export async function POST(request: NextRequest) {
     }
 
     const userId = payload.userId;
+
+    // Rate limit: max 10 RFQs per buyer per day
+    const limitCheck = await checkDailyLimit(userId, 'rfq', 10);
+    if (!limitCheck.allowed) {
+      return NextResponse.json(
+        { success: false, error: `Daily RFQ limit reached (${limitCheck.count}/${limitCheck.limit}). Try again tomorrow.` },
+        { status: 429 }
+      );
+    }
 
     // Compute derived fields
     const tags = extractTags(rfqData.title, rfqData.description || '');

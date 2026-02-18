@@ -75,18 +75,19 @@ export async function POST(request: NextRequest) {
         where: { id: quoteId },
         data: { status: 'ACCEPTED', isAccepted: true },
       });
-      // Fetch supplier email for notification
-      prisma.user.findUnique({ where: { id: quote.supplierId }, select: { id: true, name: true, email: true } })
-        .then(supplier => {
-          if (!supplier) return;
-          const buyer = { id: userId, name: null };
-          onQuoteAccepted(
-            { id: quote.id, price: quote.price },
-            { id: quote.rfq.id, title: quote.rfq.title },
-            supplier,
-            buyer
-          );
-        }).catch(err => console.error('[Orchestration] onQuoteAccepted:', err));
+      // Fetch both buyer + supplier for orchestration
+      Promise.all([
+        prisma.user.findUnique({ where: { id: userId }, select: { id: true, name: true } }),
+        prisma.user.findUnique({ where: { id: quote.supplierId }, select: { id: true, name: true, email: true } }),
+      ]).then(([buyer, supplier]) => {
+        if (!buyer || !supplier) return;
+        onQuoteAccepted(
+          { id: quote.id, price: quote.price },
+          { id: quote.rfq.id, title: quote.rfq.title },
+          supplier,
+          { id: buyer.id, name: buyer.name }
+        );
+      }).catch(err => console.error('[Orchestration] onQuoteAccepted:', err));
 
     } else if (action === 'reject' && isBuyer) {
       updated = await prisma.quote.update({
