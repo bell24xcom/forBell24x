@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { verifyToken } from '@/lib/jwt';
+import { onRFQCreated } from '@/lib/orchestration';
 
 const prisma = new PrismaClient();
 
@@ -76,6 +77,17 @@ export async function POST(request: NextRequest) {
         createdBy: userId,
       },
     });
+
+    // Fire orchestration in background — never blocks the response
+    const buyer = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, name: true, email: true },
+    }).catch(() => null);
+
+    onRFQCreated(
+      { id: rfq.id, title: rfq.title, category: rfq.category, location: rfq.location },
+      { id: userId, name: buyer?.name ?? null, email: buyer?.email ?? null }
+    ).catch(err => console.error('[Orchestration] onRFQCreated error:', err));
 
     return NextResponse.json({
       success: true,
