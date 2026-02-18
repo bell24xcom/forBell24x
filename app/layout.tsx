@@ -4,6 +4,7 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://www.bell24h.com'),
   title: "Bell24H - India's #1 B2B Supplier Marketplace | Voice, Video & Text RFQs",
   description: 'Connect with 10,000+ verified suppliers across 450+ categories. Post RFQs via voice, video, or text. AI-powered matching for Indian businesses.',
   keywords: 'B2B marketplace, suppliers India, RFQ, voice RFQ, video RFQ, AI matching, procurement, verified suppliers, 450 categories',
