@@ -8,28 +8,30 @@ export class Bell24hAIClient {
   }
 
   private initializeClients() {
-    // Minimax M2.1 for multimodal tasks
-this.clients.set('minimax', new OpenAI({
-      baseURL: 'https://integrate.api.nvidia.com/v1',
-      apiKey: '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',
+    const NVIDIA_BASE_URL = 'https://integrate.api.nvidia.com/v1';
+
+    // Minimax M2.1 for multimodal tasks (voice/video)
+    this.clients.set('minimax', new OpenAI({
+      baseURL: NVIDIA_BASE_URL,
+      apiKey: process.env.NVIDIA_MINIMAX_KEY || process.env.NVIDIA_API_KEY || '',
     }));
 
-    // DeepSeek V3.2 for text and embeddings
-this.clients.set('deepseek', new OpenAI({
-      baseURL: 'https://integrate.api.nvidia.com/v1',
-      apiKey: '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',
+    // DeepSeek V3.2 for text, RFQ extraction, and embeddings
+    this.clients.set('deepseek', new OpenAI({
+      baseURL: NVIDIA_BASE_URL,
+      apiKey: process.env.NVIDIA_DEEPSEEK_KEY || process.env.NVIDIA_API_KEY || '',
     }));
 
-    // Kimi 2.5 for long-context tasks
-this.clients.set('kimi', new OpenAI({
-      baseURL: 'https://integrate.api.nvidia.com/v1',
-      apiKey: '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',
+    // Kimi K2.5 for long-context tasks (200K context window)
+    this.clients.set('kimi', new OpenAI({
+      baseURL: NVIDIA_BASE_URL,
+      apiKey: process.env.NVIDIA_KIMI_KEY || process.env.NVIDIA_DEEPSEEK_KEY || process.env.NVIDIA_API_KEY || '',
     }));
 
     // AWS GPT-OSS for cost-effective text processing
-this.clients.set('gpt-oss', new OpenAI({
-      baseURL: 'https://integrate.api.nvidia.com/v1',
-      apiKey: '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',
+    this.clients.set('gpt-oss', new OpenAI({
+      baseURL: NVIDIA_BASE_URL,
+      apiKey: process.env.NVIDIA_GPT_OSS_KEY || process.env.NVIDIA_API_KEY || '',
     }));
   }
 
