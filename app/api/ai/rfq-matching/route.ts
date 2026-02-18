@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { aiClient } from '@/lib/ai-client';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
@@ -154,8 +155,16 @@ export async function POST(request: NextRequest) {
 }
 
 async function performAIMatching(rfqData: RFQData, suppliers: SupplierProfile[], textContent: string): Promise<MatchingResult[]> {
+  // Try NVIDIA DeepSeek semantic matching first
+  try {
+    return await performNvidiaSemanticMatching(rfqData, suppliers, textContent);
+  } catch (err) {
+    console.warn('NVIDIA AI matching unavailable, using algorithmic fallback:', err);
+  }
+
+  // Algorithmic fallback
   const results: MatchingResult[] = [];
-  
+
   for (const supplier of suppliers) {
     // Calculate match score using multiple factors
     let matchScore = 0;
@@ -229,6 +238,83 @@ async function performAIMatching(rfqData: RFQData, suppliers: SupplierProfile[],
   
   // Sort by match score descending
   return results.sort((a, b) => b.matchScore - a.matchScore);
+}
+
+async function performNvidiaSemanticMatching(rfqData: RFQData, suppliers: SupplierProfile[], textContent: string): Promise<MatchingResult[]> {
+  const client = aiClient.getClient('text'); // NVIDIA DeepSeek V3.2
+  if (!client) throw new Error('NVIDIA client not initialized');
+
+  const suppliersSummary = suppliers.map(s => ({
+    id: s.id,
+    name: s.name,
+    category: s.category,
+    location: s.location,
+    rating: s.rating,
+    gstVerified: s.gstVerified,
+    capabilities: s.capabilities,
+    trustScore: s.trustScore,
+    successRate: s.successRate,
+    responseTime: s.responseTime,
+    priceRange: s.priceRange
+  }));
+
+  const prompt = `You are an expert B2B procurement AI for Bell24h.com. Analyze this RFQ and rank suppliers.
+
+RFQ Details:
+- Category: ${rfqData.category}
+- Location: ${rfqData.location}
+- Budget: ₹${rfqData.budget}
+- Urgency: ${rfqData.urgency}
+- Requirements: ${textContent || 'Not specified'}
+- Specifications: ${rfqData.specifications?.join(', ') || 'None'}
+
+Suppliers to evaluate:
+${JSON.stringify(suppliersSummary, null, 2)}
+
+Return ONLY valid JSON array (no other text):
+[
+  {
+    "supplierId": "1",
+    "matchScore": 0.95,
+    "confidence": 0.92,
+    "priceEstimate": 45000,
+    "deliveryTime": 72,
+    "reasons": ["Perfect category match", "GST verified", "Fast response time"],
+    "semanticScore": 0.88,
+    "riskLevel": "low"
+  }
+]
+
+Score all ${suppliers.length} suppliers. matchScore is 0-1. Include all suppliers with score > 0.2.`;
+
+  const response = await (client as any).chat.completions.create({
+    model: 'deepseek-ai/deepseek-v3.2',
+    messages: [{ role: 'user', content: prompt }],
+    temperature: 0.2,
+    max_tokens: 1200,
+  });
+
+  const content = response.choices[0]?.message?.content || '';
+  const jsonMatch = content.match(/\[[\s\S]*\]/);
+  if (!jsonMatch) throw new Error('No JSON array in NVIDIA response');
+
+  const aiResults = JSON.parse(jsonMatch[0]);
+
+  return aiResults
+    .map((result: any) => {
+      const supplier = suppliers.find(s => s.id === result.supplierId);
+      if (!supplier) return null;
+      return {
+        supplier,
+        matchScore: Math.round((result.matchScore || 0.5) * 100) / 100,
+        reasons: result.reasons || ['AI semantic match'],
+        confidence: Math.round((result.confidence || 0.8) * 100) / 100,
+        priceEstimate: result.priceEstimate || Math.round((supplier.priceRange.min + supplier.priceRange.max) / 2),
+        deliveryTime: result.deliveryTime || (supplier.responseTime + 24),
+      } as MatchingResult;
+    })
+    .filter(Boolean)
+    .sort((a: MatchingResult, b: MatchingResult) => b.matchScore - a.matchScore);
 }
 
 function calculateLocationScore(rfqLocation: string, supplierLocation: string): number {
