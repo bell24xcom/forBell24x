@@ -4,7 +4,9 @@
  * Event-driven orchestration for all B2B marketplace actions.
  *
  * SUPPLIER MATCHING ALGORITHM (scored, not random):
+ *   +3 pts  rfqCategory in supplier preferences.categories (explicit self-declared)
  *   +3 pts  location match (supplier.location contains rfq.location city)
+ *   +2 pts  rfqLocation city in supplier preferences.cities (explicit city coverage)
  *   +2 pts  category history (supplier has previously quoted in same category)
  *   +1 pt   isVerified supplier
  *   +1 pt   has at least 1 accepted quote (proven supplier)
@@ -63,6 +65,7 @@ async function findMatchedSuppliers(rfqCategory: string, rfqLocation: string | n
       company: true,
       location: true,
       isVerified: true,
+      preferences: true,
       quotes: {
         select: {
           status: true,
@@ -80,11 +83,29 @@ async function findMatchedSuppliers(rfqCategory: string, rfqLocation: string | n
   function scoreSupplier(s: SupplierRow): number {
     let score = 0;
 
-    // +3: location match
+    // Parse preferences safely
+    const prefs = (s.preferences as { categories?: string[]; cities?: string[] } | null) ?? {};
+    const prefCategories = (prefs.categories ?? []).map((c: string) => c.toLowerCase());
+    const prefCities = (prefs.cities ?? []).map((c: string) => c.toLowerCase());
+
+    // +3: supplier explicitly selected this category in their profile
+    if (prefCategories.some(cat => cat.includes(rfqCategory.toLowerCase()) || rfqCategory.toLowerCase().includes(cat))) {
+      score += 3;
+    }
+
+    // +3: location field match
     if (rfqLocation && s.location) {
       const rfqCity = rfqLocation.toLowerCase().trim();
       const supCity = s.location.toLowerCase().trim();
       if (supCity.includes(rfqCity) || rfqCity.includes(supCity)) score += 3;
+    }
+
+    // +2: supplier explicitly covers this city in preferences
+    if (rfqLocation && prefCities.length > 0) {
+      const rfqCity = rfqLocation.toLowerCase().trim();
+      if (prefCities.some(city => city.includes(rfqCity) || rfqCity.includes(city))) {
+        score += 2;
+      }
     }
 
     // +2: has previously quoted in the same category
