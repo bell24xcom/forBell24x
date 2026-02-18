@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
+import { verifyToken } from '@/lib/jwt';
 
-// Enhanced RFQ creation with live database integration
+const prisma = new PrismaClient();
+
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest) {
   try {
     const rfqData = await request.json();
@@ -12,54 +17,80 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generate unique RFQ ID
-    const rfqId = generateRFQId();
-    
-    // Enhanced RFQ data with live features
-    const enhancedRFQ = {
-      id: rfqId,
-      title: rfqData.title,
-      category: rfqData.category,
-      description: rfqData.description || '',
-      quantity: rfqData.quantity || '1',
-      unit: rfqData.unit || 'units',
-      minBudget: rfqData.minBudget || '0',
-      maxBudget: rfqData.maxBudget || '0',
-      timeline: rfqData.timeline || '2 weeks',
-      requirements: rfqData.requirements || '',
-      urgency: rfqData.urgency || 'normal',
-      status: 'active',
-      createdBy: 'user-123', // In real app, get from session
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      views: 0,
-      quotes: 0,
-      suppliers: [],
-      tags: extractTags(rfqData.title, rfqData.description),
-      location: 'India', // Default location
-      isPublic: true,
-      expiresAt: calculateExpiryDate(rfqData.timeline),
-      priority: calculatePriority(rfqData.urgency, rfqData.timeline),
-      estimatedValue: calculateEstimatedValue(rfqData.minBudget, rfqData.maxBudget),
-      matchingSuppliers: await findMatchingSuppliers(rfqData.category, rfqData.tags || [])
+    // Authenticate user from cookie or Authorization header
+    const token =
+      request.cookies.get('auth-token')?.value ||
+      request.headers.get('authorization')?.replace('Bearer ', '');
+
+    if (!token) {
+      return NextResponse.json(
+        { success: false, error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
+    const payload = verifyToken(token);
+    if (!payload) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid or expired session' },
+        { status: 401 }
+      );
+    }
+
+    const userId = payload.userId;
+
+    // Compute derived fields
+    const tags = extractTags(rfqData.title, rfqData.description || '');
+    const expiresAt = calculateExpiryDate(rfqData.timeline || '30 days');
+    const priority = calculatePriority(rfqData.urgency || 'normal', rfqData.timeline || '');
+    const estimatedValue = calculateEstimatedValue(
+      String(rfqData.minBudget || 0),
+      String(rfqData.maxBudget || 0)
+    );
+
+    const urgencyMap: Record<string, 'LOW' | 'NORMAL' | 'HIGH' | 'URGENT'> = {
+      low: 'LOW', normal: 'NORMAL', high: 'HIGH', urgent: 'URGENT',
     };
+    const urgency = urgencyMap[(rfqData.urgency || 'normal').toLowerCase()] ?? 'NORMAL';
 
-    // In a real implementation, save to database
-    console.log('Creating RFQ:', enhancedRFQ);
-
-    // Simulate supplier matching
-    const matchedSuppliers = await matchSuppliers(enhancedRFQ);
-    enhancedRFQ.suppliers = matchedSuppliers;
-
-    // Send notifications to matched suppliers
-    await notifySuppliers(enhancedRFQ, matchedSuppliers);
+    // Save to database
+    const rfq = await prisma.rFQ.create({
+      data: {
+        title: rfqData.title,
+        description: rfqData.description || '',
+        category: rfqData.category,
+        quantity: String(rfqData.quantity || '1'),
+        unit: rfqData.unit || 'units',
+        minBudget: rfqData.minBudget ? parseFloat(rfqData.minBudget) : null,
+        maxBudget: rfqData.maxBudget ? parseFloat(rfqData.maxBudget) : null,
+        timeline: rfqData.timeline || '30 days',
+        requirements: rfqData.requirements || '',
+        urgency,
+        status: 'ACTIVE',
+        location: rfqData.location || 'India',
+        tags,
+        isPublic: true,
+        expiresAt,
+        priority,
+        estimatedValue,
+        createdBy: userId,
+      },
+    });
 
     return NextResponse.json({
       success: true,
-      rfq: enhancedRFQ,
+      rfq: {
+        id: rfq.id,
+        title: rfq.title,
+        category: rfq.category,
+        status: rfq.status,
+        createdAt: rfq.createdAt.toISOString(),
+        expiresAt: rfq.expiresAt?.toISOString(),
+        priority: rfq.priority,
+        estimatedValue: rfq.estimatedValue,
+        tags: rfq.tags,
+      },
       message: 'RFQ created successfully',
-      matchedSuppliers: matchedSuppliers.length,
-      timestamp: new Date().toISOString()
     });
   } catch (error) {
     console.error('Error creating RFQ:', error);
@@ -70,111 +101,42 @@ export async function POST(request: NextRequest) {
   }
 }
 
-function generateRFQId(): string {
-  const timestamp = Date.now().toString(36);
-  const random = Math.random().toString(36).substr(2, 5);
-  return `RFQ-${timestamp}-${random}`.toUpperCase();
-}
-
 function extractTags(title: string, description: string): string[] {
   const text = `${title} ${description}`.toLowerCase();
-  const commonTags = [
+  const knownTags = [
     'urgent', 'bulk', 'custom', 'quality', 'certified', 'branded',
     'steel', 'cotton', 'electronic', 'construction', 'chemical',
-    'machinery', 'packaging', 'automotive', 'pharmaceutical'
+    'machinery', 'packaging', 'automotive', 'pharmaceutical',
   ];
-  
-  return commonTags.filter(tag => text.includes(tag));
+  return knownTags.filter(tag => text.includes(tag));
 }
 
-function calculateExpiryDate(timeline: string): string {
+function calculateExpiryDate(timeline: string): Date {
   const now = new Date();
-  let days = 30; // Default 30 days
-  
+  let days = 30;
   if (timeline.includes('week')) {
-    const weeks = parseInt(timeline.match(/\d+/)?.[0] || '2');
-    days = weeks * 7;
+    days = parseInt(timeline.match(/\d+/)?.[0] || '2') * 7;
   } else if (timeline.includes('month')) {
-    const months = parseInt(timeline.match(/\d+/)?.[0] || '1');
-    days = months * 30;
+    days = parseInt(timeline.match(/\d+/)?.[0] || '1') * 30;
   } else if (timeline.includes('day')) {
     days = parseInt(timeline.match(/\d+/)?.[0] || '30');
   }
-  
-  const expiryDate = new Date(now.getTime() + (days * 24 * 60 * 60 * 1000));
-  return expiryDate.toISOString();
+  return new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
 }
 
 function calculatePriority(urgency: string, timeline: string): number {
-  let priority = 1; // Low priority
-  
-  if (urgency === 'urgent') priority = 5;
-  else if (urgency === 'high') priority = 4;
-  else if (urgency === 'normal') priority = 3;
-  else if (urgency === 'low') priority = 2;
-  
-  // Adjust based on timeline
-  if (timeline.includes('day') && parseInt(timeline) <= 7) priority += 1;
-  if (timeline.includes('week') && parseInt(timeline) <= 2) priority += 1;
-  
-  return Math.min(priority, 5);
+  const base: Record<string, number> = { urgent: 5, high: 4, normal: 3, low: 2 };
+  let priority = base[urgency.toLowerCase()] ?? 3;
+  if (timeline.includes('day') && parseInt(timeline) <= 7) priority = Math.min(priority + 1, 5);
+  if (timeline.includes('week') && parseInt(timeline) <= 2) priority = Math.min(priority + 1, 5);
+  return priority;
 }
 
 function calculateEstimatedValue(minBudget: string, maxBudget: string): number {
   const min = parseFloat(minBudget) || 0;
   const max = parseFloat(maxBudget) || 0;
-  
-  if (min > 0 && max > 0) {
-    return (min + max) / 2;
-  } else if (min > 0) {
-    return min * 1.5; // Estimate 50% higher
-  } else if (max > 0) {
-    return max * 0.7; // Estimate 30% lower
-  }
-  
-  return 0; // Unknown value
-}
-
-async function findMatchingSuppliers(category: string, tags: string[]): Promise<string[]> {
-  // Mock supplier matching based on category and tags
-  const supplierDatabase = {
-    'manufacturing': ['supplier-1', 'supplier-2', 'supplier-6'],
-    'textiles': ['supplier-2', 'supplier-7'],
-    'electronics': ['supplier-3', 'supplier-8'],
-    'construction': ['supplier-4', 'supplier-1'],
-    'chemicals': ['supplier-5'],
-    'machinery': ['supplier-6', 'supplier-1'],
-    'packaging': ['supplier-7'],
-    'automotive': ['supplier-8']
-  };
-  
-  return supplierDatabase[category as keyof typeof supplierDatabase] || [];
-}
-
-async function matchSuppliers(rfq: any): Promise<any[]> {
-  // Enhanced supplier matching algorithm
-  const suppliers = await findMatchingSuppliers(rfq.category, rfq.tags);
-  
-  return suppliers.map((supplierId, index) => ({
-    id: supplierId,
-    name: `Supplier ${supplierId.split('-')[1]}`,
-    company: `Company ${supplierId.split('-')[1]}`,
-    rating: 4.0 + (Math.random() * 1.0),
-    responseTime: `${Math.floor(Math.random() * 24)} hours`,
-    matchScore: 85 + (Math.random() * 15),
-    location: 'Mumbai, Maharashtra',
-    verified: true,
-    specialties: rfq.tags.slice(0, 3),
-    lastActive: '2 hours ago'
-  }));
-}
-
-async function notifySuppliers(rfq: any, suppliers: any[]): Promise<void> {
-  // Simulate sending notifications to suppliers
-  console.log(`Notifying ${suppliers.length} suppliers about RFQ ${rfq.id}`);
-  
-  // In real implementation, send emails/SMS/push notifications
-  suppliers.forEach(supplier => {
-    console.log(`Notification sent to ${supplier.name} (${supplier.company})`);
-  });
+  if (min > 0 && max > 0) return (min + max) / 2;
+  if (min > 0) return min * 1.5;
+  if (max > 0) return max * 0.7;
+  return 0;
 }
