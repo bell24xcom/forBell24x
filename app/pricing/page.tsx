@@ -1,8 +1,23 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import DynamicPricingCalculator from '@/components/DynamicPricingCalculator';
+
+function loadRazorpayScript(): Promise<boolean> {
+  return new Promise((resolve) => {
+    if (typeof window !== 'undefined' && (window as any).Razorpay) {
+      resolve(true);
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+}
 
 interface PricingTier {
   id: string;
@@ -216,10 +231,98 @@ const addOns = [
 ];
 
 export default function PricingPage() {
+  const router = useRouter();
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
   const [selectedTier, setSelectedTier] = useState<string | null>(null);
   const [showComparison, setShowComparison] = useState(false);
   const [showCalculator, setShowCalculator] = useState(false);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
+
+  const handleTierSelect = async (tierId: string) => {
+    const tier = pricingTiers.find(t => t.id === tierId);
+    if (!tier) return;
+    setSelectedTier(tierId);
+    setPaymentError(null);
+
+    if (tier.price === 0) {
+      router.push('/auth/register');
+      return;
+    }
+    if (tier.id === 'enterprise') {
+      router.push('/contact');
+      return;
+    }
+    await initiateRazorpayCheckout(tier);
+  };
+
+  const initiateRazorpayCheckout = async (tier: PricingTier) => {
+    setCheckoutLoading(true);
+    try {
+      const amount = billingPeriod === 'yearly' ? getDiscountedPrice(tier) : tier.price;
+      const userData = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('userData') || '{}') : {};
+
+      const res = await fetch('/api/payment/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount,
+          currency: 'INR',
+          description: `Bell24h ${tier.name} Plan (${billingPeriod})`,
+          customerName: userData.name || 'Bell24h User',
+          customerEmail: userData.email || 'user@bell24h.com',
+          customerPhone: userData.phone || '',
+        }),
+      });
+
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error || 'Failed to create order');
+
+      const loaded = await loadRazorpayScript();
+      if (!loaded) throw new Error('Razorpay checkout could not be loaded. Please try again.');
+
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: data.data.amount,
+        currency: data.data.currency,
+        name: 'Bell24h',
+        description: `${tier.name} Plan`,
+        order_id: data.data.id,
+        prefill: {
+          name: userData.name || '',
+          email: userData.email || '',
+          contact: userData.phone ? `+91${userData.phone}` : '',
+        },
+        theme: { color: '#4F46E5' },
+        handler: async (response: any) => {
+          const verifyRes = await fetch('/api/payment/create-order', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              orderId: response.razorpay_order_id,
+              paymentId: response.razorpay_payment_id,
+              signature: response.razorpay_signature,
+            }),
+          });
+          const verifyData = await verifyRes.json();
+          if (verifyData.success) {
+            router.push('/dashboard/subscription?success=true&plan=' + tier.id);
+          } else {
+            setPaymentError('Payment verification failed. Contact support.');
+          }
+        },
+        modal: {
+          ondismiss: () => setCheckoutLoading(false),
+        },
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+      rzp.open();
+    } catch (err) {
+      setPaymentError(err instanceof Error ? err.message : 'Payment initiation failed. Please try again.');
+      setCheckoutLoading(false);
+    }
+  };
 
   const getDiscountedPrice = (tier: PricingTier) => {
     if (billingPeriod === 'yearly') {
@@ -358,17 +461,21 @@ export default function PricingPage() {
 
               {/* CTA Button */}
               <button
-                onClick={() => setSelectedTier(tier.id)}
-                className={`w-full py-3 px-6 rounded-lg font-semibold text-lg transition-colors ${
+                onClick={() => handleTierSelect(tier.id)}
+                disabled={checkoutLoading && selectedTier === tier.id}
+                className={`w-full py-3 px-6 rounded-lg font-semibold text-lg transition-colors disabled:opacity-60 disabled:cursor-wait ${
                   tier.buttonVariant === 'primary'
-                    ? 'bg-indigo-600 text-white hover:bg-primary-700'
+                    ? 'bg-indigo-600 text-white hover:bg-indigo-700'
                     : tier.buttonVariant === 'secondary'
                     ? 'bg-purple-600 text-white hover:bg-purple-700'
                     : 'border-2 border-indigo-600 text-indigo-600 hover:bg-indigo-50'
                 }`}
               >
-                {tier.buttonText}
+                {checkoutLoading && selectedTier === tier.id ? 'Processing...' : tier.buttonText}
               </button>
+              {paymentError && selectedTier === tier.id && (
+                <p className="mt-2 text-sm text-red-600 text-center">{paymentError}</p>
+              )}
             </div>
           ))}
         </div>
