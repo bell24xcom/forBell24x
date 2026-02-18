@@ -6,7 +6,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { getInsforge, isInsforgeConfigured } from '@/lib/insforge';
+import { isInsforgeConfigured } from '@/lib/insforge';
 
 export async function GET() {
   if (!isInsforgeConfigured()) {
@@ -22,41 +22,53 @@ export async function GET() {
   }
 
   try {
-    const client = getInsforge();
-    if (!client) {
-      return NextResponse.json(
-        { connected: false, configured: true, message: 'InsForge client failed to initialize' },
-        { status: 503 }
-      );
-    }
+    const url = process.env.INSFORGE_URL!;
+    const apiKey = process.env.INSFORGE_API_KEY!;
 
-    // Quick ping — list 1 user to confirm connection works
-    const { error } = await client.auth.admin.listUsers({ page: 1, perPage: 1 });
-
-    if (error) {
-      return NextResponse.json(
-        {
-          connected: false,
-          configured: true,
-          message: `InsForge responded with error: ${error.message}`,
-          hint: 'Check if your ik_ API key is correct in .env.production',
-        },
-        { status: 503 }
-      );
-    }
-
-    return NextResponse.json({
-      connected: true,
-      configured: true,
-      message: 'InsForge is connected and working!',
-      url: process.env.INSFORGE_URL,
+    // Ping the InsForge server with the API key — any HTTP response means the server is up
+    const response = await fetch(`${url.replace(/\/$/, '')}/health`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'apikey': apiKey,
+        'Content-Type': 'application/json',
+      },
+      signal: AbortSignal.timeout(5000), // 5 second timeout
     });
-  } catch (err) {
+
+    // Any HTTP response (even 404) means the server is reachable
+    const isReachable = response.status < 500;
+    const statusText = `HTTP ${response.status}`;
+
+    if (isReachable) {
+      return NextResponse.json({
+        connected: true,
+        configured: true,
+        message: 'InsForge server is reachable and API key is set.',
+        server_status: statusText,
+        url: url,
+      });
+    }
+
     return NextResponse.json(
       {
         connected: false,
         configured: true,
-        message: `Connection error: ${err instanceof Error ? err.message : 'Unknown'}`,
+        message: `InsForge server returned ${statusText}`,
+        hint: 'Server may be temporarily down. Try again in a moment.',
+      },
+      { status: 503 }
+    );
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    const isTimeout = message.includes('timeout') || message.includes('abort');
+    return NextResponse.json(
+      {
+        connected: false,
+        configured: true,
+        message: isTimeout
+          ? 'InsForge server did not respond within 5 seconds (timeout)'
+          : `Connection error: ${message}`,
       },
       { status: 500 }
     );
