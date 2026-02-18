@@ -98,8 +98,14 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    // Update lastLoginAt
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { lastLoginAt: new Date() },
+    }).catch(() => {});
+
     // Generate real JWT token using lib/jwt.ts
-    const token = generateToken({ userId: user.id, phone: user.phone, role: user.role });
+    const token = generateToken({ userId: user.id, phone: user.phone ?? phone, role: user.role });
 
     authLogger.info('User authenticated', { userId: user.id });
 

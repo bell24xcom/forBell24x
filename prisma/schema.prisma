@@ -5,7 +5,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  // directUrl = env("DIRECT_URL")  // Only needed when DATABASE_URL is a Neon pooler URL
 }
 
 // Enhanced User model for production
@@ -31,7 +31,6 @@ model User {
   quotes      Quote[]
   buyerTransactions Transaction[] @relation("BuyerTransactions")
   supplierTransactions Transaction[] @relation("SupplierTransactions")
-  otpVerifications OTPVerification[]
   leads       Lead[]
   notifications Notification[]
   wallet      Wallet?
@@ -41,7 +40,8 @@ model User {
   @@map("users")
 }
 
-// OTP Verification for authentication
+// OTP Verification for authentication — standalone table, NO FK to users
+// (phone may not yet have a User record at OTP send time)
 model OTPVerification {
   id         String   @id @default(cuid())
   phone      String   @unique
@@ -51,9 +51,6 @@ model OTPVerification {
   isVerified Boolean  @default(false)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-
-  // Relations
-  user       User?    @relation(fields: [phone], references: [phone])
 
   @@map("otp_verifications")
 }
