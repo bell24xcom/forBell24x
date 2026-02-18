@@ -9,30 +9,108 @@ export class Bell24hAIClient {
 
   private initializeClients() {
     const NVIDIA_BASE_URL = 'https://integrate.api.nvidia.com/v1';
+    // Support both naming conventions: NVIDIA_MINIMAX_KEY (ours) and NVIDIA_API_KEY_MINIMAX (Cline's)
+    const fallback = process.env.NVIDIA_API_KEY || '';
 
-    // Minimax M2.1 for multimodal tasks (voice/video)
     this.clients.set('minimax', new OpenAI({
       baseURL: NVIDIA_BASE_URL,
-      apiKey: process.env.NVIDIA_MINIMAX_KEY || process.env.NVIDIA_API_KEY || '',
+      apiKey: process.env.NVIDIA_MINIMAX_KEY || process.env.NVIDIA_API_KEY_MINIMAX || fallback,
     }));
 
-    // DeepSeek V3.2 for text, RFQ extraction, and embeddings
     this.clients.set('deepseek', new OpenAI({
       baseURL: NVIDIA_BASE_URL,
-      apiKey: process.env.NVIDIA_DEEPSEEK_KEY || process.env.NVIDIA_API_KEY || '',
+      apiKey: process.env.NVIDIA_DEEPSEEK_KEY || process.env.NVIDIA_API_KEY_DEEPSEEK || fallback,
     }));
 
-    // Kimi K2.5 for long-context tasks (200K context window)
     this.clients.set('kimi', new OpenAI({
       baseURL: NVIDIA_BASE_URL,
-      apiKey: process.env.NVIDIA_KIMI_KEY || process.env.NVIDIA_DEEPSEEK_KEY || process.env.NVIDIA_API_KEY || '',
+      apiKey: process.env.NVIDIA_KIMI_KEY || process.env.NVIDIA_API_KEY_KIMI ||
+              process.env.NVIDIA_DEEPSEEK_KEY || process.env.NVIDIA_API_KEY_DEEPSEEK || fallback,
     }));
 
-    // AWS GPT-OSS for cost-effective text processing
     this.clients.set('gpt-oss', new OpenAI({
       baseURL: NVIDIA_BASE_URL,
-      apiKey: process.env.NVIDIA_GPT_OSS_KEY || process.env.NVIDIA_API_KEY || '',
+      apiKey: process.env.NVIDIA_GPT_OSS_KEY || process.env.NVIDIA_API_KEY_GPT_OSS || fallback,
     }));
+  }
+
+  // Model name constants
+  static readonly MODELS = {
+    MINIMAX: 'minimaxai/minimax-m2.1',
+    DEEPSEEK: 'deepseek-ai/deepseek-v3.2',
+    DEEPSEEK_EMBEDDINGS: 'deepseek-ai/deepseek-v3.2',
+    KIMI: 'moonshotai/kimi-k2.5',
+    GPT_OSS: 'openai/gpt-oss-20b',
+  };
+
+  getModel(serviceType: string): string {
+    switch (serviceType) {
+      case 'voice': case 'video': case 'multimodal': case 'voice-processing': case 'video-processing':
+        return Bell24hAIClient.MODELS.MINIMAX;
+      case 'text': case 'embeddings': case 'rfq-matching': case 'document-processing':
+        return Bell24hAIClient.MODELS.DEEPSEEK;
+      case 'long-context': case 'chatbot': case 'chat':
+        return Bell24hAIClient.MODELS.KIMI;
+      case 'cost-effective': case 'content-generation': case 'quote-generation':
+        return Bell24hAIClient.MODELS.GPT_OSS;
+      default:
+        return Bell24hAIClient.MODELS.DEEPSEEK;
+    }
+  }
+
+  // Unified chat completion method (used by service files)
+  async createChatCompletion(
+    serviceType: string,
+    messages: Array<{ role: string; content: string | Array<any> }>,
+    options?: { temperature?: number; maxTokens?: number; enableReasoning?: boolean }
+  ) {
+    const client = this.getClient(serviceType);
+    if (!client) throw new Error(`No client for serviceType: ${serviceType}`);
+    const model = this.getModel(serviceType);
+    return (client as any).chat.completions.create({
+      model,
+      messages,
+      temperature: options?.temperature ?? 0.7,
+      max_tokens: options?.maxTokens ?? 2000,
+    });
+  }
+
+  // Embeddings method (used by rfq-matching service)
+  async createEmbeddings(texts: string[]) {
+    const client = this.getClient('embeddings');
+    if (!client) throw new Error('Embeddings client not available');
+    return (client as any).embeddings.create({
+      model: Bell24hAIClient.MODELS.DEEPSEEK_EMBEDDINGS,
+      input: texts,
+    });
+  }
+
+  // Multimodal method for audio/video input (used by voice-processing service)
+  async processMultimodal(
+    textPrompt: string,
+    mediaFiles: Array<{ type: 'audio' | 'video' | 'image'; base64Data: string; mediaType: string }>,
+    options?: { temperature?: number; maxTokens?: number }
+  ) {
+    const client = this.getClient('voice');
+    if (!client) throw new Error('Multimodal client not available');
+
+    const content: Array<any> = [{ type: 'text', text: textPrompt }];
+    for (const media of mediaFiles) {
+      if (media.type === 'audio') {
+        content.push({ type: 'input_audio', input_audio: { data: media.base64Data, format: media.mediaType.split('/')[1] } });
+      } else if (media.type === 'video') {
+        content.push({ type: 'input_video', input_video: { data: media.base64Data, format: media.mediaType.split('/')[1] } });
+      } else if (media.type === 'image') {
+        content.push({ type: 'image_url', image_url: { url: `data:${media.mediaType};base64,${media.base64Data}` } });
+      }
+    }
+
+    return (client as any).chat.completions.create({
+      model: Bell24hAIClient.MODELS.MINIMAX,
+      messages: [{ role: 'user', content }],
+      temperature: options?.temperature ?? 0.7,
+      max_tokens: options?.maxTokens ?? 2000,
+    });
   }
 
   getClient(serviceType: string) {

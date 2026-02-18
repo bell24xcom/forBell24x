@@ -288,7 +288,7 @@ Return ONLY valid JSON array (no other text):
 Score all ${suppliers.length} suppliers. matchScore is 0-1. Include all suppliers with score > 0.2.`;
 
   const response = await (client as any).chat.completions.create({
-    model: 'deepseek-ai/deepseek-v3-0324',
+    model: 'deepseek-ai/deepseek-v3.2',
     messages: [{ role: 'user', content: prompt }],
     temperature: 0.2,
     max_tokens: 1200,

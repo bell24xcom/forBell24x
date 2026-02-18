@@ -60,7 +60,7 @@ Return this exact JSON structure:
 }`;
 
   const response = await (client as any).chat.completions.create({
-    model: 'deepseek-ai/deepseek-v3-0324',
+    model: 'deepseek-ai/deepseek-v3.2',
     messages: [
       { role: 'system', content: systemPrompt },
       { role: 'user', content: `Extract RFQ from this voice input: "${voiceText}"` }
