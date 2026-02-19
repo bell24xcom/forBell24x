@@ -21,6 +21,7 @@ model User {
   gstNumber   String?   // optional — increases trust score if provided
   udyamNumber String?   // optional MSME Udyam Aadhar — increases trust score if provided
   trustScore  Int       @default(0) // 0-100: calculated from verification completeness
+  plan        UserPlan  @default(FREE) // subscription plan
   location    String?
   avatar      String?
   preferences Json?
@@ -265,6 +266,12 @@ enum UserRole {
   BUYER
   ADMIN
   AGENT
+}
+
+enum UserPlan {
+  FREE
+  PRO
+  ENTERPRISE
 }
 
 enum RFQStatus {
