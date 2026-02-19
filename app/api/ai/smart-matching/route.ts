@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { verifyToken } from '@/lib/jwt';
 import { aiClient } from '@/lib/ai-client';
-
-const prisma = new PrismaClient();
 
 export const dynamic = 'force-dynamic';
 
@@ -59,11 +57,12 @@ export async function POST(request: NextRequest) {
         isActive: true,
       },
       select: {
-        id: true,
-        name: true,
-        company: true,
-        location: true,
+        id:         true,
+        name:       true,
+        company:    true,
+        location:   true,
         isVerified: true,
+        trustScore: true,   // 0-100 — used in match scoring
         quotes: {
           select: { status: true },
           take: 50,
@@ -76,20 +75,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true, matches: [] });
     }
 
-    // Build supplier summaries for AI
+    // Build supplier summaries for AI + fallback scoring
     const supplierSummaries = suppliers.map(s => {
-      const total = s.quotes.length;
-      const won = s.quotes.filter(q => q.status === 'ACCEPTED').length;
-      const rate = total > 0 ? Math.round((won / total) * 100) : 0;
+      const total       = s.quotes.length;
+      const won         = s.quotes.filter(q => q.status === 'ACCEPTED').length;
+      const successRate = total > 0 ? Math.round((won / total) * 100) : 0;
       return {
-        id: s.id,
-        name: s.name || s.company || 'Supplier',
-        company: s.company || '',
-        location: s.location || 'Unknown',
-        isVerified: s.isVerified,
+        id:          s.id,
+        name:        s.name    || s.company || 'Supplier',
+        company:     s.company || '',
+        location:    s.location || 'Unknown',
+        isVerified:  s.isVerified,
+        trustScore:  s.trustScore,  // 0-100
         totalQuotes: total,
-        wonQuotes: won,
-        successRate: rate,
+        wonQuotes:   won,
+        successRate,
       };
     });
 
@@ -98,7 +98,21 @@ export async function POST(request: NextRequest) {
     const reasonMap: Record<string, string> = {};
 
     try {
-      const prompt = `You are a B2B procurement matching engine. Given this RFQ:\n- Title: "${rfqTitle || rfqCategory}"\n- Category: ${rfqCategory}\n- Location preference: ${rfqLocation || 'Any'}\n- Budget: ₹${rfqBudget || 'Not specified'}\n\nSupplier pool:\n${supplierSummaries.map((s, i) => `${i + 1}. ID:${s.id} | ${s.company || s.name} | Loc:${s.location} | Verified:${s.isVerified} | SuccessRate:${s.successRate}%`).join('\n')}\n\nReturn a JSON array of top 5 supplier IDs with reasons:\n[{"id":"...","reason":"..."},...]`;
+      const prompt = [
+        `You are a B2B procurement matching engine. Given this RFQ:`,
+        `- Title: "${rfqTitle || rfqCategory}"`,
+        `- Category: ${rfqCategory}`,
+        `- Location preference: ${rfqLocation || 'Any'}`,
+        `- Budget: ₹${rfqBudget || 'Not specified'}`,
+        ``,
+        `Supplier pool:`,
+        ...supplierSummaries.map((s, i) =>
+          `${i + 1}. ID:${s.id} | ${s.company || s.name} | Loc:${s.location} | Verified:${s.isVerified} | Trust:${s.trustScore}/100 | SuccessRate:${s.successRate}%`
+        ),
+        ``,
+        `Trust score indicates: 70+ = GST/Udyam verified (high credibility). Weight it heavily.`,
+        `Return JSON array of top 5: [{"id":"...","reason":"..."},...]`,
+      ].join('\n');
 
       const aiResponse = await aiClient.createChatCompletion('text', [
         { role: 'system', content: 'You are a B2B supplier matching assistant. Always return valid JSON.' },
@@ -116,28 +130,39 @@ export async function POST(request: NextRequest) {
       console.warn('AI ranking unavailable, using algorithmic fallback:', aiErr);
     }
 
-    // Fallback: sort by successRate if AI failed
+    // ── Algorithmic fallback — trust score integrated ──────────────────────
+    // rankScore formula:
+    //   successRate / 100   → 0–1   (win rate)
+    //   isVerified ? 1 : 0  → 0 or 1
+    //   trustScore / 20     → 0–5   (up to +5 bonus for high-trust suppliers)
+    //   location match      → +0.5
     if (rankedIds.length === 0) {
       rankedIds = supplierSummaries
-        .sort((a, b) => {
-          const locA = a.location.toLowerCase().includes(rfqLocation.toLowerCase()) ? 1 : 0;
-          const locB = b.location.toLowerCase().includes(rfqLocation.toLowerCase()) ? 1 : 0;
-          return (b.isVerified ? 1 : 0) + b.successRate / 100 + locB -
-                 ((a.isVerified ? 1 : 0) + a.successRate / 100 + locA);
-        })
+        .map(s => ({
+          id: s.id,
+          rankScore:
+            s.successRate / 100 +
+            (s.isVerified ? 1 : 0) +
+            s.trustScore / 20 +
+            (rfqLocation && s.location.toLowerCase().includes(rfqLocation.toLowerCase()) ? 0.5 : 0),
+        }))
+        .sort((a, b) => b.rankScore - a.rankScore)
         .slice(0, 5)
         .map(s => s.id);
     }
 
     const matches = rankedIds
       .slice(0, 5)
-      .map(id => {
+      .map((id, rank) => {
         const s = supplierSummaries.find(x => x.id === id);
         if (!s) return null;
+        // Trust bonus: up to +5 on top of base score
+        const base       = s.isVerified ? 90 : 75;
+        const trustBonus = Math.round(s.trustScore / 20);
         return {
-          supplier: s,
-          matchScore: s.isVerified ? 90 - rankedIds.indexOf(id) * 5 : 75 - rankedIds.indexOf(id) * 5,
-          reason: reasonMap[id] || `Matches ${rfqCategory} category requirements`,
+          supplier:   s,
+          matchScore: Math.max(0, base + trustBonus - rank * 5),
+          reason:     reasonMap[id] || `Matches ${rfqCategory} requirements · Trust ${s.trustScore}/100`,
         };
       })
       .filter(Boolean);

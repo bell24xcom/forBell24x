@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { verifyToken } from '@/lib/jwt';
 
-const prisma = new PrismaClient();
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
@@ -20,7 +19,7 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: 'desc' },
       include: {
         rfq: { select: { title: true, category: true } },
-        supplier: { select: { name: true, company: true, phone: true } },
+        supplier: { select: { name: true, company: true, phone: true, trustScore: true, isVerified: true } },
       },
     });
 
@@ -30,8 +29,10 @@ export async function GET(request: NextRequest) {
         id: q.id,
         rfqTitle: q.rfq.title,
         rfqCategory: q.rfq.category,
-        supplierName: q.supplier.name,
-        supplierCompany: q.supplier.company,
+        supplierName:       q.supplier.name,
+        supplierCompany:    q.supplier.company,
+        supplierTrustScore: q.supplier.trustScore,   // shown to buyer
+        supplierVerified:   q.supplier.isVerified,
         price: q.price,
         quantity: q.quantity,
         timeline: q.timeline,

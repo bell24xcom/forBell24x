@@ -1,169 +1,130 @@
+/**
+ * GET  /api/rfq/quotes?rfqId=&supplierId=&status=
+ * POST /api/rfq/quotes  — create a quote (supplier)
+ * PUT  /api/rfq/quotes  — accept/reject a quote (buyer)
+ *
+ * Uses only fields that exist in the Prisma schema.
+ * Supplier trustScore is included in GET so buyers can see it.
+ */
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
+
+const SUPPLIER_SELECT = {
+  id:         true,
+  name:       true,
+  company:    true,
+  location:   true,
+  isVerified: true,   // KYC status
+  trustScore: true,   // 0-100 — shown to buyers
+} as const;
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const rfqId = searchParams.get('rfqId');
+    const rfqId      = searchParams.get('rfqId');
     const supplierId = searchParams.get('supplierId');
-    const status = searchParams.get('status');
+    const status     = searchParams.get('status');
 
-    const where: any = {};
-
-    if (rfqId) where.rfqId = rfqId;
+    const where: Record<string, unknown> = {};
+    if (rfqId)      where.rfqId      = rfqId;
     if (supplierId) where.supplierId = supplierId;
-    if (status) where.status = status;
+    if (status)     where.status     = status;
 
     const quotes = await prisma.quote.findMany({
       where,
       include: {
-        supplier: {
-          select: {
-            id: true,
-            name: true,
-            company: true,
-            rating: true,
-            verified: true,
-            location: true
-          }
-        },
-        rfq: {
-          select: {
-            id: true,
-            title: true,
-            category: true
-          }
-        }
+        supplier: { select: SUPPLIER_SELECT },
+        rfq:      { select: { id: true, title: true, category: true } },
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
 
-    return NextResponse.json({ quotes });
-
+    return NextResponse.json({ success: true, quotes });
   } catch (error) {
-    console.error('Error fetching quotes:', error);
-    return NextResponse.json({ error: 'Failed to fetch quotes' }, { status: 500 });
+    console.error('rfq/quotes GET error:', error);
+    return NextResponse.json({ success: false, error: 'Failed to fetch quotes' }, { status: 500 });
   }
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const { 
-      rfqId, 
-      supplierId, 
-      price, 
-      quantity, 
-      deliveryTime, 
-      terms, 
-      validity, 
-      notes 
-    } = await req.json();
+    const { rfqId, supplierId, price, quantity, timeline, description, terms } = await req.json();
 
-    if (!rfqId || !supplierId || !price) {
-      return NextResponse.json({ 
-        error: 'RFQ ID, Supplier ID, and Price are required' 
-      }, { status: 400 });
+    if (!rfqId || !supplierId || price == null) {
+      return NextResponse.json(
+        { success: false, error: 'rfqId, supplierId, and price are required' },
+        { status: 400 }
+      );
     }
 
-    // Check if quote already exists
-    const existingQuote = await prisma.quote.findFirst({
-      where: {
-        rfqId,
-        supplierId
-      }
-    });
-
-    if (existingQuote) {
-      return NextResponse.json({ 
-        error: 'Quote already submitted for this RFQ' 
-      }, { status: 400 });
+    // Prevent duplicate quotes
+    const existing = await prisma.quote.findFirst({ where: { rfqId, supplierId } });
+    if (existing) {
+      return NextResponse.json(
+        { success: false, error: 'Quote already submitted for this RFQ' },
+        { status: 409 }
+      );
     }
 
     const quote = await prisma.quote.create({
       data: {
         rfqId,
         supplierId,
-        price: parseFloat(price),
-        quantity: parseInt(quantity) || 1,
-        deliveryTime,
-        terms,
-        validity: parseInt(validity) || 30,
-        notes,
-        status: 'PENDING'
+        price:       parseFloat(price),
+        quantity:    String(quantity || '1'),
+        timeline:    String(timeline || ''),
+        description: description || null,
+        terms:       terms       || null,
+        status:      'PENDING',
       },
-      include: {
-        supplier: {
-          select: {
-            id: true,
-            name: true,
-            company: true,
-            rating: true,
-            verified: true
-          }
-        }
-      }
+      include: { supplier: { select: SUPPLIER_SELECT } },
     });
 
-    return NextResponse.json({ 
-      success: true, 
-      quote 
-    });
-
+    return NextResponse.json({ success: true, quote });
   } catch (error) {
-    console.error('Error creating quote:', error);
-    return NextResponse.json({ error: 'Failed to create quote' }, { status: 500 });
+    console.error('rfq/quotes POST error:', error);
+    return NextResponse.json({ success: false, error: 'Failed to create quote' }, { status: 500 });
   }
 }
 
 export async function PUT(req: NextRequest) {
   try {
-    const { quoteId, status, selectedReason } = await req.json();
+    const { quoteId, status } = await req.json();
 
     if (!quoteId || !status) {
-      return NextResponse.json({ 
-        error: 'Quote ID and status are required' 
-      }, { status: 400 });
+      return NextResponse.json(
+        { success: false, error: 'quoteId and status are required' },
+        { status: 400 }
+      );
+    }
+
+    const validStatuses = ['PENDING', 'ACCEPTED', 'REJECTED', 'EXPIRED'];
+    if (!validStatuses.includes(status)) {
+      return NextResponse.json(
+        { success: false, error: `Invalid status. Use: ${validStatuses.join(', ')}` },
+        { status: 400 }
+      );
     }
 
     const quote = await prisma.quote.update({
       where: { id: quoteId },
-      data: { 
-        status,
-        selectedReason: selectedReason || null
-      },
-      include: {
-        supplier: {
-          select: {
-            id: true,
-            name: true,
-            company: true
-          }
-        }
-      }
+      data:  { status, isAccepted: status === 'ACCEPTED' },
+      include: { supplier: { select: SUPPLIER_SELECT } },
     });
 
-    // If quote is selected, mark others as rejected
+    // Accept one → reject all others on the same RFQ
     if (status === 'ACCEPTED') {
       await prisma.quote.updateMany({
-        where: {
-          rfqId: quote.rfqId,
-          id: { not: quoteId }
-        },
-        data: { status: 'REJECTED' }
+        where: { rfqId: quote.rfqId, id: { not: quoteId } },
+        data:  { status: 'REJECTED' },
       });
     }
 
-    return NextResponse.json({ 
-      success: true, 
-      quote 
-    });
-
+    return NextResponse.json({ success: true, quote });
   } catch (error) {
-    console.error('Error updating quote:', error);
-    return NextResponse.json({ error: 'Failed to update quote' }, { status: 500 });
+    console.error('rfq/quotes PUT error:', error);
+    return NextResponse.json({ success: false, error: 'Failed to update quote' }, { status: 500 });
   }
 }

@@ -11,6 +11,14 @@ interface Stats {
   totalQuotes: number;
 }
 
+interface Trust {
+  score: number;
+  isVerified: boolean;
+  hasGST: boolean;
+  hasUdyam: boolean;
+  improvements: Array<{ label: string; points: number }>;
+}
+
 interface Quote {
   id: string;
   price: number;
@@ -26,10 +34,11 @@ interface Quote {
 }
 
 export default function SupplierDashboardPage() {
-  const [stats, setStats] = useState<Stats | null>(null);
+  const [stats,  setStats]  = useState<Stats | null>(null);
+  const [trust,  setTrust]  = useState<Trust | null>(null);
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error,   setError]   = useState('');
 
   useEffect(() => {
     async function load() {
@@ -47,7 +56,10 @@ export default function SupplierDashboardPage() {
         const statsData = await statsRes.json();
         const quotesData = await quotesRes.json();
 
-        if (statsData.success) setStats(statsData.stats);
+        if (statsData.success) {
+          setStats(statsData.stats);
+          if (statsData.trust) setTrust(statsData.trust);
+        }
         if (quotesData.success) setQuotes(quotesData.quotes);
       } catch {
         setError('Network error. Please try again.');
@@ -117,6 +129,66 @@ export default function SupplierDashboardPage() {
             </div>
           </div>
         ) : null}
+
+        {/* Trust Score Card */}
+        {!loading && trust && (
+          <div className="bg-slate-800/70 border border-slate-700/50 rounded-xl p-5 mb-6 flex flex-col sm:flex-row gap-5">
+            {/* Score gauge */}
+            <div className="flex-shrink-0 text-center sm:text-left">
+              <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-1">Trust Score</p>
+              <div className="flex items-end gap-1">
+                <span className={`text-5xl font-extrabold ${
+                  trust.score >= 70 ? 'text-green-400' : trust.score >= 40 ? 'text-amber-400' : 'text-slate-400'
+                }`}>{trust.score}</span>
+                <span className="text-slate-500 text-lg mb-1">/ 100</span>
+              </div>
+              <div className="w-full sm:w-36 h-2 bg-slate-700 rounded-full mt-2 overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all ${
+                    trust.score >= 70 ? 'bg-green-500' : trust.score >= 40 ? 'bg-amber-500' : 'bg-slate-500'
+                  }`}
+                  style={{ width: `${trust.score}%` }}
+                />
+              </div>
+              {trust.isVerified && (
+                <span className="inline-block mt-2 text-xs bg-green-900/40 text-green-400 border border-green-700/50 px-2 py-0.5 rounded-full font-semibold">
+                  ✓ KYC Verified
+                </span>
+              )}
+            </div>
+
+            {/* Improvement hints */}
+            {trust.improvements.length > 0 && (
+              <div className="flex-1">
+                <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-2">
+                  Improve your visibility
+                </p>
+                <div className="space-y-1.5">
+                  {trust.improvements.map(item => (
+                    <div key={item.label} className="flex items-center justify-between text-sm">
+                      <span className="text-slate-300">{item.label}</span>
+                      <span className="text-green-400 font-semibold">+{item.points} pts</span>
+                    </div>
+                  ))}
+                </div>
+                <Link
+                  href="/auth/kyc"
+                  className="inline-block mt-3 text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg transition-colors font-medium"
+                >
+                  Complete KYC →
+                </Link>
+              </div>
+            )}
+
+            {trust.improvements.length === 0 && (
+              <div className="flex-1 flex items-center">
+                <p className="text-green-300 text-sm">
+                  Maximum trust score achieved! Your profile is fully verified.
+                </p>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Recent quotes table */}
         <div className="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
