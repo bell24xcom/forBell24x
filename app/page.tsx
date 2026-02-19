@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Search, Mic, Video, FileText, Brain, Lock, Zap, Globe, Sparkles, ArrowRight, Users, CheckCircle, ChevronRight } from 'lucide-react';
 
@@ -274,13 +274,37 @@ function CategoriesSection() {
   );
 }
 
-/* ---- STATS ---- */
+/* ---- STATS — fetched live from DB ---- */
 function StatsSection() {
+  const [stats, setStats] = useState<{ suppliers: number; rfqs: number; categories: number } | null>(null);
+
+  useEffect(() => {
+    fetch('/api/stats')
+      .then(r => r.json())
+      .then(d => { if (d.success) setStats(d.stats); })
+      .catch(() => {}); // fail silently
+  }, []);
+
+  const items = [
+    {
+      value: stats ? (stats.suppliers > 0 ? `${stats.suppliers}+` : 'Growing') : '—',
+      label: 'Verified Suppliers',
+    },
+    {
+      value: stats ? (stats.categories > 0 ? `${stats.categories}+` : '19+') : '—',
+      label: 'Categories',
+    },
+    {
+      value: stats ? String(stats.rfqs) : '—',
+      label: 'RFQs Posted',
+    },
+  ];
+
   return (
     <section className="py-12 border-t border-slate-800">
       <div className="max-w-4xl mx-auto px-4">
         <div className="grid grid-cols-3 gap-8">
-          {STATS.map((stat) => (
+          {items.map((stat) => (
             <div key={stat.label} className="text-center">
               <div className="text-3xl lg:text-4xl font-bold text-blue-400 mb-1">
                 {stat.value}
