@@ -113,18 +113,34 @@ function handleAPIRoute(request: NextRequest, response: NextResponse): NextRespo
 
 // Handle admin routes
 function handleAdminRoute(request: NextRequest, response: NextResponse): NextResponse {
-  // Add admin-specific security headers
   response.headers.set('X-Frame-Options', 'DENY');
   response.headers.set('X-Content-Type-Options', 'nosniff');
   response.headers.set('X-XSS-Protection', '1; mode=block');
-  
-  // Check for admin authentication (this would be implemented with actual auth)
-  const authHeader = request.headers.get('authorization');
-  if (!authHeader && !request.nextUrl.pathname.includes('/login')) {
-    // Redirect to admin login
-    return NextResponse.redirect(new URL('/admin/login', request.url));
+
+  const { pathname } = request.nextUrl;
+
+  // Allow login page and the login API through without a token
+  if (pathname === '/admin/login' || pathname.startsWith('/api/admin/login')) {
+    return response;
   }
-  
+
+  // Check admin-token cookie (set by POST /api/admin/login)
+  const adminToken = request.cookies.get('admin-token')?.value;
+  if (!adminToken) {
+    // For page routes: redirect to login
+    if (!pathname.startsWith('/api/')) {
+      const loginUrl = new URL('/admin/login', request.url);
+      loginUrl.searchParams.set('redirect', pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+    // For API routes: return 401 (requireAdmin() in the route handles this too)
+    return new NextResponse(JSON.stringify({ success: false, message: 'Admin authentication required' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  // Full JWT + role verification is done inside each /api/admin/* handler via requireAdmin().
   return response;
 }
 

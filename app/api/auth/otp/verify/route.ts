@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { generateToken } from '@/lib/jwt';
 import { authLogger } from '@/lib/logger';
-
-const prisma = new PrismaClient();
 
 export const dynamic = 'force-dynamic';
 
@@ -84,22 +82,24 @@ export async function POST(request: NextRequest) {
           phone,
           name: `User ${phone.slice(-4)}`,
           email: `${phone}@bell24h.com`,
-          company: 'New Company',
+          company: '',
           role: 'SUPPLIER',
           isActive: true,
           isVerified: true,
+          trustScore: 30, // base score: phone verified via OTP
+          lastLoginAt: new Date(),
         },
       });
       authLogger.info('New user created', { userId: user.id, phone: `${phone.slice(0, 5)}*****` });
     } else {
       user = await prisma.user.update({
         where: { id: user.id },
-        data: { isVerified: true, isActive: true },
+        data: { isVerified: true, isActive: true, lastLoginAt: new Date() },
       });
     }
 
     // Generate real JWT token using lib/jwt.ts
-    const token = generateToken({ userId: user.id, phone: user.phone, role: user.role });
+    const token = generateToken({ userId: user.id, phone: user.phone ?? phone, role: user.role });
 
     authLogger.info('User authenticated', { userId: user.id });
 

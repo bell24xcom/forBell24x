@@ -1,45 +1,74 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
+import { prisma } from '@/lib/prisma';
+import { verifyToken, extractToken } from '@/lib/jwt';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export async function GET(request: NextRequest) {
   try {
-    // Get user session from cookie
-    const cookieStore = cookies();
-    const userSession = cookieStore.get('user_session')?.value;
+    // Support both Authorization header and auth-token cookie (set by OTP verify)
+    const token = extractToken(
+      request.headers.get('authorization'),
+      request.cookies.get('auth-token')?.value
+    );
 
-    if (!userSession) {
+    if (!token) {
       return NextResponse.json(
         { success: false, error: 'Not authenticated' },
         { status: 401 }
       );
     }
 
-    const user = JSON.parse(userSession);
+    let payload;
+    try {
+      payload = verifyToken(token);
+    } catch {
+      return NextResponse.json(
+        { success: false, error: 'Session expired. Please log in again.' },
+        { status: 401 }
+      );
+    }
+
+    // Fetch live user record from DB
+    const user = await prisma.user.findUnique({
+      where: { id: payload.userId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        company: true,
+        role: true,
+        isVerified: true,
+        isActive: true,
+        gstNumber: true,
+        location: true,
+        avatar: true,
+        preferences: true,
+        lastLoginAt: true,
+      },
+    });
+
+    if (!user || !user.isActive) {
+      return NextResponse.json(
+        { success: false, error: 'User not found or deactivated' },
+        { status: 401 }
+      );
+    }
 
     return NextResponse.json({
       success: true,
       user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        phone: user.phone,
-        role: user.role,
-        verified: user.verified,
-        loginMethod: user.loginMethod
-      }
+        ...user,
+        loginMethod: 'otp',
+      },
     });
 
   } catch (error) {
-    console.error('Get User Error:', error);
+    console.error('GET /api/auth/me error:', error);
     return NextResponse.json(
-      { 
-        success: false, 
-        error: 'Failed to get user information',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      },
+      { success: false, error: 'Failed to get user information' },
       { status: 500 }
     );
   }

@@ -5,7 +5,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  // directUrl = env("DIRECT_URL")  // Only needed when DATABASE_URL is a Neon pooler URL
 }
 
 // Enhanced User model for production
@@ -18,7 +18,10 @@ model User {
   isActive    Boolean  @default(true)
   isVerified  Boolean  @default(false)
   company     String?
-  gstNumber   String?
+  gstNumber   String?   // optional — increases trust score if provided
+  udyamNumber String?   // optional MSME Udyam Aadhar — increases trust score if provided
+  trustScore  Int       @default(0) // 0-100: calculated from verification completeness
+  plan        UserPlan  @default(FREE) // subscription plan
   location    String?
   avatar      String?
   preferences Json?
@@ -31,14 +34,17 @@ model User {
   quotes      Quote[]
   buyerTransactions Transaction[] @relation("BuyerTransactions")
   supplierTransactions Transaction[] @relation("SupplierTransactions")
-  otpVerifications OTPVerification[]
   leads       Lead[]
   notifications Notification[]
+  wallet      Wallet?
+  sentMessages     Message[] @relation("SentMessages")
+  receivedMessages Message[] @relation("ReceivedMessages")
 
   @@map("users")
 }
 
-// OTP Verification for authentication
+// OTP Verification for authentication — standalone table, NO FK to users
+// (phone may not yet have a User record at OTP send time)
 model OTPVerification {
   id         String   @id @default(cuid())
   phone      String   @unique
@@ -49,20 +55,25 @@ model OTPVerification {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  // Relations
-  user       User?    @relation(fields: [phone], references: [phone])
-
   @@map("otp_verifications")
 }
 
-// Category for RFQ classification (aligns API with schema)
+// Category — hierarchical (level 1 = main, level 2 = subcategory)
 model Category {
-  id          String   @id @default(cuid())
+  id          String     @id @default(cuid())
   name        String
-  slug        String   @unique
+  slug        String     @unique
   description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  parentId    String?    @map("parent_id")
+  parent      Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children    Category[] @relation("CategoryHierarchy")
+  level       Int        @default(1)  // 1 = main category, 2 = subcategory
+  isActive    Boolean    @default(true)
+  sortOrder   Int        @default(0)
+  icon        String?    // emoji or icon name for UI
+  color       String?    // hex color for UI badges
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 
   rfqs        RFQ[]
 
@@ -203,12 +214,64 @@ model Notification {
   @@map("notifications")
 }
 
+// Wallet — one per user, tracks balance via WalletTransactions
+model Wallet {
+  id           String              @id @default(cuid())
+  userId       String              @unique @map("user_id")
+  balance      Float               @default(0)
+  currency     String              @default("INR")
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+
+  user         User                @relation(fields: [userId], references: [id])
+  transactions WalletTransaction[]
+
+  @@map("wallets")
+}
+
+// WalletTransaction — each deposit/debit
+model WalletTransaction {
+  id          String   @id @default(cuid())
+  walletId    String   @map("wallet_id")
+  type        String   // "credit" | "debit"
+  amount      Float
+  description String?
+  reference   String?  // e.g. payment ID or order ID
+  createdAt   DateTime @default(now())
+
+  wallet      Wallet   @relation(fields: [walletId], references: [id])
+
+  @@map("wallet_transactions")
+}
+
+// Message — direct messages between users (optionally linked to an RFQ)
+model Message {
+  id        String   @id @default(cuid())
+  fromId    String   @map("from_id")
+  toId      String   @map("to_id")
+  rfqId     String?  @map("rfq_id")
+  content   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  from      User     @relation("SentMessages",     fields: [fromId], references: [id])
+  to        User     @relation("ReceivedMessages", fields: [toId],   references: [id])
+
+  @@map("messages")
+}
+
 // Enums
 enum UserRole {
   SUPPLIER
   BUYER
   ADMIN
   AGENT
+}
+
+enum UserPlan {
+  FREE
+  PRO
+  ENTERPRISE
 }
 
 enum RFQStatus {
