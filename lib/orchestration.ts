@@ -1,5 +1,5 @@
 /**
- * Bell24h Orchestration Engine — v2
+ * Bell24h Orchestration Engine — v3
  *
  * Event-driven orchestration for all B2B marketplace actions.
  *
@@ -8,30 +8,41 @@
  *   +3 pts  location match (supplier.location contains rfq.location city)
  *   +2 pts  rfqLocation city in supplier preferences.cities (explicit city coverage)
  *   +2 pts  category history (supplier has previously quoted in same category)
+ *   +2 pts  trust score ≥ 70 (high-quality supplier)
  *   +1 pt   isVerified supplier
  *   +1 pt   has at least 1 accepted quote (proven supplier)
  *   → Sort desc by score → take top 15 → notify only those
  *   → Fallback: if < 5 scored matches, fill from any active suppliers
  *
+ * RFQ STATUS LIFECYCLE:
+ *   ACTIVE → (quote accepted) → ACCEPTED → (buyer confirms) → COMPLETED
+ *   ACTIVE → CANCELLED  (buyer cancels)
+ *   ACTIVE → EXPIRED    (auto-expiry)
+ *   ACCEPTED → CLOSED_EXTERNAL  (manual override by admin)
+ *
  * All side effects are fire-and-forget — they NEVER block the HTTP response.
  */
 
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { n8nMarketing } from '@/lib/n8n-trigger';
 import { resendService } from '@/lib/resend';
-
-const prisma = new PrismaClient();
 
 const MAX_SUPPLIERS_TO_NOTIFY = 15;
 const MIN_SUPPLIERS_BEFORE_FALLBACK = 5;
 
 // ─── Internal helpers ────────────────────────────────────────────────────────
 
+type NotifType =
+  | 'INFO' | 'SUCCESS' | 'WARNING' | 'ERROR'
+  | 'RFQ_CREATED' | 'QUOTE_RECEIVED' | 'QUOTE_ACCEPTED'
+  | 'DEAL_CHECK' | 'DEAL_CONFIRMED'
+  | 'TRANSACTION_UPDATE' | 'SYSTEM_ALERT';
+
 async function createNotification(
   userId: string,
   title: string,
   message: string,
-  type: 'INFO' | 'SUCCESS' | 'WARNING' | 'ERROR' | 'RFQ_CREATED' | 'QUOTE_RECEIVED' | 'TRANSACTION_UPDATE' | 'SYSTEM_ALERT',
+  type: NotifType,
   data?: Record<string, unknown>
 ) {
   try {
@@ -65,6 +76,7 @@ async function findMatchedSuppliers(rfqCategory: string, rfqLocation: string | n
       company: true,
       location: true,
       isVerified: true,
+      trustScore: true,
       preferences: true,
       quotes: {
         select: {
@@ -113,6 +125,9 @@ async function findMatchedSuppliers(rfqCategory: string, rfqLocation: string | n
       q => q.rfq.category.toLowerCase() === rfqCategory.toLowerCase()
     );
     if (hasCategory) score += 2;
+
+    // +2: high trust score (≥ 70) — proven quality supplier
+    if ((s.trustScore ?? 0) >= 70) score += 2;
 
     // +1: verified
     if (s.isVerified) score += 1;
@@ -314,7 +329,7 @@ export async function onQuoteSubmitted(quote: {
   );
 }
 
-// ─── Event: Quote Accepted — includes deal lock + auto message ───────────────
+// ─── Event: Quote Accepted — deal lock, ACCEPTED status, deal confirmation ────
 
 export async function onQuoteAccepted(quote: {
   id: string;
@@ -331,20 +346,30 @@ export async function onQuoteAccepted(quote: {
   name: string | null;
 }) {
   const buyerLabel = buyer.name || 'The buyer';
+  const now = new Date();
+  const confirmBy = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // 7 days from now
 
-  // 1. Lock the RFQ — mark as COMPLETED, reject all other PENDING quotes
-  await prisma.rFQ.update({
-    where: { id: rfq.id },
-    data: { status: 'COMPLETED' },
-  }).catch(err => console.error('[Orchestration] RFQ lock failed:', err));
+  // 1. Lock the RFQ — mark as ACCEPTED (not COMPLETED — buyer must confirm later)
+  //    Also reject all remaining PENDING quotes on this RFQ
+  await Promise.allSettled([
+    prisma.rFQ.update({
+      where: { id: rfq.id },
+      data: { status: 'ACCEPTED', acceptedAt: now },
+    }),
+    prisma.quote.updateMany({
+      where: { rfqId: rfq.id, id: { not: quote.id }, status: 'PENDING' },
+      data: { status: 'REJECTED' },
+    }),
+  ]).catch(err => console.error('[Orchestration] RFQ lock failed:', err));
 
-  await prisma.quote.updateMany({
-    where: { rfqId: rfq.id, id: { not: quote.id }, status: 'PENDING' },
-    data: { status: 'REJECTED' },
-  }).catch(err => console.error('[Orchestration] Bulk reject failed:', err));
+  // 2. Bump supplier trust score (+5 for winning a deal)
+  prisma.user.update({
+    where: { id: supplier.id },
+    data: { trustScore: { increment: 5 } },
+  }).catch(err => console.warn('[Orchestration] Trust score update failed:', err));
 
-  // 2. Auto-create opening message thread
-  await prisma.message.create({
+  // 3. Auto-create opening message thread
+  prisma.message.create({
     data: {
       fromId: buyer.id,
       toId: supplier.id,
@@ -354,25 +379,49 @@ export async function onQuoteAccepted(quote: {
     },
   }).catch(err => console.error('[Orchestration] Auto-message failed:', err));
 
-  // 3. Notify supplier
+  // 4. Notify supplier
   await createNotification(
     supplier.id,
     '🎉 Your Quote Was Accepted!',
-    `${buyerLabel} accepted your quote of ₹${quote.price.toLocaleString('en-IN')} for "${rfq.title}". Deal closed!`,
-    'SUCCESS',
+    `${buyerLabel} accepted your quote of ₹${quote.price.toLocaleString('en-IN')} for "${rfq.title}". Deal locked — coordinate delivery via messages.`,
+    'QUOTE_ACCEPTED',
     { rfqId: rfq.id, quoteId: quote.id }
   );
 
-  // 4. Confirm to buyer
+  // 5. Confirm to buyer + schedule 7-day deal-check notification
   await createNotification(
     buyer.id,
-    '✅ Deal Confirmed',
-    `You accepted the quote for "${rfq.title}". A message thread has been opened.`,
-    'SUCCESS',
-    { rfqId: rfq.id, quoteId: quote.id }
+    '✅ Deal Locked — Quote Accepted',
+    `You accepted the quote for "${rfq.title}". A message thread has been opened. Please confirm completion within 7 days.`,
+    'QUOTE_ACCEPTED',
+    { rfqId: rfq.id, quoteId: quote.id, confirmBy: confirmBy.toISOString() }
   );
 
-  // 5. Email supplier
+  // 6. Schedule deal-check reminder (creates the notification now; n8n will deliver it at 7 days)
+  await createNotification(
+    buyer.id,
+    '❓ Was the Deal Completed?',
+    `7 days ago you accepted a quote for "${rfq.title}". Was the deal completed? Please confirm at bell24h.com/rfq/${rfq.id}/complete`,
+    'DEAL_CHECK',
+    { rfqId: rfq.id, quoteId: quote.id, scheduledFor: confirmBy.toISOString() }
+  );
+
+  // 7. n8n webhook — fires WhatsApp/email follow-ups via automation
+  safeN8N(() =>
+    n8nMarketing.notifyQuoteAccepted({
+      rfqId: rfq.id,
+      quoteId: quote.id,
+      rfqTitle: rfq.title,
+      supplierId: supplier.id,
+      supplierName: supplier.name || 'Supplier',
+      buyerId: buyer.id,
+      buyerName: buyer.name || 'Buyer',
+      amount: quote.price,
+      confirmBy: confirmBy.toISOString(),
+    })
+  );
+
+  // 8. Email supplier
   safeEmail(supplier.email, () =>
     resendService.sendEmail({
       to: supplier.email!,
@@ -401,6 +450,62 @@ export async function onQuoteAccepted(quote: {
           </div>
         </div>
       `,
+    })
+  );
+}
+
+// ─── Event: Deal Completed — buyer confirms ───────────────────────────────────
+
+export async function onDealCompleted(rfq: {
+  id: string;
+  title: string;
+}, supplier: {
+  id: string;
+  name: string | null;
+  email: string | null;
+}, buyer: {
+  id: string;
+  name: string | null;
+}) {
+  // 1. Mark RFQ as COMPLETED + set completedAt
+  await prisma.rFQ.update({
+    where: { id: rfq.id },
+    data: { status: 'COMPLETED', completedAt: new Date() },
+  }).catch(err => console.error('[Orchestration] Deal complete update failed:', err));
+
+  // 2. Boost supplier trust score further (+10 for completed deal)
+  prisma.user.update({
+    where: { id: supplier.id },
+    data: { trustScore: { increment: 10 } },
+  }).catch(err => console.warn('[Orchestration] Trust score complete update failed:', err));
+
+  // 3. Notify both parties
+  await Promise.allSettled([
+    createNotification(
+      supplier.id,
+      '🏆 Deal Confirmed Complete!',
+      `${buyer.name || 'The buyer'} confirmed that the deal for "${rfq.title}" is complete. Your trust score has been updated.`,
+      'DEAL_CONFIRMED',
+      { rfqId: rfq.id }
+    ),
+    createNotification(
+      buyer.id,
+      '✅ Deal Marked as Complete',
+      `Thank you for confirming. "${rfq.title}" is now marked complete.`,
+      'DEAL_CONFIRMED',
+      { rfqId: rfq.id }
+    ),
+  ]);
+
+  // 4. n8n webhook for deal completion
+  safeN8N(() =>
+    n8nMarketing.notifyDealCompleted({
+      rfqId: rfq.id,
+      rfqTitle: rfq.title,
+      supplierId: supplier.id,
+      supplierName: supplier.name || 'Supplier',
+      buyerId: buyer.id,
+      buyerName: buyer.name || 'Buyer',
     })
   );
 }

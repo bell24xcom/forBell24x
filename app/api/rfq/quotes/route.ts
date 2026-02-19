@@ -8,6 +8,8 @@
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { onQuoteAccepted, onQuoteRejected, checkDailyLimit } from '@/lib/orchestration';
+import { sanitizeString, sanitizeText, safePositiveFloat } from '@/lib/sanitize';
 
 export const dynamic = 'force-dynamic';
 
@@ -50,20 +52,50 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const { rfqId, supplierId, price, quantity, timeline, description, terms } = await req.json();
+    const body = await req.json();
+    const { rfqId, supplierId } = body;
 
-    if (!rfqId || !supplierId || price == null) {
+    if (!rfqId || !supplierId || body.price == null) {
       return NextResponse.json(
         { success: false, error: 'rfqId, supplierId, and price are required' },
         { status: 400 }
       );
     }
 
-    // Prevent duplicate quotes
+    const price = safePositiveFloat(body.price);
+    if (!price) {
+      return NextResponse.json(
+        { success: false, error: 'Price must be a positive number' },
+        { status: 400 }
+      );
+    }
+
+    // Rate limit: max 20 quotes per day per supplier
+    const limitCheck = await checkDailyLimit(supplierId, 'quote', 20);
+    if (!limitCheck.allowed) {
+      return NextResponse.json(
+        { success: false, error: `Daily quote limit reached (${limitCheck.count}/${limitCheck.limit}). Try again tomorrow.` },
+        { status: 429 }
+      );
+    }
+
+    // Prevent duplicate quotes (one per supplier per RFQ)
     const existing = await prisma.quote.findFirst({ where: { rfqId, supplierId } });
     if (existing) {
       return NextResponse.json(
-        { success: false, error: 'Quote already submitted for this RFQ' },
+        { success: false, error: 'You have already submitted a quote for this RFQ' },
+        { status: 409 }
+      );
+    }
+
+    // Verify RFQ is still open
+    const rfq = await prisma.rFQ.findUnique({ where: { id: rfqId }, select: { status: true } });
+    if (!rfq) {
+      return NextResponse.json({ success: false, error: 'RFQ not found' }, { status: 404 });
+    }
+    if (!['ACTIVE', 'QUOTED'].includes(rfq.status)) {
+      return NextResponse.json(
+        { success: false, error: `This RFQ is no longer accepting quotes (status: ${rfq.status})` },
         { status: 409 }
       );
     }
@@ -72,15 +104,21 @@ export async function POST(req: NextRequest) {
       data: {
         rfqId,
         supplierId,
-        price:       parseFloat(price),
-        quantity:    String(quantity || '1'),
-        timeline:    String(timeline || ''),
-        description: description || null,
-        terms:       terms       || null,
+        price,
+        quantity:    sanitizeString(String(body.quantity || '1'), 50),
+        timeline:    sanitizeString(String(body.timeline  || ''), 100),
+        description: sanitizeText(body.description, 1000) || null,
+        terms:       sanitizeText(body.terms,       500)  || null,
         status:      'PENDING',
       },
       include: { supplier: { select: SUPPLIER_SELECT } },
     });
+
+    // Update RFQ status to QUOTED (fire-and-forget)
+    prisma.rFQ.update({
+      where: { id: rfqId, status: 'ACTIVE' },
+      data:  { status: 'QUOTED' },
+    }).catch(() => {}); // ignore if already QUOTED
 
     return NextResponse.json({ success: true, quote });
   } catch (error) {
@@ -91,7 +129,7 @@ export async function POST(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   try {
-    const { quoteId, status } = await req.json();
+    const { quoteId, status, buyerId } = await req.json();
 
     if (!quoteId || !status) {
       return NextResponse.json(
@@ -108,18 +146,59 @@ export async function PUT(req: NextRequest) {
       );
     }
 
+    // Load quote with full context before updating
+    const quoteWithCtx = await prisma.quote.findUnique({
+      where: { id: quoteId },
+      include: {
+        rfq:      { select: { id: true, title: true, createdBy: true } },
+        supplier: { select: { id: true, name: true, email: true } },
+      },
+    });
+    if (!quoteWithCtx) {
+      return NextResponse.json({ success: false, error: 'Quote not found' }, { status: 404 });
+    }
+
     const quote = await prisma.quote.update({
       where: { id: quoteId },
       data:  { status, isAccepted: status === 'ACCEPTED' },
       include: { supplier: { select: SUPPLIER_SELECT } },
     });
 
-    // Accept one → reject all others on the same RFQ
+    // On ACCEPT: lock RFQ + reject all others + trigger orchestration
     if (status === 'ACCEPTED') {
-      await prisma.quote.updateMany({
-        where: { rfqId: quote.rfqId, id: { not: quoteId } },
-        data:  { status: 'REJECTED' },
-      });
+      await Promise.all([
+        prisma.quote.updateMany({
+          where: { rfqId: quote.rfqId, id: { not: quoteId } },
+          data:  { status: 'REJECTED' },
+        }),
+        prisma.rFQ.update({
+          where: { id: quote.rfqId },
+          data:  { status: 'ACCEPTED', acceptedAt: new Date() },
+        }),
+      ]);
+
+      // Fire orchestration (fire-and-forget)
+      const effectiveBuyerId = buyerId || quoteWithCtx.rfq.createdBy;
+      Promise.all([
+        prisma.user.findUnique({ where: { id: effectiveBuyerId }, select: { id: true, name: true } }),
+      ]).then(([buyer]) => {
+        if (!buyer) return;
+        onQuoteAccepted(
+          { id: quoteWithCtx.id, price: quoteWithCtx.price },
+          { id: quoteWithCtx.rfq.id, title: quoteWithCtx.rfq.title },
+          quoteWithCtx.supplier,
+          { id: buyer.id, name: buyer.name }
+        );
+      }).catch(err => console.error('[Orchestration] quotes PUT accept:', err));
+    }
+
+    // On REJECT: fire rejection notification
+    if (status === 'REJECTED') {
+      onQuoteRejected(
+        { id: quoteWithCtx.id, price: quoteWithCtx.price },
+        { id: quoteWithCtx.rfq.id, title: quoteWithCtx.rfq.title },
+        quoteWithCtx.supplier
+      ).catch(err => console.error('[Orchestration] quotes PUT reject:', err));
     }
 
     return NextResponse.json({ success: true, quote });
