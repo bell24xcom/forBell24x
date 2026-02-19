@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { aiClient } from '@/lib/ai-client';
+import { prisma } from '@/lib/prisma';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
@@ -61,51 +62,47 @@ export async function POST(request: NextRequest) {
     // Get text content from any source
     const textContent = rfqData.text || rfqData.audioTranscript || rfqData.videoTranscript || '';
     
-    // Mock supplier database (in production, this would be from your database)
-    const suppliers: SupplierProfile[] = [
-      {
-        id: '1',
-        name: 'TechCorp Solutions',
-        category: 'Electronics',
-        location: 'Mumbai',
-        rating: 4.8,
-        gstVerified: true,
-        responseTime: 2,
-        priceRange: { min: 10000, max: 500000 },
-        capabilities: ['Electronics', 'Automation', 'IoT'],
-        trustScore: 0.92,
-        previousOrders: 156,
-        successRate: 0.98
+    // Fetch real suppliers from DB, ordered by trust score descending (performance-driven routing)
+    const dbSuppliers = await prisma.user.findMany({
+      where: { role: 'SUPPLIER', isActive: true },
+      take: 50,
+      orderBy: { trustScore: 'desc' },
+      select: {
+        id: true, name: true, location: true, gstNumber: true,
+        udyamNumber: true, trustScore: true, company: true,
+        preferences: true, isVerified: true,
+        _count: { select: { quotes: true } },
       },
-      {
-        id: '2',
-        name: 'SteelWorks Industries',
-        category: 'Steel & Metals',
-        location: 'Delhi',
-        rating: 4.6,
-        gstVerified: true,
-        responseTime: 4,
-        priceRange: { min: 5000, max: 200000 },
-        capabilities: ['Steel', 'Metals', 'Fabrication'],
-        trustScore: 0.89,
-        previousOrders: 89,
-        successRate: 0.95
-      },
-      {
-        id: '3',
-        name: 'Textile Masters',
-        category: 'Textiles',
-        location: 'Ahmedabad',
-        rating: 4.7,
-        gstVerified: true,
-        responseTime: 3,
-        priceRange: { min: 2000, max: 100000 },
-        capabilities: ['Textiles', 'Fabric', 'Garments'],
-        trustScore: 0.91,
-        previousOrders: 203,
-        successRate: 0.97
-      }
-    ];
+    });
+
+    const suppliers: SupplierProfile[] = dbSuppliers.map(s => {
+      const prefs = (s.preferences as Record<string, unknown>) ?? {};
+      const categories = (prefs.categories as string[]) ?? [];
+      return {
+        id:             s.id,
+        name:           s.name || s.company || `Supplier ${s.id.slice(-4)}`,
+        category:       categories[0] ?? 'General',
+        location:       s.location ?? 'India',
+        rating:         3.5 + (s.trustScore / 100) * 1.5, // 3.5–5.0 scaled by trust
+        gstVerified:    !!(s.gstNumber),
+        responseTime:   s.trustScore > 70 ? 4 : 12,       // high-trust → faster response
+        priceRange:     { min: 1000, max: 5000000 },
+        capabilities:   categories.length > 0 ? categories : ['General Supply'],
+        // trust score: convert 0-100 integer → 0-1 float for matching algorithm
+        // high-trust suppliers get a bonus of up to +5 to match score (trustScore/20)
+        trustScore:     s.trustScore / 100,
+        previousOrders: s._count.quotes,
+        successRate:    s.isVerified ? 0.90 : 0.70,       // verified KYC → higher success rate
+      };
+    });
+
+    // Fallback: if no real suppliers yet, use a placeholder so the algorithm doesn't crash
+    if (suppliers.length === 0) {
+      return NextResponse.json({
+        success: false,
+        error: 'No active suppliers available for matching. Onboard suppliers first.',
+      }, { status: 404 });
+    }
 
     // AI Matching Algorithm
     const matchingResults = await performAIMatching(rfqData, suppliers, textContent);
