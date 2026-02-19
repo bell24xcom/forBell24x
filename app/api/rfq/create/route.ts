@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { verifyToken } from '@/lib/jwt';
+import { onRFQCreated, checkDailyLimit } from '@/lib/orchestration';
 
 const prisma = new PrismaClient();
 
@@ -39,6 +40,15 @@ export async function POST(request: NextRequest) {
 
     const userId = payload.userId;
 
+    // Rate limit: max 10 RFQs per buyer per day
+    const limitCheck = await checkDailyLimit(userId, 'rfq', 10);
+    if (!limitCheck.allowed) {
+      return NextResponse.json(
+        { success: false, error: `Daily RFQ limit reached (${limitCheck.count}/${limitCheck.limit}). Try again tomorrow.` },
+        { status: 429 }
+      );
+    }
+
     // Compute derived fields
     const tags = extractTags(rfqData.title, rfqData.description || '');
     const expiresAt = calculateExpiryDate(rfqData.timeline || '30 days');
@@ -76,6 +86,17 @@ export async function POST(request: NextRequest) {
         createdBy: userId,
       },
     });
+
+    // Fire orchestration in background — never blocks the response
+    const buyer = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, name: true, email: true },
+    }).catch(() => null);
+
+    onRFQCreated(
+      { id: rfq.id, title: rfq.title, category: rfq.category, location: rfq.location },
+      { id: userId, name: buyer?.name ?? null, email: buyer?.email ?? null }
+    ).catch(err => console.error('[Orchestration] onRFQCreated error:', err));
 
     return NextResponse.json({
       success: true,

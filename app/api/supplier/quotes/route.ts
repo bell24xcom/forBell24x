@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { verifyToken } from '@/lib/jwt';
+import { onQuoteSubmitted, checkDailyLimit } from '@/lib/orchestration';
 
 const prisma = new PrismaClient();
 
@@ -91,6 +92,16 @@ export async function POST(request: NextRequest) {
     }
 
     const supplierId = payload.userId;
+
+    // Rate limit: max 20 quotes per supplier per day
+    const limitCheck = await checkDailyLimit(supplierId, 'quote', 20);
+    if (!limitCheck.allowed) {
+      return NextResponse.json(
+        { success: false, error: `Daily quote limit reached (${limitCheck.count}/${limitCheck.limit}). Try again tomorrow.` },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const { rfqId, price, quantity, timeline, description, terms } = body;
 
@@ -133,9 +144,23 @@ export async function POST(request: NextRequest) {
         status: 'PENDING',
       },
       include: {
-        rfq: { select: { title: true } },
+        rfq: { select: { id: true, title: true, createdBy: true } },
       },
     });
+
+    // Fire orchestration in background
+    Promise.all([
+      prisma.user.findUnique({ where: { id: supplierId }, select: { id: true, name: true, company: true, email: true } }),
+      prisma.user.findUnique({ where: { id: quote.rfq.createdBy }, select: { id: true, name: true, email: true } }),
+    ]).then(([supplier, buyer]) => {
+      if (!supplier || !buyer) return;
+      onQuoteSubmitted(
+        { id: quote.id, price: quote.price, timeline: quote.timeline },
+        { id: quote.rfq.id, title: quote.rfq.title, createdBy: quote.rfq.createdBy },
+        { id: supplier.id, name: supplier.name, company: supplier.company, email: supplier.email },
+        { id: buyer.id, name: buyer.name, email: buyer.email }
+      );
+    }).catch(err => console.error('[Orchestration] onQuoteSubmitted error:', err));
 
     return NextResponse.json({ success: true, quote }, { status: 201 });
   } catch (error) {
