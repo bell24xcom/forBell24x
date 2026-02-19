@@ -15,16 +15,22 @@ interface SendEmailParams {
 }
 
 class ResendService {
-  private resend: Resend;
   private config: ResendConfig;
+  // Lazy — only created when a key is available, so module import never throws
+  private _client: Resend | null = null;
 
   constructor() {
     this.config = {
       apiKey: process.env.RESEND_API_KEY || '',
-      fromEmail: process.env.FROM_EMAIL || 'noreply@bell24h.com'
+      fromEmail: process.env.FROM_EMAIL || 'noreply@bell24h.com',
     };
+  }
 
-    this.resend = new Resend(this.config.apiKey);
+  /** Returns the Resend client, or null if no API key is configured */
+  private get client(): Resend | null {
+    if (!this.config.apiKey) return null;
+    if (!this._client) this._client = new Resend(this.config.apiKey);
+    return this._client;
   }
 
   async sendEmail({ 
@@ -58,7 +64,7 @@ class ResendService {
         }
       }
 
-      const result = await this.resend.emails.send({
+      const result = await this.client!.emails.send({
         from: from || this.config.fromEmail,
         to: recipients,
         subject,
