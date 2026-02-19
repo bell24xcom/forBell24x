@@ -1,149 +1,147 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
+import { requireAdmin, isErrorResponse } from '@/lib/admin-auth';
 
-const prisma = new PrismaClient();
-
-// Force dynamic rendering
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
-  try {
-    const now = new Date();
-    const last24Hours = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-    const last7Days = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  // Enforce admin auth
+  const auth = requireAdmin(req);
+  if (isErrorResponse(auth)) return auth;
 
-    // Fetch system monitoring data in parallel
+  try {
+    const now        = new Date();
+    const last24h    = new Date(now.getTime() - 24  * 60 * 60 * 1000);
+    const last7days  = new Date(now.getTime() -  7 * 24 * 60 * 60 * 1000);
+
     const [
-      totalUsers,
-      activeUsers,
-      totalRfqs,
-      activeRfqs,
-      totalTransactions,
-      completedTransactions,
-      systemErrors,
-      recentActivity,
-      performanceMetrics
+      totalUsers, activeUsers, newUsersToday, newUsersWeek,
+      totalRFQs, activeRFQs, rfqsToday, rfqsWeek,
+      acceptedRFQs, completedRFQs, cancelledRFQs,
+      totalQuotes, quotesToday, acceptedQuotes,
+      totalTx, completedTx,
+      pendingNotifications,
+      recentRFQs,
+      recentQuotes,
     ] = await Promise.all([
-      // User metrics
+      // Users
       prisma.user.count(),
       prisma.user.count({ where: { isActive: true } }),
-      
-      // RFQ metrics
-      prisma.rfq.count(),
-      prisma.rfq.count({ where: { status: 'ACTIVE' } }),
-      
-      // Transaction metrics
+      prisma.user.count({ where: { createdAt: { gte: last24h } } }),
+      prisma.user.count({ where: { createdAt: { gte: last7days } } }),
+
+      // RFQs
+      prisma.rFQ.count(),
+      prisma.rFQ.count({ where: { status: 'ACTIVE' } }),
+      prisma.rFQ.count({ where: { createdAt: { gte: last24h } } }),
+      prisma.rFQ.count({ where: { createdAt: { gte: last7days } } }),
+      prisma.rFQ.count({ where: { status: 'ACCEPTED' } }),
+      prisma.rFQ.count({ where: { status: 'COMPLETED' } }),
+      prisma.rFQ.count({ where: { status: 'CANCELLED' } }),
+
+      // Quotes
+      prisma.quote.count(),
+      prisma.quote.count({ where: { createdAt: { gte: last24h } } }),
+      prisma.quote.count({ where: { status: 'ACCEPTED' } }),
+
+      // Transactions
       prisma.transaction.count(),
       prisma.transaction.count({ where: { status: 'COMPLETED' } }),
-      
-      // System errors (mock data for now)
-      Promise.resolve(0), // No error tracking table yet
-      
-      // Recent activity
-      prisma.rfq.findMany({
-        where: {
-          createdAt: { gte: last24Hours }
-        },
+
+      // Unread notifications (system health proxy)
+      prisma.notification.count({ where: { isRead: false } }),
+
+      // Recent RFQ activity (last 24h)
+      prisma.rFQ.findMany({
+        where: { createdAt: { gte: last24h } },
         orderBy: { createdAt: 'desc' },
         take: 10,
         select: {
-          id: true,
-          title: true,
-          status: true,
+          id: true, title: true, status: true, category: true,
           createdAt: true,
-          buyer: {
-            select: {
-              name: true
-            }
-          }
-        }
+          user: { select: { name: true, company: true } },
+        },
       }),
-      
-      // Performance metrics (mock data)
-      Promise.resolve({
-        responseTime: 245, // ms
-        uptime: 99.9, // percentage
-        cpuUsage: 45.2, // percentage
-        memoryUsage: 67.8, // percentage
-        diskUsage: 23.4 // percentage
-      })
+
+      // Recent quotes (last 24h)
+      prisma.quote.findMany({
+        where: { createdAt: { gte: last24h } },
+        orderBy: { createdAt: 'desc' },
+        take: 10,
+        select: {
+          id: true, price: true, status: true, createdAt: true,
+          rfq:      { select: { title: true } },
+          supplier: { select: { name: true, company: true } },
+        },
+      }),
     ]);
 
-    // Calculate system health score
-    const transactionSuccessRate = totalTransactions > 0 ? (completedTransactions / totalTransactions) * 100 : 100;
-    const userActivityRate = totalUsers > 0 ? (activeUsers / totalUsers) * 100 : 100;
-    const systemHealth = Math.round(((transactionSuccessRate + userActivityRate + performanceMetrics.uptime) / 3) * 10) / 10;
-
-    // Calculate growth metrics
-    const userGrowth = await prisma.user.count({
-      where: {
-        createdAt: { gte: last7Days }
-      }
+    // Escrow / transaction volume
+    const volumeResult = await prisma.transaction.aggregate({
+      _sum: { amount: true },
+      where: { status: 'COMPLETED' },
     });
+    const completedVolume = Number(volumeResult._sum.amount ?? 0);
 
-    const rfqGrowth = await prisma.rfq.count({
-      where: {
-        createdAt: { gte: last7Days }
-      }
-    });
+    // Health score: weighted across key ratios
+    const rfqConversionRate = totalRFQs  > 0 ? (acceptedQuotes  / totalRFQs)  * 100 : 100;
+    const txSuccessRate     = totalTx    > 0 ? (completedTx     / totalTx)    * 100 : 100;
+    const userActivityRate  = totalUsers > 0 ? (activeUsers     / totalUsers) * 100 : 100;
+    const systemHealth      = Math.round(((rfqConversionRate + txSuccessRate + userActivityRate) / 3) * 10) / 10;
 
-    const monitoring = {
+    // Auto-alerts from real data
+    const alerts: Array<{ type: string; message: string; timestamp: string }> = [];
+    if (systemHealth < 80)        alerts.push({ type: 'warning',  message: 'System health below 80% — check conversion rates', timestamp: now.toISOString() });
+    if (cancelledRFQs > totalRFQs * 0.3) alerts.push({ type: 'warning',  message: 'High RFQ cancellation rate (>30%)', timestamp: now.toISOString() });
+    if (pendingNotifications > 500)       alerts.push({ type: 'info',     message: `${pendingNotifications} unread notifications pending`, timestamp: now.toISOString() });
+
+    return NextResponse.json({
+      success: true,
       systemHealth,
       metrics: {
         users: {
-          total: totalUsers,
-          active: activeUsers,
-          growth: userGrowth
+          total: totalUsers, active: activeUsers,
+          newToday: newUsersToday, newThisWeek: newUsersWeek,
         },
         rfqs: {
-          total: totalRfqs,
-          active: activeRfqs,
-          growth: rfqGrowth
+          total: totalRFQs, active: activeRFQs,
+          today: rfqsToday, thisWeek: rfqsWeek,
+          accepted: acceptedRFQs, completed: completedRFQs, cancelled: cancelledRFQs,
+        },
+        quotes: {
+          total: totalQuotes, today: quotesToday, accepted: acceptedQuotes,
+          conversionRate: rfqConversionRate.toFixed(1),
         },
         transactions: {
-          total: totalTransactions,
-          completed: completedTransactions,
-          successRate: Math.round(transactionSuccessRate * 10) / 10
+          total: totalTx, completed: completedTx,
+          completedVolume,
+          successRate: txSuccessRate.toFixed(1),
         },
-        errors: {
-          total: systemErrors,
-          last24Hours: 0 // Mock data
-        }
       },
-      performance: performanceMetrics,
-      recentActivity: recentActivity.map(activity => ({
-        ...activity,
-        type: 'rfq',
-        description: `New RFQ: ${activity.title}`,
-        user: activity.buyer.name,
-        timeAgo: Math.round((now.getTime() - activity.createdAt.getTime()) / (1000 * 60)) // minutes ago
-      })),
-      alerts: [
-        ...(systemHealth < 95 ? [{
-          type: 'warning',
-          message: 'System health is below optimal threshold',
-          timestamp: now.toISOString()
-        }] : []),
-        ...(performanceMetrics.responseTime > 500 ? [{
-          type: 'warning',
-          message: 'Response time is higher than expected',
-          timestamp: now.toISOString()
-        }] : []),
-        ...(performanceMetrics.memoryUsage > 80 ? [{
-          type: 'critical',
-          message: 'Memory usage is critically high',
-          timestamp: now.toISOString()
-        }] : [])
-      ],
-      lastUpdated: now.toISOString()
-    };
+      recentActivity: {
+        rfqs: recentRFQs.map(r => ({
+          id: r.id,
+          title: r.title,
+          status: r.status,
+          category: r.category,
+          buyer: r.user?.company || r.user?.name || 'Unknown',
+          minutesAgo: Math.round((now.getTime() - r.createdAt.getTime()) / 60000),
+        })),
+        quotes: recentQuotes.map(q => ({
+          id: q.id,
+          rfqTitle: q.rfq.title,
+          price: q.price,
+          status: q.status,
+          supplier: q.supplier.company || q.supplier.name || 'Unknown',
+          minutesAgo: Math.round((now.getTime() - q.createdAt.getTime()) / 60000),
+        })),
+      },
+      alerts,
+      lastUpdated: now.toISOString(),
+    });
 
-    return NextResponse.json(monitoring);
-    
   } catch (error) {
-    console.error('Error fetching monitoring data:', error);
-    return NextResponse.json({ 
-      error: 'Failed to fetch monitoring data' 
-    }, { status: 500 });
+    console.error('Admin monitoring error:', error);
+    return NextResponse.json({ success: false, error: 'Failed to fetch monitoring data' }, { status: 500 });
   }
 }

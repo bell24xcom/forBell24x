@@ -110,12 +110,14 @@ model RFQ {
   location    String?
   tags        String[]
   isPublic    Boolean  @default(true)
-  expiresAt   DateTime?
-  priority    Int      @default(3)
+  expiresAt      DateTime?
+  acceptedAt     DateTime?  // set when a quote is accepted (deal locked)
+  completedAt    DateTime?  // set when buyer confirms deal done
+  priority       Int       @default(3)
   estimatedValue Float?
-  views       Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  views          Int       @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   // Relations
   createdBy   String   @map("created_by")
@@ -278,9 +280,12 @@ enum RFQStatus {
   DRAFT
   ACTIVE
   QUOTED
-  COMPLETED
+  ACCEPTED        // quote accepted — deal locked, in-progress
+  IN_PROGRESS     // buyer confirmed work started
+  COMPLETED       // buyer confirmed deal done
   CANCELLED
   EXPIRED
+  CLOSED_EXTERNAL // deal completed outside platform (manual override)
 }
 
 enum RFQUrgency {
@@ -323,6 +328,9 @@ enum NotificationType {
   ERROR
   RFQ_CREATED
   QUOTE_RECEIVED
+  QUOTE_ACCEPTED
+  DEAL_CHECK      // 7-day follow-up: "Was this deal completed?"
+  DEAL_CONFIRMED  // buyer confirmed deal complete
   TRANSACTION_UPDATE
   SYSTEM_ALERT
 }
