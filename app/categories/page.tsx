@@ -1,12 +1,16 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { prisma } from '@/lib/prisma';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 300; // cache 5 minutes
 
 export const metadata: Metadata = {
   title: 'All Categories - Bell24h',
   description: 'Browse all B2B product and service categories on Bell24h marketplace',
 };
 
-const categories = [
+const FALLBACK_CATEGORIES = [
   { slug: 'textiles-garments', title: 'Textiles & Garments', icon: '👕', suppliers: 2400 },
   { slug: 'pharmaceuticals', title: 'Pharmaceuticals', icon: '💊', suppliers: 1800 },
   { slug: 'agricultural-products', title: 'Agricultural Products', icon: '🌾', suppliers: 3200 },
@@ -28,14 +32,46 @@ const categories = [
   { slug: 'leather', title: 'Leather', icon: '👜', suppliers: 1600 },
 ];
 
-export default function CategoriesPage() {
+type DisplayCategory = {
+  slug: string;
+  title: string;
+  icon: string;
+  suppliers: number;
+};
+
+async function getCategories(): Promise<DisplayCategory[]> {
+  try {
+    const dbCategories = await prisma.category.findMany({
+      where: { isActive: true },
+      orderBy: { sortOrder: 'asc' },
+      select: { slug: true, name: true, icon: true, _count: { select: { rfqs: true } } },
+    });
+
+    if (dbCategories.length > 0) {
+      return dbCategories.map(c => ({
+        slug: c.slug,
+        title: c.name,
+        icon: c.icon || '📦',
+        suppliers: c._count.rfqs, // use RFQ count as activity proxy until supplierCount column exists
+      }));
+    }
+  } catch {
+    // DB unavailable — fall through to hardcoded
+  }
+
+  return FALLBACK_CATEGORIES;
+}
+
+export default async function CategoriesPage() {
+  const categories = await getCategories();
+
   return (
     <div className="min-h-screen bg-[var(--bg-primary)]">
       <div className="max-w-6xl mx-auto px-4 py-12">
         <div className="text-center mb-10">
           <h1 className="text-3xl font-bold text-white mb-3">All Categories</h1>
           <p className="text-slate-400 max-w-2xl mx-auto">
-            Browse 450+ product and service categories. Find verified suppliers across India.
+            Browse {categories.length < 30 ? '450+' : `${categories.length}+`} product and service categories. Find verified suppliers across India.
           </p>
         </div>
 
@@ -51,7 +87,7 @@ export default function CategoriesPage() {
                 {cat.title}
               </h3>
               <p className="text-slate-500 text-sm mt-1">
-                {cat.suppliers.toLocaleString()}+ suppliers
+                {cat.suppliers > 0 ? `${cat.suppliers.toLocaleString()}+ suppliers` : 'Suppliers joining'}
               </p>
             </Link>
           ))}

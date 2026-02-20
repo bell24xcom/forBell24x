@@ -1,6 +1,13 @@
-import { NextAuthOptions } from 'next-auth'
-import CredentialsProvider from 'next-auth/providers/credentials'
-import bcrypt from 'bcryptjs'
+/**
+ * LEGACY STUB — Bell24h uses OTP + JWT auth, NOT NextAuth credentials.
+ * Real auth: /api/auth/otp/send → /api/auth/otp/verify → JWT cookie (auth-token)
+ * Admin auth: /api/admin/login → JWT cookie (admin-token)
+ *
+ * This file is kept only for backward compatibility with any NextAuth imports.
+ * Do NOT add real credentials here.
+ */
+import { NextAuthOptions } from 'next-auth';
+import CredentialsProvider from 'next-auth/providers/credentials';
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -8,52 +15,30 @@ export const authOptions: NextAuthOptions = {
       name: 'credentials',
       credentials: {
         email: { label: 'Email', type: 'email' },
-        password: { label: 'Password', type: 'password' }
+        password: { label: 'Password', type: 'password' },
       },
-      async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          return null
-        }
-
-        // Mock user for now - in production, fetch from database
-        const mockUser = {
-          id: '1',
-          email: credentials.email,
-          name: 'John Doe',
-          role: 'buyer'
-        }
-
-        // Mock password check - in production, verify against database
-        const isValidPassword = credentials.password === 'password123'
-
-        if (isValidPassword) {
-          return mockUser
-        }
-
-        return null
-      }
-    })
+      async authorize() {
+        // NextAuth credentials login is disabled.
+        // Use OTP auth: POST /api/auth/otp/send + /api/auth/otp/verify
+        return null;
+      },
+    }),
   ],
   pages: {
     signIn: '/auth/login',
-    signUp: '/auth/register'
   },
   callbacks: {
     async jwt({ token, user }) {
-      if (user) {
-        token.role = user.role
-      }
-      return token
+      if (user) token.role = (user as { role?: string }).role;
+      return token;
     },
     async session({ session, token }) {
       if (token) {
-        session.user.id = token.sub
-        session.user.role = token.role
+        (session.user as { id?: string }).id = token.sub;
+        (session.user as { role?: unknown }).role = token.role;
       }
-      return session
-    }
+      return session;
+    },
   },
-  session: {
-    strategy: 'jwt'
-  }
-}
+  session: { strategy: 'jwt' },
+};

@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { verifyToken } from '@/lib/jwt';
 import { aiClient } from '@/lib/ai-client';
 import { onQuoteAccepted, onQuoteRejected, onCounterOffer } from '@/lib/orchestration';
-
-const prisma = new PrismaClient();
 
 export const dynamic = 'force-dynamic';
 

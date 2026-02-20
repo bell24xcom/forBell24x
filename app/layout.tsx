@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import LaunchBanner from '@/components/LaunchBanner'
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.bell24h.com'),
@@ -52,6 +53,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body className="font-sans bg-[#0F172A] text-white antialiased">
+        {process.env.NEXT_PUBLIC_LAUNCH_MODE === 'true' && <LaunchBanner />}
         <Header />
         <main className="min-h-screen">
           {children}
