@@ -41,42 +41,50 @@ function logWarning(message) {
   log(`⚠️  ${message}`, 'yellow');
 }
 
-// Your actual credentials
+// Credentials loaded from environment variables - NEVER hardcode secrets here
 const CREDENTIALS = {
   // Database (Neon)
-  DATABASE_URL: 'postgresql://neondb_owner:npg_0Duqdxs3RoyA@ep-super-wind-a1c1ni4n-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require',
-  
+  DATABASE_URL: process.env.DATABASE_URL || '',
+
   // JWT for mobile OTP (not NextAuth)
-  JWT_SECRET: 'bell24h-jwt-secret-key-2024-production-32chars',
-  JWT_EXPIRY: '30d',
-  
+  JWT_SECRET: process.env.JWT_SECRET || '',
+  JWT_EXPIRY: process.env.JWT_EXPIRY || '30d',
+
   // MSG91 for OTP
-  MSG91_AUTH_KEY: '468517Ak5rJ0vb7NDV68c24863P1',
-  MSG91_SENDER_ID: 'BELL24H',
-  MSG91_TEMPLATE_ID: 'your_template_id',
-  
-  // Razorpay (Live credentials)
-  RAZORPAY_KEY_ID: 'rzp_live_RJjxcgaBo9j0QUA',
-  RAZORPAY_KEY_SECRET: 'lwTxLReQSKVL7lbrr39XSoyG',
-  
+  MSG91_AUTH_KEY: process.env.MSG91_AUTH_KEY || '',
+  MSG91_SENDER_ID: process.env.MSG91_SENDER_ID || 'BELL24H',
+  MSG91_TEMPLATE_ID: process.env.MSG91_TEMPLATE_ID || '',
+
+  // Razorpay
+  RAZORPAY_KEY_ID: process.env.RAZORPAY_KEY_ID || '',
+  RAZORPAY_KEY_SECRET: process.env.RAZORPAY_KEY_SECRET || '',
+
   // Cloudinary
-  CLOUDINARY_URL: 'cloudinary://691544893118315:a874-WX7GJIz6edvOJXL-jSehG8@dxcuwmjcd',
-  CLOUDINARY_CLOUD_NAME: 'dxcuwmjcd',
-  CLOUDINARY_API_KEY: '691544893118315',
-  CLOUDINARY_API_SECRET: 'a874-WX7GJIz6edvOJXL-jSehG8',
-  
+  CLOUDINARY_URL: process.env.CLOUDINARY_URL || '',
+  CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME || '',
+  CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY || '',
+  CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET || '',
+
   // Resend (Email)
-  RESEND_API_KEY: 're_KAbHFXwi_oKERiaUEfECscs83UxGrr59p',
-  RESEND_WEBHOOK_SECRET: 'whsec_bx+f2GI8/f67BXfoMfL3Jj4Ealo8TOEq',
-  
+  RESEND_API_KEY: process.env.RESEND_API_KEY || '',
+  RESEND_WEBHOOK_SECRET: process.env.RESEND_WEBHOOK_SECRET || '',
+
   // App URLs
-  NEXTAUTH_URL: 'https://www.bell24h.com',
-  APP_URL: 'https://www.bell24h.com',
-  
+  NEXTAUTH_URL: process.env.NEXTAUTH_URL || 'https://www.bell24h.com',
+  APP_URL: process.env.APP_URL || 'https://www.bell24h.com',
+
   // Environment
-  NODE_ENV: 'production',
-  VERCEL: '1'
+  NODE_ENV: process.env.NODE_ENV || 'production',
+  VERCEL: process.env.VERCEL || '1'
 };
+
+// Validate required credentials are set
+const requiredKeys = ['DATABASE_URL', 'JWT_SECRET', 'MSG91_AUTH_KEY', 'RAZORPAY_KEY_ID', 'RAZORPAY_KEY_SECRET'];
+const missingKeys = requiredKeys.filter(key => !CREDENTIALS[key]);
+if (missingKeys.length > 0) {
+  logWarning(`Missing required environment variables: ${missingKeys.join(', ')}`);
+  logWarning('Please set these in your .env.production file or environment before deploying.');
+}
 
 // Create production environment file with your credentials
 function createProductionEnvironment() {

@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-<<<<<<< HEAD
 // Mobile OTP Verification API
 // Verifies OTP and creates user session
 export async function POST(request: NextRequest) {
   try {
     const { phoneNumber, otp } = await request.json();
 
-    console.log(`🔐 Verifying OTP for: ${phoneNumber}`);
+    console.log(`Verifying OTP for: ${phoneNumber}`);
 
     // Validate inputs
     if (!phoneNumber || !otp) {
@@ -40,7 +39,7 @@ export async function POST(request: NextRequest) {
     // Generate session token (in production, use JWT)
     const sessionToken = generateSessionToken(user);
 
-    console.log(`✅ OTP verified successfully for ${phoneNumber}`);
+    console.log(`OTP verified successfully for ${phoneNumber}`);
 
     return NextResponse.json({
       success: true,
@@ -62,10 +61,10 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('❌ Verify OTP Error:', error);
+    console.error('Verify OTP Error:', error);
     return NextResponse.json(
-      { 
-        success: false, 
+      {
+        success: false,
         error: 'Internal server error',
         details: error instanceof Error ? error.message : 'Unknown error'
       },
@@ -77,9 +76,8 @@ export async function POST(request: NextRequest) {
 // Verify OTP (mock implementation - replace with Redis/database check)
 async function verifyOTP(phoneNumber: string, otp: string): Promise<boolean> {
   // In production, this would check against stored OTP in Redis/database
-  // For now, accept any 6-digit OTP for testing
-  console.log(`🔍 Verifying OTP: ${otp} for ${phoneNumber}`);
-  
+  console.log(`Verifying OTP: ${otp} for ${phoneNumber}`);
+
   // Mock verification - accept if OTP is 6 digits
   return /^\d{6}$/.test(otp);
 }
@@ -88,9 +86,9 @@ async function verifyOTP(phoneNumber: string, otp: string): Promise<boolean> {
 async function createOrGetUser(phoneNumber: string) {
   // In production, this would integrate with your Prisma database
   // For now, return mock user data
-  
+
   const userId = `user_${Date.now()}`;
-  
+
   return {
     id: userId,
     phoneNumber: phoneNumber,
@@ -104,7 +102,7 @@ async function createOrGetUser(phoneNumber: string) {
 }
 
 // Generate session token (mock implementation)
-function generateSessionToken(user: any): string {
+function generateSessionToken(user: { id: string; phoneNumber: string; role: string }): string {
   // In production, use JWT or similar secure token
   const tokenData = {
     userId: user.id,
@@ -112,13 +110,13 @@ function generateSessionToken(user: any): string {
     role: user.role,
     timestamp: Date.now()
   };
-  
+
   // Simple base64 encoding (use JWT in production)
   return Buffer.from(JSON.stringify(tokenData)).toString('base64');
 }
 
 // GET endpoint for testing
-export async function GET(request: NextRequest) {
+export async function GET() {
   return NextResponse.json({
     success: true,
     message: 'Mobile OTP Verification System Status',
@@ -133,21 +131,5 @@ export async function GET(request: NextRequest) {
         'Role-based access'
       ]
     }
-=======
-export async function POST(req: NextRequest) {
-  const { mobile, otp } = await req.json();
-  if (!mobile || !otp) {
-    return NextResponse.json({ success: false, message: 'Mobile & OTP required' }, { status: 400 });
-  }
-  // TODO: Integrate with MSG91 for real verification
-  return NextResponse.json({
-    success: true,
-    token: 'demo-jwt',
-    user: {
-      mobile,
-      name: 'Demo User',
-      role: 'buyer',
-    },
->>>>>>> b7b4b9c6cd126094e89116e18b3dbb247f1e8e4d
   });
 }
