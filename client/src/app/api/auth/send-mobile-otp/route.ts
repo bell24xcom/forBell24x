@@ -112,9 +112,16 @@ async function checkExistingUser(phoneNumber: string) {
 // Send OTP via MSG91 API (Cost-effective method)
 async function sendOTPviaMSG91(phoneNumber: string, otp: string) {
   try {
-    const msg91AuthKey = process.env.MSG91_AUTH_KEY || '468517Ak5rJ0vb7NDV68c24863P1';
+    const msg91AuthKey = process.env.MSG91_AUTH_KEY;
     const senderId = process.env.MSG91_SENDER_ID || 'BELL24H';
-    
+
+    if (!msg91AuthKey) {
+      return {
+        success: false,
+        error: 'MSG91_AUTH_KEY environment variable is not configured'
+      };
+    }
+
     // Format phone number for MSG91 (add +91 if not present)
     let formattedNumber = phoneNumber;
     if (!phoneNumber.startsWith('+91')) {

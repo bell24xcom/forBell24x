@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { authLogger } from '@/lib/logger';
+import { errorLogger } from '@/lib/errorLogger';
 
 export const dynamic = 'force-dynamic';
 
@@ -76,6 +77,7 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     authLogger.error('Send OTP error', { error });
+    errorLogger.critical(error, { route: '/api/auth/otp/send', meta: {} });
     return NextResponse.json(
       { success: false, message: 'Internal server error' },
       { status: 500 }
