@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function AdminLoginPage() {
+function AdminLoginForm() {
   const [email,    setEmail]    = useState('');
   const [password, setPassword] = useState('');
   const [loading,  setLoading]  = useState(false);
@@ -86,5 +86,13 @@ export default function AdminLoginPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function AdminLoginPage() {
+  return (
+    <Suspense>
+      <AdminLoginForm />
+    </Suspense>
   );
 }

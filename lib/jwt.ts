@@ -4,8 +4,28 @@
  */
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'bell24h_jwt_secret_change_in_production';
-const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'bell24h_refresh_secret_change_in_production';
+// In production, JWT_SECRET must be set explicitly — never use the fallback.
+const JWT_SECRET = (() => {
+  const s = process.env.JWT_SECRET;
+  if (!s || s === 'bell24h_jwt_secret_change_in_production') {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('[JWT] JWT_SECRET env var is not set. Set it in Vercel → Settings → Environment Variables.');
+    }
+    return 'dev_only_jwt_secret_not_for_production';
+  }
+  return s;
+})();
+
+const JWT_REFRESH_SECRET = (() => {
+  const s = process.env.JWT_REFRESH_SECRET;
+  if (!s || s === 'bell24h_refresh_secret_change_in_production') {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('[JWT] JWT_REFRESH_SECRET env var is not set. Set it in Vercel → Settings → Environment Variables.');
+    }
+    return 'dev_only_refresh_secret_not_for_production';
+  }
+  return s;
+})();
 
 export interface TokenPayload {
   userId: string;

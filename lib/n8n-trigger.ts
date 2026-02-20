@@ -7,18 +7,17 @@ export class N8NMarketing {
     this.webhookPath = 'bell24h-events';
   }
 
-  private async sendToN8N(eventType: string, data: any) {
+  private async sendToN8N(eventType: string, data: unknown) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000); // 5s timeout
     try {
       const response = await fetch(`${this.baseUrl}${this.webhookPath}`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          event: eventType,
-          data: data,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ event: eventType, data }),
+        signal: controller.signal,
       });
+      clearTimeout(timeout);
 
       if (!response.ok) {
         throw new Error(`N8N webhook failed: ${response.status}`);
@@ -26,6 +25,7 @@ export class N8NMarketing {
 
       return await response.json();
     } catch (error) {
+      clearTimeout(timeout);
       console.error('N8N webhook error:', error);
       throw error;
     }
@@ -108,6 +108,37 @@ export class N8NMarketing {
       supplierId: data.supplierId,
       supplierName: data.supplierName,
       amount: data.amount,
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  async notifyQuoteAccepted(data: {
+    rfqId: string;
+    quoteId: string;
+    rfqTitle: string;
+    supplierId: string;
+    supplierName: string;
+    buyerId: string;
+    buyerName: string;
+    amount: number;
+    confirmBy: string; // ISO date — 7 days from now
+  }) {
+    return this.sendToN8N('quote_accepted', {
+      ...data,
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  async notifyDealCompleted(data: {
+    rfqId: string;
+    rfqTitle: string;
+    supplierId: string;
+    supplierName: string;
+    buyerId: string;
+    buyerName: string;
+  }) {
+    return this.sendToN8N('deal_completed', {
+      ...data,
       timestamp: new Date().toISOString(),
     });
   }

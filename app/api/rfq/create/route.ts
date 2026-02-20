@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { verifyToken } from '@/lib/jwt';
 import { onRFQCreated, checkDailyLimit } from '@/lib/orchestration';
-
-const prisma = new PrismaClient();
+import { sanitizeString, sanitizeText, safePositiveFloat } from '@/lib/sanitize';
 
 export const dynamic = 'force-dynamic';
 
@@ -49,10 +48,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Sanitize all string inputs
+    const title        = sanitizeString(rfqData.title, 200);
+    const description  = sanitizeText(rfqData.description, 2000);
+    const category     = sanitizeString(rfqData.category, 100);
+    const requirements = sanitizeText(rfqData.requirements, 3000);
+    const location     = sanitizeString(rfqData.location || 'India', 100);
+    const unit         = sanitizeString(rfqData.unit || 'units', 50);
+    const timeline     = sanitizeString(rfqData.timeline || '30 days', 100);
+
+    if (!title || !category) {
+      return NextResponse.json(
+        { success: false, error: 'Title and category are required' },
+        { status: 400 }
+      );
+    }
+
     // Compute derived fields
-    const tags = extractTags(rfqData.title, rfqData.description || '');
-    const expiresAt = calculateExpiryDate(rfqData.timeline || '30 days');
-    const priority = calculatePriority(rfqData.urgency || 'normal', rfqData.timeline || '');
+    const tags           = extractTags(title, description);
+    const expiresAt      = calculateExpiryDate(timeline);
+    const priority       = calculatePriority(rfqData.urgency || 'normal', timeline);
+    const minBudget      = safePositiveFloat(rfqData.minBudget);
+    const maxBudget      = safePositiveFloat(rfqData.maxBudget);
     const estimatedValue = calculateEstimatedValue(
       String(rfqData.minBudget || 0),
       String(rfqData.maxBudget || 0)
@@ -66,18 +83,18 @@ export async function POST(request: NextRequest) {
     // Save to database
     const rfq = await prisma.rFQ.create({
       data: {
-        title: rfqData.title,
-        description: rfqData.description || '',
-        category: rfqData.category,
-        quantity: String(rfqData.quantity || '1'),
-        unit: rfqData.unit || 'units',
-        minBudget: rfqData.minBudget ? parseFloat(rfqData.minBudget) : null,
-        maxBudget: rfqData.maxBudget ? parseFloat(rfqData.maxBudget) : null,
-        timeline: rfqData.timeline || '30 days',
-        requirements: rfqData.requirements || '',
+        title,
+        description,
+        category,
+        quantity: sanitizeString(String(rfqData.quantity || '1'), 50),
+        unit,
+        minBudget,
+        maxBudget,
+        timeline,
+        requirements,
         urgency,
         status: 'ACTIVE',
-        location: rfqData.location || 'India',
+        location,
         tags,
         isPublic: true,
         expiresAt,
