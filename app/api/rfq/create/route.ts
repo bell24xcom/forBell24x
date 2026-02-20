@@ -132,6 +132,8 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error creating RFQ:', error);
+    const { errorLogger } = await import('@/lib/errorLogger');
+    errorLogger.critical(error, { route: '/api/rfq/create' });
     return NextResponse.json(
       { success: false, error: 'Failed to create RFQ' },
       { status: 500 }
