@@ -36,8 +36,8 @@ export default function PhoneOTPModal({ isOpen, onClose, onSuccess }: PhoneOTPMo
       const data = await response.json();
       
       if (data.success) {
+        if (data.devOtp) setDemoOTP(data.devOtp);
         setStep('phoneOtp');
-        console.log('Demo OTP:', data.demoOTP);
       } else {
         setError(data.error || 'Failed to send OTP');
       }
@@ -90,8 +90,8 @@ export default function PhoneOTPModal({ isOpen, onClose, onSuccess }: PhoneOTPMo
       const data = await response.json();
       
       if (data.success) {
+        if (data.devOtp) setDemoOTP(data.devOtp);
         setStep('emailOtp');
-        console.log('Demo OTP:', data.demoOTP);
       } else {
         setError(data.error || 'Failed to send OTP');
       }
@@ -271,7 +271,7 @@ function PhoneInput({ onPhoneSubmit, loading }: { onPhoneSubmit: (phone: string,
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (phone.length >= 10) {
-      onPhoneSubmit(phone, '123456'); // Demo OTP
+      onPhoneSubmit(phone);
     }
   };
 
@@ -383,7 +383,7 @@ function EmailInput({ phone, onEmailSubmit, onSkip, loading }: {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (email.includes('@')) {
-      onEmailSubmit(email, '654321'); // Demo OTP
+      onEmailSubmit(email);
     }
   };
 
