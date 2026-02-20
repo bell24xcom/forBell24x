@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Link from 'next/link';
 import Script from 'next/script';
 import { useRouter } from 'next/navigation';
@@ -27,11 +27,47 @@ export default function LoginPage() {
   const [demoOTP, setDemoOTP] = useState('');
   const [widgetReady, setWidgetReady] = useState(false);
   const [sentViaWidget, setSentViaWidget] = useState(false);
+  const phoneRef = useRef('');
   const router = useRouter();
 
   // Normalize phone: strip +91, spaces, dashes
   const normalizePhone = (raw: string): string => {
     return raw.replace(/[\s\-\(\)]/g, '').replace(/^\+91/, '').replace(/^91/, '');
+  };
+
+  // Extract access-token from MSG91 callback data (handles all known formats)
+  const extractToken = (data: unknown): string => {
+    if (typeof data === 'string') return data;
+    const r = data as Record<string, unknown>;
+    return ((r['access-token'] ?? r['accessToken'] ?? r['token'] ?? '') as string);
+  };
+
+  // Complete login with access-token from MSG91
+  const completeWidgetLogin = async (accessToken: string) => {
+    const normalizedPhone = phoneRef.current;
+    if (!accessToken || !normalizedPhone) {
+      setError('Verification failed. Please try again.');
+      setIsLoading(false);
+      return;
+    }
+    try {
+      const response = await fetch('/api/auth/otp/widget-verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ accessToken, phone: normalizedPhone }),
+      });
+      const loginData = await response.json();
+      if (!response.ok || !loginData.success) {
+        setError(loginData.message || 'Login failed. Please try again.');
+        setIsLoading(false);
+        return;
+      }
+      localStorage.setItem('bell24h_user', JSON.stringify(loginData.user));
+      router.push('/dashboard');
+    } catch {
+      setError('Network error. Please check your connection and try again.');
+      setIsLoading(false);
+    }
   };
 
   // ── Send OTP ─────────────────────────────────────────────────────────────
@@ -45,6 +81,7 @@ export default function LoginPage() {
       setIsLoading(false);
       return;
     }
+    phoneRef.current = normalized;
 
     // Widget mode: delegate to MSG91 widget (sends real SMS, no DLT needed)
     if (widgetReady && window.sendOtp) {
@@ -98,41 +135,17 @@ export default function LoginPage() {
 
     const normalized = normalizePhone(phone);
 
-    // Widget mode: verify OTP via MSG91 widget → get access-token → call backend
+    // Widget mode: verify OTP via MSG91 widget
     if (sentViaWidget && window.verifyOtp) {
       window.verifyOtp(
         parseInt(otp, 10),
         async (data: unknown) => {
-          const result = data as Record<string, string>;
-          const accessToken = result['access-token'];
-
-          if (!accessToken) {
-            setError('Verification failed. Please try again.');
-            setIsLoading(false);
-            return;
+          // Some MSG91 versions pass access-token directly in verifyOtp callback
+          const accessToken = extractToken(data);
+          if (accessToken) {
+            await completeWidgetLogin(accessToken);
           }
-
-          try {
-            const response = await fetch('/api/auth/otp/widget-verify', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ accessToken, phone: normalized }),
-            });
-
-            const loginData = await response.json();
-
-            if (!response.ok || !loginData.success) {
-              setError(loginData.message || 'Login failed. Please try again.');
-              setIsLoading(false);
-              return;
-            }
-
-            localStorage.setItem('bell24h_user', JSON.stringify(loginData.user));
-            router.push('/dashboard');
-          } catch {
-            setError('Network error. Please check your connection and try again.');
-            setIsLoading(false);
-          }
+          // If no token here, initSendOTP.success callback will handle it
         },
         (err) => {
           console.error('MSG91 verifyOtp failed:', err);
@@ -188,8 +201,17 @@ export default function LoginPage() {
                 widgetId: WIDGET_ID,
                 tokenAuth: TOKEN_AUTH,
                 exposeMethods: true,
-                success: () => {}, // handled inside verifyOtp callback
-                failure: () => {}, // handled inside verifyOtp callback
+                success: async (data: unknown) => {
+                  // MSG91 delivers the access-token here after OTP is verified
+                  const r = data as Record<string, unknown>;
+                  const accessToken = ((r['access-token'] ?? r['accessToken'] ?? r['token'] ?? '') as string);
+                  if (accessToken) await completeWidgetLogin(accessToken);
+                },
+                failure: (err: unknown) => {
+                  console.error('MSG91 widget failure:', err);
+                  setError('OTP verification failed. Please try again.');
+                  setIsLoading(false);
+                },
               });
               setWidgetReady(true);
             }
