@@ -263,10 +263,10 @@ export default function PhoneEmailAuth() {
 
                 <button
                   onClick={sendOTP}
-                  disabled={loading || phone.length !== 10}
+                  disabled={loading || phone.length !== 10 || !widgetReady}
                   className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
                 >
-                  {loading ? 'Sending...' : 'Send OTP'}
+                  {loading ? 'Sending...' : !widgetReady ? 'Loading...' : 'Send OTP'}
                 </button>
               </div>
             )}
