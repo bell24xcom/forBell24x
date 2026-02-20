@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
@@ -16,28 +14,24 @@ export async function GET(req: NextRequest) {
 
     const skip = (page - 1) * limit;
 
-    // Build where clause for Neon database
     const where: any = {};
-    
+
     if (status && status !== 'all') {
       where.status = status.toUpperCase();
     }
-    
+
     if (category && category !== 'all') {
       where.category = category;
     }
 
-    // Fetch RFQs from Neon database
     const [rfqs, totalCount] = await Promise.all([
-      prisma.rfq.findMany({
+      prisma.rFQ.findMany({
         where,
         skip,
         take: limit,
-        orderBy: {
-          createdAt: 'desc'
-        },
+        orderBy: { createdAt: 'desc' },
         include: {
-          buyer: {
+          user: {
             select: {
               id: true,
               name: true,
@@ -49,7 +43,7 @@ export async function GET(req: NextRequest) {
             select: {
               id: true,
               price: true,
-              deliveryTime: true,
+              timeline: true,
               supplier: {
                 select: {
                   name: true,
@@ -60,10 +54,10 @@ export async function GET(req: NextRequest) {
           }
         }
       }),
-      prisma.rfq.count({ where })
+      prisma.rFQ.count({ where })
     ]);
 
-    const response = {
+    return NextResponse.json({
       rfqs,
       pagination: {
         page,
@@ -71,79 +65,39 @@ export async function GET(req: NextRequest) {
         total: totalCount,
         pages: Math.ceil(totalCount / limit)
       }
-    };
-
-    return NextResponse.json(response);
-    
-  } catch (error) {
-    console.error('Error fetching RFQs from Neon:', error);
-    
-    // Return mock data if database fails
-    const mockRfqs = [
-      {
-        id: '1',
-        title: 'Steel Pipes for Construction',
-        description: 'Need 1000 steel pipes for construction project',
-        category: 'steel',
-        quantity: '1000 pieces',
-        budget: '500000',
-        deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-        urgency: 'NORMAL',
-        status: 'OPEN',
-        createdAt: new Date(),
-        buyer: {
-          id: '1',
-          name: 'John Doe',
-          company: 'Construction Co',
-          location: 'Mumbai, India'
-        },
-        quotes: [
-          {
-            id: '1',
-            price: 250000,
-            deliveryTime: '7 days',
-            supplier: {
-              name: 'Rajesh Kumar',
-              company: 'SteelCo India'
-            }
-          }
-        ]
-      }
-    ];
-
-    return NextResponse.json({
-      rfqs: mockRfqs,
-      pagination: {
-        page: 1,
-        limit: 20,
-        total: mockRfqs.length,
-        pages: 1
-      }
     });
+
+  } catch (error) {
+    console.error('Error fetching RFQs:', error);
+    return NextResponse.json({
+      rfqs: [],
+      pagination: { page: 1, limit: 20, total: 0, pages: 0 },
+      error: 'Failed to fetch RFQs'
+    }, { status: 500 });
   }
 }
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    
-    // Create RFQ in Neon database
-    const rfq = await prisma.rfq.create({
+
+    const rfq = await prisma.rFQ.create({
       data: {
         title: body.title,
         description: body.description,
-        category: body.category,
-        quantity: body.quantity,
-        budget: body.budget,
-        deadline: new Date(body.deadline),
+        category: body.category || '',
+        quantity: body.quantity || '1',
+        unit: body.unit || 'units',
+        minBudget: body.minBudget ? parseFloat(body.minBudget) : null,
+        maxBudget: body.maxBudget ? parseFloat(body.maxBudget) : null,
+        timeline: body.timeline || body.deadline || '7 days',
         urgency: body.urgency || 'NORMAL',
-        status: 'OPEN',
-        buyerId: body.buyerId || 'default-buyer-id', // In production, get from auth
-        specifications: body.specifications,
-        location: body.location
+        status: 'ACTIVE',
+        location: body.location,
+        createdBy: body.buyerId || body.userId,
       },
       include: {
-        buyer: {
+        user: {
           select: {
             id: true,
             name: true,
@@ -159,9 +113,9 @@ export async function POST(req: NextRequest) {
       rfq,
       message: 'RFQ created successfully'
     });
-    
+
   } catch (error) {
-    console.error('Error creating RFQ in Neon:', error);
+    console.error('Error creating RFQ:', error);
     return NextResponse.json({
       success: false,
       error: 'Failed to create RFQ'

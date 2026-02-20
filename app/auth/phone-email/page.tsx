@@ -1,6 +1,7 @@
 "use client"
 import { CheckCircle, Phone, Shield } from 'lucide-react';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function PhoneEmailAuth() {
   const [step, setStep] = useState('phone'); // 'phone' or 'otp'
@@ -9,46 +10,88 @@ export default function PhoneEmailAuth() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [demoOTP, setDemoOTP] = useState('');
+  const router = useRouter();
+
+  // Normalize phone: strip +91, spaces, dashes
+  const normalizePhone = (raw: string): string => {
+    return raw.replace(/[\s\-\(\)]/g, '').replace(/^\+91/, '').replace(/^91/, '');
+  };
 
   const sendOTP = async () => {
     setLoading(true);
     setError('');
 
-    if (!/^[6-9]\d{9}$/.test(phone)) {
+    const normalized = normalizePhone(phone);
+    if (!/^[6-9]\d{9}$/.test(normalized)) {
       setError('Please enter a valid 10-digit mobile number');
       setLoading(false);
       return;
     }
 
     try {
-      // Generate demo OTP for testing
-      const generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
-      setDemoOTP(generatedOTP);
+      const response = await fetch('/api/auth/otp/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: normalized }),
+      });
 
-      console.log(`📱 OTP for +91${phone}: ${generatedOTP}`);
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        setError(data.message || 'Failed to send OTP. Please try again.');
+        setLoading(false);
+        return;
+      }
+
+      // In pilot/dev mode, backend returns devOtp
+      if (data.devOtp) {
+        setDemoOTP(data.devOtp);
+      }
+
       setStep('otp');
-    } catch (err) {
-      setError('Failed to send OTP. Please try again.');
+    } catch {
+      setError('Network error. Please check your connection.');
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   const verifyOTP = async () => {
     setLoading(true);
     setError('');
 
-    if (otp !== demoOTP) {
-      setError('Invalid OTP. Please try again.');
-      setLoading(false);
-      return;
-    }
+    const normalized = normalizePhone(phone);
 
-    // Success - redirect to dashboard
-    window.location.href = '/dashboard';
+    try {
+      const response = await fetch('/api/auth/otp/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: normalized, otp }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        setError(data.message || 'Invalid OTP. Please try again.');
+        setLoading(false);
+        return;
+      }
+
+      // Store user session
+      localStorage.setItem('bell24h_user', JSON.stringify(data.user));
+
+      // Redirect to dashboard
+      router.push('/dashboard');
+    } catch {
+      setError('Network error. Please check your connection.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const resendOTP = () => {
+    setOtp('');
+    setDemoOTP('');
     sendOTP();
   };
 
@@ -66,14 +109,21 @@ export default function PhoneEmailAuth() {
             </p>
           </div>
 
-          {/* Demo OTP Display */}
+          {/* Demo OTP Display (only in pilot/dev mode) */}
           {demoOTP && step === 'otp' && (
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
               <div className="text-center">
-                <h3 className="text-sm font-medium text-yellow-800">Demo OTP</h3>
+                <h3 className="text-sm font-medium text-yellow-800">Your OTP</h3>
                 <p className="text-2xl font-bold text-yellow-900 mt-1">{demoOTP}</p>
-                <p className="text-xs text-yellow-700 mt-1">Use this code for testing</p>
+                <p className="text-xs text-yellow-700 mt-1">Enter this code below</p>
               </div>
+            </div>
+          )}
+
+          {/* Error Display */}
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
+              {error}
             </div>
           )}
 
@@ -96,7 +146,6 @@ export default function PhoneEmailAuth() {
                     className="flex-1 rounded-r-lg border border-neutral-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
-                {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
               </div>
 
               <button
@@ -122,9 +171,9 @@ export default function PhoneEmailAuth() {
                   onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
                   placeholder="000000"
                   className="w-full text-center text-2xl tracking-widest border border-neutral-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  maxLength="6"
+                  maxLength={6}
+                  autoFocus
                 />
-                {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
               </div>
 
               <button
@@ -137,14 +186,15 @@ export default function PhoneEmailAuth() {
 
               <div className="flex justify-between">
                 <button
-                  onClick={() => setStep('phone')}
+                  onClick={() => { setStep('phone'); setOtp(''); setDemoOTP(''); setError(''); }}
                   className="text-blue-600 hover:text-blue-700 text-sm font-medium"
                 >
                   Change Number
                 </button>
                 <button
                   onClick={resendOTP}
-                  className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                  disabled={loading}
+                  className="text-blue-600 hover:text-blue-700 text-sm font-medium disabled:text-gray-400"
                 >
                   Resend OTP
                 </button>
@@ -158,15 +208,15 @@ export default function PhoneEmailAuth() {
             <div className="space-y-1 text-sm text-neutral-600">
               <div className="flex items-center">
                 <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
-                <span>Supplier Verification - ₹2,000</span>
+                <span>Supplier Verification - &#8377;2,000</span>
               </div>
               <div className="flex items-center">
                 <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
-                <span>RFQ Writing Service - ₹500</span>
+                <span>RFQ Writing Service - &#8377;500</span>
               </div>
               <div className="flex items-center">
                 <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
-                <span>Featured Listing - ₹1,000/month</span>
+                <span>Featured Listing - &#8377;1,000/month</span>
               </div>
             </div>
           </div>

@@ -5,9 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [phone, setPhone] = useState('+91 9876543210');
+  const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -15,70 +13,81 @@ export default function LoginPage() {
   const [demoOTP, setDemoOTP] = useState('');
   const router = useRouter();
 
-  // Email/Password Login Handler
-  const handleEmailLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError('');
-
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      if (email === 'admin@bell24h.com' && password === 'admin123') {
-        // Success - redirect to dashboard
-        router.push('/dashboard');
-      } else {
-        setError('Invalid email or password. Please try again.');
-      }
-    } catch (error) {
-      setError('Login failed. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
+  // Normalize phone: strip +91, spaces, dashes
+  const normalizePhone = (raw: string): string => {
+    return raw.replace(/[\s\-\(\)]/g, '').replace(/^\+91/, '').replace(/^91/, '');
   };
 
-  // Send OTP Handler
+  // Send OTP via real backend API
   const handleSendOtp = async () => {
     setIsLoading(true);
     setError('');
 
+    const normalized = normalizePhone(phone);
+    if (!/^[6-9]\d{9}$/.test(normalized)) {
+      setError('Please enter a valid 10-digit Indian mobile number.');
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      // Generate demo OTP for testing
-      const generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
-      setDemoOTP(generatedOTP);
-      
-      console.log(`📱 OTP for ${phone}: ${generatedOTP}`);
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      const response = await fetch('/api/auth/otp/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: normalized }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        setError(data.message || 'Failed to send OTP. Please try again.');
+        setIsLoading(false);
+        return;
+      }
+
+      // In pilot/dev mode, backend returns devOtp
+      if (data.devOtp) {
+        setDemoOTP(data.devOtp);
+      }
+
       setIsOtpSent(true);
-    } catch (error) {
-      setError('Failed to send OTP. Please try again.');
+    } catch {
+      setError('Network error. Please check your connection and try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Verify OTP Handler
+  // Verify OTP via real backend API
   const handleOtpLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
 
+    const normalized = normalizePhone(phone);
+
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      if (otp === demoOTP) {
-        // Success - redirect to dashboard
-        router.push('/dashboard');
-      } else {
-        setError('Invalid OTP. Please try again.');
+      const response = await fetch('/api/auth/otp/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: normalized, otp }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        setError(data.message || 'Invalid OTP. Please try again.');
+        setIsLoading(false);
+        return;
       }
-    } catch (error) {
-      setError('OTP verification failed. Please try again.');
+
+      // Store user session in localStorage
+      localStorage.setItem('bell24h_user', JSON.stringify(data.user));
+
+      // Token is also set as httpOnly cookie by the backend
+      router.push('/dashboard');
+    } catch {
+      setError('Network error. Please check your connection and try again.');
     } finally {
       setIsLoading(false);
     }
@@ -222,30 +231,6 @@ export default function LoginPage() {
           cursor: not-allowed;
         }
 
-        .divider {
-          position: relative;
-          text-align: center;
-          margin: 24px 0;
-        }
-
-        .divider::before {
-          content: '';
-          position: absolute;
-          top: 50%;
-          left: 0;
-          right: 0;
-          height: 1px;
-          background: rgba(100, 116, 139, 0.3);
-        }
-
-        .divider-text {
-          background: #1e293b;
-          padding: 0 16px;
-          color: #64748b;
-          font-size: 14px;
-          position: relative;
-        }
-
         .error-message {
           background: rgba(220, 38, 38, 0.15);
           border: 1px solid rgba(220, 38, 38, 0.4);
@@ -347,7 +332,7 @@ export default function LoginPage() {
           <div className="brand-header">
             <div className="brand-name">Bell24h</div>
             <h1 className="welcome-title">Welcome Back</h1>
-            <p className="welcome-subtitle">Sign in to your account</p>
+            <p className="welcome-subtitle">Sign in with your phone number</p>
           </div>
 
           {/* Error Message */}
@@ -357,66 +342,16 @@ export default function LoginPage() {
             </div>
           )}
 
-          {/* Demo OTP Display */}
+          {/* Demo OTP Display (only shown in pilot/dev mode) */}
           {demoOTP && isOtpSent && (
             <div className="demo-otp">
-              <div className="demo-otp-title">Demo OTP</div>
+              <div className="demo-otp-title">Your OTP</div>
               <div className="demo-otp-code">{demoOTP}</div>
-              <div className="demo-otp-subtitle">Use this code for testing</div>
+              <div className="demo-otp-subtitle">Enter this code below</div>
             </div>
           )}
 
-          {/* Email/Password Login Form */}
-          {!isOtpSent && (
-            <form onSubmit={handleEmailLogin}>
-              <div className="form-group">
-                <label htmlFor="email" className="form-label">Email Address</label>
-                <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="form-input"
-                  placeholder="Enter your email"
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="password" className="form-label">Password</label>
-                <input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="form-input"
-                  placeholder="Enter your password"
-                  required
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="btn-primary"
-              >
-                {isLoading ? (
-                  <>
-                    <span className="loading-spinner"></span> Signing in...
-                  </>
-                ) : (
-                  'Sign In with Email'
-                )}
-              </button>
-            </form>
-          )}
-
-          {/* Divider */}
-          <div className="divider">
-            <span className="divider-text">Or continue with</span>
-          </div>
-
-          {/* Phone OTP Section */}
+          {/* Phone Number Input */}
           {!isOtpSent ? (
             <div>
               <div className="form-group">
@@ -425,7 +360,7 @@ export default function LoginPage() {
                   id="phone"
                   type="tel"
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
+                  onChange={(e) => setPhone(e.target.value.replace(/[^\d+\-\s]/g, ''))}
                   className="form-input"
                   placeholder="+91 9876543210"
                   required
@@ -434,7 +369,7 @@ export default function LoginPage() {
               <button
                 onClick={handleSendOtp}
                 disabled={isLoading || !phone}
-                className="btn-secondary"
+                className="btn-primary"
               >
                 {isLoading ? (
                   <>
@@ -448,7 +383,7 @@ export default function LoginPage() {
           ) : (
             <form onSubmit={handleOtpLogin}>
               <div className="form-group">
-                <label htmlFor="otp" className="form-label">Enter OTP</label>
+                <label htmlFor="otp" className="form-label">Enter OTP sent to {phone}</label>
                 <input
                   id="otp"
                   type="text"
@@ -457,6 +392,7 @@ export default function LoginPage() {
                   className="form-input"
                   placeholder="Enter 6-digit OTP"
                   maxLength={6}
+                  autoFocus
                   required
                 />
               </div>
@@ -470,16 +406,24 @@ export default function LoginPage() {
                     <span className="loading-spinner"></span> Verifying...
                   </>
                 ) : (
-                  'Verify OTP'
+                  'Verify OTP & Login'
                 )}
               </button>
-              <div style={{ textAlign: 'center', marginTop: '16px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '16px' }}>
                 <button
                   type="button"
                   onClick={resetOtpFlow}
                   className="back-link"
                 >
-                  ← Change Phone Number
+                  Change Number
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSendOtp}
+                  disabled={isLoading}
+                  className="back-link"
+                >
+                  Resend OTP
                 </button>
               </div>
             </form>
@@ -488,9 +432,9 @@ export default function LoginPage() {
           {/* Sign Up Link */}
           <div className="signup-link">
             <p className="signup-link-text">
-              Don't have an account?{' '}
-              <Link href="/auth/register" className="signup-link-button">
-                Sign up here
+              New to Bell24h?{' '}
+              <Link href="/auth/phone-email" className="signup-link-button">
+                Create account
               </Link>
             </p>
           </div>
