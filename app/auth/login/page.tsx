@@ -26,6 +26,7 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [demoOTP, setDemoOTP] = useState('');
   const [widgetReady, setWidgetReady] = useState(false);
+  const [sentViaWidget, setSentViaWidget] = useState(false);
   const router = useRouter();
 
   // Normalize phone: strip +91, spaces, dashes
@@ -47,6 +48,7 @@ export default function LoginPage() {
 
     // Widget mode: delegate to MSG91 widget (sends real SMS, no DLT needed)
     if (widgetReady && window.sendOtp) {
+      setSentViaWidget(true);
       window.sendOtp(
         `91${normalized}`,
         () => {
@@ -63,6 +65,7 @@ export default function LoginPage() {
     }
 
     // Pilot / fallback mode: call our backend (OTP shown on screen)
+    setSentViaWidget(false);
     try {
       const response = await fetch('/api/auth/otp/send', {
         method: 'POST',
@@ -96,7 +99,7 @@ export default function LoginPage() {
     const normalized = normalizePhone(phone);
 
     // Widget mode: verify OTP via MSG91 widget → get access-token → call backend
-    if (widgetReady && window.verifyOtp) {
+    if (sentViaWidget && window.verifyOtp) {
       window.verifyOtp(
         parseInt(otp, 10),
         async (data: unknown) => {
