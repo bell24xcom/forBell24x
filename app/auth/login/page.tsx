@@ -2,7 +2,21 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Script from 'next/script';
 import { useRouter } from 'next/navigation';
+
+// MSG91 widget method types (provided by otp-provider.js at runtime)
+declare global {
+  interface Window {
+    initSendOTP: (config: object) => void;
+    sendOtp: (identifier: string, success?: (d: unknown) => void, failure?: (e: unknown) => void) => void;
+    verifyOtp: (otp: number, success?: (d: unknown) => void, failure?: (e: unknown) => void) => void;
+    retryOtp: (channel: string | null, success?: (d: unknown) => void, failure?: (e: unknown) => void) => void;
+  }
+}
+
+const WIDGET_ID  = process.env.NEXT_PUBLIC_MSG91_WIDGET_ID;
+const TOKEN_AUTH = process.env.NEXT_PUBLIC_MSG91_TOKEN_AUTH;
 
 export default function LoginPage() {
   const [phone, setPhone] = useState('');
@@ -11,6 +25,7 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [demoOTP, setDemoOTP] = useState('');
+  const [widgetReady, setWidgetReady] = useState(false);
   const router = useRouter();
 
   // Normalize phone: strip +91, spaces, dashes
@@ -18,7 +33,7 @@ export default function LoginPage() {
     return raw.replace(/[\s\-\(\)]/g, '').replace(/^\+91/, '').replace(/^91/, '');
   };
 
-  // Send OTP via real backend API
+  // ── Send OTP ─────────────────────────────────────────────────────────────
   const handleSendOtp = async () => {
     setIsLoading(true);
     setError('');
@@ -30,6 +45,24 @@ export default function LoginPage() {
       return;
     }
 
+    // Widget mode: delegate to MSG91 widget (sends real SMS, no DLT needed)
+    if (widgetReady && window.sendOtp) {
+      window.sendOtp(
+        `91${normalized}`,
+        () => {
+          setIsOtpSent(true);
+          setIsLoading(false);
+        },
+        (err) => {
+          console.error('MSG91 sendOtp failed:', err);
+          setError('Failed to send OTP. Please try again.');
+          setIsLoading(false);
+        }
+      );
+      return;
+    }
+
+    // Pilot / fallback mode: call our backend (OTP shown on screen)
     try {
       const response = await fetch('/api/auth/otp/send', {
         method: 'POST',
@@ -45,11 +78,7 @@ export default function LoginPage() {
         return;
       }
 
-      // In pilot/dev mode, backend returns devOtp
-      if (data.devOtp) {
-        setDemoOTP(data.devOtp);
-      }
-
+      if (data.devOtp) setDemoOTP(data.devOtp);
       setIsOtpSent(true);
     } catch {
       setError('Network error. Please check your connection and try again.');
@@ -58,7 +87,7 @@ export default function LoginPage() {
     }
   };
 
-  // Verify OTP via real backend API
+  // ── Verify OTP ────────────────────────────────────────────────────────────
   const handleOtpLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -66,6 +95,52 @@ export default function LoginPage() {
 
     const normalized = normalizePhone(phone);
 
+    // Widget mode: verify OTP via MSG91 widget → get access-token → call backend
+    if (widgetReady && window.verifyOtp) {
+      window.verifyOtp(
+        parseInt(otp, 10),
+        async (data: unknown) => {
+          const result = data as Record<string, string>;
+          const accessToken = result['access-token'];
+
+          if (!accessToken) {
+            setError('Verification failed. Please try again.');
+            setIsLoading(false);
+            return;
+          }
+
+          try {
+            const response = await fetch('/api/auth/otp/widget-verify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ accessToken, phone: normalized }),
+            });
+
+            const loginData = await response.json();
+
+            if (!response.ok || !loginData.success) {
+              setError(loginData.message || 'Login failed. Please try again.');
+              setIsLoading(false);
+              return;
+            }
+
+            localStorage.setItem('bell24h_user', JSON.stringify(loginData.user));
+            router.push('/dashboard');
+          } catch {
+            setError('Network error. Please check your connection and try again.');
+            setIsLoading(false);
+          }
+        },
+        (err) => {
+          console.error('MSG91 verifyOtp failed:', err);
+          setError('Invalid OTP. Please check and try again.');
+          setIsLoading(false);
+        }
+      );
+      return;
+    }
+
+    // Pilot / fallback mode: verify OTP with our backend
     try {
       const response = await fetch('/api/auth/otp/verify', {
         method: 'POST',
@@ -81,10 +156,7 @@ export default function LoginPage() {
         return;
       }
 
-      // Store user session in localStorage
       localStorage.setItem('bell24h_user', JSON.stringify(data.user));
-
-      // Token is also set as httpOnly cookie by the backend
       router.push('/dashboard');
     } catch {
       setError('Network error. Please check your connection and try again.');
@@ -93,7 +165,6 @@ export default function LoginPage() {
     }
   };
 
-  // Reset OTP flow
   const resetOtpFlow = () => {
     setIsOtpSent(false);
     setOtp('');
@@ -103,6 +174,26 @@ export default function LoginPage() {
 
   return (
     <>
+      {/* MSG91 OTP Widget — headless mode (sends real SMS without DLT registration) */}
+      {WIDGET_ID && TOKEN_AUTH && (
+        <Script
+          src="https://verify.msg91.com/otp-provider.js"
+          strategy="afterInteractive"
+          onLoad={() => {
+            if (typeof window.initSendOTP === 'function') {
+              window.initSendOTP({
+                widgetId: WIDGET_ID,
+                tokenAuth: TOKEN_AUTH,
+                exposeMethods: true,
+                success: () => {}, // handled inside verifyOtp callback
+                failure: () => {}, // handled inside verifyOtp callback
+              });
+              setWidgetReady(true);
+            }
+          }}
+        />
+      )}
+
       <style jsx global>{`
         * {
           box-sizing: border-box;
@@ -342,7 +433,7 @@ export default function LoginPage() {
             </div>
           )}
 
-          {/* Demo OTP Display (only shown in pilot/dev mode) */}
+          {/* Demo OTP Display (only shown in pilot/fallback mode) */}
           {demoOTP && isOtpSent && (
             <div className="demo-otp">
               <div className="demo-otp-title">Your OTP</div>
