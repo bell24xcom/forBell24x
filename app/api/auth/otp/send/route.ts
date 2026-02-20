@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
     // Store OTP in database (upsert to handle resends)
-    await prisma.otpVerification.upsert({
+    await prisma.oTPVerification.upsert({
       where: { phone },
       update: { otp, expiresAt, attempts: 0, isVerified: false },
       create: { phone, otp, expiresAt, attempts: 0, isVerified: false },

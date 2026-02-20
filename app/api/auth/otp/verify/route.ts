@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Look up OTP record
-    const otpRecord = await prisma.otpVerification.findUnique({ where: { phone } });
+    const otpRecord = await prisma.oTPVerification.findUnique({ where: { phone } });
 
     if (!otpRecord) {
       return NextResponse.json(
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (otpRecord.otp !== otp) {
-      await prisma.otpVerification.update({
+      await prisma.oTPVerification.update({
         where: { phone },
         data: { attempts: otpRecord.attempts + 1 },
       });
@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
     }
 
     // OTP valid — mark as used
-    await prisma.otpVerification.update({
+    await prisma.oTPVerification.update({
       where: { phone },
       data: { isVerified: true },
     });
