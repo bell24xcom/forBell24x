@@ -11,6 +11,9 @@ function normalizePhone(raw: string): string | null {
   return /^\d{10}$/.test(cleaned) ? cleaned : null;
 }
 
+const PILOT_MODE = process.env.PILOT_OTP_IN_RESPONSE === 'true';
+const IS_DEV     = process.env.NODE_ENV === 'development';
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -35,43 +38,38 @@ export async function POST(request: NextRequest) {
       create: { phone, otp, expiresAt, attempts: 0, isVerified: false },
     });
 
-    // Send OTP via MSG91
+    // ── Pilot / Dev mode: skip SMS, show OTP on screen ──
+    // Set PILOT_OTP_IN_RESPONSE=true in Vercel env for controlled pilot
+    if (PILOT_MODE || IS_DEV) {
+      authLogger.info(`[PILOT] OTP generated for ${phone.slice(0, 5)}*****`);
+      return NextResponse.json({
+        success: true,
+        message: PILOT_MODE
+          ? 'OTP generated (pilot mode — enter the OTP shown below)'
+          : 'OTP sent (DEV mode — check below)',
+        phone: phone.replace(/(\d{5})(\d{5})/, '$1*****'),
+        devOtp: otp,
+      });
+    }
+
+    // ── Production: send OTP via MSG91 SMS ──
     const smsResult = await sendViaMSG91(phone, otp);
 
     if (!smsResult.success) {
       authLogger.error('MSG91 send failed', { phone: `${phone.slice(0, 5)}*****`, error: smsResult.error });
-
-      const pilotMode = process.env.PILOT_OTP_IN_RESPONSE === 'true';
-      const isDev     = process.env.NODE_ENV === 'development';
-
-      // In dev OR explicit pilot bypass: return OTP in response
-      // Set PILOT_OTP_IN_RESPONSE=true in Vercel env for controlled 13-user pilot
-      if (isDev || pilotMode) {
-        authLogger.warn(`[PILOT/DEV] OTP for ${phone} is ${otp} (MSG91 not configured)`);
-        return NextResponse.json({
-          success: true,
-          message: pilotMode
-            ? 'OTP generated (pilot mode — SMS disabled, use the OTP below)'
-            : 'OTP sent (DEV mode — check server logs)',
-          phone: phone.replace(/(\d{5})(\d{5})/, '$1*****'),
-          // Shown only when PILOT_OTP_IN_RESPONSE=true or in development
-          ...(pilotMode || isDev ? { devOtp: otp } : {}),
-        });
-      }
-
       return NextResponse.json(
         {
           success: false,
-          message: 'SMS service not configured. Set MSG91_AUTH_KEY + MSG91_TEMPLATE_ID, or set PILOT_OTP_IN_RESPONSE=true for pilot testing.',
+          message: 'Unable to send OTP SMS. Please try again or contact support.',
         },
         { status: 500 }
       );
     }
 
-    authLogger.info('OTP sent', { phone: `${phone.slice(0, 5)}*****` });
+    authLogger.info('OTP sent via SMS', { phone: `${phone.slice(0, 5)}*****` });
     return NextResponse.json({
       success: true,
-      message: 'OTP sent successfully',
+      message: 'OTP sent successfully to your phone',
       phone: phone.replace(/(\d{5})(\d{5})/, '$1*****'),
     });
 
