@@ -23,6 +23,7 @@ export default function PhoneEmailAuth() {
   const [error, setError] = useState('');
   const [demoOTP, setDemoOTP] = useState('');
   const [widgetReady, setWidgetReady] = useState(false);
+  const [sentViaWidget, setSentViaWidget] = useState(false);
   const router = useRouter();
 
   // Normalize phone: strip +91, spaces, dashes
@@ -43,6 +44,7 @@ export default function PhoneEmailAuth() {
 
     // Widget mode: MSG91 sends real SMS without DLT
     if (widgetReady && window.sendOtp) {
+      setSentViaWidget(true);
       window.sendOtp(
         `91${normalized}`,
         () => { setStep('otp'); setLoading(false); },
@@ -56,6 +58,7 @@ export default function PhoneEmailAuth() {
     }
 
     // Pilot / fallback mode
+    setSentViaWidget(false);
     try {
       const response = await fetch('/api/auth/otp/send', {
         method: 'POST',
@@ -87,7 +90,7 @@ export default function PhoneEmailAuth() {
     const normalized = normalizePhone(phone);
 
     // Widget mode: verify via MSG91 widget → get access-token → backend login
-    if (widgetReady && window.verifyOtp) {
+    if (sentViaWidget && window.verifyOtp) {
       window.verifyOtp(
         parseInt(otp, 10),
         async (data: unknown) => {
