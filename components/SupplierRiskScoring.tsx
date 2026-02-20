@@ -124,9 +124,9 @@ export const SupplierRiskScoring: React.FC = () => {
   // Get risk icon
   const getRiskIcon = (level: 'low' | 'medium' | 'high') => {
     switch (level) {
-      case 'low: return <CheckCircle className="h-4 w-4" />;
-      case medium&apos;: return <Clock className="h-4 w-4" />;
-      case &apos;high': return <AlertTriangle className="h-4 w-4" />;
+      case 'low': return <CheckCircle className="h-4 w-4" />;
+      case 'medium': return <Clock className="h-4 w-4" />;
+      case 'high': return <AlertTriangle className="h-4 w-4" />;
     }
   };
 

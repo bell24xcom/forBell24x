@@ -36,7 +36,7 @@ export const VoiceRFQ: React.FC<VoiceRFQProps> = ({ onRFQCreated, userId }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
-  const [transcript, setTranscript] = useState<string>(&apos;');
+  const [transcript, setTranscript] = useState<string>('');
   const [rfqData, setRfqData] = useState<RFQData>({
     title: '',
     description: '',
