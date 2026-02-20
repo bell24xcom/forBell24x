@@ -35,13 +35,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const verifyResponse = await fetch('https://api.msg91.com/api/v5/widget/verifyAccessToken', {
+    const verifyResponse = await fetch('https://control.msg91.com/api/v5/widget/verifyAccessToken', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'authkey': AUTH_KEY,
       },
-      body: JSON.stringify({ 'access-token': accessToken }),
+      body: JSON.stringify({ authkey: AUTH_KEY, 'access-token': accessToken }),
     });
 
     const verifyResult = await verifyResponse.json();
