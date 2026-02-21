@@ -36,7 +36,7 @@ export default function PhoneEmailAuth() {
   const extractToken = (data: unknown): string => {
     if (typeof data === 'string') return data;
     const r = data as Record<string, unknown>;
-    return ((r['access-token'] ?? r['accessToken'] ?? r['token'] ?? '') as string);
+    return ((r['access-token'] ?? r['accessToken'] ?? r['token'] ?? r['message'] ?? '') as string);
   };
 
   // Complete login with access-token from MSG91
@@ -131,8 +131,8 @@ export default function PhoneEmailAuth() {
       window.verifyOtp(
         parseInt(otp, 10),
         async (data: unknown) => {
-          // Some MSG91 versions pass access-token directly in verifyOtp callback
           const accessToken = extractToken(data);
+          console.log('[MSG91 verifyOtp success] data=', data, 'token=', accessToken?.slice(0, 20));
           if (accessToken) {
             await completeWidgetLogin(accessToken);
           }
@@ -192,10 +192,14 @@ export default function PhoneEmailAuth() {
                 tokenAuth: TOKEN_AUTH,
                 exposeMethods: true,
                 success: async (data: unknown) => {
-                  // MSG91 delivers the access-token here after OTP is verified
-                  const r = data as Record<string, unknown>;
-                  const accessToken = ((r['access-token'] ?? r['accessToken'] ?? r['token'] ?? '') as string);
-                  if (accessToken) await completeWidgetLogin(accessToken);
+                  const accessToken = extractToken(data);
+                  console.log('[MSG91 success] data=', data, 'token=', accessToken?.slice(0, 20));
+                  if (accessToken) {
+                    await completeWidgetLogin(accessToken);
+                  } else {
+                    setError('Verification failed — no token received. Please try again.');
+                    setLoading(false);
+                  }
                 },
                 failure: (err: unknown) => {
                   console.error('MSG91 widget failure:', err);
