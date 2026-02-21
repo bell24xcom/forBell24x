@@ -16,7 +16,10 @@ function decodeJWTPayload(jwt: string): Record<string, unknown> | null {
   try {
     const parts = jwt.split('.');
     if (parts.length !== 3) return null;
-    const payload = Buffer.from(parts[1], 'base64url').toString('utf-8');
+    // base64url → base64: replace URL-safe chars and add padding
+    const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+    const padded = base64.padEnd(base64.length + (4 - base64.length % 4) % 4, '=');
+    const payload = Buffer.from(padded, 'base64').toString('utf-8');
     return JSON.parse(payload);
   } catch {
     return null;
