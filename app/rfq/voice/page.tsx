@@ -1,234 +1,322 @@
-// app/rfq/voice/page.tsx - Voice RFQ Page
-'use client';
-
-import { Mic, MicOff, Pause, Play, Send, Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useSession } from '@/contexts/AuthContext';
 
 export default function VoiceRFQPage() {
   const [isRecording, setIsRecording] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [transcript, setTranscript] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [rfqData, setRFQData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [language, setLanguage] = useState('hi');
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const router = useRouter();
+  const { user } = useSession();
+
+  const languages = [
+    { value: 'hi', label: 'Hindi' },
+    { value: 'en', label: 'English' },
+    { value: 'mr', label: 'Marathi' },
+    { value: 'gu', label: 'Gujarati' },
+  ];
+
+  useEffect(() => {
+    if (!user) {
+      router.push('/login');
+    }
+  }, [user, router]);
 
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
-      const chunks: BlobPart[] = [];
+      mediaRecorderRef.current = new MediaRecorder(stream);
+      const audioChunks: Blob[] = [];
 
-      mediaRecorder.ondataavailable = (event) => {
-        chunks.push(event.data);
+      mediaRecorderRef.current.ondataavailable = (event) => {
+        audioChunks.push(event.data);
       };
 
-      mediaRecorder.onstop = () => {
-        const blob = new Blob(chunks, { type: 'audio/wav' });
-        setAudioBlob(blob);
-        setAudioUrl(URL.createObjectURL(blob));
-        stream.getTracks().forEach(track => track.stop());
+      mediaRecorderRef.current.onstop = () => {
+        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+        setAudioBlob(audioBlob);
       };
 
-      mediaRecorder.start();
+      mediaRecorderRef.current.start();
       setIsRecording(true);
-
-      // Stop recording after 60 seconds
-      setTimeout(() => {
-        mediaRecorder.stop();
-        setIsRecording(false);
-      }, 60000);
-
-    } catch (error) {
-      console.error('Error accessing microphone:', error);
-      alert('Please allow microphone access to record voice RFQ');
+    } catch (err) {
+      console.error('Error accessing microphone:', err);
+      setError('Please allow microphone access to record audio');
     }
   };
 
   const stopRecording = () => {
-    setIsRecording(false);
-  };
-
-  const playRecording = () => {
-    if (audioUrl) {
-      const audio = new Audio(audioUrl);
-      audio.play();
-      setIsPlaying(true);
-      audio.onended = () => setIsPlaying(false);
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
+      mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+      setIsRecording(false);
     }
   };
 
-  const deleteRecording = () => {
-    setAudioBlob(null);
-    setAudioUrl(null);
-    setTranscript('');
+  const playAudio = () => {
+    if (audioBlob) {
+      const audioUrl = URL.createObjectURL(audioBlob);
+      audioRef.current!.src = audioUrl;
+      audioRef.current!.play();
+    }
   };
 
-  const processVoiceRFQ = async () => {
+  const deleteAudio = () => {
+    setAudioBlob(null);
+    setTranscript('');
+    setRFQData(null);
+    setError('');
+  };
+
+  const processWithAI = async () => {
     if (!audioBlob) return;
 
-    setLoading(true);
+    setIsLoading(true);
+    setError('');
+
     try {
-      // Simulate voice processing
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const formData = new FormData();
+      formData.append('audioBase64', audioBlobToBase64(audioBlob));
+      formData.append('audioFormat', 'webm');
+      formData.append('language', language);
 
-      // Mock transcript
-      setTranscript('I need 1000 pieces of cotton t-shirts in various sizes. Budget is around ₹50,000. Need delivery within 2 weeks. Please send quotes.');
+      const response = await fetch('/api/rfq/voice', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('auth-token')}`,
+        },
+        body: formData,
+      });
 
-    } catch (error) {
-      console.error('Error processing voice:', error);
+      if (!response.ok) {
+        throw new Error('Failed to process RFQ');
+      }
+
+      const data = await response.json();
+      setTranscript(data.transcript);
+      setRFQData(data.rfq);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
+  };
+
+  const submitRFQ = async () => {
+    if (!rfqData) return;
+
+    try {
+      // In a real implementation, this would submit the RFQ to the server
+      console.log('Submitting RFQ:', rfqData);
+      router.push('/dashboard/rfqs');
+    } catch (err) {
+      setError('Failed to submit RFQ');
+    }
+  };
+
+  const audioBlobToBase64 = (blob: Blob): string => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        resolve(reader.result as string);
+      };
+      reader.readAsDataURL(blob);
+    });
   };
 
   return (
-    <div className="page-container">
-      <div className="page-content">
-        <div className="max-w-4xl mx-auto">
-          <div className="page-header">
-            <h1 className="page-title">
-              Voice RFQ - Coming Soon
-            </h1>
-            <p className="text-neutral-600">
-              Record your RFQ requirements using voice and get AI-powered transcription
+    <div className="min-h-screen bg-[#0F172A] text-white">
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-4">Voice RFQ</h1>
+          <p className="text-slate-400">
+            Record your RFQ requirements and let AI transcribe and extract key details
+          </p>
+        </div>
+
+        {/* Language Selector */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium mb-2">Language</label>
+          <select
+            value={language}
+            onChange={(e) => setLanguage(e.target.value)}
+            className="w-full px-4 py-2 bg-slate-800 border border-slate-600 text-white rounded-lg focus:outline-none focus:border-indigo-500"
+          >
+            {languages.map((lang) => (
+              <option key={lang.value} value={lang.value}>
+                {lang.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Recording Controls */}
+        <div className="bg-slate-800 rounded-lg p-6 mb-6">
+          <div className="text-center mb-6">
+            <h2 className="text-xl font-semibold mb-2">Record Your RFQ</h2>
+            <p className="text-slate-400">
+              Click the microphone to start recording your RFQ requirements
             </p>
           </div>
 
-          {/* Coming Soon Banner */}
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 mb-8">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <Mic className="h-8 w-8 text-amber-600" />
-              </div>
-              <div className="ml-4">
-                <h3 className="text-lg font-semibold text-amber-800">
-                  Voice RFQ Feature Coming Soon
-                </h3>
-                <p className="text-amber-700 mt-1">
-                  We're working on an advanced voice-to-text RFQ system. This feature will allow you to:
-                </p>
-                <ul className="list-disc list-inside text-amber-700 mt-2 space-y-1">
-                  <li>Record your RFQ requirements using voice</li>
-                  <li>Get AI-powered transcription and formatting</li>
-                  <li>Automatically extract key details (quantity, budget, timeline)</li>
-                  <li>Send to multiple suppliers with one click</li>
-                </ul>
-              </div>
-            </div>
+          <div className="flex justify-center items-center gap-4">
+            {isRecording ? (
+              <button
+                onClick={stopRecording}
+                className="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg flex items-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 9v6h4M4 18h16" />
+                </svg>
+                Stop Recording
+              </button>
+            ) : (
+              <button
+                onClick={startRecording}
+                className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg flex items-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                Start Recording
+              </button>
+            )}
+
+            {audioBlob && (
+              <button
+                onClick={playAudio}
+                className="bg-slate-600 hover:bg-slate-700 text-white px-4 py-2 rounded-lg"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 018 0z" />
+                </svg>
+                Play
+              </button>
+            )}
           </div>
 
-          {/* Demo Interface */}
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="feature-title text-neutral-900 mb-6">Demo Interface</h2>
-
-            <div className="space-y-6">
-              {/* Recording Controls */}
-              <div className="flex justify-center space-x-4">
-                {!isRecording ? (
-                  <button
-                    onClick={startRecording}
-                    className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg flex items-center space-x-2 transition-colors"
-                  >
-                    <Mic className="h-5 w-5" />
-                    <span>Start Recording</span>
-                  </button>
-                ) : (
-                  <button
-                    onClick={stopRecording}
-                    className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg flex items-center space-x-2 transition-colors"
-                  >
-                    <MicOff className="h-5 w-5" />
-                    <span>Stop Recording</span>
-                  </button>
-                )}
-              </div>
-
-              {/* Audio Player */}
-              {audioUrl && (
-                <div className="bg-neutral-50 rounded-lg p-4">
-                  <h3 className="text-lg font-medium text-neutral-900 mb-3">Your Recording</h3>
-                  <div className="flex items-center space-x-4">
-                    <button
-                      onClick={playRecording}
-                      disabled={isPlaying}
-                      className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
-                    >
-                      {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-                      <span>{isPlaying ? 'Playing...' : 'Play'}</span>
-                    </button>
-
-                    <button
-                      onClick={deleteRecording}
-                      className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                      <span>Delete</span>
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* Transcript */}
-              {transcript && (
-                <div className="bg-neutral-50 rounded-lg p-4">
-                  <h3 className="text-lg font-medium text-neutral-900 mb-3">Transcription</h3>
-                  <p className="text-neutral-700">{transcript}</p>
-                </div>
-              )}
-
-              {/* Process Button */}
-              {audioBlob && !transcript && (
-                <div className="flex justify-center">
-                  <button
-                    onClick={processVoiceRFQ}
-                    disabled={loading}
-                    className="bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white px-6 py-3 rounded-lg flex items-center space-x-2 transition-colors"
-                  >
-                    <Send className="h-5 w-5" />
-                    <span>{loading ? 'Processing...' : 'Process Voice RFQ'}</span>
-                  </button>
-                </div>
-              )}
+          {isRecording && (
+            <div className="mt-4 flex justify-center items-center gap-2">
+              <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+              <span className="text-sm text-red-400">Recording...</span>
             </div>
-          </div>
-
-          {/* Features Preview */}
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                <Mic className="h-6 w-6 text-blue-600" />
-              </div>
-              <h3 className="text-lg font-semibold text-neutral-900 mb-2">Voice Recording</h3>
-              <p className="text-neutral-600">Record your RFQ requirements naturally using voice</p>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                <Play className="h-6 w-6 text-green-600" />
-              </div>
-              <h3 className="text-lg font-semibold text-neutral-900 mb-2">AI Transcription</h3>
-              <p className="text-neutral-600">Get accurate transcription with AI-powered processing</p>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-                <Send className="h-6 w-6 text-purple-600" />
-              </div>
-              <h3 className="text-lg font-semibold text-neutral-900 mb-2">Auto Send</h3>
-              <p className="text-neutral-600">Automatically send to relevant suppliers</p>
-            </div>
-          </div>
-
-          {/* CTA */}
-          <div className="mt-8 text-center">
-            <a
-              href="/rfq/create"
-              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors"
-            >
-              Use Text RFQ Instead
-            </a>
-          </div>
+          )}
         </div>
+
+        {/* Audio Controls */}
+        {audioBlob && (
+          <div className="bg-slate-800 rounded-lg p-6 mb-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">Recorded Audio</h3>
+              <button
+                onClick={deleteAudio}
+                className="text-red-500 hover:text-red-600"
+              >
+                Delete Recording
+              </button>
+            </div>
+            <audio ref={audioRef} controls className="w-full" />
+          </div>
+        )}
+
+        {/* AI Processing */}
+        {audioBlob && !rfqData && (
+          <div className="bg-slate-800 rounded-lg p-6 mb-6">
+            <div className="text-center mb-4">
+              <h3 className="text-lg font-semibold mb-2">Process with AI</h3>
+              <p className="text-slate-400">
+                AI will transcribe your audio and extract RFQ details
+              </p>
+            </div>
+            <button
+              onClick={processWithAI}
+              disabled={isLoading}
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-lg disabled:opacity-50"
+            >
+              {isLoading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="animate-spin h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  Processing with AI...
+                </span>
+              ) : (
+                'Process with AI'
+              )}
+            </button>
+          </div>
+        )}
+
+        {/* AI Results */}
+        {rfqData && (
+          <div className="bg-slate-800 rounded-lg p-6 mb-6">
+            <div className="text-center mb-6">
+              <h3 className="text-lg font-semibold mb-2">AI Results</h3>
+              <p className="text-slate-400">
+                AI has extracted the following details from your RFQ
+              </p>
+            </div>
+
+            {/* Transcript */}
+            <div className="bg-slate-700 rounded-lg p-4 mb-6">
+              <h4 className="font-medium mb-2">Transcript</h4>
+              <p className="text-sm text-slate-300">{transcript}</p>
+            </div>
+
+            {/* Extracted RFQ Details */}
+            <div className="space-y-4 mb-6">
+              <div className="bg-slate-700 rounded-lg p-4">
+                <h4 className="font-medium mb-2">Title</h4>
+                <p className="text-sm text-slate-300">{rfqData.title}</p>
+              </div>
+
+              <div className="bg-slate-700 rounded-lg p-4">
+                <h4 className="font-medium mb-2">Category</h4>
+                <p className="text-sm text-slate-300">{rfqData.category}</p>
+              </div>
+
+              <div className="bg-slate-700 rounded-lg p-4">
+                <h4 className="font-medium mb-2">Description</h4>
+                <p className="text-sm text-slate-300">{rfqData.description}</p>
+              </div>
+
+              <div className="bg-slate-700 rounded-lg p-4">
+                <h4 className="font-medium mb-2">Quantity</h4>
+                <p className="text-sm text-slate-300">{rfqData.quantity}</p>
+              </div>
+            </div>
+
+            <div className="flex gap-4">
+              <button
+                onClick={submitRFQ}
+                className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-lg"
+              >
+                Submit RFQ
+              </button>
+              <button
+                onClick={deleteAudio}
+                className="flex-1 bg-slate-600 hover:bg-slate-700 text-white py-3 rounded-lg"
+              >
+                Re-record
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-900/50 rounded-lg p-4 mb-6 text-red-300">
+            {error}
+          </div>
+        )}
       </div>
     </div>
   );

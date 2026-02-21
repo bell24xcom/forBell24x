@@ -13,7 +13,8 @@ const nextConfig = {
   },
   images: {
     unoptimized: true
-  }
+  },
+  output: 'standalone',
+  outputFileTracingRoot: require('path').join(__dirname),
 }
-
 module.exports = nextConfig

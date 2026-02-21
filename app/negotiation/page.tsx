@@ -1,404 +1,320 @@
-'use client';
-
-import React, { useState, useEffect } from 'react';
-// Simple UI components for negotiation page
-const Card = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
-  <div className={`bg-white rounded-lg shadow-sm border ${className}`}>{children}</div>
-);
-
-const CardHeader = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
-  <div className={`p-6 border-b border-gray-200 ${className}`}>{children}</div>
-);
-
-const CardTitle = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
-  <h3 className={`text-lg font-semibold text-gray-900 ${className}`}>{children}</h3>
-);
-
-const CardContent = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
-  <div className={`p-6 ${className}`}>{children}</div>
-);
-
-const Button = ({ children, className = '', onClick, disabled = false, variant = 'default' }: { 
-  children: React.ReactNode; 
-  className?: string; 
-  onClick?: () => void; 
-  disabled?: boolean;
-  variant?: 'default' | 'outline' | 'destructive';
-}) => {
-  const baseClasses = 'px-4 py-2 rounded-lg font-medium transition-colors';
-  const variantClasses = {
-    default: 'bg-blue-600 text-white hover:bg-blue-700',
-    outline: 'border border-gray-300 text-gray-700 hover:bg-gray-50',
-    destructive: 'bg-red-600 text-white hover:bg-red-700'
-  };
-  
-  return (
-    <button 
-      className={`${baseClasses} ${variantClasses[variant]} ${className} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-      onClick={onClick}
-      disabled={disabled}
-    >
-      {children}
-    </button>
-  );
-};
-
-const Badge = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
-  <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${className}`}>
-    {children}
-  </span>
-);
-
-const Input = ({ className = '', ...props }: { className?: string; [key: string]: any }) => (
-  <input className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${className}`} {...props} />
-);
-
-const Textarea = ({ className = '', ...props }: { className?: string; [key: string]: any }) => (
-  <textarea className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${className}`} {...props} />
-);
-import { 
-  MessageSquare, 
-  Users, 
-  DollarSign, 
-  Clock, 
-  TrendingUp,
-  CheckCircle,
-  XCircle,
-  AlertCircle,
-  Send,
-  Bot,
-  User
-} from 'lucide-react';
-
-interface Negotiation {
-  id: string;
-  rfqId: string;
-  buyerId: string;
-  supplierId: string;
-  status: 'active' | 'completed' | 'cancelled';
-  currentOffer: number;
-  counterOffer?: number;
-  messages: NegotiationMessage[];
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface NegotiationMessage {
-  id: string;
-  sender: 'buyer' | 'supplier' | 'ai';
-  message: string;
-  offer?: number;
-  timestamp: string;
-  isAISuggestion?: boolean;
-}
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useSession } from '@/contexts/AuthContext';
 
 export default function NegotiationPage() {
-  const [negotiations, setNegotiations] = useState<Negotiation[]>([]);
-  const [selectedNegotiation, setSelectedNegotiation] = useState<Negotiation | null>(null);
-  const [newMessage, setNewMessage] = useState('');
-  const [newOffer, setNewOffer] = useState('');
+  const [quotes, setQuotes] = useState<any[]>([]);
+  const [selectedQuote, setSelectedQuote] = useState<string | null>(null);
+  const [negotiationData, setNegotiationData] = useState({
+    counterPrice: '',
+    message: '',
+  });
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const router = useRouter();
+  const { user } = useSession();
 
-  // Mock data for demonstration
   useEffect(() => {
-    const mockNegotiations: Negotiation[] = [
-      {
-        id: 'neg-1',
-        rfqId: 'rfq-123',
-        buyerId: 'buyer-1',
-        supplierId: 'supplier-1',
-        status: 'active',
-        currentOffer: 45000,
-        counterOffer: 42000,
-        messages: [
-          {
-            id: 'msg-1',
-            sender: 'buyer',
-            message: 'We need 1000 units of steel bars. What\'s your best price?',
-            offer: 45000,
-            timestamp: '2025-09-18T10:00:00Z'
-          },
-          {
-            id: 'msg-2',
-            sender: 'supplier',
-            message: 'For 1000 units, we can offer ₹42,000 per ton.',
-            offer: 42000,
-            timestamp: '2025-09-18T10:15:00Z'
-          },
-          {
-            id: 'msg-3',
-            sender: 'ai',
-            message: 'Based on market analysis, ₹41,500 per ton would be a fair price for this quantity.',
-            offer: 41500,
-            isAISuggestion: true,
-            timestamp: '2025-09-18T10:20:00Z'
-          }
-        ],
-        createdAt: '2025-09-18T10:00:00Z',
-        updatedAt: '2025-09-18T10:20:00Z'
-      }
-    ];
-    setNegotiations(mockNegotiations);
+    if (!user) {
+      router.push('/login');
+    }
+  }, [user, router]);
+
+  useEffect(() => {
+    fetchQuotes();
   }, []);
 
-  const handleSendMessage = async () => {
-    if (!selectedNegotiation || (!newMessage && !newOffer)) return;
-
-    setIsLoading(true);
-    
+  const fetchQuotes = async () => {
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const newMsg: NegotiationMessage = {
-        id: `msg-${Date.now()}`,
-        sender: 'buyer',
-        message: newMessage,
-        offer: newOffer ? parseFloat(newOffer) : undefined,
-        timestamp: new Date().toISOString()
-      };
-
-      setNegotiations(prev => prev.map(neg => 
-        neg.id === selectedNegotiation.id 
-          ? { ...neg, messages: [...neg.messages, newMsg] }
-          : neg
-      ));
-
-      setNewMessage('');
-      setNewOffer('');
-    } catch (error) {
-      console.error('Error sending message:', error);
-    } finally {
-      setIsLoading(false);
+      const response = await fetch('/api/dashboard/quotes');
+      const data = await response.json();
+      if (data.success) {
+        setQuotes(data.quotes.filter((q: any) => q.status === 'PENDING'));
+      }
+    } catch (err) {
+      console.error('Error fetching quotes:', err);
+      setError('Failed to load quotes');
     }
   };
 
-  const handleAISuggestion = async () => {
-    if (!selectedNegotiation) return;
+  const handleNegotiation = async (quoteId: string, action: string) => {
+    if (action === 'counter') {
+      setSelectedQuote(quoteId);
+    } else {
+      setIsLoading(true);
+      setError('');
+      setSuccess('');
+
+      try {
+        const response = await fetch('/api/negotiation', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('auth-token')}`,
+          },
+          body: JSON.stringify({
+            quoteId,
+            action,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to process negotiation');
+        }
+
+        const data = await response.json();
+        if (data.success) {
+          setSuccess(`Quote ${action === 'accept' ? 'accepted' : 'rejected'} successfully!`);
+          fetchQuotes();
+        } else {
+          setError(data.error || 'Failed to process negotiation');
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };
+
+  const submitCounter = async () => {
+    if (!negotiationData.counterPrice) {
+      setError('Please enter a counter price');
+      return;
+    }
 
     setIsLoading(true);
-    
+    setError('');
+    setSuccess('');
+
     try {
-      // Call your existing AI negotiation API
-      const response = await fetch('/api/negotiation/run', {
+      const response = await fetch('/api/negotiation', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('auth-token')}`,
         },
         body: JSON.stringify({
-          rfqId: selectedNegotiation.rfqId,
-          initialOffer: selectedNegotiation.currentOffer,
-          minAcceptable: 40000,
-          maxAcceptable: 45000,
-          deliveryTerms: 'standard',
-          contractTerms: 'standard',
-          context: 'Steel bars negotiation'
-        })
+          quoteId: selectedQuote!,
+          action: 'counter',
+          counterPrice: parseFloat(negotiationData.counterPrice),
+          message: negotiationData.message,
+        }),
       });
 
-      const result = await response.json();
-      
-      const aiMessage: NegotiationMessage = {
-        id: `msg-${Date.now()}`,
-        sender: 'ai',
-        message: result.explanation,
-        offer: result.finalPrice,
-        isAISuggestion: true,
-        timestamp: new Date().toISOString()
-      };
+      if (!response.ok) {
+        throw new Error('Failed to submit counter offer');
+      }
 
-      setNegotiations(prev => prev.map(neg => 
-        neg.id === selectedNegotiation.id 
-          ? { ...neg, messages: [...neg.messages, aiMessage] }
-          : neg
-      ));
-    } catch (error) {
-      console.error('Error getting AI suggestion:', error);
+      const data = await response.json();
+      if (data.success) {
+        setSuccess('Counter offer submitted successfully!');
+        setNegotiationData({ counterPrice: '', message: '' });
+        setSelectedQuote(null);
+        fetchQuotes();
+      } else {
+        setError(data.error || 'Failed to submit counter offer');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active': return 'bg-green-100 text-green-800';
-      case 'completed': return 'bg-blue-100 text-blue-800';
-      case 'cancelled': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
+  const getInitials = (name: string) => {
+    return name.split(' ').map(n => n[0]).join('').toUpperCase();
   };
 
-  const getSenderIcon = (sender: string) => {
-    switch (sender) {
-      case 'buyer': return <User className="w-4 h-4" />;
-      case 'supplier': return <Users className="w-4 h-4" />;
-      case 'ai': return <Bot className="w-4 h-4" />;
-      default: return <User className="w-4 h-4" />;
-    }
+  const getStatusBadge = (status: string) => {
+    const colors = {
+      PENDING: 'bg-yellow-500',
+      ACCEPTED: 'bg-green-500',
+      REJECTED: 'bg-red-500',
+    };
+    return colors[status as keyof typeof colors] || 'bg-gray-500';
+  };
+
+  const formatDateTime = (date: Date) => {
+    return date.toLocaleDateString();
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-[#0F172A] text-white">
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        {/* Breadcrumb */}
+        <nav className="mb-6">
+          <ol className="flex items-center space-x-2 text-sm text-slate-400">
+            <li>
+              <a href="/dashboard" className="hover:text-white">Dashboard</a>
+            </li>
+            <li>
+              <span className="text-white">Negotiation</span>
+            </li>
+          </ol>
+        </nav>
+
+        {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">AI-Powered Negotiations</h1>
-          <p className="text-gray-600">Intelligent negotiation system with AI assistance</p>
+          <h1 className="text-3xl font-bold mb-4">Negotiation</h1>
+          <p className="text-slate-400">
+            Manage your quote negotiations with buyers
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Negotiations List */}
-          <div className="lg:col-span-1">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MessageSquare className="w-5 h-5" />
-                  Active Negotiations
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {negotiations.map((negotiation) => (
-                  <div
-                    key={negotiation.id}
-                    className={`p-4 border rounded-lg cursor-pointer transition-colors ${
-                      selectedNegotiation?.id === negotiation.id
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                    onClick={() => setSelectedNegotiation(negotiation)}
-                  >
-                    <div className="flex justify-between items-start mb-2">
-                      <div>
-                        <h3 className="font-semibold">RFQ #{negotiation.rfqId}</h3>
-                        <p className="text-sm text-gray-600">Steel Bars Negotiation</p>
-                      </div>
-                      <Badge className={getStatusColor(negotiation.status)}>
-                        {negotiation.status}
-                      </Badge>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <div className="text-sm text-gray-600">
-                        <span className="font-medium">Current: ₹{negotiation.currentOffer?.toLocaleString()}</span>
-                        {negotiation.counterOffer && (
-                          <span className="ml-2">Counter: ₹{negotiation.counterOffer.toLocaleString()}</span>
-                        )}
-                      </div>
-                      <Clock className="w-4 h-4 text-gray-400" />
-                    </div>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
+        {/* Success/Error Messages */}
+        {success && (
+          <div className="bg-green-900/50 rounded-lg p-4 mb-6 text-green-300">
+            {success}
           </div>
+        )}
+        {error && (
+          <div className="bg-red-900/50 rounded-lg p-4 mb-6 text-red-300">
+            {error}
+          </div>
+        )}
 
-          {/* Chat Interface */}
-          <div className="lg:col-span-2">
-            {selectedNegotiation ? (
-              <Card className="h-[600px] flex flex-col">
-                <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
-                    <span>Negotiation #{selectedNegotiation.rfqId}</span>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handleAISuggestion}
-                        disabled={isLoading}
-                      >
-                        <Bot className="w-4 h-4 mr-2" />
-                        AI Suggestion
-                      </Button>
+        {/* Quotes List */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {quotes.length === 0 ? (
+            <div className="col-span-full bg-white rounded-xl shadow-sm p-6 text-center text-slate-400">
+              <p>No pending quotes to negotiate</p>
+            </div>
+          ) : (
+            quotes.map((quote: any) => (
+              <div key={quote.id} className="bg-white rounded-xl shadow-sm p-6">
+                {/* Quote Header */}
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-indigo-500 rounded-full flex items-center justify-center font-medium text-white">
+                      {getInitials(quote.rfq.user.name)}
                     </div>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="flex-1 flex flex-col">
-                  {/* Messages */}
-                  <div className="flex-1 overflow-y-auto space-y-4 mb-4">
-                    {selectedNegotiation.messages.map((message) => (
-                      <div
-                        key={message.id}
-                        className={`flex gap-3 ${
-                          message.sender === 'buyer' ? 'justify-end' : 'justify-start'
-                        }`}
-                      >
-                        <div
-                          className={`flex gap-2 max-w-[80%] ${
-                            message.sender === 'buyer' ? 'flex-row-reverse' : 'flex-row'
-                          }`}
-                        >
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                            message.sender === 'buyer' ? 'bg-blue-500 text-white' :
-                            message.sender === 'supplier' ? 'bg-green-500 text-white' :
-                            'bg-purple-500 text-white'
-                          }`}>
-                            {getSenderIcon(message.sender)}
-                          </div>
-                          <div className={`p-3 rounded-lg ${
-                            message.sender === 'buyer' ? 'bg-blue-500 text-white' :
-                            message.sender === 'supplier' ? 'bg-green-100 text-green-900' :
-                            'bg-purple-100 text-purple-900 border border-purple-200'
-                          }`}>
-                            <p className="text-sm">{message.message}</p>
-                            {message.offer && (
-                              <p className="font-semibold mt-1">₹{message.offer.toLocaleString()}</p>
-                            )}
-                            <p className="text-xs opacity-70 mt-1">
-                              {new Date(message.timestamp).toLocaleTimeString()}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Input Area */}
-                  <div className="border-t pt-4">
-                    <div className="flex gap-2 mb-2">
-                      <Input
-                        placeholder="Enter your message..."
-                        value={newMessage}
-                        onChange={(e) => setNewMessage(e.target.value)}
-                        className="flex-1"
-                      />
-                      <Input
-                        placeholder="Offer amount"
-                        type="number"
-                        value={newOffer}
-                        onChange={(e) => setNewOffer(e.target.value)}
-                        className="w-32"
-                      />
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        onClick={handleSendMessage}
-                        disabled={isLoading || (!newMessage && !newOffer)}
-                        className="flex-1"
-                      >
-                        <Send className="w-4 h-4 mr-2" />
-                        Send Message
-                      </Button>
-                      <Button
-                        variant="outline"
-                        onClick={handleAISuggestion}
-                        disabled={isLoading}
-                      >
-                        <Bot className="w-4 h-4 mr-2" />
-                        AI Help
-                      </Button>
+                    <div>
+                      <h3 className="font-medium">{quote.rfq.user.company}</h3>
+                      <p className="text-sm text-slate-400">{quote.rfq.user.name}</p>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            ) : (
-              <Card className="h-[600px] flex items-center justify-center">
-                <div className="text-center">
-                  <MessageSquare className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Select a Negotiation</h3>
-                  <p className="text-gray-600">Choose a negotiation from the list to start chatting</p>
+                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusBadge(quote.status)}`}>
+                    {quote.status}
+                  </span>
                 </div>
-              </Card>
-            )}
-          </div>
+
+                {/* RFQ Info */}
+                <div className="mb-4">
+                  <h4 className="font-medium mb-2">RFQ: {quote.rfq.title}</h4>
+                  <p className="text-sm text-slate-400">
+                    Category: {quote.rfq.category}
+                  </p>
+                </div>
+
+                {/* Quote Details */}
+                <div className="mb-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm text-slate-500">Your Quote:</span>
+                    <span className="font-medium text-slate-900">₹{parseFloat(quote.price).toLocaleString('en-IN')}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-slate-500">Quantity:</span>
+                    <span className="text-sm text-slate-900">{quote.quantity}</span>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => handleNegotiation(quote.id, 'accept')}
+                    disabled={isLoading}
+                    className="flex-1 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg disabled:opacity-50"
+                  >
+                    {isLoading ? (
+                      <svg className="animate-spin h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      </svg>
+                    ) : null}
+                    Accept
+                  </button>
+                  <button
+                    onClick={() => handleNegotiation(quote.id, 'counter')}
+                    disabled={isLoading}
+                    className="flex-1 bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-2 rounded-lg disabled:opacity-50"
+                  >
+                    {isLoading ? (
+                      <svg className="animate-spin h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      </svg>
+                    ) : null}
+                    Counter
+                  </button>
+                  <button
+                    onClick={() => handleNegotiation(quote.id, 'reject')}
+                    disabled={isLoading}
+                    className="flex-1 bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg disabled:opacity-50"
+                  >
+                    {isLoading ? (
+                      <svg className="animate-spin h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      </svg>
+                    ) : null}
+                    Reject
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
         </div>
+
+        {/* Counter Offer Form */}
+        {selectedQuote && (
+          <div className="bg-white rounded-xl shadow-sm p-6 mt-6">
+            <h2 className="text-lg font-semibold mb-4">Submit Counter Offer</h2>
+            <form className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">Counter Price (₹)</label>
+                <input
+                  type="number"
+                  value={negotiationData.counterPrice}
+                  onChange={(e) => setNegotiationData({ ...negotiationData, counterPrice: e.target.value })}
+                  placeholder="9500"
+                  className="w-full px-4 py-2 bg-slate-50 border border-slate-300 text-slate-900 rounded-lg focus:outline-none focus:border-indigo-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Message</label>
+                <textarea
+                  value={negotiationData.message}
+                  onChange={(e) => setNegotiationData({ ...negotiationData, message: e.target.value })}
+                  placeholder="Add a message to your counter offer"
+                  rows={3}
+                  className="w-full px-4 py-2 bg-slate-50 border border-slate-300 text-slate-900 rounded-lg focus:outline-none focus:border-indigo-500"
+                />
+              </div>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setSelectedQuote(null)}
+                  className="flex-1 bg-slate-600 hover:bg-slate-700 text-white px-4 py-2 rounded-lg"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={submitCounter}
+                  disabled={isLoading}
+                  className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg disabled:opacity-50"
+                >
+                  {isLoading ? (
+                    <svg className="animate-spin h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                  ) : null}
+                  Submit Counter Offer
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
       </div>
     </div>
   );

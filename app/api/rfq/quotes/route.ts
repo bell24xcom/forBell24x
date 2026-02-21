@@ -1,169 +1,203 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { jwt } from '@/lib/jwt';
+import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(req: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
-    const rfqId = searchParams.get('rfqId');
-    const supplierId = searchParams.get('supplierId');
-    const status = searchParams.get('status');
+    // Authenticate user
+    const user = await jwt.authenticate(request);
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
 
-    const where: any = {};
+    // Get query parameters
+    const rfqId = request.nextUrl.searchParams.get('rfqId');
 
-    if (rfqId) where.rfqId = rfqId;
-    if (supplierId) where.supplierId = supplierId;
-    if (status) where.status = status;
+    if (!rfqId) {
+      return NextResponse.json(
+        { error: 'RFQ ID is required' },
+        { status: 400 }
+      );
+    }
 
+    // Get quotes for the RFQ
     const quotes = await prisma.quote.findMany({
-      where,
+      where: { rfqId },
       include: {
         supplier: {
           select: {
             id: true,
             name: true,
-            company: true,
-            rating: true,
-            verified: true,
-            location: true
-          }
+            companyName: true,
+            email: true,
+            phone: true,
+          },
         },
-        rfq: {
-          select: {
-            id: true,
-            title: true,
-            category: true
-          }
-        }
       },
-      orderBy: { createdAt: 'desc' }
     });
 
-    return NextResponse.json({ quotes });
-
+    return NextResponse.json({
+      success: true,
+      quotes: quotes.map((quote) => ({
+        id: quote.id,
+        rfqId: quote.rfqId,
+        supplier: quote.supplier,
+        price: quote.price,
+        quantity: quote.quantity,
+        timeline: quote.timeline,
+        description: quote.description,
+        terms: quote.terms,
+        status: quote.status,
+        createdAt: quote.createdAt,
+      })),
+    });
   } catch (error) {
     console.error('Error fetching quotes:', error);
-    return NextResponse.json({ error: 'Failed to fetch quotes' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
   }
 }
 
-export async function POST(req: NextRequest) {
+export async function PUT(request: NextRequest) {
   try {
-    const { 
-      rfqId, 
-      supplierId, 
-      price, 
-      quantity, 
-      deliveryTime, 
-      terms, 
-      validity, 
-      notes 
-    } = await req.json();
-
-    if (!rfqId || !supplierId || !price) {
-      return NextResponse.json({ 
-        error: 'RFQ ID, Supplier ID, and Price are required' 
-      }, { status: 400 });
+    // Authenticate user
+    const user = await jwt.authenticate(request);
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
     }
 
-    // Check if quote already exists
-    const existingQuote = await prisma.quote.findFirst({
-      where: {
-        rfqId,
-        supplierId
-      }
-    });
+    // Parse request body
+    const body = await request.json();
+    const { quoteId, action } = body;
 
-    if (existingQuote) {
-      return NextResponse.json({ 
-        error: 'Quote already submitted for this RFQ' 
-      }, { status: 400 });
+    if (!quoteId || !action || !['accept', 'reject'].includes(action)) {
+      return NextResponse.json(
+        { error: 'Invalid request' },
+        { status: 400 }
+      );
     }
 
-    const quote = await prisma.quote.create({
-      data: {
-        rfqId,
-        supplierId,
-        price: parseFloat(price),
-        quantity: parseInt(quantity) || 1,
-        deliveryTime,
-        terms,
-        validity: parseInt(validity) || 30,
-        notes,
-        status: 'PENDING'
-      },
-      include: {
-        supplier: {
-          select: {
-            id: true,
-            name: true,
-            company: true,
-            rating: true,
-            verified: true
-          }
-        }
-      }
-    });
-
-    return NextResponse.json({ 
-      success: true, 
-      quote 
-    });
-
-  } catch (error) {
-    console.error('Error creating quote:', error);
-    return NextResponse.json({ error: 'Failed to create quote' }, { status: 500 });
-  }
-}
-
-export async function PUT(req: NextRequest) {
-  try {
-    const { quoteId, status, selectedReason } = await req.json();
-
-    if (!quoteId || !status) {
-      return NextResponse.json({ 
-        error: 'Quote ID and status are required' 
-      }, { status: 400 });
-    }
-
-    const quote = await prisma.quote.update({
+    // Get the quote
+    const quote = await prisma.quote.findUnique({
       where: { id: quoteId },
-      data: { 
-        status,
-        selectedReason: selectedReason || null
-      },
       include: {
-        supplier: {
-          select: {
-            id: true,
-            name: true,
-            company: true
-          }
-        }
-      }
+        rfq: {
+          select: { createdBy: true },
+        },
+      },
     });
 
-    // If quote is selected, mark others as rejected
-    if (status === 'SELECTED') {
-      await prisma.quote.updateMany({
-        where: {
-          rfqId: quote.rfqId,
-          id: { not: quoteId }
-        },
-        data: { status: 'REJECTED' }
+    if (!quote) {
+      return NextResponse.json(
+        { error: 'Quote not found' },
+        { status: 404 }
+      );
+    }
+
+    // Verify the RFQ belongs to the authenticated user
+    if (quote.rfq.createdBy !== user.userId) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 403 }
+      );
+    }
+
+    // Update quote status
+    const updatedQuote = await prisma.quote.update({
+      where: { id: quoteId },
+      data: { status: action === 'accept' ? 'ACCEPTED' : 'REJECTED' },
+    });
+
+    // If accepting, update RFQ status
+    if (action === 'accept') {
+      await prisma.rFQ.update({
+        where: { id: quote.rfqId },
+        data: { status: 'QUOTED' },
       });
     }
 
-    return NextResponse.json({ 
-      success: true, 
-      quote 
+    return NextResponse.json({
+      success: true,
+      quote: {
+        id: updatedQuote.id,
+        status: updatedQuote.status,
+      },
     });
-
   } catch (error) {
     console.error('Error updating quote:', error);
-    return NextResponse.json({ error: 'Failed to update quote' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    // Authenticate user
+    const user = await jwt.authenticate(request);
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
+    // Parse request body
+    const body = await request.json();
+    const { rfqId, price, quantity, timeline, description, terms } = body;
+
+    if (!rfqId || !price || !quantity || !timeline) {
+      return NextResponse.json(
+        { error: 'Missing required fields' },
+        { status: 400 }
+      );
+    }
+
+    // Create quote
+    const quote = await prisma.quote.create({
+      data: {
+        rfqId,
+        supplierId: user.userId,
+        price,
+        quantity,
+        timeline,
+        description,
+        terms,
+        status: 'PENDING',
+      },
+    });
+
+    return NextResponse.json({
+      success: true,
+      quote: {
+        id: quote.id,
+        rfqId: quote.rfqId,
+        supplierId: quote.supplierId,
+        price: quote.price,
+        quantity: quote.quantity,
+        timeline: quote.timeline,
+        description: quote.description,
+        terms: quote.terms,
+        status: quote.status,
+        createdAt: quote.createdAt,
+      },
+    });
+  } catch (error) {
+    console.error('Error creating quote:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
   }
 }
