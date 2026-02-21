@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { Phone, Mail, ArrowLeft, CheckCircle, X, Building2, CreditCard, User } from 'lucide-react';
 
 const WIDGET_ID  = process.env.NEXT_PUBLIC_MSG91_WIDGET_ID;
@@ -48,6 +49,8 @@ export default function EnhancedAuthModal({ isOpen, onClose, onSuccess }: Enhanc
   const [selectedPlan, setSelectedPlan] = useState('professional'); // Default to Professional (free trial)
   const [widgetReady, setWidgetReady] = useState(false);
   const phoneRef = useRef('');
+  const loginCalledRef = useRef(false);
+  const router = useRouter();
 
   // Load MSG91 widget when modal opens
   useEffect(() => {
@@ -60,7 +63,8 @@ export default function EnhancedAuthModal({ isOpen, onClose, onSuccess }: Enhanc
           tokenAuth: TOKEN_AUTH,
           exposeMethods: true,
           success: async (data: unknown) => {
-            // MSG91 delivers the access-token here after OTP is verified
+            if (loginCalledRef.current) return; // prevent double-firing
+            loginCalledRef.current = true;
             const accessToken = typeof data === 'string' ? data : (() => {
               const r = data as Record<string, unknown>;
               return ((r['access-token'] ?? r['accessToken'] ?? r['token'] ?? r['message'] ?? '') as string);
@@ -69,9 +73,9 @@ export default function EnhancedAuthModal({ isOpen, onClose, onSuccess }: Enhanc
             if (!accessToken) {
               setError('Verification failed — no token received. Please try again.');
               setLoading(false);
+              loginCalledRef.current = false;
               return;
             }
-
             try {
               const response = await fetch('/api/auth/otp/widget-verify', {
                 method: 'POST',
@@ -82,19 +86,20 @@ export default function EnhancedAuthModal({ isOpen, onClose, onSuccess }: Enhanc
               if (!response.ok || !loginData.success) {
                 setError(loginData.message || 'Verification failed. Please try again.');
                 setLoading(false);
+                loginCalledRef.current = false;
                 return;
               }
               setUser(loginData.user);
               setLoading(false);
-              // Determine next step based on user profile completion
-              if (!loginData.user.company) {
-                setStep('kyc');
+              if (loginData.isNewUser || !loginData.user.company) {
+                setStep('kyc'); // New user → complete KYC in modal
               } else {
-                setStep('success');
+                router.push('/dashboard'); // Existing user → go straight to dashboard
               }
             } catch {
               setError('Network error. Please try again.');
               setLoading(false);
+              loginCalledRef.current = false;
             }
           },
           failure: (err: unknown) => {
@@ -154,6 +159,7 @@ export default function EnhancedAuthModal({ isOpen, onClose, onSuccess }: Enhanc
     const normalized = phoneNumber.replace(/[\s\-\(\)]/g, '').replace(/^\+91/, '').replace(/^91/, '');
     setPhone(normalized);
     phoneRef.current = normalized;
+    loginCalledRef.current = false; // reset guard for new OTP attempt
     setError('');
 
     if (!widgetReady || !window.sendOtp) {
@@ -183,35 +189,43 @@ export default function EnhancedAuthModal({ isOpen, onClose, onSuccess }: Enhanc
     window.verifyOtp(
       parseInt(otp, 10),
       async (data: unknown) => {
-        // Some MSG91 versions pass the token directly in verifyOtp callback
+        if (loginCalledRef.current) return; // prevent double-firing
+        loginCalledRef.current = true;
         const accessToken = typeof data === 'string' ? data : (() => {
           const r = data as Record<string, unknown>;
           return ((r['access-token'] ?? r['accessToken'] ?? r['token'] ?? r['message'] ?? '') as string);
         })();
         console.log('[MSG91 verifyOtp success] data=', data, 'token=', accessToken?.slice(0, 20));
-        if (accessToken) {
-          // Token came via verifyOtp callback — complete login now
-          try {
-            const response = await fetch('/api/auth/otp/widget-verify', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ accessToken, phone: phoneRef.current }),
-            });
-            const loginData = await response.json();
-            if (!response.ok || !loginData.success) {
-              setError(loginData.message || 'Verification failed.');
-              setLoading(false);
-              return;
-            }
-            setUser(loginData.user);
-            setLoading(false);
-            setStep(!loginData.user.company ? 'kyc' : 'success');
-          } catch {
-            setError('Network error. Please try again.');
-            setLoading(false);
-          }
+        if (!accessToken) {
+          // No token here — initSendOTP.success will handle it, reset guard
+          loginCalledRef.current = false;
+          return;
         }
-        // If no token here, initSendOTP.success callback will handle it
+        try {
+          const response = await fetch('/api/auth/otp/widget-verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ accessToken, phone: phoneRef.current }),
+          });
+          const loginData = await response.json();
+          if (!response.ok || !loginData.success) {
+            setError(loginData.message || 'Verification failed.');
+            setLoading(false);
+            loginCalledRef.current = false;
+            return;
+          }
+          setUser(loginData.user);
+          setLoading(false);
+          if (loginData.isNewUser || !loginData.user.company) {
+            setStep('kyc');
+          } else {
+            router.push('/dashboard');
+          }
+        } catch {
+          setError('Network error. Please try again.');
+          setLoading(false);
+          loginCalledRef.current = false;
+        }
       },
       (err) => {
         console.error('MSG91 verifyOtp failed:', err);
