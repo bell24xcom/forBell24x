@@ -1,41 +1,64 @@
-// TEMPORARY: Personal account payment until GST ready
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { jwt } from '@/lib/jwt';
+import { prisma } from '@/lib/prisma';
 
-// Force dynamic rendering
 export const dynamic = 'force-dynamic';
 
-export async function POST(req: Request) {
+export async function GET(request: NextRequest) {
   try {
-    const data = await req.json();
+    // Authenticate user
+    const user = await jwt.authenticate(request);
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
 
-    // Create UPI payment link
-    const upiLink = `upi://pay?pa=yourphonenumber@paytm&pn=Bell24h&am=${data.amount}&cu=INR&tn=${data.service}`;
+    // Get transactions for the user
+    const buyerTransactions = await prisma.transaction.findMany({
+      where: { buyerId: user.userId },
+      orderBy: { createdAt: 'desc' },
+    });
 
-    // Bank transfer details
-    const bankDetails = {
-      name: "Your Name",
-      account: "XXXXXXXXXX",
-      ifsc: "XXXXXXX",
-      amount: data.amount,
-      reference: `BELL24H-${Date.now()}`,
-      upi: upiLink
-    };
+    const supplierTransactions = await prisma.transaction.findMany({
+      where: { supplierId: user.userId },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    // Combine and sort transactions
+    const allTransactions = [
+      ...buyerTransactions.map(tx => ({ ...tx, type: 'debit' as const })),
+      ...supplierTransactions.map(tx => ({ ...tx, type: 'credit' as const })),
+    ].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+
+    // Calculate summary
+    const totalSpent = buyerTransactions.reduce((sum, tx) => sum + tx.amount, 0);
+    const totalEarned = supplierTransactions.reduce((sum, tx) => sum + tx.amount, 0);
+    const balance = totalEarned - totalSpent;
 
     return NextResponse.json({
       success: true,
-      payment: bankDetails,
-      note: "GST registration pending - will provide GST invoice once registered",
-      instructions: [
-        "1. Make payment using UPI or bank transfer",
-        "2. Send payment screenshot to WhatsApp",
-        "3. Service will be delivered within 48 hours",
-        "4. GST invoice will be provided once registered"
-      ]
+      transactions: allTransactions.map(tx => ({
+        id: tx.id,
+        type: tx.type,
+        amount: tx.amount,
+        currency: tx.currency,
+        status: tx.status,
+        description: tx.description,
+        createdAt: tx.createdAt,
+      })),
+      summary: {
+        totalSpent,
+        totalEarned,
+        balance,
+      },
     });
   } catch (error) {
-    return NextResponse.json({
-      success: false,
-      error: "Payment link generation failed"
-    }, { status: 500 });
+    console.error('Error fetching transactions:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
   }
 }

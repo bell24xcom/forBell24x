@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  previewFeatures = ["jsonProtocol"]
 }
 
 datasource db {
@@ -35,6 +34,10 @@ model User {
   otpVerifications OTPVerification[]
   leads       Lead[]
   notifications Notification[]
+
+  wallet           Wallet?
+  sentMessages     Message[] @relation("SentMessages")
+  receivedMessages Message[] @relation("ReceivedMessages")
 
   @@map("users")
 }
@@ -263,4 +266,42 @@ enum NotificationType {
   QUOTE_RECEIVED
   TRANSACTION_UPDATE
   SYSTEM_ALERT
+}
+
+// New models for Phase 3A
+model Wallet {
+  id           String              @id @default(cuid())
+  userId       String              @unique @map("user_id")
+  balance      Float               @default(0)
+  currency     String              @default("INR")
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+  user         User                @relation(fields: [userId], references: [id])
+  transactions WalletTransaction[]
+  @@map("wallets")
+}
+
+model WalletTransaction {
+  id          String   @id @default(cuid())
+  walletId    String   @map("wallet_id")
+  type        String
+  amount      Float
+  description String?
+  reference   String?
+  createdAt   DateTime @default(now())
+  wallet      Wallet   @relation(fields: [walletId], references: [id])
+  @@map("wallet_transactions")
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  fromId    String   @map("from_id")
+  toId      String   @map("to_id")
+  rfqId     String?  @map("rfq_id")
+  content   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  from      User     @relation("SentMessages",     fields: [fromId], references: [id])
+  to        User     @relation("ReceivedMessages", fields: [toId],   references: [id])
+  @@map("messages")
 }
