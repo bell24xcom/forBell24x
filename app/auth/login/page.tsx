@@ -484,12 +484,16 @@ export default function LoginPage() {
               </div>
               <button
                 onClick={handleSendOtp}
-                disabled={isLoading || !phone}
+                disabled={isLoading || !phone || !widgetReady}
                 className="btn-primary"
               >
                 {isLoading ? (
                   <>
                     <span className="loading-spinner"></span> Sending OTP...
+                  </>
+                ) : !widgetReady ? (
+                  <>
+                    <span className="loading-spinner"></span> Loading...
                   </>
                 ) : (
                   'Send OTP'
