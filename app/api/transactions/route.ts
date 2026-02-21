@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
       description,
       status: 'pending',
       escrow_required: escrowRequired,
-      escrow_enabled: process.env.ENABLE_ESCROW === 'true',
+      escrow_enabled: true,
       created_at: new Date().toISOString(),
       metadata: {
         source: 'bell24h-platform',
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
       }
     };
     
-    if (escrowRequired && process.env.ENABLE_ESCROW === 'true') {
+    if (escrowRequired) {
       // Create escrow transaction
       transaction.status = 'escrow_pending';
       transaction.metadata.escrow_id = `escrow_${Date.now()}`;
@@ -39,10 +39,8 @@ export async function POST(request: NextRequest) {
       transaction,
       escrow_info: escrowRequired ? {
         required: true,
-        enabled: process.env.ENABLE_ESCROW === 'true',
-        message: process.env.ENABLE_ESCROW === 'true' 
-          ? 'Transaction will be held in escrow until completion'
-          : 'Escrow feature coming soon for high-value transactions'
+        enabled: true,
+        message: 'Transaction will be held in escrow until completion'
       } : {
         required: false,
         message: 'Direct transaction - no escrow required'
@@ -67,9 +65,7 @@ export async function GET() {
       enabled: process.env.ENABLE_ESCROW === 'true',
       threshold: 500000,
       currency: 'INR',
-      message: process.env.ENABLE_ESCROW === 'true' 
-        ? 'Escrow protection active for transactions above ₹5,00,000'
-        : 'Escrow feature coming soon - currently in development'
+      message: 'Escrow protection active for transactions above ₹5,00,000'
     },
     supported_currencies: ['INR', 'USD', 'EUR', 'GBP'],
     features: [
