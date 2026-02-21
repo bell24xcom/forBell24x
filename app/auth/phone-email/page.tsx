@@ -25,6 +25,7 @@ export default function PhoneEmailAuth() {
   const [widgetReady, setWidgetReady] = useState(false);
   const [sentViaWidget, setSentViaWidget] = useState(false);
   const phoneRef = useRef('');
+  const loginCalledRef = useRef(false); // prevent double-firing
   const router = useRouter();
 
   // Normalize phone: strip +91, spaces, dashes
@@ -39,12 +40,15 @@ export default function PhoneEmailAuth() {
     return ((r['access-token'] ?? r['accessToken'] ?? r['token'] ?? r['message'] ?? '') as string);
   };
 
-  // Complete login with access-token from MSG91
+  // Complete login with access-token from MSG91 (guards against double-firing)
   const completeWidgetLogin = async (accessToken: string) => {
+    if (loginCalledRef.current) return;
+    loginCalledRef.current = true;
     const normalizedPhone = phoneRef.current;
     if (!accessToken || !normalizedPhone) {
       setError('Verification failed. Please try again.');
       setLoading(false);
+      loginCalledRef.current = false;
       return;
     }
     try {
@@ -57,6 +61,7 @@ export default function PhoneEmailAuth() {
       if (!response.ok || !loginData.success) {
         setError(loginData.message || 'Login failed. Please try again.');
         setLoading(false);
+        loginCalledRef.current = false;
         return;
       }
       localStorage.setItem('bell24h_user', JSON.stringify(loginData.user));
@@ -64,6 +69,7 @@ export default function PhoneEmailAuth() {
     } catch {
       setError('Network error. Please check your connection.');
       setLoading(false);
+      loginCalledRef.current = false;
     }
   };
 
