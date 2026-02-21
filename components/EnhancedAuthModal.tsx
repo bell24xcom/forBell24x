@@ -61,9 +61,16 @@ export default function EnhancedAuthModal({ isOpen, onClose, onSuccess }: Enhanc
           exposeMethods: true,
           success: async (data: unknown) => {
             // MSG91 delivers the access-token here after OTP is verified
-            const r = data as Record<string, unknown>;
-            const accessToken = ((r['access-token'] ?? r['accessToken'] ?? r['token'] ?? '') as string);
-            if (!accessToken) return;
+            const accessToken = typeof data === 'string' ? data : (() => {
+              const r = data as Record<string, unknown>;
+              return ((r['access-token'] ?? r['accessToken'] ?? r['token'] ?? r['message'] ?? '') as string);
+            })();
+            console.log('[MSG91 success] data=', data, 'token=', accessToken?.slice(0, 20));
+            if (!accessToken) {
+              setError('Verification failed — no token received. Please try again.');
+              setLoading(false);
+              return;
+            }
 
             try {
               const response = await fetch('/api/auth/otp/widget-verify', {
@@ -177,8 +184,11 @@ export default function EnhancedAuthModal({ isOpen, onClose, onSuccess }: Enhanc
       parseInt(otp, 10),
       async (data: unknown) => {
         // Some MSG91 versions pass the token directly in verifyOtp callback
-        const r = data as Record<string, unknown>;
-        const accessToken = ((r['access-token'] ?? r['accessToken'] ?? r['token'] ?? '') as string);
+        const accessToken = typeof data === 'string' ? data : (() => {
+          const r = data as Record<string, unknown>;
+          return ((r['access-token'] ?? r['accessToken'] ?? r['token'] ?? r['message'] ?? '') as string);
+        })();
+        console.log('[MSG91 verifyOtp success] data=', data, 'token=', accessToken?.slice(0, 20));
         if (accessToken) {
           // Token came via verifyOtp callback — complete login now
           try {
