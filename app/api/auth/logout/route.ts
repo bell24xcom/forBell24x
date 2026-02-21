@@ -1,41 +1,21 @@
 import { NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST() {
-  try {
-    const response = NextResponse.json({
-      success: true,
-      message: 'Logout successful'
-    });
+  const response = NextResponse.json({
+    success: true,
+    message: 'Logout successful'
+  });
 
-    // Clear user session cookie
-    response.cookies.set('user_session', '', {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 0,
-      path: '/'
-    });
+  // Clear the httpOnly auth-token cookie (set by /api/auth/otp/verify)
+  response.cookies.set('auth-token', '', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 0,
+    path: '/',
+  });
 
-    // Clear OTP cookie if exists
-    response.cookies.set('demo_otp', '', {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 0,
-      path: '/'
-    });
-
-    console.log('✅ User logged out successfully');
-
-    return response;
-
-  } catch (error) {
-    console.error('Logout Error:', error);
-    return NextResponse.json(
-      { 
-        success: false, 
-        error: 'Logout failed',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      },
-      { status: 500 }
-    );
-  }
+  return response;
 }

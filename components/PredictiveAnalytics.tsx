@@ -506,7 +506,7 @@ export const PredictiveAnalytics: React.FC = () => {
                     <div className="text-right">
                       <p className="font-medium">${stock.price.toFixed(2)}</p>
                       <p className={`text-sm ${stock.change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        {stock.change >= 0 ? '+' : }{stock.change.toFixed(2)} ({stock.changePercent.toFixed(2)}%)
+                        {stock.change >= 0 ? '+' : ''}{stock.change.toFixed(2)} ({stock.changePercent.toFixed(2)}%)
                       </p>
                     </div>
                   </div>

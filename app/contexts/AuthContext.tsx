@@ -4,21 +4,21 @@ import { useRouter } from 'next/navigation';
 
 interface User {
   id: string;
-  phoneNumber: string;
+  phone?: string;
   name?: string;
   email?: string;
   role?: string;
+  company?: string;
   isVerified?: boolean;
-  loginMethod?: string;
 }
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  signIn: (phoneNumber: string, otp: string) => Promise<void>;
+  signIn: (phone: string, otp: string) => Promise<void>;
   signOut: () => Promise<void>;
   isAuthenticated: boolean;
-  sendOTP: (phoneNumber: string) => Promise<void>;
+  sendOTP: (phone: string) => Promise<{ devOtp?: string }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -48,22 +48,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     checkAuth();
   }, []);
 
-  const sendOTP = async (phoneNumber: string) => {
+  const sendOTP = async (phone: string): Promise<{ devOtp?: string }> => {
     try {
       setLoading(true);
-      const response = await fetch('/api/auth/send-otp', {
+      const response = await fetch('/api/auth/otp/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phoneNumber })
+        body: JSON.stringify({ phone })
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to send OTP');
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || 'Failed to send OTP');
       }
 
-      const data = await response.json();
-      console.log('OTP sent successfully:', data);
+      return { devOtp: data.devOtp };
     } catch (error) {
       console.error('Send OTP error:', error);
       throw error;
@@ -72,26 +72,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signIn = async (phoneNumber: string, otp: string) => {
+  const signIn = async (phone: string, otp: string) => {
     try {
       setLoading(true);
-      const response = await fetch('/api/auth/verify-otp', {
+      const response = await fetch('/api/auth/otp/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phoneNumber, otp })
+        body: JSON.stringify({ phone, otp })
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Invalid OTP');
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || 'Invalid OTP');
       }
 
-      const data = await response.json();
-      
-      // Store user session
-      localStorage.setItem('bell24h_user', JSON.stringify(data.data.user));
-      setUser(data.data.user);
-      
+      // Store user session — backend returns { success, user, token }
+      localStorage.setItem('bell24h_user', JSON.stringify(data.user));
+      setUser(data.user);
+
       // Redirect to dashboard
       router.push('/dashboard');
     } catch (error) {
@@ -105,15 +104,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async () => {
     try {
       setLoading(true);
-      
-      // Remove user session
+
+      // Clear httpOnly cookie via server-side logout endpoint
+      await fetch('/api/auth/logout', { method: 'POST' });
+
+      // Remove client-side session
       localStorage.removeItem('bell24h_user');
       setUser(null);
-      
+
       // Redirect to home
       router.push('/');
     } catch (error) {
       console.error('Sign out error:', error);
+      // Still clear local state even if server call fails
+      localStorage.removeItem('bell24h_user');
+      setUser(null);
+      router.push('/');
     } finally {
       setLoading(false);
     }

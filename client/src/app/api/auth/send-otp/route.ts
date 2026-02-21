@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-<<<<<<< HEAD
 // Mobile OTP Authentication API
 // Sends OTP to mobile number using MSG91
 export async function POST(request: NextRequest) {
   try {
     const { phoneNumber } = await request.json();
 
-    console.log(`📱 Sending OTP to: ${phoneNumber}`);
+    console.log(`Sending OTP to: ${phoneNumber}`);
 
     // Validate phone number
     if (!phoneNumber || phoneNumber.length < 10) {
@@ -19,7 +18,7 @@ export async function POST(request: NextRequest) {
 
     // Generate 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    
+
     // Store OTP temporarily (in production, use Redis or database)
     const otpData = {
       phoneNumber,
@@ -35,8 +34,8 @@ export async function POST(request: NextRequest) {
     const smsResult = await sendOTPviaMSG91(phoneNumber, otp);
 
     if (smsResult.success) {
-      console.log(`✅ OTP sent successfully to ${phoneNumber}`);
-      
+      console.log(`OTP sent successfully to ${phoneNumber}`);
+
       return NextResponse.json({
         success: true,
         message: 'OTP sent successfully',
@@ -47,11 +46,11 @@ export async function POST(request: NextRequest) {
         }
       });
     } else {
-      console.error(`❌ Failed to send OTP to ${phoneNumber}:`, smsResult.error);
-      
+      console.error(`Failed to send OTP to ${phoneNumber}:`, smsResult.error);
+
       return NextResponse.json(
-        { 
-          success: false, 
+        {
+          success: false,
           error: 'Failed to send OTP. Please try again.',
           details: smsResult.error
         },
@@ -60,10 +59,10 @@ export async function POST(request: NextRequest) {
     }
 
   } catch (error) {
-    console.error('❌ Send OTP Error:', error);
+    console.error('Send OTP Error:', error);
     return NextResponse.json(
-      { 
-        success: false, 
+      {
+        success: false,
         error: 'Internal server error',
         details: error instanceof Error ? error.message : 'Unknown error'
       },
@@ -75,9 +74,16 @@ export async function POST(request: NextRequest) {
 // Send OTP via MSG91 API
 async function sendOTPviaMSG91(phoneNumber: string, otp: string) {
   try {
-    const msg91AuthKey = process.env.MSG91_AUTH_KEY || '468517Ak5rJ0vb7NDV68c24863P1';
+    const msg91AuthKey = process.env.MSG91_AUTH_KEY;
     const senderId = process.env.MSG91_SENDER_ID || 'BELL24H';
-    
+
+    if (!msg91AuthKey) {
+      return {
+        success: false,
+        error: 'MSG91_AUTH_KEY environment variable is not configured'
+      };
+    }
+
     // Format phone number for MSG91 (add +91 if not present)
     let formattedNumber = phoneNumber;
     if (!phoneNumber.startsWith('+91')) {
@@ -105,7 +111,7 @@ async function sendOTPviaMSG91(phoneNumber: string, otp: string) {
 
     if (response.ok) {
       const result = await response.text();
-      
+
       // MSG91 returns message ID on success
       if (result && result.length > 10) {
         return {
@@ -157,14 +163,4 @@ export async function GET(request: NextRequest) {
       ]
     }
   });
-=======
-export async function POST(req: NextRequest) {
-  const { mobile } = await req.json();
-  // TODO: Integrate with MSG91 API if keys are present.
-  // For now, always return success.
-  if (!mobile || mobile.length < 10) {
-    return NextResponse.json({ success: false, message: 'Invalid mobile number.' }, { status: 400 });
-  }
-  return NextResponse.json({ success: true });
->>>>>>> b7b4b9c6cd126094e89116e18b3dbb247f1e8e4d
 }

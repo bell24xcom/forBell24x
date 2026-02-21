@@ -1,44 +1,107 @@
+/**
+ * GET /api/admin/analytics?range=7d|30d|90d|1d
+ * Returns real platform analytics from the database.
+ * Protected — requires admin-token cookie.
+ */
 import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { requireAdmin, isErrorResponse } from '@/lib/admin-auth';
 
-// Force dynamic rendering
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
-  try {
-    const now = new Date();
-    const { searchParams } = new URL(req.url);
-    const timeRange = searchParams.get('range') || '7d';
+  const auth = requireAdmin(req);
+  if (isErrorResponse(auth)) return auth;
 
-    // Mock analytics data
-    const analytics = {
+  try {
+    const { searchParams } = new URL(req.url);
+    const range     = searchParams.get('range') || '7d';
+    const now       = new Date();
+    const daysMap   = { '1d': 1, '7d': 7, '30d': 30, '90d': 90 } as const;
+    const days      = daysMap[range as keyof typeof daysMap] ?? 7;
+    const since     = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+    const prevSince = new Date(since.getTime() - days * 24 * 60 * 60 * 1000);
+
+    const [
+      totalUsers,
+      activeSuppliers,
+      recentUsers,
+      prevUsers,
+      recentLeads,
+      prevLeads,
+      recentRfqs,
+      prevRfqs,
+      recentSuppliers,
+      prevSuppliers,
+      revenueResult,
+      prevRevenueResult,
+      highTrustSuppliers,
+      systemHealth,
+    ] = await Promise.all([
+      prisma.user.count(),
+      prisma.user.count({ where: { role: 'SUPPLIER', isActive: true } }),
+      // Growth: current period
+      prisma.user.count({ where: { createdAt: { gte: since } } }),
+      // Growth: previous period (for delta)
+      prisma.user.count({ where: { createdAt: { gte: prevSince, lt: since } } }),
+      prisma.lead.count({ where: { createdAt: { gte: since } } }),
+      prisma.lead.count({ where: { createdAt: { gte: prevSince, lt: since } } }),
+      prisma.rFQ.count({ where: { createdAt:  { gte: since } } }),
+      prisma.rFQ.count({ where: { createdAt:  { gte: prevSince, lt: since } } }),
+      prisma.user.count({ where: { role: 'SUPPLIER', createdAt: { gte: since } } }),
+      prisma.user.count({ where: { role: 'SUPPLIER', createdAt: { gte: prevSince, lt: since } } }),
+      // Revenue: completed transactions in period
+      prisma.transaction.aggregate({
+        _sum: { amount: true },
+        where: { status: 'COMPLETED', createdAt: { gte: since } },
+      }),
+      prisma.transaction.aggregate({
+        _sum: { amount: true },
+        where: { status: 'COMPLETED', createdAt: { gte: prevSince, lt: since } },
+      }),
+      prisma.user.count({ where: { role: 'SUPPLIER', trustScore: { gte: 70 } } }),
+      // System health proxy: active users / total users ratio
+      prisma.user.count({ where: { isActive: true } }),
+    ]);
+
+    const totalRevenue     = Number(revenueResult._sum.amount    ?? 0);
+    const prevRevenue      = Number(prevRevenueResult._sum.amount ?? 0);
+
+    // Growth % helper — returns 0 if no previous data
+    const growthPct = (curr: number, prev: number) =>
+      prev > 0 ? parseFloat(((curr - prev) / prev * 100).toFixed(1)) : (curr > 0 ? 100 : 0);
+
+    const healthPct = totalUsers > 0
+      ? parseFloat(((systemHealth / totalUsers) * 100).toFixed(1))
+      : 100;
+
+    return NextResponse.json({
       metrics: {
-        totalUsers: 1247,
-        activeSuppliers: 89,
-        totalRevenue: 2450000,
-        systemHealth: 99.2,
-        aiAccuracy: 94.2,
-        fraudDetection: 98.1,
-        uptime: 99.9,
+        totalUsers,
+        activeSuppliers,
+        totalRevenue,
+        systemHealth:     Math.min(healthPct, 100),
+        highTrustSuppliers,
+        recentLeads,
+        recentRfqs,
+        // Static performance indicators — real system metrics require infra integration
+        aiAccuracy:       94.2,
+        fraudDetection:   98.1,
+        uptime:           99.9,
         performanceScore: 96.8,
-        recentLeads: 156,
-        recentRfqs: 89
       },
       growth: {
-        userGrowth: 12.5,
-        revenueGrowth: 18.3,
-        leadGrowth: 15.2,
-        supplierGrowth: 8.7
+        userGrowth:      growthPct(recentUsers,      prevUsers),
+        revenueGrowth:   growthPct(totalRevenue,     prevRevenue),
+        leadGrowth:      growthPct(recentLeads,      prevLeads),
+        supplierGrowth:  growthPct(recentSuppliers,  prevSuppliers),
+        rfqGrowth:       growthPct(recentRfqs,       prevRfqs),
       },
-      timeRange,
-      lastUpdated: now.toISOString()
-    };
-
-    return NextResponse.json(analytics);
-    
+      timeRange:   range,
+      lastUpdated: now.toISOString(),
+    });
   } catch (error) {
-    console.error('Error fetching analytics:', error);
-    return NextResponse.json({ 
-      error: 'Failed to fetch analytics data' 
-    }, { status: 500 });
+    console.error('Admin analytics error:', error);
+    return NextResponse.json({ error: 'Failed to fetch analytics data' }, { status: 500 });
   }
 }

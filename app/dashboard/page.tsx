@@ -46,14 +46,12 @@ export default function DashboardPage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
-    totalRFQs: 45,
-    activeRFQs: 8,
-    totalSuppliers: 127,
-    totalProducts: 89,
-    totalSpent: 2850000,
-    totalEarned: 4200000,
-    successRate: 94.5,
-    trustScore: 87
+    totalRFQs: 0,
+    activeRFQs: 0,
+    totalQuotesReceived: 0,
+    totalSpent: 0,
+    totalEarned: 0,
+    successRate: 0,
   });
 
   const [liveFeatures] = useState<LiveFeature[]>([
@@ -107,36 +105,7 @@ export default function DashboardPage() {
     }
   ]);
 
-  const [recentActivity] = useState<RecentActivity[]>([
-    {
-      id: '1',
-      type: 'rfq_created',
-      description: 'Created RFQ for Industrial Steel Pipes',
-      timestamp: '2 hours ago',
-      status: 'success'
-    },
-    {
-      id: '2',
-      type: 'transaction_completed',
-      description: 'Completed payment for Electronics Order',
-      timestamp: '5 hours ago',
-      status: 'success'
-    },
-    {
-      id: '3',
-      type: 'ai_matching',
-      description: 'AI matched 3 suppliers for Steel RFQ',
-      timestamp: '1 day ago',
-      status: 'success'
-    },
-    {
-      id: '4',
-      type: 'escrow_released',
-      description: 'Released escrow payment for Machinery',
-      timestamp: '2 days ago',
-      status: 'success'
-    }
-  ]);
+  const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
 
   const router = useRouter();
 
@@ -157,8 +126,14 @@ export default function DashboardPage() {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
-      // Mock data loading - in real app, this would fetch from APIs
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const res = await fetch('/api/dashboard/stats', { credentials: 'include' });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          setStats(data.stats);
+          setRecentActivity(data.recentActivity || []);
+        }
+      }
     } catch (error) {
       console.error('Error loading dashboard data:', error);
     } finally {
@@ -251,11 +226,11 @@ export default function DashboardPage() {
         <div className="bg-white rounded-lg shadow-sm p-6">
           <div className="flex items-center">
             <div className="p-3 rounded-full bg-purple-100 text-purple-600">
-              <Users className="w-6 h-6" />
+              <MessageSquare className="w-6 h-6" />
             </div>
             <div className="ml-4">
-              <p className="text-sm text-gray-600">Suppliers</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.totalSuppliers}</p>
+              <p className="text-sm text-gray-600">Quotes Received</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.totalQuotesReceived}</p>
             </div>
           </div>
         </div>
@@ -263,11 +238,11 @@ export default function DashboardPage() {
         <div className="bg-white rounded-lg shadow-sm p-6">
           <div className="flex items-center">
             <div className="p-3 rounded-full bg-orange-100 text-orange-600">
-              <ShoppingCart className="w-6 h-6" />
+              <TrendingUp className="w-6 h-6" />
             </div>
             <div className="ml-4">
-              <p className="text-sm text-gray-600">Products</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.totalProducts}</p>
+              <p className="text-sm text-gray-600">Total Earned</p>
+              <p className="text-2xl font-bold text-gray-900">{formatCurrency(stats.totalEarned)}</p>
             </div>
           </div>
         </div>
@@ -305,8 +280,10 @@ export default function DashboardPage() {
               <Award className="w-6 h-6" />
             </div>
             <div className="ml-4">
-              <p className="text-sm text-gray-600">Trust Score</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.trustScore}</p>
+              <p className="text-sm text-gray-600">Quote Rate</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {stats.totalRFQs > 0 ? Math.round((stats.totalQuotesReceived / stats.totalRFQs) * 100) : 0}%
+              </p>
             </div>
           </div>
         </div>

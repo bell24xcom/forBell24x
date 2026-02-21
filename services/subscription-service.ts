@@ -3,19 +3,25 @@ import { BELL24H_PLANS } from '../lib/subscription-plans';
 
 export class SubscriptionService {
   private purchases: any;
+  private initialized = false;
 
-  constructor() {
-    this.purchases = Purchases.configure({
-      apiKey: process.env.REVENUECAT_API_KEY!,
-      appUserID: null, // Will be set when user logs in
-    });
+  private ensureInitialized() {
+    if (!this.initialized && process.env.REVENUECAT_API_KEY) {
+      this.purchases = Purchases.configure({
+        apiKey: process.env.REVENUECAT_API_KEY,
+        appUserID: null, // Will be set when user logs in
+      });
+      this.initialized = true;
+    }
   }
 
   async initializeUser(userId: string) {
+    this.ensureInitialized();
     await this.purchases.identify(userId);
   }
 
   async getOfferings() {
+    this.ensureInitialized();
     const offerings = await this.purchases.getOfferings();
     return offerings.current?.availablePackages || [];
   }
@@ -39,6 +45,7 @@ export class SubscriptionService {
   }
 
   async checkSubscriptionStatus() {
+    this.ensureInitialized();
     const customerInfo = await this.purchases.getCustomerInfo();
 
     return {
