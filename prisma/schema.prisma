@@ -3,9 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  directUrl  = env("DIRECT_URL")
 }
 
 // Enhanced User model for production
@@ -18,7 +18,10 @@ model User {
   isActive    Boolean  @default(true)
   isVerified  Boolean  @default(false)
   company     String?
-  gstNumber   String?
+  gstNumber   String?   // optional — increases trust score if provided
+  udyamNumber String?   // optional MSME Udyam Aadhar — increases trust score if provided
+  trustScore  Int       @default(0) // 0-100: calculated from verification completeness
+  plan        UserPlan  @default(FREE) // subscription plan
   location    String?
   avatar      String?
   preferences Json?
@@ -31,9 +34,11 @@ model User {
   quotes      Quote[]
   buyerTransactions Transaction[] @relation("BuyerTransactions")
   supplierTransactions Transaction[] @relation("SupplierTransactions")
-  otpVerifications OTPVerification[]
   leads       Lead[]
   notifications Notification[]
+  wallet      Wallet?
+  sentMessages     Message[] @relation("SentMessages")
+  receivedMessages Message[] @relation("ReceivedMessages")
 
   wallet           Wallet?
   sentMessages     Message[] @relation("SentMessages")
@@ -42,7 +47,8 @@ model User {
   @@map("users")
 }
 
-// OTP Verification for authentication
+// OTP Verification for authentication — standalone table, NO FK to users
+// (phone may not yet have a User record at OTP send time)
 model OTPVerification {
   id         String   @id @default(cuid())
   phone      String   @unique
@@ -53,20 +59,25 @@ model OTPVerification {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  // Relations
-  user       User?    @relation(fields: [phone], references: [phone])
-
   @@map("otp_verifications")
 }
 
-// Category for RFQ classification (aligns API with schema)
+// Category — hierarchical (level 1 = main, level 2 = subcategory)
 model Category {
-  id          String   @id @default(cuid())
+  id          String     @id @default(cuid())
   name        String
-  slug        String   @unique
+  slug        String     @unique
   description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  parentId    String?    @map("parent_id")
+  parent      Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children    Category[] @relation("CategoryHierarchy")
+  level       Int        @default(1)  // 1 = main category, 2 = subcategory
+  isActive    Boolean    @default(true)
+  sortOrder   Int        @default(0)
+  icon        String?    // emoji or icon name for UI
+  color       String?    // hex color for UI badges
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 
   rfqs        RFQ[]
 
@@ -103,12 +114,14 @@ model RFQ {
   location    String?
   tags        String[]
   isPublic    Boolean  @default(true)
-  expiresAt   DateTime?
-  priority    Int      @default(3)
+  expiresAt      DateTime?
+  acceptedAt     DateTime?  // set when a quote is accepted (deal locked)
+  completedAt    DateTime?  // set when buyer confirms deal done
+  priority       Int       @default(3)
   estimatedValue Float?
-  views       Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  views          Int       @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   // Relations
   createdBy   String   @map("created_by")
@@ -207,6 +220,105 @@ model Notification {
   @@map("notifications")
 }
 
+// Wallet — one per user, tracks balance via WalletTransactions
+model Wallet {
+  id           String              @id @default(cuid())
+  userId       String              @unique @map("user_id")
+  balance      Float               @default(0)
+  currency     String              @default("INR")
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+
+  user         User                @relation(fields: [userId], references: [id])
+  transactions WalletTransaction[]
+
+  @@map("wallets")
+}
+
+// WalletTransaction — each deposit/debit
+model WalletTransaction {
+  id          String   @id @default(cuid())
+  walletId    String   @map("wallet_id")
+  type        String   // "credit" | "debit"
+  amount      Float
+  description String?
+  reference   String?  // e.g. payment ID or order ID
+  createdAt   DateTime @default(now())
+
+  wallet      Wallet   @relation(fields: [walletId], references: [id])
+
+  @@map("wallet_transactions")
+}
+
+// Message — direct messages between users (optionally linked to an RFQ)
+model Message {
+  id        String   @id @default(cuid())
+  fromId    String   @map("from_id")
+  toId      String   @map("to_id")
+  rfqId     String?  @map("rfq_id")
+  content   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  from      User     @relation("SentMessages",     fields: [fromId], references: [id])
+  to        User     @relation("ReceivedMessages", fields: [toId],   references: [id])
+
+  @@map("messages")
+}
+
+// Error log — lightweight self-hosted error tracking
+model ErrorLog {
+  id        String   @id @default(cuid())
+  route     String
+  method    String   @default("POST")
+  message   String
+  stack     String?
+  userId    String?  @map("user_id")
+  severity  String   @default("error") // "error" | "warn" | "critical"
+  meta      Json?    // extra context (phone, rfqId, etc.)
+  createdAt DateTime @default(now())
+
+  @@map("error_logs")
+}
+
+// Credit system for lead unlocking
+model UserCredits {
+  id        String   @id @default(cuid())
+  userId    String   @unique @map("user_id")
+  credits   Int      @default(0)
+  spent     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("user_credits")
+}
+
+model CreditPurchase {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  credits     Int
+  amount      Float
+  razorpayId  String?  @map("razorpay_id")
+  status      String   @default("pending")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("credit_purchases")
+}
+
+// Lead-Supplier unlock tracking
+model LeadSupplier {
+  id         String    @id @default(cuid())
+  leadId     String    @map("lead_id")
+  supplierId String    @map("supplier_id")
+  unlocked   Boolean   @default(false)
+  unlockedAt DateTime?
+  credits    Int       @default(0)
+  createdAt  DateTime  @default(now())
+
+  @@map("lead_suppliers")
+}
+
 // Enums
 enum UserRole {
   SUPPLIER
@@ -215,13 +327,22 @@ enum UserRole {
   AGENT
 }
 
+enum UserPlan {
+  FREE
+  PRO
+  ENTERPRISE
+}
+
 enum RFQStatus {
   DRAFT
   ACTIVE
   QUOTED
-  COMPLETED
+  ACCEPTED        // quote accepted — deal locked, in-progress
+  IN_PROGRESS     // buyer confirmed work started
+  COMPLETED       // buyer confirmed deal done
   CANCELLED
   EXPIRED
+  CLOSED_EXTERNAL // deal completed outside platform (manual override)
 }
 
 enum RFQUrgency {
@@ -264,6 +385,9 @@ enum NotificationType {
   ERROR
   RFQ_CREATED
   QUOTE_RECEIVED
+  QUOTE_ACCEPTED
+  DEAL_CHECK      // 7-day follow-up: "Was this deal completed?"
+  DEAL_CONFIRMED  // buyer confirmed deal complete
   TRANSACTION_UPDATE
   SYSTEM_ALERT
 }

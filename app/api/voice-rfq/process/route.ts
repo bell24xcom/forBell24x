@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { aiClient } from '@/lib/ai-client';
 
-// AI-powered voice processing for RFQ generation
+// Real AI-powered voice RFQ processing via NVIDIA DeepSeek V3.2
 export async function POST(request: NextRequest) {
   try {
     const { voiceText } = await request.json();
@@ -12,8 +13,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // AI processing to extract RFQ details from voice text
-    const processedRFQ = await processVoiceToRFQ(voiceText);
+    // Try NVIDIA DeepSeek AI first, fall back to keyword extraction
+    let processedRFQ;
+    try {
+      processedRFQ = await processVoiceWithNvidiaAI(voiceText);
+    } catch (aiError) {
+      console.warn('NVIDIA AI unavailable, using keyword extraction fallback:', aiError);
+      processedRFQ = processVoiceWithKeywords(voiceText);
+    }
 
     return NextResponse.json({
       success: true,
@@ -29,203 +36,120 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function processVoiceToRFQ(voiceText: string) {
-  // AI-powered extraction of RFQ details
-  const text = voiceText.toLowerCase();
-  
-  // Extract category
-  const category = extractCategory(text);
-  
-  // Extract quantity
-  const quantity = extractQuantity(text);
-  
-  // Extract timeline
-  const timeline = extractTimeline(text);
-  
-  // Extract budget
-  const budget = extractBudget(text);
-  
-  // Generate title
-  const title = generateTitle(text, category);
-  
-  // Generate description
-  const description = generateDescription(text, category);
-  
-  // Extract specifications
-  const specifications = extractSpecifications(text, category);
-  
-  // Generate unique ID
-  const id = generateId();
+// NVIDIA DeepSeek V3.2 - real AI extraction
+async function processVoiceWithNvidiaAI(voiceText: string) {
+  const client = aiClient.getClient('text'); // DeepSeek V3.2
+
+  if (!client) throw new Error('NVIDIA AI client not available');
+
+  const systemPrompt = `You are an expert B2B procurement assistant for Bell24h.com, an Indian B2B marketplace.
+Extract a structured RFQ from the user's voice input. Always respond with valid JSON only, no other text.
+
+Return this exact JSON structure:
+{
+  "title": "product/service name (concise, 5-10 words)",
+  "description": "detailed description of what is needed",
+  "category": "one of: Agriculture, Apparel & Fashion, Automobile, Chemical, Electronics & Electrical, Food Products & Beverage, Industrial Machinery, Packaging & Paper, Real Estate & Construction, Textiles, Tools & Equipment, Health & Beauty, Logistics, Other",
+  "quantity": "e.g. 500 pieces, 10 tons, 1000 units",
+  "unit": "pieces/kg/tons/meters/liters/boxes",
+  "budget": "e.g. ₹50,000 or 'Not specified'",
+  "timeline": "e.g. 2 weeks, 1 month, urgent",
+  "specifications": ["spec1", "spec2", "spec3"],
+  "location": "delivery city/state or 'Not specified'",
+  "urgency": "low/medium/high"
+}`;
+
+  const response = await (client as any).chat.completions.create({
+    model: 'deepseek-ai/deepseek-v3.2',
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: `Extract RFQ from this voice input: "${voiceText}"` }
+    ],
+    temperature: 0.3,
+    max_tokens: 800,
+  });
+
+  const content = response.choices[0]?.message?.content || '';
+
+  // Parse JSON from response
+  const jsonMatch = content.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) throw new Error('No JSON in AI response');
+
+  const extracted = JSON.parse(jsonMatch[0]);
 
   return {
-    id,
-    title,
-    description,
-    category,
-    quantity,
-    specifications,
-    timeline,
-    budget,
+    id: `voice-rfq-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    title: extracted.title || 'Voice RFQ',
+    description: extracted.description || voiceText,
+    category: extracted.category || 'Other',
+    quantity: extracted.quantity || 'Not specified',
+    unit: extracted.unit || 'units',
+    budget: extracted.budget || 'To be discussed',
+    timeline: extracted.timeline || '2 weeks',
+    specifications: extracted.specifications || [],
+    location: extracted.location || 'Not specified',
+    urgency: extracted.urgency || 'medium',
     status: 'draft' as const,
     createdAt: new Date().toISOString(),
-    createdVia: 'voice' as const
+    createdVia: 'voice' as const,
+    aiPowered: true,
+    aiModel: 'NVIDIA DeepSeek V3.2'
   };
 }
 
-function extractCategory(text: string): string {
-  const categoryKeywords = {
-    'manufacturing': ['steel', 'metal', 'machinery', 'equipment', 'industrial', 'manufacturing'],
-    'textiles': ['cotton', 'fabric', 'textile', 'clothing', 'garment', 'apparel', 't-shirt', 'shirt'],
-    'electronics': ['electronic', 'circuit', 'led', 'sensor', 'component', 'device', 'technology'],
-    'construction': ['construction', 'building', 'cement', 'brick', 'tile', 'infrastructure'],
-    'chemicals': ['chemical', 'pharmaceutical', 'medicine', 'drug', 'compound', 'solvent'],
-    'machinery': ['machine', 'cnc', 'automation', 'tool', 'equipment', 'spare part'],
-    'packaging': ['packaging', 'box', 'label', 'container', 'wrapper', 'corrugated'],
-    'automotive': ['automotive', 'car', 'vehicle', 'engine', 'brake', 'auto part']
+// Keyword-based fallback (no AI dependency)
+function processVoiceWithKeywords(voiceText: string) {
+  const text = voiceText.toLowerCase();
+
+  const categoryKeywords: Record<string, string[]> = {
+    'Industrial Machinery': ['steel', 'metal', 'machinery', 'equipment', 'industrial', 'manufacturing', 'cnc', 'machine'],
+    'Textiles': ['cotton', 'fabric', 'textile', 'clothing', 'garment', 'apparel', 't-shirt', 'shirt', 'yarn'],
+    'Electronics & Electrical': ['electronic', 'circuit', 'led', 'sensor', 'component', 'device', 'technology', 'electrical', 'wire'],
+    'Real Estate & Construction': ['construction', 'building', 'cement', 'brick', 'tile', 'infrastructure', 'sand', 'concrete'],
+    'Chemical': ['chemical', 'pharmaceutical', 'medicine', 'drug', 'compound', 'solvent', 'acid', 'polymer'],
+    'Packaging & Paper': ['packaging', 'box', 'label', 'container', 'wrapper', 'corrugated', 'carton', 'paper'],
+    'Automobile': ['automotive', 'car', 'vehicle', 'engine', 'brake', 'auto part', 'tyre'],
+    'Agriculture': ['seeds', 'fertilizer', 'pesticide', 'crop', 'agri', 'farm', 'grain'],
+    'Food Products & Beverage': ['food', 'beverage', 'snack', 'spice', 'grain', 'rice', 'wheat', 'sugar'],
   };
 
-  for (const [category, keywords] of Object.entries(categoryKeywords)) {
-    if (keywords.some(keyword => text.includes(keyword))) {
-      return category;
-    }
+  let category = 'Other';
+  for (const [cat, keywords] of Object.entries(categoryKeywords)) {
+    if (keywords.some(kw => text.includes(kw))) { category = cat; break; }
   }
 
-  return 'general';
-}
-
-function extractQuantity(text: string): string {
-  const quantityRegex = /(\d+)\s*(?:pieces?|units?|kg|tons?|meters?|feet?|boxes?|packages?)/gi;
-  const match = text.match(quantityRegex);
-  
-  if (match) {
-    return match[0];
-  }
-
-  // Look for numbers
-  const numberRegex = /\d+/g;
-  const numbers = text.match(numberRegex);
-  
-  if (numbers && numbers.length > 0) {
-    return `${numbers[0]} units`;
-  }
-
-  return 'Quantity not specified';
-}
-
-function extractTimeline(text: string): string {
-  const timelineKeywords = {
-    'urgent': ['urgent', 'asap', 'immediately', 'today', 'tomorrow'],
-    '1 week': ['week', '7 days', 'one week'],
-    '2 weeks': ['2 weeks', 'two weeks', 'fortnight'],
-    '1 month': ['month', '30 days', 'one month'],
-    '2 months': ['2 months', 'two months', '60 days']
+  const quantityMatch = text.match(/(\d+)\s*(?:pieces?|units?|kg|tons?|meters?|feet?|boxes?|packages?|liters?)/i);
+  const budgetMatch = text.match(/(?:budget|price|cost|₹|rs\.?)\s*(\d+(?:,\d+)*)/i);
+  const timelineMap: Record<string, string[]> = {
+    'urgent': ['urgent', 'asap', 'immediately', 'today'],
+    '1 week': ['week', '7 days'],
+    '1 month': ['month', '30 days'],
   };
 
-  for (const [timeline, keywords] of Object.entries(timelineKeywords)) {
-    if (keywords.some(keyword => text.includes(keyword))) {
-      return timeline;
-    }
+  let timeline = '2 weeks';
+  for (const [t, kws] of Object.entries(timelineMap)) {
+    if (kws.some(kw => text.includes(kw))) { timeline = t; break; }
   }
 
-  return '2 weeks';
-}
+  const words = voiceText.split(' ').filter(w => w.length > 4 &&
+    !['need', 'want', 'require', 'looking', 'please', 'provide'].includes(w.toLowerCase()));
 
-function extractBudget(text: string): string {
-  const budgetRegex = /(?:budget|price|cost|₹|rs\.?)\s*(\d+(?:,\d+)*(?:\.\d+)?)\s*(?:lakh|cr|k|thousand|million)?/gi;
-  const match = text.match(budgetRegex);
-  
-  if (match) {
-    return `₹${match[0].replace(/[^\d]/g, '')}`;
-  }
-
-  return 'Budget to be discussed';
-}
-
-function generateTitle(text: string, category: string): string {
-  const categoryTitles = {
-    'manufacturing': 'Industrial Equipment & Machinery',
-    'textiles': 'Textile & Apparel Products',
-    'electronics': 'Electronic Components & Devices',
-    'construction': 'Construction Materials & Supplies',
-    'chemicals': 'Chemical & Pharmaceutical Products',
-    'machinery': 'Machinery & Equipment',
-    'packaging': 'Packaging Materials & Solutions',
-    'automotive': 'Automotive Parts & Components',
-    'general': 'General Products & Services'
+  return {
+    id: `voice-rfq-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    title: words.slice(0, 5).join(' ') || 'Voice RFQ',
+    description: `Voice RFQ: ${voiceText}`,
+    category,
+    quantity: quantityMatch ? quantityMatch[0] : 'Not specified',
+    unit: 'units',
+    budget: budgetMatch ? `₹${budgetMatch[1]}` : 'To be discussed',
+    timeline,
+    specifications: [],
+    location: 'Not specified',
+    urgency: timeline === 'urgent' ? 'high' : 'medium',
+    status: 'draft' as const,
+    createdAt: new Date().toISOString(),
+    createdVia: 'voice' as const,
+    aiPowered: false,
+    aiModel: 'keyword-fallback'
   };
-
-  const baseTitle = categoryTitles[category as keyof typeof categoryTitles] || 'General Products';
-  
-  // Extract key product from text
-  const productKeywords = text.split(' ').filter(word => 
-    word.length > 3 && 
-    !['need', 'want', 'require', 'looking', 'for', 'the', 'and', 'or', 'but'].includes(word)
-  );
-
-  if (productKeywords.length > 0) {
-    return `${productKeywords[0].charAt(0).toUpperCase() + productKeywords[0].slice(1)} - ${baseTitle}`;
-  }
-
-  return baseTitle;
-}
-
-function generateDescription(text: string, category: string): string {
-  const categoryDescriptions = {
-    'manufacturing': 'Industrial equipment and machinery requirements',
-    'textiles': 'Textile and apparel product specifications',
-    'electronics': 'Electronic components and technology solutions',
-    'construction': 'Construction materials and building supplies',
-    'chemicals': 'Chemical and pharmaceutical product needs',
-    'machinery': 'Machinery and equipment specifications',
-    'packaging': 'Packaging materials and solutions',
-    'automotive': 'Automotive parts and components',
-    'general': 'General product and service requirements'
-  };
-
-  const baseDescription = categoryDescriptions[category as keyof typeof categoryDescriptions] || 'General requirements';
-  
-  return `Voice-generated RFQ: ${text}. ${baseDescription}.`;
-}
-
-function extractSpecifications(text: string, category: string): string[] {
-  const specifications: string[] = [];
-  
-  // Extract common specifications
-  if (text.includes('quality')) {
-    specifications.push('High quality standards required');
-  }
-  
-  if (text.includes('certified') || text.includes('certification')) {
-    specifications.push('Certified products only');
-  }
-  
-  if (text.includes('branded') || text.includes('brand')) {
-    specifications.push('Branded products preferred');
-  }
-  
-  if (text.includes('custom') || text.includes('customized')) {
-    specifications.push('Custom specifications required');
-  }
-  
-  if (text.includes('bulk') || text.includes('wholesale')) {
-    specifications.push('Bulk quantity pricing required');
-  }
-  
-  // Category-specific specifications
-  const categorySpecs = {
-    'textiles': ['Color specifications', 'Size requirements', 'Fabric type'],
-    'electronics': ['Technical specifications', 'Compatibility requirements', 'Warranty terms'],
-    'construction': ['Grade specifications', 'Size requirements', 'Durability standards'],
-    'chemicals': ['Purity levels', 'Safety standards', 'Packaging requirements'],
-    'machinery': ['Technical specifications', 'Performance requirements', 'Maintenance support']
-  };
-
-  const categorySpecificSpecs = categorySpecs[category as keyof typeof categorySpecs] || [];
-  specifications.push(...categorySpecificSpecs.slice(0, 2));
-
-  return specifications.length > 0 ? specifications : ['Standard specifications'];
-}
-
-function generateId(): string {
-  return `voice-rfq-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 }

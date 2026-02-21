@@ -1,3 +1,11 @@
+/**
+ * GET  /api/rfq/quotes?rfqId=&supplierId=&status=
+ * POST /api/rfq/quotes  — create a quote (supplier)
+ * PUT  /api/rfq/quotes  — accept/reject a quote (buyer)
+ *
+ * Uses only fields that exist in the Prisma schema.
+ * Supplier trustScore is included in GET so buyers can see it.
+ */
 import { NextRequest, NextResponse } from 'next/server';
 import { jwt } from '@/lib/jwt';
 import { prisma } from '@/lib/prisma';

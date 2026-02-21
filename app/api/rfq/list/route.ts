@@ -1,200 +1,110 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
 
-// Get list of RFQs with filtering and pagination
+const prisma = new PrismaClient();
+
+export const dynamic = 'force-dynamic';
+
+// Public marketplace RFQ listing — no auth required, suppliers browse these
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '10');
+    const page = Math.max(1, parseInt(searchParams.get('page') || '1'));
+    const limit = Math.min(50, Math.max(1, parseInt(searchParams.get('limit') || '10')));
     const category = searchParams.get('category');
     const status = searchParams.get('status');
     const search = searchParams.get('search');
     const sortBy = searchParams.get('sortBy') || 'createdAt';
-    const sortOrder = searchParams.get('sortOrder') || 'desc';
+    const sortOrder = (searchParams.get('sortOrder') || 'desc') as 'asc' | 'desc';
 
-    // Mock RFQ data - in real app, fetch from database
-    const allRFQs = [
-      {
-        id: 'RFQ-001',
-        title: 'Steel Pipes for Construction Project',
-        category: 'manufacturing',
-        description: 'High-quality steel pipes for residential construction project',
-        quantity: '500',
-        unit: 'meters',
-        minBudget: '250000',
-        maxBudget: '350000',
-        timeline: '2 weeks',
-        status: 'active',
-        urgency: 'normal',
-        createdBy: 'user-123',
-        createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-        views: 45,
-        quotes: 8,
-        suppliers: 12,
-        tags: ['steel', 'construction', 'quality'],
-        location: 'Mumbai, Maharashtra',
-        priority: 3,
-        estimatedValue: 300000
-      },
-      {
-        id: 'RFQ-002',
-        title: 'Cotton T-shirts for Retail Store',
-        category: 'textiles',
-        description: 'Premium quality cotton t-shirts in various sizes and colors',
-        quantity: '1000',
-        unit: 'pieces',
-        minBudget: '50000',
-        maxBudget: '75000',
-        timeline: '1 week',
-        status: 'quoted',
-        urgency: 'high',
-        createdBy: 'user-456',
-        createdAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
-        views: 78,
-        quotes: 15,
-        suppliers: 8,
-        tags: ['cotton', 'textile', 'retail'],
-        location: 'Delhi, NCR',
-        priority: 4,
-        estimatedValue: 62500
-      },
-      {
-        id: 'RFQ-003',
-        title: 'Electronic Components for IoT Device',
-        category: 'electronics',
-        description: 'Sensors, microcontrollers, and connectivity modules for IoT project',
-        quantity: '200',
-        unit: 'pieces',
-        minBudget: '100000',
-        maxBudget: '150000',
-        timeline: '3 weeks',
-        status: 'active',
-        urgency: 'normal',
-        createdBy: 'user-789',
-        createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-        views: 32,
-        quotes: 5,
-        suppliers: 6,
-        tags: ['electronic', 'iot', 'sensor'],
-        location: 'Bangalore, Karnataka',
-        priority: 3,
-        estimatedValue: 125000
-      },
-      {
-        id: 'RFQ-004',
-        title: 'Pharmaceutical Packaging Materials',
-        category: 'chemicals',
-        description: 'FDA-approved packaging materials for pharmaceutical products',
-        quantity: '500',
-        unit: 'boxes',
-        minBudget: '75000',
-        maxBudget: '100000',
-        timeline: '2 weeks',
-        status: 'completed',
-        urgency: 'urgent',
-        createdBy: 'user-321',
-        createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-        views: 56,
-        quotes: 12,
-        suppliers: 4,
-        tags: ['pharmaceutical', 'packaging', 'fda'],
-        location: 'Chennai, Tamil Nadu',
-        priority: 5,
-        estimatedValue: 87500
-      },
-      {
-        id: 'RFQ-005',
-        title: 'CNC Machines for Manufacturing',
-        category: 'machinery',
-        description: 'High-precision CNC machines for metal fabrication',
-        quantity: '2',
-        unit: 'units',
-        minBudget: '1500000',
-        maxBudget: '2000000',
-        timeline: '1 month',
-        status: 'active',
-        urgency: 'normal',
-        createdBy: 'user-654',
-        createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-        views: 89,
-        quotes: 6,
-        suppliers: 10,
-        tags: ['cnc', 'machinery', 'precision'],
-        location: 'Pune, Maharashtra',
-        priority: 3,
-        estimatedValue: 1750000
-      }
-    ];
-
-    // Apply filters
-    let filteredRFQs = allRFQs;
-
-    if (category && category !== 'all') {
-      filteredRFQs = filteredRFQs.filter(rfq => rfq.category === category);
-    }
+    // Build Prisma where clause — only public RFQs for the marketplace
+    const where: Record<string, unknown> = {
+      isPublic: true,
+    };
 
     if (status && status !== 'all') {
-      filteredRFQs = filteredRFQs.filter(rfq => rfq.status === status);
+      where.status = status.toUpperCase();
+    } else {
+      // Default: show ACTIVE and QUOTED RFQs in marketplace
+      where.status = { in: ['ACTIVE', 'QUOTED'] };
+    }
+
+    if (category && category !== 'all') {
+      where.category = { contains: category, mode: 'insensitive' };
     }
 
     if (search) {
-      const searchLower = search.toLowerCase();
-      filteredRFQs = filteredRFQs.filter(rfq => 
-        rfq.title.toLowerCase().includes(searchLower) ||
-        rfq.description.toLowerCase().includes(searchLower) ||
-        rfq.tags.some(tag => tag.toLowerCase().includes(searchLower))
-      );
+      where.OR = [
+        { title: { contains: search, mode: 'insensitive' } },
+        { description: { contains: search, mode: 'insensitive' } },
+        { category: { contains: search, mode: 'insensitive' } },
+      ];
     }
 
-    // Apply sorting
-    filteredRFQs.sort((a, b) => {
-      let aValue = a[sortBy as keyof typeof a];
-      let bValue = b[sortBy as keyof typeof b];
+    // Validate sortBy to prevent injection
+    const allowedSortFields = ['createdAt', 'updatedAt', 'estimatedValue', 'priority', 'views'];
+    const safeSortBy = allowedSortFields.includes(sortBy) ? sortBy : 'createdAt';
 
-      if (sortBy === 'createdAt') {
-        aValue = new Date(aValue as string).getTime();
-        bValue = new Date(bValue as string).getTime();
-      }
+    const [rfqs, total] = await Promise.all([
+      prisma.rFQ.findMany({
+        where,
+        orderBy: { [safeSortBy]: sortOrder },
+        skip: (page - 1) * limit,
+        take: limit,
+        include: {
+          quotes: { select: { id: true } },
+          user: {
+            select: {
+              id: true,
+              name: true,
+              company: true,
+              location: true,
+            },
+          },
+        },
+      }),
+      prisma.rFQ.count({ where }),
+    ]);
 
-      if (sortOrder === 'desc') {
-        return (bValue as number) - (aValue as number);
-      } else {
-        return (aValue as number) - (bValue as number);
-      }
-    });
-
-    // Apply pagination
-    const startIndex = (page - 1) * limit;
-    const endIndex = startIndex + limit;
-    const paginatedRFQs = filteredRFQs.slice(startIndex, endIndex);
-
-    // Calculate pagination info
-    const totalPages = Math.ceil(filteredRFQs.length / limit);
-    const hasNextPage = page < totalPages;
-    const hasPrevPage = page > 1;
+    const totalPages = Math.ceil(total / limit);
 
     return NextResponse.json({
       success: true,
-      rfqs: paginatedRFQs,
+      rfqs: rfqs.map(rfq => ({
+        id: rfq.id,
+        title: rfq.title,
+        category: rfq.category,
+        description: rfq.description,
+        quantity: rfq.quantity,
+        unit: rfq.unit,
+        minBudget: rfq.minBudget,
+        maxBudget: rfq.maxBudget,
+        timeline: rfq.timeline,
+        status: rfq.status,
+        urgency: rfq.urgency,
+        location: rfq.location,
+        tags: rfq.tags,
+        priority: rfq.priority,
+        estimatedValue: rfq.estimatedValue,
+        views: rfq.views,
+        createdAt: rfq.createdAt.toISOString(),
+        expiresAt: rfq.expiresAt?.toISOString() ?? null,
+        quotes: rfq.quotes.length,
+        buyer: rfq.user,
+      })),
       pagination: {
         page,
         limit,
-        total: filteredRFQs.length,
+        total,
         totalPages,
-        hasNextPage,
-        hasPrevPage
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
       },
-      filters: {
-        category,
-        status,
-        search,
-        sortBy,
-        sortOrder
-      },
-      timestamp: new Date().toISOString()
+      filters: { category, status, search, sortBy: safeSortBy, sortOrder },
+      timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('Error fetching RFQs:', error);
+    console.error('Error fetching RFQ list:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to fetch RFQs' },
       { status: 500 }

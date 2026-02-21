@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
@@ -19,36 +17,32 @@ export async function GET(req: NextRequest) {
 
     const skip = (page - 1) * limit;
 
-    // Build where clause
     const where: any = {};
-    
+
     if (status) {
       where.status = status;
     }
-    
+
     if (category) {
       where.category = category;
     }
-    
+
     if (search) {
       where.OR = [
         { title: { contains: search, mode: 'insensitive' } },
         { description: { contains: search, mode: 'insensitive' } },
-        { buyer: { name: { contains: search, mode: 'insensitive' } } }
+        { user: { name: { contains: search, mode: 'insensitive' } } }
       ];
     }
 
-    // Fetch RFQs with pagination
     const [rfqs, totalCount] = await Promise.all([
-      prisma.rfq.findMany({
+      prisma.rFQ.findMany({
         where,
         skip,
         take: limit,
-        orderBy: {
-          [sortBy]: sortOrder
-        },
+        orderBy: { [sortBy]: sortOrder },
         include: {
-          buyer: {
+          user: {
             select: {
               id: true,
               name: true,
@@ -56,39 +50,42 @@ export async function GET(req: NextRequest) {
               phone: true
             }
           },
-          suppliers: {
+          quotes: {
             select: {
               id: true,
-              name: true,
-              email: true
+              price: true,
+              status: true,
+              supplier: {
+                select: {
+                  id: true,
+                  name: true,
+                  email: true
+                }
+              }
             }
           },
           _count: {
-            select: {
-              bids: true,
-              suppliers: true
-            }
+            select: { quotes: true }
           }
         }
       }),
-      prisma.rfq.count({ where })
+      prisma.rFQ.count({ where })
     ]);
 
-    // Calculate additional stats
     const stats = await Promise.all([
-      prisma.rfq.count({ where: { status: 'ACTIVE' } }),
-      prisma.rfq.count({ where: { status: 'COMPLETED' } }),
-      prisma.rfq.count({ where: { status: 'CANCELLED' } }),
-      prisma.rfq.count({ 
-        where: { 
-          createdAt: { 
-            gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) 
-          } 
-        } 
+      prisma.rFQ.count({ where: { status: 'ACTIVE' } }),
+      prisma.rFQ.count({ where: { status: 'COMPLETED' } }),
+      prisma.rFQ.count({ where: { status: 'CANCELLED' } }),
+      prisma.rFQ.count({
+        where: {
+          createdAt: {
+            gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+          }
+        }
       })
     ]);
 
-    const response = {
+    return NextResponse.json({
       rfqs,
       pagination: {
         page,
@@ -103,14 +100,12 @@ export async function GET(req: NextRequest) {
         cancelledRfqs: stats[2],
         newRfqsThisWeek: stats[3]
       }
-    };
+    });
 
-    return NextResponse.json(response);
-    
   } catch (error) {
     console.error('Error fetching RFQs:', error);
-    return NextResponse.json({ 
-      error: 'Failed to fetch RFQs' 
+    return NextResponse.json({
+      error: 'Failed to fetch RFQs'
     }, { status: 500 });
   }
 }
@@ -118,18 +113,18 @@ export async function GET(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   try {
     const { rfqId, updates } = await req.json();
-    
+
     if (!rfqId) {
-      return NextResponse.json({ 
-        error: 'RFQ ID is required' 
+      return NextResponse.json({
+        error: 'RFQ ID is required'
       }, { status: 400 });
     }
 
-    const updatedRfq = await prisma.rfq.update({
+    const updatedRfq = await prisma.rFQ.update({
       where: { id: rfqId },
       data: updates,
       include: {
-        buyer: {
+        user: {
           select: {
             id: true,
             name: true,
@@ -137,23 +132,20 @@ export async function PUT(req: NextRequest) {
           }
         },
         _count: {
-          select: {
-            bids: true,
-            suppliers: true
-          }
+          select: { quotes: true }
         }
       }
     });
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       rfq: updatedRfq,
-      message: 'RFQ updated successfully' 
+      message: 'RFQ updated successfully'
     });
-    
+
   } catch (error) {
     console.error('Error updating RFQ:', error);
-    return NextResponse.json({ 
-      error: 'Failed to update RFQ' 
+    return NextResponse.json({
+      error: 'Failed to update RFQ'
     }, { status: 500 });
   }
 }
@@ -162,15 +154,14 @@ export async function DELETE(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const rfqId = searchParams.get('rfqId');
-    
+
     if (!rfqId) {
-      return NextResponse.json({ 
-        error: 'RFQ ID is required' 
+      return NextResponse.json({
+        error: 'RFQ ID is required'
       }, { status: 400 });
     }
 
-    // Soft delete - mark as cancelled instead of hard delete
-    const updatedRfq = await prisma.rfq.update({
+    const updatedRfq = await prisma.rFQ.update({
       where: { id: rfqId },
       data: { status: 'CANCELLED' },
       select: {
@@ -180,15 +171,15 @@ export async function DELETE(req: NextRequest) {
       }
     });
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       rfq: updatedRfq,
-      message: 'RFQ cancelled successfully' 
+      message: 'RFQ cancelled successfully'
     });
-    
+
   } catch (error) {
     console.error('Error cancelling RFQ:', error);
-    return NextResponse.json({ 
-      error: 'Failed to cancel RFQ' 
+    return NextResponse.json({
+      error: 'Failed to cancel RFQ'
     }, { status: 500 });
   }
 }

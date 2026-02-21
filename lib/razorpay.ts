@@ -1,112 +1,4 @@
-import { OpenAI } from 'openai';
-
-// NVIDIA API Configuration
-const nvidiaClient = new OpenAI({
-  baseURL: 'https://integrate.api.nvidia.com/v1',
-  apiKey: process.env.NVIDIA_API_KEY
-});
-
-// Original OpenAI (for critical functions)
-const openaiClient = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
-
-export class AIServiceManager {
-  
-  // Voice RFQ Processing - Use Minimax M2.1
-  async processVoiceRFQ(audioBuffer: Buffer, language: string = 'hindi') {
-    const base64Audio = audioBuffer.toString('base64');
-    
-    const response = await nvidiaClient.chat.completions.create({
-      model: 'minimaxai/minimax-m2.1',
-      messages: [{
-        role: 'user',
-        content: [
-          {
-            type: 'audio',
-            source: {
-              type: 'base64',
-              media_type: 'audio/mp3',
-              data: base64Audio
-            }
-          },
-          {
-            type: 'text',
-            text: `Transcribe this RFQ in ${language} and extract: product, quantity, delivery location, urgency level`
-          }
-        ]
-      }],
-      temperature: 0.7,
-      max_tokens: 2048
-    });
-    
-    return response.choices[0].message.content;
-  }
-
-  // RFQ Matching - Use DeepSeek (90% cheaper!)
-  async matchRFQToSuppliers(rfqText: string) {
-    const response = await nvidiaClient.chat.completions.create({
-      model: 'deepseek-ai/deepseek-v3.2',
-      messages: [{
-        role: 'user',
-        content: `Analyze this RFQ and suggest matching suppliers:\n\n${rfqText}`
-      }],
-      temperature: 0.5,
-      max_tokens: 1024,
-      extra_body: { thinking: true }
-    });
-    
-    return response.choices[0].message.content;
-  }
-
-  // Content Generation - Use Minimax M2.1
-  async generateContent(prompt: string) {
-    const response = await nvidiaClient.chat.completions.create({
-      model: 'minimaxai/minimax-m2.1',
-      messages: [{
-        role: 'user',
-        content: prompt
-      }],
-      temperature: 0.7,
-      max_tokens: 1500
-    });
-    
-    return response.choices[0].message.content;
-  }
-
-  // Chatbot - Use Kimi 2.5 (200K context!)
-  async chatWithSupplier(conversationHistory: any[], userMessage: string) {
-    const response = await nvidiaClient.chat.completions.create({
-      model: 'moonshotai/kimi-k2.5',
-      messages: [
-        ...conversationHistory,
-        { role: 'user', content: userMessage }
-      ],
-      temperature: 0.7,
-      max_tokens: 4096,
-      extra_body: { thinking: true }
-    });
-    
-    return response.choices[0].message.content;
-  }
-
-  // CRITICAL FUNCTIONS - Keep GPT-4
-  async analyzeSentiment(negotiationText: string) {
-    // Use original OpenAI for critical accuracy
-    const response = await openaiClient.chat.completions.create({
-      model: 'gpt-4',
-      messages: [{
-        role: 'user',
-        content: `Analyze sentiment in B2B negotiation:\n\n${negotiationText}`
-      }],
-      temperature: 0.3
-    });
-    
-    return response.choices[0].message.content;
-  }
-}
-
-export const aiService = new AIServiceManager();import Razorpay from 'razorpay';
+import Razorpay from 'razorpay';
 import crypto from 'crypto';
 
 if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
@@ -183,11 +75,11 @@ export function verifyRazorpayPayment(
   paymentId: string,
   signature: string
 ): boolean {
-  const text = orderId + "|" + paymentId;
+  const text = orderId + '|' + paymentId;
   const generated_signature = crypto
-    .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET!)
+    .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET!)
     .update(text)
-    .digest("hex");
+    .digest('hex');
   return generated_signature === signature;
 }
 
@@ -196,9 +88,9 @@ export function verifyRazorpayWebhook(
   signature: string
 ): boolean {
   const expectedSignature = crypto
-    .createHmac("sha256", process.env.RAZORPAY_WEBHOOK_SECRET!)
+    .createHmac('sha256', process.env.RAZORPAY_WEBHOOK_SECRET!)
     .update(body)
-    .digest("hex");
+    .digest('hex');
   return expectedSignature === signature;
 }
 

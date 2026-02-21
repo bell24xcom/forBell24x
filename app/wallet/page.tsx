@@ -1,4 +1,6 @@
 'use client';
+import { useEffect, useState } from 'react';
+import { Wallet, ArrowDownLeft, ArrowUpRight, Plus } from 'lucide-react';
 
 import { useState, useEffect } from 'react';
 import { useSession } from '@/contexts/AuthContext';
@@ -39,7 +41,7 @@ export default function WalletPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }
 
   const handleDeposit = async () => {
     if (!depositAmount || parseFloat(depositAmount) <= 0) {

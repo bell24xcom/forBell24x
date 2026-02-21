@@ -1,7 +1,19 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { Phone, Mail, ArrowLeft, CheckCircle, X, Building2, CreditCard, User } from 'lucide-react';
+
+const WIDGET_ID  = process.env.NEXT_PUBLIC_MSG91_WIDGET_ID;
+const TOKEN_AUTH = process.env.NEXT_PUBLIC_MSG91_TOKEN_AUTH;
+
+declare global {
+  interface Window {
+    initSendOTP: (config: object) => void;
+    sendOtp: (id: string, success?: (d: unknown) => void, failure?: (e: unknown) => void) => void;
+    verifyOtp: (otp: number, success?: (d: unknown) => void, failure?: (e: unknown) => void) => void;
+  }
+}
 
 type AuthStep = 'phone' | 'phoneOtp' | 'email' | 'emailOtp' | 'kyc' | 'plan' | 'success';
 
@@ -35,6 +47,81 @@ export default function EnhancedAuthModal({ isOpen, onClose, onSuccess }: Enhanc
     panNumber: ''
   });
   const [selectedPlan, setSelectedPlan] = useState('professional'); // Default to Professional (free trial)
+  const [widgetReady, setWidgetReady] = useState(false);
+  const phoneRef = useRef('');
+  const loginCalledRef = useRef(false);
+  const router = useRouter();
+
+  // Load MSG91 widget when modal opens
+  useEffect(() => {
+    if (!isOpen || !WIDGET_ID || !TOKEN_AUTH) return;
+
+    const initWidget = () => {
+      if (typeof window.initSendOTP === 'function') {
+        window.initSendOTP({
+          widgetId: WIDGET_ID,
+          tokenAuth: TOKEN_AUTH,
+          exposeMethods: true,
+          success: async (data: unknown) => {
+            if (loginCalledRef.current) return; // prevent double-firing
+            loginCalledRef.current = true;
+            const accessToken = typeof data === 'string' ? data : (() => {
+              const r = data as Record<string, unknown>;
+              return ((r['access-token'] ?? r['accessToken'] ?? r['token'] ?? r['message'] ?? '') as string);
+            })();
+            console.log('[MSG91 success] data=', data, 'token=', accessToken?.slice(0, 20));
+            if (!accessToken) {
+              setError('Verification failed — no token received. Please try again.');
+              setLoading(false);
+              loginCalledRef.current = false;
+              return;
+            }
+            try {
+              const response = await fetch('/api/auth/otp/widget-verify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ accessToken, phone: phoneRef.current }),
+              });
+              const loginData = await response.json();
+              if (!response.ok || !loginData.success) {
+                setError(loginData.message || 'Verification failed. Please try again.');
+                setLoading(false);
+                loginCalledRef.current = false;
+                return;
+              }
+              setUser(loginData.user);
+              setLoading(false);
+              if (loginData.isNewUser || !loginData.user.company) {
+                setStep('kyc'); // New user → complete KYC in modal
+              } else {
+                router.push('/dashboard'); // Existing user → go straight to dashboard
+              }
+            } catch {
+              setError('Network error. Please try again.');
+              setLoading(false);
+              loginCalledRef.current = false;
+            }
+          },
+          failure: (err: unknown) => {
+            console.error('MSG91 widget failure:', err);
+            setError('OTP verification failed. Please try again.');
+            setLoading(false);
+          },
+        });
+        setWidgetReady(true);
+      }
+    };
+
+    if (typeof window !== 'undefined' && typeof window.initSendOTP === 'function') {
+      initWidget();
+    } else {
+      const script = document.createElement('script');
+      script.src = 'https://verify.msg91.com/otp-provider.js';
+      script.async = true;
+      script.onload = initWidget;
+      document.head.appendChild(script);
+    }
+  }, [isOpen]);
 
   const plans = [
     {
@@ -68,66 +155,84 @@ export default function EnhancedAuthModal({ isOpen, onClose, onSuccess }: Enhanc
     }
   ];
 
-  const handlePhoneSubmit = async (phoneNumber: string, demoOTP?: string) => {
-    setPhone(phoneNumber);
-    setDemoOTP(demoOTP || '');
-    setLoading(true);
+  const handlePhoneSubmit = (phoneNumber: string) => {
+    const normalized = phoneNumber.replace(/[\s\-\(\)]/g, '').replace(/^\+91/, '').replace(/^91/, '');
+    setPhone(normalized);
+    phoneRef.current = normalized;
+    loginCalledRef.current = false; // reset guard for new OTP attempt
     setError('');
 
-    try {
-      const response = await fetch('/api/auth/send-phone-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: phoneNumber })
-      });
-
-      const data = await response.json();
-      
-      if (data.success) {
-        setStep('phoneOtp');
-        console.log('Demo OTP:', data.demoOTP);
-      } else {
-        setError(data.error || 'Failed to send OTP');
-      }
-    } catch (err) {
-      setError('Network error. Please try again.');
-    } finally {
-      setLoading(false);
+    if (!widgetReady || !window.sendOtp) {
+      setError('OTP service is still loading. Please wait a moment and try again.');
+      return;
     }
+
+    setLoading(true);
+    window.sendOtp(
+      `91${normalized}`,
+      () => { setStep('phoneOtp'); setLoading(false); },
+      (err) => {
+        console.error('MSG91 sendOtp failed:', err);
+        setError('Failed to send OTP. Please try again.');
+        setLoading(false);
+      }
+    );
   };
 
-  const handlePhoneOTPVerified = async (otp: string) => {
+  const handlePhoneOTPVerified = (otp: string) => {
+    if (!widgetReady || !window.verifyOtp) {
+      setError('OTP service not ready. Please refresh and try again.');
+      return;
+    }
     setLoading(true);
     setError('');
-
-    try {
-      const response = await fetch('/api/auth/verify-phone-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, otp })
-      });
-
-      const data = await response.json();
-      
-      if (data.success) {
-        setUser(data.user);
-        
-        // Check if user is new or needs KYC
-        if (data.user.isNewUser || !data.user.kycCompleted) {
-          setStep('kyc');
-        } else if (!data.user.planSelected) {
-          setStep('plan');
-        } else {
-          setStep('success');
+    window.verifyOtp(
+      parseInt(otp, 10),
+      async (data: unknown) => {
+        if (loginCalledRef.current) return; // prevent double-firing
+        loginCalledRef.current = true;
+        const accessToken = typeof data === 'string' ? data : (() => {
+          const r = data as Record<string, unknown>;
+          return ((r['access-token'] ?? r['accessToken'] ?? r['token'] ?? r['message'] ?? '') as string);
+        })();
+        console.log('[MSG91 verifyOtp success] data=', data, 'token=', accessToken?.slice(0, 20));
+        if (!accessToken) {
+          // No token here — initSendOTP.success will handle it, reset guard
+          loginCalledRef.current = false;
+          return;
         }
-      } else {
-        setError(data.error || 'Invalid OTP');
+        try {
+          const response = await fetch('/api/auth/otp/widget-verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ accessToken, phone: phoneRef.current }),
+          });
+          const loginData = await response.json();
+          if (!response.ok || !loginData.success) {
+            setError(loginData.message || 'Verification failed.');
+            setLoading(false);
+            loginCalledRef.current = false;
+            return;
+          }
+          setUser(loginData.user);
+          setLoading(false);
+          if (loginData.isNewUser || !loginData.user.company) {
+            setStep('kyc');
+          } else {
+            router.push('/dashboard');
+          }
+        } catch {
+          setError('Network error. Please try again.');
+          setLoading(false);
+          loginCalledRef.current = false;
+        }
+      },
+      (err) => {
+        console.error('MSG91 verifyOtp failed:', err);
+        setError('Invalid OTP. Please check and try again.');
+        setLoading(false);
       }
-    } catch (err) {
-      setError('Network error. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+    );
   };
 
   const handleEmailSubmit = async (emailAddress: string, demoOTP?: string) => {
@@ -146,8 +251,8 @@ export default function EnhancedAuthModal({ isOpen, onClose, onSuccess }: Enhanc
       const data = await response.json();
       
       if (data.success) {
+        if (data.devOtp) setDemoOTP(data.devOtp);
         setStep('emailOtp');
-        console.log('Demo OTP:', data.demoOTP);
       } else {
         setError(data.error || 'Failed to send OTP');
       }
@@ -424,7 +529,7 @@ function PhoneInput({ onPhoneSubmit, loading }: { onPhoneSubmit: (phone: string,
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (phone.length >= 10) {
-      onPhoneSubmit(phone, '123456'); // Demo OTP
+      onPhoneSubmit(phone);
     }
   };
 
@@ -536,7 +641,7 @@ function EmailInput({ phone, onEmailSubmit, onSkip, loading }: {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (email.includes('@')) {
-      onEmailSubmit(email, '654321'); // Demo OTP
+      onEmailSubmit(email);
     }
   };
 

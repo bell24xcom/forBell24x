@@ -3,6 +3,13 @@
 import { useState, useEffect } from 'react';
 import { useSession } from '@/contexts/AuthContext';
 
+const STATUS_COLORS: Record<string, string> = {
+  PENDING: 'text-yellow-400 bg-yellow-900/40',
+  COMPLETED: 'text-green-400 bg-green-900/40',
+  REFUNDED: 'text-blue-400 bg-blue-900/40',
+  FAILED: 'text-red-400 bg-red-900/40',
+};
+
 export default function EscrowPage() {
   const [escrows, setEscrows] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
