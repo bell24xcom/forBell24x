@@ -45,10 +45,19 @@ export async function POST(request: NextRequest) {
 
     const verifyResult = await verifyResponse.json();
 
+    // Log full MSG91 response for debugging
+    authLogger.info('MSG91 verifyAccessToken response', {
+      status: verifyResponse.status,
+      type: verifyResult.type,
+      message: verifyResult.message,
+    });
+
     if (!verifyResponse.ok || verifyResult.type !== 'success') {
       authLogger.warn('MSG91 widget token verification failed', {
         phone: `${phone.slice(0, 5)}*****`,
-        msg91Response: verifyResult.message,
+        status: verifyResponse.status,
+        msg91Type: verifyResult.type,
+        msg91Message: verifyResult.message,
       });
       return NextResponse.json(
         { success: false, message: 'OTP verification failed. Please try again.' },
@@ -57,9 +66,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Token verified — find or create user
+    let isNewUser = false;
     let user = await prisma.user.findUnique({ where: { phone } });
 
     if (!user) {
+      isNewUser = true;
       user = await prisma.user.create({
         data: {
           phone,
@@ -88,6 +99,7 @@ export async function POST(request: NextRequest) {
     const response = NextResponse.json({
       success: true,
       message: 'Login successful',
+      isNewUser,
       user: {
         id: user.id,
         name: user.name,
