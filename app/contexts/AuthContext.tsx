@@ -148,3 +148,6 @@ export function useAuth() {
   }
   return context;
 }
+
+// Alias for compatibility
+export const useSession = useAuth;
