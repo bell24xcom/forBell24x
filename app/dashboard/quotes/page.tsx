@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   ChevronRight,
   MessageSquare,
@@ -9,6 +10,8 @@ import {
   RefreshCw,
   CheckCircle,
   Loader2,
+  ArrowLeft,
+  LogOut,
 } from 'lucide-react';
 
 type QuoteStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED';
@@ -74,6 +77,13 @@ export default function MyQuotesPage() {
   const [error, setError] = useState<string | null>(null);
   const [acceptingId, setAcceptingId] = useState<string | null>(null);
   const [acceptError, setAcceptError] = useState<string | null>(null);
+  const router = useRouter();
+
+  const handleLogout = () => {
+    localStorage.removeItem('bell24h_auth_token');
+    localStorage.removeItem('bell24h_user');
+    router.push('/');
+  };
 
   const fetchQuotes = useCallback(async () => {
     setLoading(true);
@@ -137,14 +147,30 @@ export default function MyQuotesPage() {
             <h1 className="text-2xl font-bold text-white">My Quotes</h1>
             <p className="text-gray-400 text-sm mt-1">Quotes received from suppliers on your RFQs</p>
           </div>
-          <button
-            onClick={fetchQuotes}
-            disabled={loading}
-            className="inline-flex items-center gap-2 px-3 py-2 text-sm text-gray-300 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-colors disabled:opacity-50"
-          >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-            Refresh
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={fetchQuotes}
+              disabled={loading}
+              className="inline-flex items-center gap-2 px-3 py-2 text-sm text-gray-300 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-colors disabled:opacity-50"
+            >
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+              Refresh
+            </button>
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-gray-300 hover:bg-white/10 transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-red-600/10 border border-red-500/30 rounded-lg text-red-400 hover:bg-red-600/20 transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+              Logout
+            </button>
+          </div>
         </div>
 
         {/* Accept Error */}
