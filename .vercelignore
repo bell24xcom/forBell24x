@@ -59,3 +59,32 @@ Thumbs.db
 # Other
 .continue/
 .cursorrules
+
+# Duplicate/backup directories (exclude from deployment)
+bell24h/
+bell24h-main/
+bell24h-main (1)/
+bell24h-production/
+clean-repo/
+mirror.git/
+client/
+frontend/
+backend/
+src/
+2nd-SSH/
+admin/
+ai-explainability-service/
+AppData/
+audit-results/
+auth-fixes-logs/
+automation-logs/
+BELL LOGO1_Images/
+bell24h-mobile/
+config/
+contracts/
+contracts_backup/
+coverage/
+cypress/
+Downloads/
+e2e/
+vercel-clean-deploy/
