@@ -115,7 +115,7 @@ export default function RFQDetailPage() {
     return (
       <div className="min-h-screen bg-[#0F172A] text-white">
         <div className="max-w-4xl mx-auto px-4 py-8">
-          <div className="text-center py-8 text-slate-400">
+          <div className="text-center py-8 text-slate-300">
             <p>Loading RFQ...</p>
           </div>
         </div>
@@ -128,7 +128,7 @@ export default function RFQDetailPage() {
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Breadcrumb */}
         <nav className="mb-6">
-          <ol className="flex items-center space-x-2 text-sm text-slate-400">
+          <ol className="flex items-center space-x-2 text-sm text-slate-300">
             <li>
               <a href="/rfq" className="hover:text-white">Marketplace</a>
             </li>
@@ -144,7 +144,7 @@ export default function RFQDetailPage() {
             {/* RFQ Header */}
             <div className="mb-6">
               <h1 className="text-2xl font-bold mb-2">{rfq.title}</h1>
-              <div className="flex items-center gap-4 text-sm text-slate-400">
+              <div className="flex items-center gap-4 text-sm text-slate-600">
                 <span>RFQ #{rfq.id}</span>
                 <span>Posted {new Date(rfq.createdAt).toLocaleDateString()}</span>
                 <span>Views: {rfq.views}</span>

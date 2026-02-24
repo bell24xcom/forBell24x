@@ -117,7 +117,7 @@ export default function EscrowPage() {
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Breadcrumb */}
         <nav className="mb-6">
-          <ol className="flex items-center space-x-2 text-sm text-slate-400">
+          <ol className="flex items-center space-x-2 text-sm text-slate-300">
             <li>
               <a href="/dashboard" className="hover:text-white">Dashboard</a>
             </li>
@@ -130,7 +130,7 @@ export default function EscrowPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-4">Escrow</h1>
-          <p className="text-slate-400">
+          <p className="text-slate-300">
             Manage your escrow transactions for secure payments
           </p>
         </div>
@@ -151,17 +151,17 @@ export default function EscrowPage() {
         <div className="bg-white rounded-xl shadow-sm p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold">Escrow Transactions</h2>
-            <span className="text-sm text-slate-400">
+            <span className="text-sm text-slate-600">
               Showing all escrow transactions
             </span>
           </div>
 
           {isLoading ? (
-            <div className="text-center py-8 text-slate-400">
+            <div className="text-center py-8 text-slate-600">
               <p>Loading escrow transactions...</p>
             </div>
           ) : escrows.length === 0 ? (
-            <div className="text-center py-8 text-slate-400">
+            <div className="text-center py-8 text-slate-600">
               <p>No escrow transactions found</p>
             </div>
           ) : (
@@ -182,19 +182,19 @@ export default function EscrowPage() {
                     <tr key={escrow.id} className="border-b border-slate-50 hover:bg-slate-50">
                       <td className="py-3 px-4 text-sm text-slate-900">
                         <div className="font-medium">{escrow.quote.rfq.title}</div>
-                        <div className="text-xs text-slate-400">
+                        <div className="text-xs text-slate-600">
                           #{escrow.quote.rfqId}
                         </div>
                       </td>
                       <td className="py-3 px-4 text-sm text-slate-900">
                         <div className="font-medium">{escrow.buyer.company}</div>
-                        <div className="text-xs text-slate-400">
+                        <div className="text-xs text-slate-600">
                           {escrow.buyer.name}
                         </div>
                       </td>
                       <td className="py-3 px-4 text-sm text-slate-900">
                         <div className="font-medium">{escrow.supplier.company}</div>
-                        <div className="text-xs text-slate-400">
+                        <div className="text-xs text-slate-600">
                           {escrow.supplier.name}
                         </div>
                       </td>

@@ -145,7 +145,7 @@ export default function NegotiationPage() {
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Breadcrumb */}
         <nav className="mb-6">
-          <ol className="flex items-center space-x-2 text-sm text-slate-400">
+          <ol className="flex items-center space-x-2 text-sm text-slate-300">
             <li>
               <a href="/dashboard" className="hover:text-white">Dashboard</a>
             </li>
@@ -158,7 +158,7 @@ export default function NegotiationPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-4">Negotiation</h1>
-          <p className="text-slate-400">
+          <p className="text-slate-300">
             Manage your quote negotiations with buyers
           </p>
         </div>
@@ -178,7 +178,7 @@ export default function NegotiationPage() {
         {/* Quotes List */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {quotes.length === 0 ? (
-            <div className="col-span-full bg-white rounded-xl shadow-sm p-6 text-center text-slate-400">
+            <div className="col-span-full bg-white rounded-xl shadow-sm p-6 text-center text-slate-600">
               <p>No pending quotes to negotiate</p>
             </div>
           ) : (
@@ -192,7 +192,7 @@ export default function NegotiationPage() {
                     </div>
                     <div>
                       <h3 className="font-medium">{quote.rfq.user.company}</h3>
-                      <p className="text-sm text-slate-400">{quote.rfq.user.name}</p>
+                      <p className="text-sm text-slate-500">{quote.rfq.user.name}</p>
                     </div>
                   </div>
                   <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusBadge(quote.status)}`}>
@@ -203,7 +203,7 @@ export default function NegotiationPage() {
                 {/* RFQ Info */}
                 <div className="mb-4">
                   <h4 className="font-medium mb-2">RFQ: {quote.rfq.title}</h4>
-                  <p className="text-sm text-slate-400">
+                  <p className="text-sm text-slate-500">
                     Category: {quote.rfq.category}
                   </p>
                 </div>
