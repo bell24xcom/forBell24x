@@ -15,6 +15,5 @@ const nextConfig = {
     unoptimized: true
   },
   output: 'standalone',
-  outputFileTracingRoot: require('path').join(__dirname),
 }
 module.exports = nextConfig

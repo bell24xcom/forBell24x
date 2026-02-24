@@ -18,7 +18,7 @@ export default function RFQTypeShowcase() {
       textColor: 'text-blue-700',
       buttonColor: 'bg-blue-600 hover:bg-blue-700',
       link: '/rfq/create?type=text',
-      demoLink: '/rfq/demo/text',
+      demoLink: '/marketplace',
     },
     {
       icon: Mic,
@@ -30,7 +30,7 @@ export default function RFQTypeShowcase() {
       textColor: 'text-cyan-700',
       buttonColor: 'bg-cyan-600 hover:bg-cyan-700',
       link: '/rfq/create?type=voice',
-      demoLink: '/rfq/demo/voice',
+      demoLink: '/marketplace',
     },
     {
       icon: Video,
@@ -42,7 +42,7 @@ export default function RFQTypeShowcase() {
       textColor: 'text-cyan-700',
       buttonColor: 'bg-cyan-600 hover:bg-cyan-700',
       link: '/rfq/create?type=video',
-      demoLink: '/rfq/demo/video',
+      demoLink: '/marketplace',
     },
   ];
 
