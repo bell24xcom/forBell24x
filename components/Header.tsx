@@ -21,8 +21,8 @@ export default function Header() {
     };
 
     const checkAuth = () => {
-      const token = localStorage.getItem('authToken');
-      const userData = localStorage.getItem('userData');
+      const token = localStorage.getItem('bell24h_auth_token');
+      const userData = localStorage.getItem('bell24h_user');
       if (token && userData) {
         setIsLoggedIn(true);
         setUser(JSON.parse(userData));
@@ -42,14 +42,14 @@ export default function Header() {
     setUser(userData);
     setIsLoggedIn(true);
     setShowAuthModal(false);
-    localStorage.setItem('authToken', 'mock_jwt_token_' + Date.now());
-    localStorage.setItem('userData', JSON.stringify(userData));
+    localStorage.setItem('bell24h_auth_token', 'mock_jwt_token_' + Date.now());
+    localStorage.setItem('bell24h_user', JSON.stringify(userData));
     router.push('/dashboard');
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('userData');
+    localStorage.removeItem('bell24h_auth_token');
+    localStorage.removeItem('bell24h_user');
     setIsLoggedIn(false);
     setUser(null);
     router.push('/');
