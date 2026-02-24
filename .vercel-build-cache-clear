@@ -1,0 +1,5 @@
+# Force Fresh Build
+# This file triggers a cache clear
+# Created: 2025-02-25
+# Reason: Stale cache causing module resolution errors
+BUILD_TIMESTAMP=2025-02-25T02:45:00Z
