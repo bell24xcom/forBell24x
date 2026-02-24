@@ -90,6 +90,7 @@ export default function EnhancedAuthModal({ isOpen, onClose, onSuccess }: Enhanc
                 return;
               }
               setUser(loginData.user);
+              localStorage.setItem('bell24h_user', JSON.stringify(loginData.user));
               setLoading(false);
               if (loginData.isNewUser || !loginData.user.company) {
                 setStep('kyc'); // New user → complete KYC in modal
@@ -215,6 +216,7 @@ export default function EnhancedAuthModal({ isOpen, onClose, onSuccess }: Enhanc
             return;
           }
           setUser(loginData.user);
+          localStorage.setItem('bell24h_user', JSON.stringify(loginData.user));
           setLoading(false);
           if (loginData.isNewUser || !loginData.user.company) {
             setStep('kyc');
