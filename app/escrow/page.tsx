@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useSession } from '@/app/contexts/AuthContext';
 
+export const dynamic = 'force-dynamic';
+
 const STATUS_COLORS: Record<string, string> = {
   PENDING: 'text-yellow-400 bg-yellow-900/40',
   COMPLETED: 'text-green-400 bg-green-900/40',
