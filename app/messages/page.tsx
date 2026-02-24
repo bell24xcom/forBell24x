@@ -125,7 +125,7 @@ export default function MessagesPage() {
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Breadcrumb */}
         <nav className="mb-6">
-          <ol className="flex items-center space-x-2 text-sm text-slate-400">
+          <ol className="flex items-center space-x-2 text-sm text-slate-300">
             <li>
               <a href="/dashboard" className="hover:text-white">Dashboard</a>
             </li>
@@ -138,7 +138,7 @@ export default function MessagesPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-4">Messages</h1>
-          <p className="text-slate-400">
+          <p className="text-slate-300">
             Communicate with buyers and suppliers
           </p>
         </div>
@@ -162,11 +162,11 @@ export default function MessagesPage() {
             <div className="bg-white rounded-xl shadow-sm p-4">
               <h2 className="text-lg font-semibold mb-4">Conversations</h2>
               {isLoading ? (
-                <div className="text-center py-8 text-slate-400">
+                <div className="text-center py-8 text-slate-500">
                   <p>Loading conversations...</p>
                 </div>
               ) : threads.length === 0 ? (
-                <div className="text-center py-8 text-slate-400">
+                <div className="text-center py-8 text-slate-500">
                   <p>No conversations found</p>
                 </div>
               ) : (
@@ -184,12 +184,12 @@ export default function MessagesPage() {
                       </div>
                       <div className="ml-3 flex-1">
                         <div className="font-medium">{thread.participants[0].company}</div>
-                        <div className="text-sm text-slate-400">
+                        <div className="text-sm text-slate-500">
                           {thread.lastMessage.content}
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-xs text-slate-400">
+                        <div className="text-xs text-slate-500">
                           {formatDateTime(thread.lastMessage.createdAt)}
                         </div>
                         {thread.unreadCount > 0 && (
@@ -213,7 +213,7 @@ export default function MessagesPage() {
                   <h2 className="text-lg font-semibold">
                     {selectedThread.participants[0].company}
                   </h2>
-                  <p className="text-sm text-slate-400">
+                  <p className="text-sm text-slate-500">
                     {selectedThread.participants[0].name}
                   </p>
                 </div>
@@ -221,7 +221,7 @@ export default function MessagesPage() {
                 {/* Messages */}
                 <div className="max-h-96 overflow-y-auto mb-6">
                   {messages.length === 0 ? (
-                    <div className="text-center py-8 text-slate-400">
+                    <div className="text-center py-8 text-slate-500">
                       <p>No messages yet</p>
                     </div>
                   ) : (
@@ -244,7 +244,7 @@ export default function MessagesPage() {
                               {isOwnMessage(message) ? 'You' : selectedThread.participants[0].name}
                             </div>
                             <div className="text-sm">{message.content}</div>
-                            <div className="text-xs text-slate-400 mt-1">
+                            <div className="text-xs text-slate-500 mt-1">
                               {formatDateTime(message.createdAt)}
                             </div>
                           </div>
@@ -279,7 +279,7 @@ export default function MessagesPage() {
                 </div>
               </div>
             ) : (
-              <div className="bg-white rounded-xl shadow-sm p-6 text-center text-slate-400">
+              <div className="bg-white rounded-xl shadow-sm p-6 text-center text-slate-500">
                 <p>Select a conversation to start messaging</p>
               </div>
             )}
