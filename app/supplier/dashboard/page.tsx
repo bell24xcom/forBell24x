@@ -1,6 +1,6 @@
+'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSession } from '@/contexts/AuthContext';
 
 export default function SupplierDashboardPage() {
   const [stats, setStats] = useState({
@@ -13,14 +13,17 @@ export default function SupplierDashboardPage() {
   const [quotes, setQuotes] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [user, setUser] = useState<Record<string, string> | null>(null);
   const router = useRouter();
-  const { user } = useSession();
 
   useEffect(() => {
-    if (!user) {
-      router.push('/login');
+    const userData = localStorage.getItem('bell24h_user');
+    if (!userData) {
+      router.push('/auth/login');
+      return;
     }
-  }, [user, router]);
+    setUser(JSON.parse(userData));
+  }, [router]);
 
   useEffect(() => {
     fetchStats();
