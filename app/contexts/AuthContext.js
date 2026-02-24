@@ -143,6 +143,18 @@ const AuthProvider = ({ children }) => {
 const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
+    // During SSR or when not wrapped in AuthProvider, return safe defaults
+    if (typeof window === 'undefined') {
+      return {
+        user: null,
+        loading: false,
+        isAuthenticated: false,
+        login: async () => ({ success: false, error: 'Not in browser context' }),
+        register: async () => ({ success: false, error: 'Not in browser context' }),
+        logout: () => {},
+        updateUser: () => {},
+      };
+    }
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
