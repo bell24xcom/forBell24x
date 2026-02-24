@@ -1,6 +1,8 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSession } from '@/contexts/AuthContext';
+import { useSession } from '@/app/contexts/AuthContext';
 
 export default function NegotiationPage() {
   const [quotes, setQuotes] = useState<any[]>([]);
