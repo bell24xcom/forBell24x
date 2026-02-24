@@ -7,7 +7,7 @@
  * Supplier trustScore is included in GET so buyers can see it.
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { jwt } from '@/lib/jwt';
+import { authenticate } from '@/lib/jwt';
 import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: NextRequest) {
   try {
     // Authenticate user
-    const user = await jwt.authenticate(request);
+    const user = await authenticate(request);
     if (!user) {
       return NextResponse.json(
         { error: 'Authentication required' },
@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     // Authenticate user
-    const user = await jwt.authenticate(request);
+    const user = await authenticate(request);
     if (!user) {
       return NextResponse.json(
         { error: 'Authentication required' },
@@ -153,7 +153,7 @@ export async function PUT(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     // Authenticate user
-    const user = await jwt.authenticate(request);
+    const user = await authenticate(request);
     if (!user) {
       return NextResponse.json(
         { error: 'Authentication required' },
