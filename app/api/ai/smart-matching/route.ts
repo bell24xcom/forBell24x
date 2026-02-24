@@ -18,9 +18,9 @@ export async function POST(request: NextRequest) {
 
     // Parse request body
     const body = await request.json();
-const { rfqId, category, budget, location, requirements } = body;
+    let { rfqId, category, budget, location, requirements } = body;
 
-if (!rfqId && (!category || !budget)) {
+    if (!rfqId && (!category || !budget)) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -28,7 +28,7 @@ if (!rfqId && (!category || !budget)) {
     }
 
     // Fetch RFQ if rfqId is provided
-let rfq;
+    let rfq;
     if (rfqId) {
       rfq = await prisma.rFQ.findUnique({
         where: { id: rfqId },

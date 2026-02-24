@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSession } from '@/contexts/AuthContext';
+import { useSession } from '@/app/contexts/AuthContext';
 
 export default function MessagesPage() {
   const [threads, setThreads] = useState([]);

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSession } from '@/contexts/AuthContext';
+import { useSession } from '@/app/contexts/AuthContext';
 
 const STATUS_COLORS: Record<string, string> = {
   PENDING: 'text-yellow-400 bg-yellow-900/40',
