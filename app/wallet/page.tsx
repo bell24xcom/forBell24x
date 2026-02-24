@@ -1,9 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { Wallet, ArrowDownLeft, ArrowUpRight, Plus } from 'lucide-react';
-
-import { useState, useEffect } from 'react';
-import { useSession } from '@/contexts/AuthContext';
+import { useSession } from '@/app/contexts/AuthContext';
 
 export default function WalletPage() {
   const [balance, setBalance] = useState(0);

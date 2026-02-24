@@ -1,6 +1,8 @@
+'use client';
+
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSession } from '@/contexts/AuthContext';
+import { useSession } from '@/app/contexts/AuthContext';
 
 export default function VoiceRFQPage() {
   const [isRecording, setIsRecording] = useState(false);
