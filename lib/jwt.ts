@@ -1,49 +1,129 @@
+/**
+ * JWT Token Management for Bell24h.com
+ * Centralized token generation, verification, and decoding.
+ */
 import jwt from 'jsonwebtoken';
 import { prisma } from '@/lib/prisma';
 import type { NextRequest } from 'next/server';
 
-export interface JWTPayload {
+// In production, JWT_SECRET must be set explicitly — never use the fallback.
+const JWT_SECRET = (() => {
+  const s = process.env.JWT_SECRET;
+  if (!s || s === 'bell24h_jwt_secret_change_in_production') {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('[JWT] JWT_SECRET env var is not set. Set it in Vercel → Settings → Environment Variables.');
+    }
+    return 'dev_only_jwt_secret_not_for_production';
+  }
+  return s;
+})();
+
+const JWT_REFRESH_SECRET = (() => {
+  const s = process.env.JWT_REFRESH_SECRET;
+  if (!s || s === 'bell24h_refresh_secret_change_in_production') {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('[JWT] JWT_REFRESH_SECRET env var is not set. Set it in Vercel → Settings → Environment Variables.');
+    }
+    return 'dev_only_refresh_secret_not_for_production';
+  }
+  return s;
+})();
+
+export interface TokenPayload {
   userId: string;
   phone: string;
   role: string;
+  type?: 'access' | 'refresh';
 }
 
-export const jwt = {
-  sign: (payload: JWTPayload, options?: jwt.SignOptions): string => {
-    return jwt.sign(payload, process.env.JWT_SECRET!, options);
-  },
+export interface TokenResult {
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: number; // seconds
+}
 
-  verify: (token: string): JWTPayload => {
-    return jwt.verify(token, process.env.JWT_SECRET!) as JWTPayload;
-  },
+/**
+ * Generate access + refresh token pair
+ */
+export function generateTokens(payload: Omit<TokenPayload, 'type'>): TokenResult {
+  const accessToken = jwt.sign(
+    { ...payload, type: 'access' },
+    JWT_SECRET,
+    { expiresIn: '7d' }
+  );
 
-  decode: (token: string): JWTPayload | null => {
-    return jwt.decode(token) as JWTPayload | null;
-  },
+  const refreshToken = jwt.sign(
+    { ...payload, type: 'refresh' },
+    JWT_REFRESH_SECRET,
+    { expiresIn: '30d' }
+  );
 
-  async authenticate(request: NextRequest) {
-    const authHeader = request.headers.get('Authorization');
-    const authToken = request.cookies.get('auth-token')?.value;
+  return {
+    accessToken,
+    refreshToken,
+    expiresIn: 7 * 24 * 60 * 60, // 7 days in seconds
+  };
+}
 
-    let token = authToken || authHeader?.replace('Bearer ', '');
+/**
+ * Generate a single access token (for backward compatibility)
+ */
+export function generateToken(payload: Omit<TokenPayload, 'type'>, expiresIn = '7d'): string {
+  return jwt.sign({ ...payload, type: 'access' }, JWT_SECRET, { expiresIn });
+}
 
-    if (!token) {
-      return null;
-    }
+/**
+ * Verify and decode an access token
+ */
+export function verifyToken(token: string): TokenPayload {
+  return jwt.verify(token, JWT_SECRET) as TokenPayload;
+}
 
-    try {
-      const payload = jwt.verify(token) as JWTPayload;
-      const user = await prisma.user.findUnique({
-        where: { id: payload.userId },
-      });
+/**
+ * Verify and decode a refresh token
+ */
+export function verifyRefreshToken(token: string): TokenPayload {
+  return jwt.verify(token, JWT_REFRESH_SECRET) as TokenPayload;
+}
 
-      if (!user) {
-        return null;
-      }
+/**
+ * Decode without verification (for debugging — never use for auth decisions)
+ */
+export function decodeToken(token: string): TokenPayload | null {
+  try {
+    return jwt.decode(token) as TokenPayload;
+  } catch {
+    return null;
+  }
+}
 
-      return { userId: user.id, phone: user.phone, role: user.role };
-    } catch (error) {
-      return null;
-    }
-  },
-};
+/**
+ * Extract token from Authorization header or cookie
+ */
+export function extractToken(authHeader?: string | null, cookieToken?: string | null): string | null {
+  if (authHeader?.startsWith('Bearer ')) {
+    return authHeader.slice(7);
+  }
+  return cookieToken || null;
+}
+
+/**
+ * Authenticate a request by extracting + verifying token and looking up the user.
+ * Returns { userId, phone, role } or null if unauthenticated.
+ */
+export async function authenticate(request: NextRequest): Promise<{ userId: string; phone: string | null; role: string } | null> {
+  const authHeader = request.headers.get('Authorization');
+  const authCookie = request.cookies.get('auth-token')?.value;
+  const token = extractToken(authHeader, authCookie);
+
+  if (!token) return null;
+
+  try {
+    const payload = verifyToken(token);
+    const user = await prisma.user.findUnique({ where: { id: payload.userId } });
+    if (!user) return null;
+    return { userId: user.id, phone: user.phone, role: user.role };
+  } catch {
+    return null;
+  }
+}
