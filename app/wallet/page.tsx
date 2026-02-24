@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import { Wallet, ArrowDownLeft, ArrowUpRight, Plus } from 'lucide-react';
 import { useSession } from '@/app/contexts/AuthContext';
 
+export const dynamic = 'force-dynamic';
+
 export default function WalletPage() {
   const [balance, setBalance] = useState(0);
   const [transactions, setTransactions] = useState([]);

@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useSession } from '@/app/contexts/AuthContext';
 
+export const dynamic = 'force-dynamic';
+
 export default function MessagesPage() {
   const [threads, setThreads] = useState([]);
   const [selectedThread, setSelectedThread] = useState(null);

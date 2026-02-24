@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from '@/app/contexts/AuthContext';
 
+export const dynamic = 'force-dynamic';
+
 export default function NegotiationPage() {
   const [quotes, setQuotes] = useState<any[]>([]);
   const [selectedQuote, setSelectedQuote] = useState<string | null>(null);
