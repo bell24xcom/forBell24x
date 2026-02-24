@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { jwt } from '@/lib/jwt';
+import { authenticate } from '@/lib/jwt';
 import { prisma } from '@/lib/prisma';
 import { Bell24hAIClient } from '@/lib/ai-client';
 
@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 export async function POST(request: NextRequest) {
   try {
     // Authenticate user
-    const user = await jwt.authenticate(request);
+    const user = await authenticate(request);
     if (!user) {
       return NextResponse.json(
         { error: 'Authentication required' },
@@ -173,7 +173,7 @@ const aiSuggestion = aiResponse.text || 'Let me think about this offer and get b
 export async function GET(request: NextRequest) {
   try {
     // Authenticate user
-    const user = await jwt.authenticate(request);
+    const user = await authenticate(request);
     if (!user) {
       return NextResponse.json(
         { error: 'Authentication required' },
