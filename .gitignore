@@ -39,3 +39,8 @@ Thumbs.db
 
 test-*.js
 .vercel
+
+# Embedded git repositories (should not be tracked)
+bell24h/
+clean-repo/
+mirror.git/
