@@ -69,7 +69,7 @@ function HeroSection() {
         </h1>
 
         {/* Subheadline */}
-        <p className="text-lg text-slate-400 max-w-2xl mx-auto mb-8">
+        <p className="text-lg text-slate-300 max-w-2xl mx-auto mb-8">
           Post RFQs via Voice, Video, or Text. AI-powered matching across 450+ categories.
         </p>
 
@@ -91,7 +91,7 @@ function HeroSection() {
         </div>
 
         {/* Trust Signals */}
-        <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-slate-400">
+        <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-slate-300">
           <span className="flex items-center gap-1.5">
             <CheckCircle className="w-4 h-4 text-green-400" />
             No credit card required
@@ -139,7 +139,7 @@ function ValuePropsSection() {
         <h2 className="text-2xl font-bold text-white text-center mb-2">
           Three Ways to Post Your RFQ
         </h2>
-        <p className="text-slate-400 text-center mb-8">
+        <p className="text-slate-300 text-center mb-8">
           Choose the format that works best for you
         </p>
 
@@ -153,7 +153,7 @@ function ValuePropsSection() {
                 {prop.icon}
               </div>
               <h3 className="text-lg font-semibold text-white mb-2">{prop.title}</h3>
-              <p className="text-slate-400 text-sm mb-4 leading-relaxed">{prop.desc}</p>
+              <p className="text-slate-300 text-sm mb-4 leading-relaxed">{prop.desc}</p>
               <Link
                 href={prop.link}
                 className="inline-flex items-center gap-1 text-blue-400 text-sm font-medium hover:text-blue-300 transition-colors"
@@ -197,7 +197,7 @@ function HowItWorksSection() {
         <h2 className="text-2xl font-bold text-white text-center mb-2">
           How Bell24H Works
         </h2>
-        <p className="text-slate-400 text-center mb-8">
+        <p className="text-slate-300 text-center mb-8">
           Simple, fast, and AI-powered
         </p>
 
@@ -208,7 +208,7 @@ function HowItWorksSection() {
                 <span className="text-blue-400 font-bold text-lg">{step.num}</span>
               </div>
               <h3 className="text-lg font-semibold text-white mb-2">{step.title}</h3>
-              <p className="text-slate-400 text-sm leading-relaxed">{step.desc}</p>
+              <p className="text-slate-300 text-sm leading-relaxed">{step.desc}</p>
             </div>
           ))}
         </div>
@@ -230,7 +230,7 @@ function CategoriesSection() {
             <h2 className="text-2xl font-bold text-white mb-1">
               Browse 450+ Categories
             </h2>
-            <p className="text-slate-400 text-sm">Top categories by active RFQs</p>
+            <p className="text-slate-300 text-sm">Top categories by active RFQs</p>
           </div>
           <Link
             href="/categories"
@@ -252,7 +252,7 @@ function CategoriesSection() {
                 <h3 className="text-white font-medium group-hover:text-blue-300 transition-colors">
                   {cat.name}
                 </h3>
-                <p className="text-slate-500 text-xs">
+                <p className="text-slate-400 text-xs">
                   {cat.rfqs.toLocaleString()} RFQs &middot; {cat.subcategories} subcategories
                 </p>
               </div>
@@ -309,7 +309,7 @@ function StatsSection() {
               <div className="text-3xl lg:text-4xl font-bold text-blue-400 mb-1">
                 {stat.value}
               </div>
-              <div className="text-slate-400 text-sm">{stat.label}</div>
+              <div className="text-slate-300 text-sm">{stat.label}</div>
             </div>
           ))}
         </div>
@@ -326,7 +326,7 @@ function FinalCTASection() {
         <h2 className="text-2xl lg:text-3xl font-bold text-white mb-4">
           Ready to Transform Your Procurement?
         </h2>
-        <p className="text-slate-400 mb-8">
+        <p className="text-slate-300 mb-8">
           Join thousands of businesses already using Bell24H to find verified suppliers faster.
         </p>
         <Link

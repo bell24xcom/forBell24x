@@ -136,7 +136,7 @@ export default function VoiceRFQPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-4">Voice RFQ</h1>
-          <p className="text-slate-400">
+          <p className="text-slate-300">
             Record your RFQ requirements and let AI transcribe and extract key details
           </p>
         </div>
@@ -161,7 +161,7 @@ export default function VoiceRFQPage() {
         <div className="bg-slate-800 rounded-lg p-6 mb-6">
           <div className="text-center mb-6">
             <h2 className="text-xl font-semibold mb-2">Record Your RFQ</h2>
-            <p className="text-slate-400">
+            <p className="text-slate-300">
               Click the microphone to start recording your RFQ requirements
             </p>
           </div>
@@ -232,7 +232,7 @@ export default function VoiceRFQPage() {
           <div className="bg-slate-800 rounded-lg p-6 mb-6">
             <div className="text-center mb-4">
               <h3 className="text-lg font-semibold mb-2">Process with AI</h3>
-              <p className="text-slate-400">
+              <p className="text-slate-300">
                 AI will transcribe your audio and extract RFQ details
               </p>
             </div>
@@ -260,7 +260,7 @@ export default function VoiceRFQPage() {
           <div className="bg-slate-800 rounded-lg p-6 mb-6">
             <div className="text-center mb-6">
               <h3 className="text-lg font-semibold mb-2">AI Results</h3>
-              <p className="text-slate-400">
+              <p className="text-slate-300">
                 AI has extracted the following details from your RFQ
               </p>
             </div>
