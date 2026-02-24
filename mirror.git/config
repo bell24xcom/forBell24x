@@ -1,0 +1,11 @@
+[core]
+	repositoryformatversion = 0
+	filemode = false
+	bare = true
+	symlinks = false
+	ignorecase = true
+[remote "origin"]
+	url = https://github.com/digitex-bell24h/git-clone---mirror-https-github.com-digitex-erp-bell24h.git
+	tagOpt = --no-tags
+	fetch = +refs/*:refs/*
+	mirror = true
