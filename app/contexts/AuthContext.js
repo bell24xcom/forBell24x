@@ -148,4 +148,7 @@ const useAuth = () => {
   return context;
 };
 
-export { AuthProvider, useAuth }; 
+// Alias for compatibility
+const useSession = useAuth;
+
+export { AuthProvider, useAuth, useSession }; 
