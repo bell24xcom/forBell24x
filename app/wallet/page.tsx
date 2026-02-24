@@ -117,7 +117,7 @@ export default function WalletPage() {
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Breadcrumb */}
         <nav className="mb-6">
-          <ol className="flex items-center space-x-2 text-sm text-slate-400">
+          <ol className="flex items-center space-x-2 text-sm text-slate-300">
             <li>
               <a href="/dashboard" className="hover:text-white">Dashboard</a>
             </li>
@@ -130,7 +130,7 @@ export default function WalletPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-4">Wallet</h1>
-          <p className="text-slate-400">
+          <p className="text-slate-300">
             Manage your wallet balance and transaction history
           </p>
         </div>
@@ -153,7 +153,7 @@ export default function WalletPage() {
           <div className="text-3xl font-bold text-green-600">
             {formatCurrency(balance)}
           </div>
-          <p className="text-slate-400 mt-2">
+          <p className="text-slate-600 mt-2">
             Last updated: {formatDate(new Date())}
           </p>
         </div>
@@ -205,17 +205,17 @@ export default function WalletPage() {
         <div className="bg-white rounded-xl shadow-sm p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold">Transaction History</h2>
-            <span className="text-sm text-slate-400">
+            <span className="text-sm text-slate-500">
               Showing last 50 transactions
             </span>
           </div>
 
           {isLoading ? (
-            <div className="text-center py-8 text-slate-400">
+            <div className="text-center py-8 text-slate-500">
               <p>Loading transactions...</p>
             </div>
           ) : transactions.length === 0 ? (
-            <div className="text-center py-8 text-slate-400">
+            <div className="text-center py-8 text-slate-500">
               <p>No transactions found</p>
             </div>
           ) : (

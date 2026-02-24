@@ -77,7 +77,7 @@ export default function SupplierDashboardPage() {
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Breadcrumb */}
         <nav className="mb-6">
-          <ol className="flex items-center space-x-2 text-sm text-slate-400">
+          <ol className="flex items-center space-x-2 text-sm text-slate-300">
             <li>
               <a href="/dashboard" className="hover:text-white">Dashboard</a>
             </li>
@@ -92,7 +92,7 @@ export default function SupplierDashboardPage() {
           <h1 className="text-3xl font-bold mb-2">
             Supplier Dashboard
           </h1>
-          <p className="text-slate-400">
+          <p className="text-slate-300">
             Welcome back, {user?.name} ({user?.company})
           </p>
         </div>
@@ -153,7 +153,7 @@ export default function SupplierDashboardPage() {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-lg font-semibold mb-2">Looking for new opportunities?</h3>
-              <p className="text-slate-400">Browse new RFQs and submit your quotes</p>
+              <p className="text-slate-600">Browse new RFQs and submit your quotes</p>
             </div>
             <a href="/rfq" className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg">
               Browse RFQs
@@ -180,7 +180,7 @@ export default function SupplierDashboardPage() {
               <tbody className="bg-white divide-y divide-slate-200">
                 {quotes.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-12 text-center text-slate-400">
+                    <td colSpan={5} className="px-6 py-12 text-center text-slate-500">
                       No quotes submitted yet
                     </td>
                   </tr>
