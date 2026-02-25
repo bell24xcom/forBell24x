@@ -197,42 +197,13 @@ export async function GET(request: NextRequest) {
     }
 
     if (userId) {
-      // Get user's current subscription
-      // In production, fetch from database
-      const mockUserSubscription = {
-        id: 'sub_123456789',
-        userId: userId,
-        planId: 'professional',
-        status: 'active',
-        startDate: '2025-01-01',
-        endDate: '2025-02-01',
-        features: subscriptionPlans.find(p => p.id === 'professional')?.features || [],
-        limitations: subscriptionPlans.find(p => p.id === 'professional')?.limitations || [],
-        usage: {
-          rfqsUsed: 23,
-          rfqsLimit: 50,
-          suppliersUsed: 156,
-          suppliersLimit: 500,
-          apiCallsUsed: 1247,
-          apiCallsLimit: 10000,
-          storageUsed: 2.5,
-          storageLimit: 10
-        },
-        billing: {
-          amount: 2999,
-          currency: '₹',
-          nextBilling: '2025-02-01',
-          paymentMethod: 'Razorpay - Card ending in 4242',
-          status: 'active'
-        },
-        createdAt: '2025-01-01T00:00:00Z',
-        updatedAt: '2025-01-16T12:00:00Z'
-      };
-
+      // Get user's current subscription from database
+      // TODO: Implement real subscription lookup from Neon database
       return NextResponse.json({
-        success: true,
-        data: mockUserSubscription
-      });
+        success: false,
+        error: 'User subscription lookup not yet implemented',
+        message: 'Please contact support for subscription details'
+      }, { status: 501 });
     }
 
     // Get all plans

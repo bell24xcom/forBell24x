@@ -69,25 +69,16 @@ export async function GET(req: NextRequest) {
       prisma.user.count({ where })
     ]);
 
-    // Add mock data for demonstration (remove in production)
-    const suppliersWithMockData = suppliers.map(supplier => ({
+    const suppliersWithData = suppliers.map(supplier => ({
       ...supplier,
       verified: supplier.isVerified,
-      rating: Math.round((Math.random() * 2 + 3) * 10) / 10, // 3.0 to 5.0
-      products: [
-        'Steel Pipes',
-        'Steel Sheets', 
-        'Steel Rods',
-        'Steel Plates',
-        'Metal Components'
-      ].slice(0, Math.floor(Math.random() * 5) + 1),
-      category: supplier.category || category || 'steel',
+      category: supplier.category || category || 'Uncategorized',
       rfqCount: supplier._count.rfqs,
       leadCount: supplier._count.leads
     }));
 
     const response = {
-      suppliers: suppliersWithMockData,
+      suppliers: suppliersWithData,
       pagination: {
         page,
         limit,
@@ -100,49 +91,18 @@ export async function GET(req: NextRequest) {
     
   } catch (error) {
     console.error('Error fetching suppliers from Neon:', error);
-    
-    // Return mock data if database fails
-    const mockSuppliers = [
-      {
-        id: '1',
-        name: 'Rajesh Kumar',
-        company: 'SteelCo India',
-        email: 'rajesh@steelco.com',
-        phone: '+91-9876543210',
-        location: 'Mumbai, Maharashtra',
-        verified: true,
-        createdAt: '2024-01-15T10:30:00Z',
-        rating: 4.8,
-        products: ['Steel Pipes', 'Steel Sheets', 'Steel Rods', 'Steel Plates'],
-        category: 'steel',
-        rfqCount: 45,
-        leadCount: 23
-      },
-      {
-        id: '2',
-        name: 'Priya Sharma',
-        company: 'Textile Innovations',
-        email: 'priya@textileinnovations.com',
-        phone: '+91-9876543211',
-        location: 'Surat, Gujarat',
-        verified: true,
-        createdAt: '2024-02-20T14:15:00Z',
-        rating: 4.6,
-        products: ['Cotton Fabric', 'Silk Fabric', 'Polyester Fabric', 'Blended Fabric'],
-        category: 'textiles',
-        rfqCount: 32,
-        leadCount: 18
-      }
-    ];
 
     return NextResponse.json({
-      suppliers: mockSuppliers,
+      success: false,
+      error: 'Failed to fetch suppliers',
+      message: 'Database error occurred. Please try again.',
+      suppliers: [],
       pagination: {
         page: 1,
         limit: 20,
-        total: mockSuppliers.length,
-        pages: 1
+        total: 0,
+        pages: 0
       }
-    });
+    }, { status: 500 });
   }
 }
