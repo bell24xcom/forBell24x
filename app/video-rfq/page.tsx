@@ -165,19 +165,19 @@ export default function VideoRFQPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-[#0F172A] p-6">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Video RFQ Creator</h1>
-          <p className="text-gray-600">Create RFQs using video with AI-powered transcription and analysis</p>
+          <h1 className="text-3xl font-bold text-white mb-2">Video RFQ Creator</h1>
+          <p className="text-slate-300">Create RFQs using video with AI-powered transcription and analysis</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Video Recording/Upload Section */}
           <div className="space-y-6">
-            <Card>
+            <Card className="bg-slate-800/50 border-slate-700">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 text-white">
                   <Camera className="w-5 h-5" />
                   Record or Upload Video
                 </CardTitle>
@@ -277,9 +277,9 @@ export default function VideoRFQPage() {
 
             {/* Transcription */}
             {transcription && (
-              <Card>
+              <Card className="bg-slate-800/50 border-slate-700">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="flex items-center gap-2 text-white">
                     <FileVideo className="w-5 h-5" />
                     Transcription
                   </CardTitle>
@@ -296,9 +296,9 @@ export default function VideoRFQPage() {
           {/* RFQ Data Display */}
           <div className="space-y-6">
             {rfqData ? (
-              <Card>
+              <Card className="bg-slate-800/50 border-slate-700">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
+                  <CardTitle className="flex items-center gap-2 text-white">
                     <FileVideo className="w-5 h-5" />
                     Extracted RFQ Data
                   </CardTitle>

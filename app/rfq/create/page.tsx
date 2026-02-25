@@ -59,17 +59,17 @@ export default function CreateRFQPage() {
 
   if (success) {
     return (
-      <div className="page-container flex items-center justify-center">
+      <div className="min-h-screen bg-[#0F172A] flex items-center justify-center py-12 px-4">
         <div className="max-w-md w-full text-center">
-          <div className="card">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-8">
+            <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h2 className="text-2xl font-bold text-neutral-900 mb-4">RFQ Created Successfully!</h2>
-            <p className="feature-description">Your request for quotation has been submitted.</p>
-            <p className="text-sm text-neutral-500">Redirecting to RFQ dashboard...</p>
+            <h2 className="text-2xl font-bold text-white mb-4">RFQ Created Successfully!</h2>
+            <p className="text-slate-300 mb-2">Your request for quotation has been submitted.</p>
+            <p className="text-sm text-slate-500">Redirecting to RFQ dashboard...</p>
           </div>
         </div>
       </div>
@@ -77,67 +77,43 @@ export default function CreateRFQPage() {
   }
 
   return (
-    <div className="page-container">
-      {/* Navigation */}
-      <nav className="bg-white shadow-lg">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-8">
-              <Link href="/" className="flex items-center gap-2">
-                <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">B</div>
-                <div>
-                  <div className="font-bold text-xl">Bell24h</div>
-                  <div className="text-xs text-neutral-600">Verified B2B Platform</div>
-                </div>
-              </Link>
-              <div className="hidden md:flex items-center gap-6">
-                <Link href="/dashboard" className="nav-link">Dashboard</Link>
-                <Link href="/rfq" className="nav-link">My RFQs</Link>
-                <Link href="/rfq/create" className="text-blue-600 font-semibold">Create RFQ</Link>
-                <Link href="/suppliers" className="nav-link">Suppliers</Link>
-              </div>
-            </div>
-          </div>
+    <div className="min-h-screen bg-[#0F172A] py-12">
+      <div className="max-w-4xl mx-auto px-4">
+        <div className="text-center mb-10">
+          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+            Create Request for Quotation
+          </h1>
+          <p className="text-lg text-slate-300">
+            Describe what you need and get quotes from verified suppliers
+          </p>
         </div>
-      </nav>
 
-      <div className="page-content">
-        <div className="max-w-4xl mx-auto">
-          <div className="page-header text-center">
-            <h1 className="page-title">
-              Create Request for Quotation
-            </h1>
-            <p className="page-subtitle">
-              Describe what you need and get quotes from verified suppliers
-            </p>
-          </div>
-          
-          <div className="card">
-            {error && (
-              <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-                {error}
-              </div>
-            )}
+        <div className="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-8">
+          {error && (
+            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/50 text-red-300 rounded-lg">
+              {error}
+            </div>
+          )}
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label htmlFor="title" className="form-label">
-                  RFQ Title *
-                </label>
-                <input
-                  id="title"
-                  name="title"
-                  type="text"
-                  required
-                  value={formData.title}
-                  onChange={handleChange}
-                  className="form-input"
-                  placeholder="e.g., Need 1000 units of LED bulbs"
-                />
-              </div>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label htmlFor="title" className="block text-sm font-medium text-slate-300 mb-2">
+                RFQ Title *
+              </label>
+              <input
+                id="title"
+                name="title"
+                type="text"
+                required
+                value={formData.title}
+                onChange={handleChange}
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                placeholder="e.g., Need 1000 units of LED bulbs"
+              />
+            </div>
 
               <div>
-                <label htmlFor="category" className="form-label">
+                <label htmlFor="category" className="block text-sm font-medium text-slate-300 mb-2">
                   Product/Service Category *
                 </label>
                 <select
@@ -146,7 +122,7 @@ export default function CreateRFQPage() {
                   required
                   value={formData.category}
                   onChange={handleChange}
-                  className="form-input"
+                  className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
                 >
                   <option value="">Select Category</option>
                   <option value="textiles-garments">Textiles & Garments</option>
@@ -167,7 +143,7 @@ export default function CreateRFQPage() {
               </div>
               
               <div>
-                <label htmlFor="description" className="form-label">
+                <label htmlFor="description" className="block text-sm font-medium text-slate-300 mb-2">
                   Product/Service Description *
                 </label>
                 <textarea 
@@ -177,14 +153,14 @@ export default function CreateRFQPage() {
                   required
                   value={formData.description}
                   onChange={handleChange}
-                  className="form-input"
+                  className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
                   placeholder="Describe the product or service you need in detail..."
                 />
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="quantity" className="form-label">
+                  <label htmlFor="quantity" className="block text-sm font-medium text-slate-300 mb-2">
                     Quantity *
                   </label>
                   <input 
@@ -194,14 +170,14 @@ export default function CreateRFQPage() {
                     required
                     value={formData.quantity}
                     onChange={handleChange}
-                    className="form-input"
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
                     placeholder="Enter quantity"
                     min="1"
                   />
                 </div>
                 
                 <div>
-                  <label htmlFor="unit" className="form-label">
+                  <label htmlFor="unit" className="block text-sm font-medium text-slate-300 mb-2">
                     Unit *
                   </label>
                   <select
@@ -210,7 +186,7 @@ export default function CreateRFQPage() {
                     required
                     value={formData.unit}
                     onChange={handleChange}
-                    className="form-input"
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
                   >
                     <option value="">Select Unit</option>
                     <option value="pieces">Pieces</option>
@@ -228,7 +204,7 @@ export default function CreateRFQPage() {
               </div>
               
               <div>
-                <label className="form-label">
+                <label className="block text-sm font-medium text-slate-300 mb-2">
                   Budget Range (INR) *
                 </label>
                 <div className="grid grid-cols-2 gap-4">
@@ -240,7 +216,7 @@ export default function CreateRFQPage() {
                       required
                       value={formData.minBudget}
                       onChange={handleChange}
-                      className="form-input"
+                      className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
                       placeholder="Minimum"
                       min="0"
                     />
@@ -254,7 +230,7 @@ export default function CreateRFQPage() {
                       required
                       value={formData.maxBudget}
                       onChange={handleChange}
-                      className="form-input"
+                      className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
                       placeholder="Maximum"
                       min="0"
                     />
@@ -265,7 +241,7 @@ export default function CreateRFQPage() {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="timeline" className="form-label">
+                  <label htmlFor="timeline" className="block text-sm font-medium text-slate-300 mb-2">
                     Delivery Timeline *
                   </label>
                   <select
@@ -274,7 +250,7 @@ export default function CreateRFQPage() {
                     required
                     value={formData.timeline}
                     onChange={handleChange}
-                    className="form-input"
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
                   >
                     <option value="">Select Timeline</option>
                     <option value="1-week">Within 1 week</option>
@@ -287,7 +263,7 @@ export default function CreateRFQPage() {
                 </div>
                 
                 <div>
-                  <label htmlFor="urgency" className="form-label">
+                  <label htmlFor="urgency" className="block text-sm font-medium text-slate-300 mb-2">
                     Urgency Level
                   </label>
                   <select
@@ -295,7 +271,7 @@ export default function CreateRFQPage() {
                     name="urgency"
                     value={formData.urgency}
                     onChange={handleChange}
-                    className="form-input"
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
                   >
                     <option value="low">Low - No rush</option>
                     <option value="normal">Normal - Standard timeline</option>
@@ -306,7 +282,7 @@ export default function CreateRFQPage() {
               </div>
               
               <div>
-                <label htmlFor="requirements" className="form-label">
+                <label htmlFor="requirements" className="block text-sm font-medium text-slate-300 mb-2">
                   Additional Requirements
                 </label>
                 <textarea 
@@ -315,41 +291,40 @@ export default function CreateRFQPage() {
                   rows={3}
                   value={formData.requirements}
                   onChange={handleChange}
-                  className="form-input"
+                  className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
                   placeholder="Any specific requirements, certifications, quality standards, or preferences..."
                 />
               </div>
               
-              <div className="flex gap-4 pt-4">
-                <button 
-                  type="submit"
-                  disabled={isLoading}
-                  className="btn-primary flex-1 flex items-center justify-center gap-2"
-                >
-                  {isLoading ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                      Creating RFQ...
-                    </>
-                  ) : (
-                    <>
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                      </svg>
-                      Submit RFQ
-                    </>
-                  )}
-                </button>
-                <button 
-                  type="button"
-                  onClick={() => router.back()}
-                  className="btn-outline"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
+            <div className="space-y-3 pt-4">
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold px-6 py-4 rounded-lg transition-all duration-200 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {isLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    Creating RFQ...
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    Submit RFQ
+                  </>
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={() => router.back()}
+                className="w-full bg-slate-700 hover:bg-slate-600 text-white font-medium px-6 py-3 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
