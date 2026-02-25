@@ -42,7 +42,7 @@ async function getCategories(): Promise<DisplayCategory[]> {
   try {
     const dbCategories = await prisma.category.findMany({
       where: { isActive: true },
-      orderBy: { sortOrder: 'asc' },
+      orderBy: { priority: 'asc' },
       select: { slug: true, name: true, icon: true, _count: { select: { rfqs: true } } },
     });
 
