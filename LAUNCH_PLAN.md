@@ -62,20 +62,20 @@ One 60-second video: Person speaks in Hindi → AI converts to structured RFQ �
 ### BLOCK 1 — CRITICAL FIXES ⚡ (Week 1, Days 1–2)
 > Must complete before any real user sees the site
 
-- [ ] Remove hardcoded agent passwords (`admin@bell24h.com / admin123` in `/api/agents/auth`)
-- [ ] Remove all mock data from live pages:
-  - [ ] `/api/products` — mockProducts array
-  - [ ] `/api/suppliers` — mockSuppliers array
-  - [ ] `/api/subscription` — mockUserSubscription
-  - [ ] `/api/neon/suppliers` — mock fallback
+- [x] Remove hardcoded agent passwords (`admin@bell24h.com / admin123` in `/api/agents/auth`) — Already secure (returns 503)
+- [x] Remove all mock data from live pages:
+  - [x] `/api/products` — Already clean (no mock data)
+  - [x] `/api/suppliers` — Already clean (uses real Prisma queries)
+  - [x] `/api/subscription` — mockUserSubscription removed (now returns 501)
+  - [x] `/api/neon/suppliers` — mock ratings, products, and fallback removed
 - [ ] Fix text visibility / contrast on all pages (white on white, dark on dark)
 - [ ] Fix mobile responsiveness — test every main page at 375px width
-- [ ] Remove "Escrow coming soon" stale text from `/api/transactions/route.ts` lines 45, 72
-- [ ] Hide autonomous agent page from navigation
+- [x] Remove "Escrow coming soon" stale text from `/api/transactions/route.ts` lines 45, 72 — Already clean
+- [x] Hide autonomous agent page from navigation — Not found (already done or never existed)
 - [ ] Add proper empty states on all main pages:
-  - [ ] "Post your first RFQ" on empty buyer dashboard
-  - [ ] "Browse open RFQs" on empty supplier dashboard
-  - [ ] Loading skeleton on RFQ list, supplier list, dashboard stats
+  - [ ] "Post your first RFQ" CTA on empty buyer dashboard (when all stats = 0)
+  - [x] "Browse open RFQs" on empty supplier dashboard — Already has CTA
+  - [x] Loading skeleton on RFQ list, supplier list, dashboard stats — Already implemented
 
 ---
 
@@ -323,14 +323,24 @@ Auto-generated shareable card after each completed deal. Indian business communi
 - ✅ Updated .vercelignore to exclude 25+ duplicate/backup directories
 - ✅ Disabled 7 pages temporarily to get site deploying
 
-### 25 February 2026 - SITE LIVE + CSS FIXED
+### 25 February 2026 - SITE LIVE + CSS FIXED + BLOCK 1 STARTED
 - ✅ Moved TypeScript and all @types/* packages to dependencies
 - ✅ Fixed Tailwind config content paths (was ./src/, changed to ./app/ and ./components/)
 - ✅ Re-enabled all 7 previously disabled pages after module resolution fixed
 - ✅ Build cache cleared - fresh builds working correctly
 - ✅ **SITE SUCCESSFULLY DEPLOYED AND LIVE** at www.bell24h.com
 - ✅ Updated LAUNCH_PLAN.md with Block 0 completion
-- 🟡 Ready to start Block 1: Critical fixes (security, mock data, UI polish)
+
+**BLOCK 1 PROGRESS (Started Day 1):**
+- ✅ Audited all API routes for security issues — agent auth already secure
+- ✅ Removed all mock data from production APIs:
+  - Removed `mockUserSubscription` from `/api/subscription`
+  - Removed mock ratings, products, and complete fallback suppliers from `/api/neon/suppliers`
+- ✅ Verified escrow text is not "coming soon" — already active messaging
+- ✅ Confirmed autonomous agent page not in navigation
+- ✅ Confirmed supplier dashboard has "Browse RFQs" CTA
+- ✅ Confirmed all pages have loading skeletons
+- ⏳ TODO: Text contrast audit, mobile responsiveness, buyer dashboard empty state CTA
 
 ---
 
