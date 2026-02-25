@@ -1,46 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-// Mock API functions
-const mockSuppliersApi = {
-  getSuppliers: async () => {
-    // Mock data for demonstration
-    return {
-      data: [
-        {
-          id: '1',
-          name: 'TechCorp India',
-          category: 'Electronics',
-          rating: 4.8,
-          location: 'Mumbai',
-          verified: true,
-          products: 150,
-          established: '2015'
-        },
-        {
-          id: '2',
-          name: 'SteelWorks Ltd',
-          category: 'Manufacturing',
-          rating: 4.6,
-          location: 'Delhi',
-          verified: true,
-          products: 89,
-          established: '2010'
-        },
-        {
-          id: '3',
-          name: 'ChemSolutions',
-          category: 'Chemicals',
-          rating: 4.4,
-          location: 'Bangalore',
-          verified: true,
-          products: 67,
-          established: '2018'
-        }
-      ]
-    };
-  }
-};
 
 export default function SuppliersPage() {
   const [suppliers, setSuppliers] = useState([]);
@@ -68,19 +28,35 @@ export default function SuppliersPage() {
     try {
       setLoading(true);
       setError(null);
-      
-      const response = await mockSuppliersApi.getSuppliers();
-      
-      setSuppliers(response.data);
+
+      // Build query parameters
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: '10'
+      });
+
+      if (search) params.append('search', search);
+      if (category && category !== 'all') params.append('category', category);
+
+      // Call real API
+      const response = await fetch(`/api/suppliers?${params.toString()}`);
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch suppliers');
+      }
+
+      const data = await response.json();
+
+      setSuppliers(data.suppliers || []);
       setPagination({
-        page: 1,
-        limit: 10,
-        total: response.data.length,
-        totalPages: 1
+        page: data.page || 1,
+        limit: data.limit || 10,
+        total: data.total || 0,
+        totalPages: data.totalPages || 1
       });
     } catch (err) {
       console.error('Error fetching suppliers:', err);
-      setError('Failed to fetch suppliers');
+      setError('Failed to load suppliers. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -229,10 +205,21 @@ export default function SuppliersPage() {
                 )}
               </>
             ) : (
-              <div className="text-center py-12">
-                <div className="text-gray-400 text-6xl mb-4">🔍</div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">No suppliers found</h3>
-                <p className="text-gray-600">Try adjusting your search criteria</p>
+              <div className="text-center py-16">
+                <div className="text-gray-400 text-6xl mb-6">🏭</div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                  Suppliers Are Being Onboarded
+                </h3>
+                <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                  Join the waitlist to be among the first verified suppliers on Bell24h.
+                  Get access to thousands of buyer RFQs across 450+ categories.
+                </p>
+                <button
+                  onClick={() => window.location.href = '/register'}
+                  className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+                >
+                  Register as Supplier
+                </button>
               </div>
             )}
           </div>
