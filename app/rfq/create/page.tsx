@@ -1,8 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+
+type Category = {
+  id: number;
+  name: string;
+  slug: string;
+};
 
 export default function CreateRFQPage() {
   const [formData, setFormData] = useState({
@@ -17,10 +23,37 @@ export default function CreateRFQPage() {
     requirements: '',
     urgency: 'normal'
   });
+  const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const router = useRouter();
+
+  // Fetch categories from API on component mount
+  useEffect(() => {
+    async function loadCategories() {
+      try {
+        const response = await fetch('/api/categories?level=1');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.categories) {
+            setCategories(data.categories);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load categories:', err);
+        // Fallback to hardcoded categories if API fails
+        setCategories([
+          { id: 1, name: 'Textiles & Garments', slug: 'textiles-garments' },
+          { id: 2, name: 'Pharmaceuticals', slug: 'pharmaceuticals' },
+          { id: 3, name: 'Agricultural Products', slug: 'agricultural-products' },
+          { id: 4, name: 'Automotive Parts', slug: 'automotive-parts' },
+          { id: 5, name: 'IT Services', slug: 'it-services' },
+        ]);
+      }
+    }
+    loadCategories();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setFormData({
@@ -125,20 +158,11 @@ export default function CreateRFQPage() {
                   className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
                 >
                   <option value="">Select Category</option>
-                  <option value="textiles-garments">Textiles & Garments</option>
-                  <option value="pharmaceuticals">Pharmaceuticals</option>
-                  <option value="agricultural-products">Agricultural Products</option>
-                  <option value="automotive-parts">Automotive Parts</option>
-                  <option value="it-services">IT Services</option>
-                  <option value="gems-jewelry">Gems & Jewelry</option>
-                  <option value="handicrafts">Handicrafts</option>
-                  <option value="machinery-equipment">Machinery & Equipment</option>
-                  <option value="chemicals">Chemicals</option>
-                  <option value="food-processing">Food Processing</option>
-                  <option value="electronics">Electronics</option>
-                  <option value="construction">Construction Materials</option>
-                  <option value="packaging">Packaging</option>
-                  <option value="logistics">Logistics & Transportation</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.slug}>
+                      {cat.name}
+                    </option>
+                  ))}
                 </select>
               </div>
               

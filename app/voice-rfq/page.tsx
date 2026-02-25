@@ -313,7 +313,7 @@ export default function VoiceRFQPage() {
               <h3 className="text-lg font-semibold text-white mb-6">How It Works</h3>
               <div className="space-y-6">
                 <div className="flex items-start">
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-4 mt-1">
+                  <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center mr-4 mt-1">
                     <span className="text-blue-600 font-bold text-sm">1</span>
                   </div>
                   <div>
@@ -323,7 +323,7 @@ export default function VoiceRFQPage() {
                 </div>
 
                 <div className="flex items-start">
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-4 mt-1">
+                  <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center mr-4 mt-1">
                     <span className="text-blue-600 font-bold text-sm">2</span>
                   </div>
                   <div>
@@ -333,7 +333,7 @@ export default function VoiceRFQPage() {
                 </div>
 
                 <div className="flex items-start">
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-4 mt-1">
+                  <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center mr-4 mt-1">
                     <span className="text-blue-600 font-bold text-sm">3</span>
                   </div>
                   <div>
@@ -343,7 +343,7 @@ export default function VoiceRFQPage() {
                 </div>
 
                 <div className="flex items-start">
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-4 mt-1">
+                  <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center mr-4 mt-1">
                     <span className="text-blue-600 font-bold text-sm">4</span>
                   </div>
                   <div>
