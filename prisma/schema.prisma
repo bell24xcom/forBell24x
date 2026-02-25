@@ -58,7 +58,7 @@ model OTPVerification {
   @@map("otp_verifications")
 }
 
-// Category — hierarchical (level 1 = main, level 2 = subcategory)
+// Category — hierarchical (parent-child relationship)
 model Category {
   id          Int        @id @default(autoincrement())
   name        String
@@ -67,11 +67,9 @@ model Category {
   parentId    Int?       @map("parent_id")
   parent      Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
   children    Category[] @relation("CategoryHierarchy")
-  level       Int        @default(1)  // 1 = main category, 2 = subcategory
   isActive    Boolean    @default(true)
-  sortOrder   Int        @default(0)
+  priority    Int        @default(0)
   icon        String?    // emoji or icon name for UI
-  color       String?    // hex color for UI badges
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 
