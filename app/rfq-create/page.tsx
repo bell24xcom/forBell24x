@@ -1,8 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 
 export default function RFQCreatePage() {
   const [formData, setFormData] = useState({
@@ -112,45 +110,38 @@ export default function RFQCreatePage() {
 
   if (success) {
     return (
-      <>
-        <Header />
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg shadow-md p-8 text-center max-w-md">
-            <div className="text-green-500 text-6xl mb-4">✅</div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">RFQ Created Successfully!</h2>
-            <p className="text-gray-600 mb-6">
-              Your RFQ has been submitted and suppliers will be notified.
-            </p>
-            <button
-              onClick={() => setSuccess(false)}
-              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Create Another RFQ
-            </button>
-          </div>
+      <div className="min-h-screen bg-[#0F172A] flex items-center justify-center py-12 px-4">
+        <div className="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-8 text-center max-w-md">
+          <div className="text-green-400 text-6xl mb-4">✅</div>
+          <h2 className="text-2xl font-bold text-white mb-4">RFQ Created Successfully!</h2>
+          <p className="text-slate-300 mb-6">
+            Your RFQ has been submitted and suppliers will be notified.
+          </p>
+          <button
+            onClick={() => setSuccess(false)}
+            className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold px-6 py-3 rounded-lg transition-all"
+          >
+            Create Another RFQ
+          </button>
         </div>
-        <Footer />
-      </>
+      </div>
     );
   }
 
   return (
-    <>
-      <Header />
-      <div className="min-h-screen bg-gray-50">
-        <section className="bg-white py-12">
-          <div className="container mx-auto px-4">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">Create RFQ</h1>
-            <p className="text-lg text-gray-600 mb-8">
-              Submit your requirements and get quotes from verified suppliers
-            </p>
-          </div>
-        </section>
+    <div className="min-h-screen bg-[#0F172A] py-12">
+      <div className="max-w-4xl mx-auto px-4">
+        <div className="text-center mb-10">
+          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-4">Create RFQ</h1>
+          <p className="text-lg text-slate-300">
+            Submit your requirements and get quotes from verified suppliers
+          </p>
+        </div>
 
         <section className="py-12">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto">
-              <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-8">
+              <form onSubmit={handleSubmit} className="bg-slate-800/50 border border-slate-700/50 rounded-lg shadow-md p-8">
                 {errors.submit && (
                   <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
                     <p className="text-red-600">{errors.submit}</p>
@@ -159,7 +150,7 @@ export default function RFQCreatePage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="title" className="block text-sm font-medium text-slate-300 mb-2">
                       RFQ Title *
                     </label>
                     <input
@@ -175,7 +166,7 @@ export default function RFQCreatePage() {
                   </div>
 
                   <div>
-                    <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="category" className="block text-sm font-medium text-slate-300 mb-2">
                       Category *
                     </label>
                     <select
@@ -193,7 +184,7 @@ export default function RFQCreatePage() {
                   </div>
 
                   <div>
-                    <label htmlFor="quantity" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="quantity" className="block text-sm font-medium text-slate-300 mb-2">
                       Quantity *
                     </label>
                     <input
@@ -209,7 +200,7 @@ export default function RFQCreatePage() {
                   </div>
 
                   <div>
-                    <label htmlFor="budget" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="budget" className="block text-sm font-medium text-slate-300 mb-2">
                       Budget (₹) *
                     </label>
                     <input
@@ -226,7 +217,7 @@ export default function RFQCreatePage() {
                   </div>
 
                   <div>
-                    <label htmlFor="deadline" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="deadline" className="block text-sm font-medium text-slate-300 mb-2">
                       Deadline *
                     </label>
                     <input
@@ -242,7 +233,7 @@ export default function RFQCreatePage() {
                   </div>
 
                   <div>
-                    <label htmlFor="urgency" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="urgency" className="block text-sm font-medium text-slate-300 mb-2">
                       Urgency Level
                     </label>
                     <select
@@ -259,7 +250,7 @@ export default function RFQCreatePage() {
                   </div>
 
                   <div className="md:col-span-2">
-                    <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="location" className="block text-sm font-medium text-slate-300 mb-2">
                       Delivery Location *
                     </label>
                     <input
@@ -276,7 +267,7 @@ export default function RFQCreatePage() {
                 </div>
 
                 <div className="mt-6">
-                  <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="description" className="block text-sm font-medium text-slate-300 mb-2">
                     Description *
                   </label>
                   <textarea
@@ -292,7 +283,7 @@ export default function RFQCreatePage() {
                 </div>
 
                 <div className="mt-6">
-                  <label htmlFor="specifications" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="specifications" className="block text-sm font-medium text-slate-300 mb-2">
                     Technical Specifications
                   </label>
                   <textarea
@@ -310,7 +301,7 @@ export default function RFQCreatePage() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-4 px-6 rounded-lg transition-all shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {loading ? 'Creating RFQ...' : 'Submit RFQ'}
                   </button>
@@ -318,9 +309,7 @@ export default function RFQCreatePage() {
               </form>
             </div>
           </div>
-        </section>
+        </div>
       </div>
-      <Footer />
-    </>
   );
 }

@@ -266,38 +266,38 @@ export default function VoiceRFQPage() {
             )}
 
             {/* Voice Commands Examples */}
-            <div className="bg-neutral-50 p-6 rounded-lg">
+            <div className="bg-slate-800/50 p-6 rounded-lg">
               <h3 className="text-lg font-semibold text-white mb-4">Voice Commands Examples:</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-3">
-                  <div className="p-3 bg-white rounded-lg border border-neutral-200">
+                  <div className="p-3 bg-slate-700/50 rounded-lg border border-slate-600">
                     <p className="text-sm text-slate-300">
                       <strong>"I need 1000 cotton t-shirts"</strong>
                     </p>
                   </div>
-                  <div className="p-3 bg-white rounded-lg border border-neutral-200">
+                  <div className="p-3 bg-slate-700/50 rounded-lg border border-slate-600">
                     <p className="text-sm text-slate-300">
                       <strong>"Looking for steel pipes for construction"</strong>
                     </p>
                   </div>
-                  <div className="p-3 bg-white rounded-lg border border-neutral-200">
+                  <div className="p-3 bg-slate-700/50 rounded-lg border border-slate-600">
                     <p className="text-sm text-slate-300">
                       <strong>"Need pharmaceutical packaging materials"</strong>
                     </p>
                   </div>
                 </div>
                 <div className="space-y-3">
-                  <div className="p-3 bg-white rounded-lg border border-neutral-200">
+                  <div className="p-3 bg-slate-700/50 rounded-lg border border-slate-600">
                     <p className="text-sm text-slate-300">
                       <strong>"Require automotive parts delivery in 2 weeks"</strong>
                     </p>
                   </div>
-                  <div className="p-3 bg-white rounded-lg border border-neutral-200">
+                  <div className="p-3 bg-slate-700/50 rounded-lg border border-slate-600">
                     <p className="text-sm text-slate-300">
                       <strong>"Want to buy agricultural equipment"</strong>
                     </p>
                   </div>
-                  <div className="p-3 bg-white rounded-lg border border-neutral-200">
+                  <div className="p-3 bg-slate-700/50 rounded-lg border border-slate-600">
                     <p className="text-sm text-slate-300">
                       <strong>"Need IT services for my company"</strong>
                     </p>
@@ -391,7 +391,7 @@ export default function VoiceRFQPage() {
             <div className="space-y-4">
               {recentRFQs.length > 0 ? (
                 recentRFQs.map((rfq) => (
-                  <div key={rfq.id} className="flex items-center justify-between p-4 border border-neutral-200 rounded-lg hover:bg-neutral-50 transition-colors">
+                  <div key={rfq.id} className="flex items-center justify-between p-4 border border-slate-600 rounded-lg hover:bg-slate-800/50 transition-colors">
                     <div>
                       <p className="font-medium text-white">{rfq.title}</p>
                       <p className="text-sm text-slate-300">
