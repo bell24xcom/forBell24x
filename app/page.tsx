@@ -51,29 +51,79 @@ export default function HomePage() {
   );
 }
 
-/* ---- HERO SECTION ---- */
+/* ---- HERO SECTION WITH 3-TAB DEMO ---- */
 function HeroSection() {
+  const [activeTab, setActiveTab] = useState<'voice' | 'video' | 'text'>('voice');
+
   return (
     <section className="relative pt-8 pb-12 lg:pt-12 lg:pb-16">
-      <div className="max-w-6xl mx-auto px-4 text-center">
+      <div className="max-w-6xl mx-auto px-4">
         {/* Badge */}
-        <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-4 py-1.5 mb-6">
-          <span className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" />
-          <span className="text-blue-300 text-sm font-medium">India&apos;s #1 Multi-Modal B2B Platform</span>
+        <div className="text-center mb-6">
+          <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-4 py-1.5">
+            <span className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" />
+            <span className="text-blue-300 text-sm font-medium">India&apos;s #1 Multi-Modal B2B Platform</span>
+          </div>
         </div>
 
         {/* Headline */}
-        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4">
-          Connect with 10,000+{' '}
-          <span className="text-blue-400">Verified Suppliers</span>
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4 text-center">
+          Post RFQs in{' '}
+          <span className="text-blue-400">3 Different Ways</span>
         </h1>
 
         {/* Subheadline */}
-        <p className="text-lg text-slate-300 max-w-2xl mx-auto mb-8">
-          Post RFQs via Voice, Video, or Text. AI-powered matching across 450+ categories.
+        <p className="text-lg text-slate-300 max-w-2xl mx-auto mb-10 text-center">
+          Choose Voice, Video, or Text. AI-powered matching across 450+ categories.
         </p>
 
-        {/* Primary CTA */}
+        {/* 3-Tab Switcher */}
+        <div className="max-w-4xl mx-auto mb-8">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-8">
+            <button
+              onClick={() => setActiveTab('voice')}
+              className={`flex items-center justify-center gap-3 px-6 py-4 rounded-xl font-semibold transition-all duration-300 ${
+                activeTab === 'voice'
+                  ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/25'
+                  : 'bg-slate-800/50 text-slate-300 hover:bg-slate-800 border border-slate-700/50'
+              }`}
+            >
+              <Mic className="w-5 h-5" />
+              <span>Voice RFQ</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('video')}
+              className={`flex items-center justify-center gap-3 px-6 py-4 rounded-xl font-semibold transition-all duration-300 ${
+                activeTab === 'video'
+                  ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/25'
+                  : 'bg-slate-800/50 text-slate-300 hover:bg-slate-800 border border-slate-700/50'
+              }`}
+            >
+              <Video className="w-5 h-5" />
+              <span>Video RFQ</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('text')}
+              className={`flex items-center justify-center gap-3 px-6 py-4 rounded-xl font-semibold transition-all duration-300 ${
+                activeTab === 'text'
+                  ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/25'
+                  : 'bg-slate-800/50 text-slate-300 hover:bg-slate-800 border border-slate-700/50'
+              }`}
+            >
+              <FileText className="w-5 h-5" />
+              <span>Text RFQ</span>
+            </button>
+          </div>
+
+          {/* Demo Container */}
+          <div className="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-8 min-h-[400px]">
+            {activeTab === 'voice' && <VoiceDemoContent />}
+            {activeTab === 'video' && <VideoDemoContent />}
+            {activeTab === 'text' && <TextDemoContent />}
+          </div>
+        </div>
+
+        {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
           <Link
             href="/rfq/create"
@@ -107,6 +157,207 @@ function HeroSection() {
         </div>
       </div>
     </section>
+  );
+}
+
+/* ---- VOICE DEMO CONTENT ---- */
+function VoiceDemoContent() {
+  const [isListening, setIsListening] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsListening(true), 500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <div className="flex flex-col items-center justify-center h-full space-y-6">
+      {/* Microphone Visual */}
+      <div className="relative">
+        <div className={`w-24 h-24 rounded-full bg-blue-500/20 border-2 border-blue-500 flex items-center justify-center transition-all duration-300 ${
+          isListening ? 'scale-110' : ''
+        }`}>
+          <Mic className="w-10 h-10 text-blue-400" />
+        </div>
+        {isListening && (
+          <div className="absolute inset-0 rounded-full bg-blue-500/30 animate-ping" />
+        )}
+      </div>
+
+      {/* Status Text */}
+      <div className="text-center space-y-2">
+        <p className="text-xl font-semibold text-white">
+          {isListening ? 'Listening...' : 'Click to speak'}
+        </p>
+        <p className="text-sm text-slate-300 max-w-md">
+          {isListening
+            ? '"I need 5000 meters of corrugated packaging boxes with 3-ply strength..."'
+            : 'Just speak naturally. AI will extract all product details.'}
+        </p>
+      </div>
+
+      {/* Features */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full mt-6">
+        <div className="text-center p-4 bg-slate-800/50 rounded-lg">
+          <div className="text-2xl mb-1">🎤</div>
+          <div className="text-xs text-slate-300">Works in any language</div>
+        </div>
+        <div className="text-center p-4 bg-slate-800/50 rounded-lg">
+          <div className="text-2xl mb-1">⚡</div>
+          <div className="text-xs text-slate-300">Real-time transcription</div>
+        </div>
+        <div className="text-center p-4 bg-slate-800/50 rounded-lg">
+          <div className="text-2xl mb-1">🤖</div>
+          <div className="text-xs text-slate-300">AI-powered extraction</div>
+        </div>
+      </div>
+
+      {/* Try Button */}
+      <Link
+        href="/voice-rfq"
+        className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 font-medium transition-colors"
+      >
+        Try Voice RFQ <ChevronRight className="w-4 h-4" />
+      </Link>
+    </div>
+  );
+}
+
+/* ---- VIDEO DEMO CONTENT ---- */
+function VideoDemoContent() {
+  const [isRecording, setIsRecording] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsRecording(true), 500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <div className="flex flex-col items-center justify-center h-full space-y-6">
+      {/* Camera Visual */}
+      <div className="relative w-full max-w-md aspect-video bg-slate-900 rounded-xl border-2 border-slate-700 flex items-center justify-center overflow-hidden">
+        <Video className="w-16 h-16 text-slate-600" />
+        {isRecording && (
+          <div className="absolute top-4 right-4 flex items-center gap-2 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+            <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
+            REC 0:15
+          </div>
+        )}
+      </div>
+
+      {/* Status Text */}
+      <div className="text-center space-y-2">
+        <p className="text-xl font-semibold text-white">
+          {isRecording ? 'Recording product demo...' : 'Show us what you need'}
+        </p>
+        <p className="text-sm text-slate-300 max-w-md">
+          Point camera at product, sample, or blueprint. AI extracts specs automatically.
+        </p>
+      </div>
+
+      {/* Features */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full mt-6">
+        <div className="text-center p-4 bg-slate-800/50 rounded-lg">
+          <div className="text-2xl mb-1">📹</div>
+          <div className="text-xs text-slate-300">Visual recognition</div>
+        </div>
+        <div className="text-center p-4 bg-slate-800/50 rounded-lg">
+          <div className="text-2xl mb-1">📏</div>
+          <div className="text-xs text-slate-300">Auto spec extraction</div>
+        </div>
+        <div className="text-center p-4 bg-slate-800/50 rounded-lg">
+          <div className="text-2xl mb-1">🎯</div>
+          <div className="text-xs text-slate-300">Instant matching</div>
+        </div>
+      </div>
+
+      {/* Try Button */}
+      <Link
+        href="/video-rfq"
+        className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 font-medium transition-colors"
+      >
+        Try Video RFQ <ChevronRight className="w-4 h-4" />
+      </Link>
+    </div>
+  );
+}
+
+/* ---- TEXT DEMO CONTENT ---- */
+function TextDemoContent() {
+  const [showForm, setShowForm] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowForm(true), 300);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <div className="flex flex-col h-full space-y-4">
+      {/* Form Preview */}
+      <div className={`space-y-4 transition-opacity duration-500 ${showForm ? 'opacity-100' : 'opacity-0'}`}>
+        <div>
+          <label className="block text-sm font-medium text-slate-300 mb-2">Product/Service</label>
+          <input
+            type="text"
+            value="Corrugated Packaging Boxes"
+            readOnly
+            className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white"
+          />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-2">Quantity</label>
+            <input
+              type="text"
+              value="5000 meters"
+              readOnly
+              className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-300 mb-2">Category</label>
+            <input
+              type="text"
+              value="Packaging"
+              readOnly
+              className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white"
+            />
+          </div>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-slate-300 mb-2">Specifications</label>
+          <textarea
+            value="3-ply strength, brown kraft paper, suitable for export shipping, ISPM 15 compliant"
+            readOnly
+            rows={3}
+            className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white resize-none"
+          />
+        </div>
+      </div>
+
+      {/* Features */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-auto">
+        <div className="text-center p-4 bg-slate-800/50 rounded-lg">
+          <div className="text-2xl mb-1">📝</div>
+          <div className="text-xs text-slate-300">Detailed forms</div>
+        </div>
+        <div className="text-center p-4 bg-slate-800/50 rounded-lg">
+          <div className="text-2xl mb-1">💾</div>
+          <div className="text-xs text-slate-300">Save drafts</div>
+        </div>
+        <div className="text-center p-4 bg-slate-800/50 rounded-lg">
+          <div className="text-2xl mb-1">📎</div>
+          <div className="text-xs text-slate-300">Attach files</div>
+        </div>
+      </div>
+
+      {/* Try Button */}
+      <Link
+        href="/rfq/create"
+        className="inline-flex items-center justify-center gap-2 text-blue-400 hover:text-blue-300 font-medium transition-colors"
+      >
+        Try Text RFQ <ChevronRight className="w-4 h-4" />
+      </Link>
+    </div>
   );
 }
 
