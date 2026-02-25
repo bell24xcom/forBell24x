@@ -1,4 +1,7 @@
 import { Metadata } from 'next';
+import { prisma } from '@/lib/prisma';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
 
 interface CategoryPageProps {
   params: {
@@ -6,247 +9,144 @@ interface CategoryPageProps {
   };
 }
 
-const categoryData = {
-  'textiles-garments': {
-    title: 'Textiles & Garments',
-    description: 'Find suppliers for textiles, clothing, and fashion accessories',
-    icon: '👕',
-    subcategories: ['Cotton Textiles', 'Synthetic Fabrics', 'Garments', 'Fashion Accessories', 'Home Textiles']
-  },
-  'pharmaceuticals': {
-    title: 'Pharmaceuticals',
-    description: 'Connect with pharmaceutical manufacturers and suppliers',
-    icon: '💊',
-    subcategories: ['Generic Medicines', 'API', 'Medical Devices', 'Healthcare Products', 'Veterinary Medicines']
-  },
-  'agricultural-products': {
-    title: 'Agricultural Products',
-    description: 'Source agricultural products and farming equipment',
-    icon: '🌾',
-    subcategories: ['Grains & Cereals', 'Fruits & Vegetables', 'Spices', 'Farming Equipment', 'Organic Products']
-  },
-  'automotive-parts': {
-    title: 'Automotive Parts',
-    description: 'Automotive components and spare parts',
-    icon: '🚗',
-    subcategories: ['Engine Parts', 'Brake Systems', 'Electrical Components', 'Body Parts', 'Accessories']
-  },
-  'it-services': {
-    title: 'IT Services',
-    description: 'Information technology services and solutions',
-    icon: '💻',
-    subcategories: ['Software Development', 'Web Development', 'Mobile Apps', 'Cloud Services', 'IT Consulting']
-  },
-  'gems-jewelry': {
-    title: 'Gems & Jewelry',
-    description: 'Precious stones, jewelry, and accessories',
-    icon: '💎',
-    subcategories: ['Diamonds', 'Gold Jewelry', 'Silver Jewelry', 'Gemstones', 'Jewelry Making Tools']
-  },
-  'handicrafts': {
-    title: 'Handicrafts',
-    description: 'Traditional and modern handicraft products',
-    icon: '🎨',
-    subcategories: ['Wooden Crafts', 'Metal Crafts', 'Textile Crafts', 'Pottery', 'Art & Decor']
-  },
-  'machinery-equipment': {
-    title: 'Machinery & Equipment',
-    description: 'Industrial machinery and equipment',
-    icon: '⚙️',
-    subcategories: ['Manufacturing Equipment', 'Construction Machinery', 'Agricultural Machinery', 'Packaging Equipment', 'Power Tools']
-  },
-  'chemicals': {
-    title: 'Chemicals',
-    description: 'Industrial and specialty chemicals',
-    icon: '🧪',
-    subcategories: ['Industrial Chemicals', 'Specialty Chemicals', 'Agrochemicals', 'Petrochemicals', 'Laboratory Chemicals']
-  },
-  'food-processing': {
-    title: 'Food Processing',
-    description: 'Food processing equipment and ingredients',
-    icon: '🍽️',
-    subcategories: ['Processing Equipment', 'Food Ingredients', 'Packaging Materials', 'Quality Control', 'Storage Solutions']
-  },
-  'construction': {
-    title: 'Construction',
-    description: 'Construction materials and services',
-    icon: '🏗️',
-    subcategories: ['Building Materials', 'Construction Equipment', 'Interior Design', 'Architectural Services', 'Safety Equipment']
-  },
-  'metals-steel': {
-    title: 'Metals & Steel',
-    description: 'Metal products and steel manufacturing',
-    icon: '🔩',
-    subcategories: ['Steel Products', 'Aluminum', 'Copper', 'Iron & Steel', 'Metal Fabrication']
-  },
-  'plastics': {
-    title: 'Plastics',
-    description: 'Plastic products and manufacturing',
-    icon: '🔄',
-    subcategories: ['Plastic Raw Materials', 'Plastic Products', 'Packaging', 'Molding Services', 'Recycling']
-  },
-  'paper-packaging': {
-    title: 'Paper & Packaging',
-    description: 'Paper products and packaging solutions',
-    icon: '📦',
-    subcategories: ['Paper Products', 'Packaging Materials', 'Printing Services', 'Labels & Tags', 'Corrugated Boxes']
-  },
-  'rubber': {
-    title: 'Rubber',
-    description: 'Rubber products and manufacturing',
-    icon: '🛞',
-    subcategories: ['Natural Rubber', 'Synthetic Rubber', 'Rubber Products', 'Tires', 'Rubber Machinery']
-  },
-  'ceramics': {
-    title: 'Ceramics',
-    description: 'Ceramic products and manufacturing',
-    icon: '🏺',
-    subcategories: ['Ceramic Tiles', 'Sanitary Ware', 'Tableware', 'Industrial Ceramics', 'Art Ceramics']
-  },
-  'glass': {
-    title: 'Glass',
-    description: 'Glass products and manufacturing',
-    icon: '🪟',
-    subcategories: ['Flat Glass', 'Container Glass', 'Specialty Glass', 'Glass Products', 'Glass Machinery']
-  },
-  'wood': {
-    title: 'Wood',
-    description: 'Wood products and furniture',
-    icon: '🪵',
-    subcategories: ['Timber', 'Furniture', 'Wooden Crafts', 'Plywood', 'Wood Processing']
-  },
-  'leather': {
-    title: 'Leather',
-    description: 'Leather products and manufacturing',
-    icon: '👜',
-    subcategories: ['Leather Goods', 'Footwear', 'Bags & Accessories', 'Leather Raw Materials', 'Leather Machinery']
+export const revalidate = 300; // cache 5 minutes
+
+async function getCategory(slug: string) {
+  try {
+    const category = await prisma.category.findUnique({
+      where: { slug },
+      include: {
+        children: {
+          where: { isActive: true },
+          orderBy: { priority: 'asc' },
+          take: 12,
+        },
+        _count: {
+          select: { rfqs: true },
+        },
+      },
+    });
+    return category;
+  } catch (error) {
+    console.error('Error fetching category:', error);
+    return null;
   }
-};
+}
 
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
-  const category = categoryData[params.category as keyof typeof categoryData];
+  const category = await getCategory(params.category);
 
   return {
-    title: `${category?.title || 'Category'} - Bell24h`,
-    description: category?.description || 'B2B marketplace category'
+    title: `${category?.name || 'Category'} - Bell24h`,
+    description: category?.description || `Find suppliers and create RFQs for ${category?.name || 'this category'}`
   };
 }
 
-export default function CategoryPage({ params }: CategoryPageProps) {
-  const category = categoryData[params.category as keyof typeof categoryData];
+export default async function CategoryPage({ params }: CategoryPageProps) {
+  const category = await getCategory(params.category);
 
-  if (!category) {
-    return (
-      <div className="page-container flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="page-title">Category Not Found</h1>
-          <p className="text-neutral-600 mb-6">The requested category does not exist.</p>
-          <a href="/marketplace" className="text-blue-600 hover:text-blue-800">
-            Back to Marketplace
-          </a>
-        </div>
-      </div>
-    );
+  if (!category || !category.isActive) {
+    notFound();
   }
 
   return (
-    <div className="page-container">
-      <div className="page-content">
-        <div className="mb-8">
-          <div className="flex items-center mb-4">
-            <span className="text-4xl mr-4">{category.icon}</span>
+    <div className="min-h-screen bg-[#0F172A] py-12">
+      <div className="max-w-7xl mx-auto px-4">
+        {/* Category Header */}
+        <div className="mb-10">
+          <div className="flex items-center mb-6">
+            {category.icon && <span className="text-5xl mr-4">{category.icon}</span>}
             <div>
-              <h1 className="text-3xl font-bold text-neutral-900">{category.title}</h1>
-              <p className="text-neutral-600 mt-2">{category.description}</p>
+              <h1 className="text-3xl sm:text-4xl font-bold text-white">{category.name}</h1>
+              {category.description && (
+                <p className="text-lg text-slate-300 mt-2">{category.description}</p>
+              )}
+              <p className="text-sm text-slate-400 mt-2">
+                {category._count.rfqs} active RFQs in this category
+              </p>
             </div>
           </div>
 
           <div className="flex gap-4">
-            <a
+            <Link
               href="/rfq/create"
-              className="btn-primary transition-colors"
+              className="inline-flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
             >
               Create RFQ
-            </a>
-            <a
+            </Link>
+            <Link
               href="/suppliers"
-              className="btn-outline transition-colors"
+              className="inline-flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-white font-medium px-6 py-3 rounded-lg transition-colors"
             >
               Browse Suppliers
-            </a>
+            </Link>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          {category.subcategories.map((subcategory, index) => (
-            <div key={index} className="feature-card">
-              <h3 className="text-lg font-semibold mb-2">{subcategory}</h3>
-              <p className="feature-description">
-                Find suppliers and products in {subcategory.toLowerCase()}
-              </p>
-              <button className="text-blue-600 hover:text-blue-800 font-medium">
-                Explore →
-              </button>
+        {/* Subcategories */}
+        {category.children && category.children.length > 0 && (
+          <div className="mb-10">
+            <h2 className="text-2xl font-bold text-white mb-6">Subcategories</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {category.children.map((subcategory) => (
+                <Link
+                  key={subcategory.id}
+                  href={`/categories/${subcategory.slug}`}
+                  className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5 hover:border-blue-500/30 transition-all group"
+                >
+                  <div className="flex items-center mb-2">
+                    {subcategory.icon && <span className="text-2xl mr-3">{subcategory.icon}</span>}
+                    <h3 className="text-lg font-semibold text-white group-hover:text-blue-400 transition-colors">
+                      {subcategory.name}
+                    </h3>
+                  </div>
+                  {subcategory.description && (
+                    <p className="text-sm text-slate-300 mb-2">
+                      {subcategory.description.slice(0, 100)}
+                      {subcategory.description.length > 100 ? '...' : ''}
+                    </p>
+                  )}
+                  <span className="text-sm text-slate-400">
+                    Explore →
+                  </span>
+                </Link>
+              ))}
             </div>
-          ))}
-        </div>
+          </div>
+        )}
 
-        <div className="feature-card">
-          <h2 className="feature-title mb-4">Featured Suppliers</h2>
+        {/* Popular RFQs in this Category */}
+        <div className="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-8">
+          <h2 className="text-2xl font-bold text-white mb-6">Popular Searches in {category.name}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="border border-neutral-200 p-4 rounded-lg">
-              <div className="flex items-center mb-3">
-                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                  <span className="text-blue-600 font-bold">A</span>
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="bg-slate-700/50 border border-slate-600 p-5 rounded-lg">
+                <div className="flex items-center mb-3">
+                  <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center mr-3">
+                    <span className="text-blue-400 font-bold">{i}</span>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-white">Sample RFQ #{i}</h4>
+                    <p className="text-xs text-slate-400">Posted 2 days ago</p>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="font-semibold">ABC {category.title}</h4>
-                  <p className="text-sm text-neutral-600">Verified Supplier</p>
-                </div>
+                <p className="text-sm text-slate-300 mb-3">
+                  Example RFQ for {category.name.toLowerCase()} products
+                </p>
+                <button className="text-blue-400 hover:text-blue-300 text-sm font-medium">
+                  View Details →
+                </button>
               </div>
-              <p className="text-sm text-neutral-600 mb-3">
-                Leading supplier in {category.title.toLowerCase()} with 10+ years experience
-              </p>
-              <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                View Profile →
-              </button>
-            </div>
+            ))}
+          </div>
 
-            <div className="border border-neutral-200 p-4 rounded-lg">
-              <div className="flex items-center mb-3">
-                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
-                  <span className="text-green-600 font-bold">B</span>
-                </div>
-                <div>
-                  <h4 className="font-semibold">Best {category.title}</h4>
-                  <p className="text-sm text-neutral-600">Premium Supplier</p>
-                </div>
-              </div>
-              <p className="text-sm text-neutral-600 mb-3">
-                High-quality {category.title.toLowerCase()} products and services
-              </p>
-              <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                View Profile →
-              </button>
-            </div>
-
-            <div className="border border-neutral-200 p-4 rounded-lg">
-              <div className="flex items-center mb-3">
-                <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center mr-3">
-                  <span className="text-yellow-600 font-bold">C</span>
-                </div>
-                <div>
-                  <h4 className="font-semibold">Creative {category.title}</h4>
-                  <p className="text-sm text-neutral-600">Innovative Solutions</p>
-                </div>
-              </div>
-              <p className="text-sm text-neutral-600 mb-3">
-                Innovative {category.title.toLowerCase()} solutions and products
-              </p>
-              <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                View Profile →
-              </button>
-            </div>
+          <div className="mt-8 text-center">
+            <Link
+              href="/rfq/create"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold px-8 py-3 rounded-lg transition-all shadow-lg shadow-blue-500/25"
+            >
+              Post Your RFQ in {category.name}
+            </Link>
           </div>
         </div>
       </div>
