@@ -60,11 +60,11 @@ model OTPVerification {
 
 // Category — hierarchical (level 1 = main, level 2 = subcategory)
 model Category {
-  id          String     @id @default(cuid())
+  id          Int        @id @default(autoincrement())
   name        String
   slug        String     @unique
   description String?
-  parentId    String?    @map("parent_id")
+  parentId    Int?       @map("parent_id")
   parent      Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
   children    Category[] @relation("CategoryHierarchy")
   level       Int        @default(1)  // 1 = main category, 2 = subcategory
@@ -97,7 +97,7 @@ model RFQ {
   title       String
   description String?
   category    String   // legacy string (e.g. slug); kept for backward compat
-  categoryId  String?  @map("category_id")
+  categoryId  Int?     @map("category_id")
   type        String?  // optional; used by API
   quantity    String
   unit        String   @default("units")
