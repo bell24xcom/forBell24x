@@ -25,17 +25,15 @@ export async function GET(request: NextRequest) {
     if (flat) {
       const categories = await prisma.category.findMany({
         where: { isActive: true },
-        orderBy: [{ level: 'asc' }, { sortOrder: 'asc' }, { name: 'asc' }],
+        orderBy: [{ priority: 'asc' }, { name: 'asc' }],
         select: {
           id: true,
           name: true,
           slug: true,
           description: true,
           parentId: true,
-          level: true,
           icon: true,
-          color: true,
-          sortOrder: true,
+          priority: true,
         },
       });
       return NextResponse.json({ success: true, categories });
@@ -44,33 +42,30 @@ export async function GET(request: NextRequest) {
     // ── Subcategories of a specific parent ───────────────────────────────────
     if (parentId) {
       const subcategories = await prisma.category.findMany({
-        where: { parentId, isActive: true },
-        orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
+        where: { parentId: parseInt(parentId), isActive: true },
+        orderBy: [{ priority: 'asc' }, { name: 'asc' }],
         select: {
           id: true,
           name: true,
           slug: true,
           description: true,
-          level: true,
           icon: true,
-          color: true,
         },
       });
       return NextResponse.json({ success: true, subcategories });
     }
 
-    // ── Only level-1 main categories ─────────────────────────────────────────
+    // ── Only level-1 main categories (parentId is null) ──────────────────────
     if (levelFilter === '1') {
       const categories = await prisma.category.findMany({
-        where: { level: 1, isActive: true },
-        orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
+        where: { parentId: null, isActive: true },
+        orderBy: [{ priority: 'asc' }, { name: 'asc' }],
         select: {
           id: true,
           name: true,
           slug: true,
           description: true,
           icon: true,
-          color: true,
           _count: { select: { children: true, rfqs: true } },
         },
       });
@@ -79,19 +74,17 @@ export async function GET(request: NextRequest) {
 
     // ── Default: hierarchical tree (main categories with their subcategories) ─
     const mainCategories = await prisma.category.findMany({
-      where: { level: 1, isActive: true },
-      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
+      where: { parentId: null, isActive: true },
+      orderBy: [{ priority: 'asc' }, { name: 'asc' }],
       include: {
         children: {
           where: { isActive: true },
-          orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
+          orderBy: [{ priority: 'asc' }, { name: 'asc' }],
           select: {
             id: true,
             name: true,
             slug: true,
-            level: true,
             icon: true,
-            color: true,
             _count: { select: { rfqs: true } },
           },
         },
