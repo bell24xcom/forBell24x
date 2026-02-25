@@ -33,6 +33,9 @@ export default function HomePage() {
       {/* === HERO SECTION === */}
       <HeroSection />
 
+      {/* === LIVE ACTIVITY TICKER === */}
+      <LiveActivityTicker />
+
       {/* === VALUE PROPS - 3 Columns === */}
       <ValuePropsSection />
 
@@ -592,5 +595,77 @@ function FinalCTASection() {
         </p>
       </div>
     </section>
+  );
+}
+
+/* ---- LIVE ACTIVITY TICKER ---- */
+function LiveActivityTicker() {
+  const activities = [
+    { business: 'Raj Traders, Pune', action: 'Voice RFQ for 200kg Copper Wire', quotes: 3 },
+    { business: 'Mumbai Plastics Ltd', action: 'Video RFQ for Custom Molding', quotes: 5 },
+    { business: 'Delhi Steel Co', action: 'Text RFQ for 5 Tons Steel Rods', quotes: 2 },
+    { business: 'Bengaluru Tech Solutions', action: 'Voice RFQ for IT Equipment', quotes: 7 },
+    { business: 'Chennai Exports', action: 'Video RFQ for Textile Machinery', quotes: 4 },
+    { business: 'Kolkata Chemicals', action: 'Text RFQ for Industrial Solvents', quotes: 6 },
+    { business: 'Hyderabad Pharma', action: 'Voice RFQ for API Ingredients', quotes: 3 },
+    { business: 'Ahmedabad Textiles', action: 'Video RFQ for Fabric Samples', quotes: 8 },
+    { business: 'Jaipur Handicrafts', action: 'Text RFQ for Export Packaging', quotes: 2 },
+    { business: 'Surat Diamond Trading', action: 'Voice RFQ for Lab Equipment', quotes: 4 },
+    { business: 'Lucknow MSME Hub', action: 'Video RFQ for CNC Machinery', quotes: 5 },
+    { business: 'Coimbatore Auto Parts', action: 'Text RFQ for Metal Components', quotes: 9 },
+  ];
+
+  return (
+    <div className="border-y border-slate-800 bg-slate-900/50 py-3 overflow-hidden">
+      <style jsx>{`
+        @keyframes scroll {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        .ticker-content {
+          animation: scroll 60s linear infinite;
+        }
+        .ticker-wrapper:hover .ticker-content {
+          animation-play-state: paused;
+        }
+      `}</style>
+
+      <div className="ticker-wrapper relative">
+        <div className="ticker-content flex gap-8 whitespace-nowrap">
+          {/* First set */}
+          {activities.map((activity, idx) => (
+            <div key={`first-${idx}`} className="inline-flex items-center gap-3 text-sm">
+              <span className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
+                <span className="text-red-400 font-semibold text-xs uppercase tracking-wide">LIVE</span>
+              </span>
+              <span className="text-slate-300">
+                <span className="font-medium text-white">{activity.business}</span>
+                {' — '}
+                {activity.action}
+                {' • '}
+                <span className="text-blue-400">{activity.quotes} quotes received</span>
+              </span>
+            </div>
+          ))}
+          {/* Duplicate set for seamless loop */}
+          {activities.map((activity, idx) => (
+            <div key={`second-${idx}`} className="inline-flex items-center gap-3 text-sm">
+              <span className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
+                <span className="text-red-400 font-semibold text-xs uppercase tracking-wide">LIVE</span>
+              </span>
+              <span className="text-slate-300">
+                <span className="font-medium text-white">{activity.business}</span>
+                {' — '}
+                {activity.action}
+                {' • '}
+                <span className="text-blue-400">{activity.quotes} quotes received</span>
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
