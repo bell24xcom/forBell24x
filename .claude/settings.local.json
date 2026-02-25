@@ -6,7 +6,12 @@
       "Bash(npx prisma validate)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(ls:*)",
+      "Bash(du:*)",
+      "Bash(git mv:*)",
+      "Bash(move:*)",
+      "Bash(find:*)"
     ]
   }
 }
