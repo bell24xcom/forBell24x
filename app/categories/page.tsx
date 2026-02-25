@@ -41,7 +41,10 @@ type DisplayCategory = {
 async function getCategories(): Promise<DisplayCategory[]> {
   try {
     const dbCategories = await prisma.category.findMany({
-      where: { isActive: true },
+      where: {
+        isActive: true,
+        parentId: null  // Only show parent/top-level categories
+      },
       orderBy: { priority: 'asc' },
       select: { slug: true, name: true, icon: true, _count: { select: { rfqs: true } } },
     });
