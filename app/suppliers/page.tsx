@@ -79,43 +79,41 @@ export default function SuppliersPage() {
     <div className="min-h-screen bg-[#0F172A] py-12">
       <div className="max-w-7xl mx-auto px-4">
         <div className="mb-10">
-          <div className="container mx-auto px-4">
-            <h1 className="text-4xl font-bold text-white mb-4">Verified Suppliers</h1>
-            <p className="text-lg text-slate-300 mb-8">
-              Connect with verified suppliers across India
-            </p>
-            
-            <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4 mb-8">
-              <div className="flex-1">
-                <input
-                  type="text"
-                  placeholder="Search suppliers..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                aria-label="Filter by category"
-              >
-                {categories.map(category => (
-                  <option key={category.value} value={category.value}>
-                    {category.label}
-                  </option>
-                ))}
-              </select>
-              <button
-                type="submit"
-                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Search
-              </button>
-            </form>
-          </div>
-        </section>
+          <h1 className="text-4xl font-bold text-white mb-4">Verified Suppliers</h1>
+          <p className="text-lg text-slate-300 mb-8">
+            Connect with verified suppliers across India
+          </p>
+
+          <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4 mb-8">
+            <div className="flex-1">
+              <input
+                type="text"
+                placeholder="Search suppliers..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              aria-label="Filter by category"
+            >
+              {categories.map(category => (
+                <option key={category.value} value={category.value}>
+                  {category.label}
+                </option>
+              ))}
+            </select>
+            <button
+              type="submit"
+              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Search
+            </button>
+          </form>
+        </div>
 
         <section className="py-12">
           <div className="container mx-auto px-4">
@@ -226,5 +224,6 @@ export default function SuppliersPage() {
           </div>
         </section>
       </div>
-    );
+    </div>
+  );
 }
