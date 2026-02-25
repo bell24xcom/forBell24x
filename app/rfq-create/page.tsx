@@ -309,7 +309,8 @@ export default function RFQCreatePage() {
               </form>
             </div>
           </div>
-        </div>
+        </section>
       </div>
+    </div>
   );
 }
