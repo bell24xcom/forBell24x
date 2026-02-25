@@ -72,8 +72,8 @@ One 60-second video: Person speaks in Hindi → AI converts to structured RFQ �
 - [ ] Fix mobile responsiveness — test every main page at 375px width
 - [x] Remove "Escrow coming soon" stale text from `/api/transactions/route.ts` lines 45, 72 — Already clean
 - [x] Hide autonomous agent page from navigation — Not found (already done or never existed)
-- [ ] Add proper empty states on all main pages:
-  - [ ] "Post your first RFQ" CTA on empty buyer dashboard (when all stats = 0)
+- [x] Add proper empty states on all main pages:
+  - [x] "Post your first RFQ" CTA on empty buyer dashboard — Beautiful gradient CTA with 3 options
   - [x] "Browse open RFQs" on empty supplier dashboard — Already has CTA
   - [x] Loading skeleton on RFQ list, supplier list, dashboard stats — Already implemented
 
@@ -331,16 +331,18 @@ Auto-generated shareable card after each completed deal. Indian business communi
 - ✅ **SITE SUCCESSFULLY DEPLOYED AND LIVE** at www.bell24h.com
 - ✅ Updated LAUNCH_PLAN.md with Block 0 completion
 
-**BLOCK 1 PROGRESS (Started Day 1):**
+**BLOCK 1 DAY 1 COMPLETE:**
 - ✅ Audited all API routes for security issues — agent auth already secure
 - ✅ Removed all mock data from production APIs:
-  - Removed `mockUserSubscription` from `/api/subscription`
+  - Removed `mockUserSubscription` from `/api/subscription` (returns 501)
   - Removed mock ratings, products, and complete fallback suppliers from `/api/neon/suppliers`
 - ✅ Verified escrow text is not "coming soon" — already active messaging
 - ✅ Confirmed autonomous agent page not in navigation
+- ✅ Added beautiful empty state CTA to buyer dashboard (3 RFQ options + social proof)
 - ✅ Confirmed supplier dashboard has "Browse RFQs" CTA
 - ✅ Confirmed all pages have loading skeletons
-- ⏳ TODO: Text contrast audit, mobile responsiveness, buyer dashboard empty state CTA
+- ✅ Text contrast audit complete — no critical issues found (dark theme consistent)
+- ⏳ Remaining: Mobile responsiveness testing at 375px width (Day 2)
 
 ---
 
