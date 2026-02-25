@@ -13,6 +13,7 @@ export const revalidate = 300; // cache 5 minutes
 
 async function getCategory(slug: string) {
   try {
+    console.log('[Category Page] Fetching category with slug:', slug);
     const category = await prisma.category.findUnique({
       where: { slug },
       include: {
@@ -26,9 +27,16 @@ async function getCategory(slug: string) {
         },
       },
     });
+
+    if (!category) {
+      console.error('[Category Page] Category not found for slug:', slug);
+    } else {
+      console.log('[Category Page] Category found:', category.name, '- Active:', category.isActive);
+    }
+
     return category;
   } catch (error) {
-    console.error('Error fetching category:', error);
+    console.error('[Category Page] Error fetching category:', error);
     return null;
   }
 }
