@@ -176,6 +176,8 @@ export default function DashboardPage() {
     );
   }
 
+  const hasNoActivity = stats.totalRFQs === 0 && stats.totalQuotesReceived === 0;
+
   return (
     <div className="space-y-6">
       {/* Welcome Section */}
@@ -195,6 +197,47 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Empty State CTA - Show when no activity */}
+      {hasNoActivity && (
+        <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg shadow-lg p-8 text-white">
+          <div className="max-w-3xl mx-auto text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-full mb-4">
+              <FileText className="w-8 h-8" />
+            </div>
+            <h2 className="text-2xl font-bold mb-3">Ready to Get Started?</h2>
+            <p className="text-blue-100 mb-6 text-lg">
+              Post your first RFQ in 30 seconds using voice, video, or text. Get quotes from verified suppliers across India.
+            </p>
+            <div className="flex items-center justify-center gap-4">
+              <button
+                onClick={() => router.push('/rfq/voice')}
+                className="flex items-center gap-2 bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+              >
+                <Mic className="w-5 h-5" />
+                Voice RFQ
+              </button>
+              <button
+                onClick={() => router.push('/rfq/video')}
+                className="flex items-center gap-2 bg-white/10 text-white border-2 border-white px-6 py-3 rounded-lg font-semibold hover:bg-white/20 transition-colors"
+              >
+                <Video className="w-5 h-5" />
+                Video RFQ
+              </button>
+              <button
+                onClick={() => router.push('/rfq/create')}
+                className="flex items-center gap-2 bg-white/10 text-white border-2 border-white px-6 py-3 rounded-lg font-semibold hover:bg-white/20 transition-colors"
+              >
+                <FileText className="w-5 h-5" />
+                Text RFQ
+              </button>
+            </div>
+            <p className="text-blue-100 text-sm mt-4">
+              🎯 Average response time: <span className="font-semibold">2 hours</span> • 98% supplier match rate
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
