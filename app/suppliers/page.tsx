@@ -76,11 +76,12 @@ export default function SuppliersPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-        <section className="bg-white py-12">
+    <div className="min-h-screen bg-[#0F172A] py-12">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="mb-10">
           <div className="container mx-auto px-4">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">Verified Suppliers</h1>
-            <p className="text-lg text-gray-600 mb-8">
+            <h1 className="text-4xl font-bold text-white mb-4">Verified Suppliers</h1>
+            <p className="text-lg text-slate-300 mb-8">
               Connect with verified suppliers across India
             </p>
             
@@ -131,8 +132,8 @@ export default function SuppliersPage() {
             ) : error ? (
               <div className="text-center py-12">
                 <div className="text-red-500 text-6xl mb-4">⚠️</div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Error Loading Suppliers</h3>
-                <p className="text-gray-600 mb-4">{error}</p>
+                <h3 className="text-xl font-semibold text-white mb-2">Error Loading Suppliers</h3>
+                <p className="text-slate-300 mb-4">{error}</p>
                 <button
                   onClick={() => fetchSuppliers()}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
@@ -147,8 +148,8 @@ export default function SuppliersPage() {
                     <div key={supplier.id} className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6">
                       <div className="flex items-start justify-between mb-4">
                         <div>
-                          <h3 className="text-xl font-semibold text-gray-900">{supplier.company}</h3>
-                          <p className="text-gray-600">{supplier.name}</p>
+                          <h3 className="text-xl font-semibold text-white">{supplier.company}</h3>
+                          <p className="text-slate-300">{supplier.name}</p>
                         </div>
                         <div className="flex flex-col items-end">
                           {supplier.verified && (
@@ -158,16 +159,16 @@ export default function SuppliersPage() {
                           )}
                           <div className="flex items-center">
                             <span className="text-yellow-400">★</span>
-                            <span className="text-sm text-gray-600 ml-1">{supplier.rating}</span>
+                            <span className="text-sm text-slate-300 ml-1">{supplier.rating}</span>
                           </div>
                         </div>
                       </div>
                       
                       <div className="space-y-2 mb-4">
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-slate-300">
                           <span className="font-medium">Location:</span> {supplier.location}
                         </p>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-slate-300">
                           <span className="font-medium">Category:</span> {supplier.category}
                         </p>
                       </div>
@@ -190,7 +191,7 @@ export default function SuppliersPage() {
                       >
                         Previous
                       </button>
-                      <span className="px-3 py-2 text-gray-600">
+                      <span className="px-3 py-2 text-slate-300">
                         Page {pagination.page} of {pagination.totalPages}
                       </span>
                       <button
@@ -207,10 +208,10 @@ export default function SuppliersPage() {
             ) : (
               <div className="text-center py-16">
                 <div className="text-gray-400 text-6xl mb-6">🏭</div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                <h3 className="text-2xl font-bold text-white mb-3">
                   Suppliers Are Being Onboarded
                 </h3>
-                <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                <p className="text-slate-300 mb-6 max-w-md mx-auto">
                   Join the waitlist to be among the first verified suppliers on Bell24h.
                   Get access to thousands of buyer RFQs across 450+ categories.
                 </p>
