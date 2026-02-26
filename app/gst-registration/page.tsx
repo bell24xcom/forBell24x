@@ -1,41 +1,94 @@
-export default function GSTRegistrationGuide() {
+'use client';
+
+import Link from 'next/link';
+
+export default function GSTRegistrationPage() {
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-4">GST Registration Status</h1>
+    <div className="min-h-screen bg-[#0F172A] text-white">
+      <div className="max-w-4xl mx-auto px-4 py-16 sm:py-24">
+        {/* Header */}
+        <div className="mb-12 text-center">
+          <h1 className="text-5xl sm:text-6xl font-bold mb-6">
+            📋 GST Registration Assistance
+          </h1>
+          <p className="text-slate-300 text-lg leading-relaxed max-w-2xl mx-auto">
+            Simplifying GST registration for new businesses. We help MSMEs navigate the registration process
+            quickly and efficiently, ensuring you're fully compliant to sell on Bell24h.
+          </p>
+        </div>
 
-      <div className="bg-yellow-100 border-l-4 border-yellow-500 p-4 mb-6">
-        <p className="font-bold">⚠️ IMPORTANT: Cannot legally take B2B payments without GST</p>
-      </div>
+        {/* Features Card */}
+        <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-8 sm:p-12 mb-8">
+          <h2 className="text-2xl font-semibold text-white mb-6">How We Help:</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            <div className="flex items-start">
+              <span className="text-2xl mr-3">📝</span>
+              <div>
+                <h3 className="font-semibold text-white mb-1">Documentation Support</h3>
+                <p className="text-slate-300">Guidance on collecting and preparing required documents</p>
+              </div>
+            </div>
+            <div className="flex items-start">
+              <span className="text-2xl mr-3">👨‍💼</span>
+              <div>
+                <h3 className="font-semibold text-white mb-1">Expert Guidance</h3>
+                <p className="text-slate-300">Step-by-step assistance from compliance experts</p>
+              </div>
+            </div>
+            <div className="flex items-start">
+              <span className="text-2xl mr-3">⚡</span>
+              <div>
+                <h3 className="font-semibold text-white mb-1">Fast Processing</h3>
+                <p className="text-slate-300">Quick turnaround with our partner network</p>
+              </div>
+            </div>
+            <div className="flex items-start">
+              <span className="text-2xl mr-3">✅</span>
+              <div>
+                <h3 className="font-semibold text-white mb-1">Compliance Assured</h3>
+                <p className="text-slate-300">Ensure full regulatory compliance before launching</p>
+              </div>
+            </div>
+          </div>
 
-      <h2 className="feature-title mb-3">Documents Required:</h2>
-      <ul className="list-disc pl-6 mb-6">
-        <li>PAN Card</li>
-        <li>Aadhaar Card</li>
-        <li>Bank Account Details</li>
-        <li>Address Proof</li>
-        <li>Photograph</li>
-        <li>Digital Signature (DSC)</li>
-      </ul>
+          {/* Coming Soon Message */}
+          <div className="bg-blue-900/30 border border-blue-700/50 rounded-lg p-4 mb-6">
+            <p className="text-blue-200 font-semibold">
+              This feature is coming soon
+            </p>
+          </div>
 
-      <h2 className="feature-title mb-3">Process:</h2>
-      <ol className="list-decimal pl-6 mb-6">
-        <li>Apply at gst.gov.in (₹0 fees)</li>
-        <li>Fill Form GST REG-01</li>
-        <li>Submit documents</li>
-        <li>Verification (15 days)</li>
-        <li>Receive GSTIN</li>
-      </ol>
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/auth/register"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors text-center"
+            >
+              Register as Supplier
+            </Link>
+            <a
+              href="mailto:support@bell24h.com"
+              className="bg-slate-700 hover:bg-slate-600 text-white font-semibold py-3 px-8 rounded-lg transition-colors text-center"
+            >
+              Contact Support
+            </a>
+          </div>
+        </div>
 
-      <h2 className="feature-title mb-3">Alternative: GST Consultant</h2>
-      <p>Cost: ₹3,000-5,000 | Time: 7-10 days</p>
+        {/* Contact Email */}
+        <div className="text-center text-slate-300 mb-8">
+          <p className="mb-2">Need GST registration assistance?</p>
+          <a href="mailto:support@bell24h.com" className="text-blue-400 hover:text-blue-300 font-semibold">
+            support@bell24h.com
+          </a>
+        </div>
 
-      <div className="bg-red-100 border-l-4 border-red-500 p-4 mt-6">
-        <p className="font-bold">Penalty for non-compliance: ₹10,000-25,000</p>
-      </div>
-
-      <div className="bg-green-100 border-l-4 border-green-500 p-4 mt-6">
-        <h3 className="font-bold">Quick Start Option:</h3>
-        <p>Start with personal UPI payments until GST is ready. Update customers that GST invoice will be provided once registered.</p>
+        {/* Back Link */}
+        <div className="text-center">
+          <Link href="/" className="text-slate-400 hover:text-slate-200 font-medium">
+            ← Back to Home
+          </Link>
+        </div>
       </div>
     </div>
   );

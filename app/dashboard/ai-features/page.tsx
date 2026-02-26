@@ -1,173 +1,178 @@
-import { Metadata } from 'next';
+'use client';
 
-export const metadata: Metadata = {
-  title: 'AI Features - Bell24h',
-  description: 'AI-powered B2B marketplace features'
-};
+import Link from 'next/link';
 
 export default function AIFeaturesPage() {
   return (
-    <div className="page-container">
-      <div className="page-content">
-        {/* Header Section */}
-        <div className="page-header">
-          <h1 className="page-title">AI-Powered Features</h1>
-          <p className="page-subtitle">
-            Leverage artificial intelligence to optimize your B2B operations and make data-driven decisions
+    <div className="min-h-screen bg-[#0F172A] text-white">
+      <div className="max-w-6xl mx-auto px-4 py-16 sm:py-24">
+        {/* Header */}
+        <div className="mb-12 text-center">
+          <h1 className="text-5xl sm:text-6xl font-bold mb-6">
+            🤖 AI Features Powered by NVIDIA
+          </h1>
+          <p className="text-slate-300 text-lg leading-relaxed max-w-2xl mx-auto">
+            Advanced AI-powered features using cutting-edge models: Voice RFQ with DeepSeek V3.2,
+            Video RFQ with MiniMax M2.1, Smart Matching across 450+ categories, and Predictive Analytics.
           </p>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex flex-wrap gap-4 mb-8">
-          <button className="btn-primary">
-            Check Quality →
-          </button>
-          <button className="btn-outline">
-            Generate Report
-          </button>
-          <button className="btn-ghost">
-            Export Data
-          </button>
-        </div>
-
         {/* Main Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          <div className="feature-card">
-            <div className="feature-icon">
-              🤖
-            </div>
-            <h3 className="feature-title">Smart Matching</h3>
-            <p className="feature-description">
-              AI-powered supplier matching based on your requirements, quality standards, and preferences
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
+          {/* Voice RFQ */}
+          <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6 hover:border-blue-500 transition-colors">
+            <div className="text-4xl mb-4">🎙️</div>
+            <h3 className="text-lg font-semibold text-white mb-2">Voice RFQ</h3>
+            <p className="text-slate-300 text-sm mb-4">
+              DeepSeek V3.2 powered voice-to-text RFQ creation
             </p>
-            <button className="btn-outline w-full">
-              Try Smart Matching →
-            </button>
+            <div className="text-xs text-slate-400">
+              <p>Speak naturally. AI captures all requirements.</p>
+            </div>
           </div>
 
-          <div className="feature-card">
-            <div className="feature-icon">
-              📊
-            </div>
-            <h3 className="feature-title">Market Analytics</h3>
-            <p className="feature-description">
-              Get insights on market trends, pricing, and demand patterns for your industry
+          {/* Video RFQ */}
+          <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6 hover:border-blue-500 transition-colors">
+            <div className="text-4xl mb-4">🎬</div>
+            <h3 className="text-lg font-semibold text-white mb-2">Video RFQ</h3>
+            <p className="text-slate-300 text-sm mb-4">
+              MiniMax M2.1 powered video analysis and matching
             </p>
-            <button className="btn-outline w-full">
-              View Analytics →
-            </button>
+            <div className="text-xs text-slate-400">
+              <p>Show your requirements visually with AI analysis.</p>
+            </div>
           </div>
 
-          <div className="feature-card">
-            <div className="feature-icon">
-              💬
-            </div>
-            <h3 className="feature-title">AI Chat Assistant</h3>
-            <p className="feature-description">
-              Get instant help with finding suppliers, creating RFQs, and marketplace navigation
+          {/* Smart Matching */}
+          <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6 hover:border-blue-500 transition-colors">
+            <div className="text-4xl mb-4">🤖</div>
+            <h3 className="text-lg font-semibold text-white mb-2">Smart Matching</h3>
+            <p className="text-slate-300 text-sm mb-4">
+              AI matches across 450+ product categories
             </p>
-            <button className="btn-outline w-full">
-              Start Chat →
-            </button>
+            <div className="text-xs text-slate-400">
+              <p>Instant matching with best-fit suppliers.</p>
+            </div>
           </div>
 
-          <div className="feature-card">
-            <div className="feature-icon">
-              🎯
-            </div>
-            <h3 className="feature-title">Price Prediction</h3>
-            <p className="feature-description">
-              AI predicts optimal pricing for your products based on market conditions
+          {/* Predictive Analytics */}
+          <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-6 hover:border-blue-500 transition-colors">
+            <div className="text-4xl mb-4">📊</div>
+            <h3 className="text-lg font-semibold text-white mb-2">Predictive Analytics</h3>
+            <p className="text-slate-300 text-sm mb-4">
+              Market trends and pricing forecasts
             </p>
-            <button className="btn-outline w-full">
-              Get Price Insights →
-            </button>
-          </div>
-
-          <div className="feature-card">
-            <div className="feature-icon">
-              🔍
+            <div className="text-xs text-slate-400">
+              <p>Data-driven insights for decisions.</p>
             </div>
-            <h3 className="feature-title">Quality Assessment</h3>
-            <p className="feature-description">
-              AI analyzes supplier profiles and reviews to assess quality and reliability
-            </p>
-            <button className="btn-outline w-full">
-              Check Quality →
-            </button>
-          </div>
-
-          <div className="feature-card">
-            <div className="feature-icon">
-              📈
-            </div>
-            <h3 className="feature-title">Demand Forecasting</h3>
-            <p className="feature-description">
-              Predict future demand for your products using AI and historical data
-            </p>
-            <button className="btn-outline w-full">
-              View Forecast →
-            </button>
           </div>
         </div>
 
-        {/* AI Features Dashboard */}
-        <div className="card">
-          <h2 className="text-2xl font-bold text-neutral-900 mb-6">AI Features Dashboard</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <h3 className="text-lg font-semibold text-neutral-900 mb-4">Recent AI Insights</h3>
-              <div className="space-y-4">
-                <div className="border-l-4 border-blue-500 pl-4 py-3">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="font-medium text-neutral-900">Market Trend</span>
-                    <span className="badge-success">positive</span>
-                  </div>
-                  <p className="text-neutral-600 text-sm">Textile demand increased by 15% this month</p>
+        {/* Features Section */}
+        <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-8 sm:p-12 mb-12">
+          <h2 className="text-2xl font-semibold text-white mb-8">Complete Feature Set:</h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            {/* Left Column */}
+            <div className="space-y-6">
+              <div className="flex items-start">
+                <span className="text-2xl mr-4 flex-shrink-0">🎙️</span>
+                <div>
+                  <h3 className="font-semibold text-white mb-1">Voice RFQ (DeepSeek V3.2)</h3>
+                  <p className="text-slate-300 text-sm">Describe requirements naturally. AI captures specifications, quantities, and timeline accurately.</p>
                 </div>
-                <div className="border-l-4 border-yellow-500 pl-4 py-3">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="font-medium text-neutral-900">Price Alert</span>
-                    <span className="badge-warning">warning</span>
-                  </div>
-                  <p className="text-neutral-600 text-sm">Steel prices expected to rise 8% next quarter</p>
+              </div>
+
+              <div className="flex items-start">
+                <span className="text-2xl mr-4 flex-shrink-0">🎬</span>
+                <div>
+                  <h3 className="font-semibold text-white mb-1">Video RFQ (MiniMax M2.1)</h3>
+                  <p className="text-slate-300 text-sm">Record or upload product videos. AI analyzes visual specifications and matches with suitable suppliers.</p>
                 </div>
-                <div className="border-l-4 border-purple-500 pl-4 py-3">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="font-medium text-neutral-900">Opportunity</span>
-                    <span className="badge-info">info</span>
-                  </div>
-                  <p className="text-neutral-600 text-sm">3 new suppliers match your criteria</p>
+              </div>
+
+              <div className="flex items-start">
+                <span className="text-2xl mr-4 flex-shrink-0">📋</span>
+                <div>
+                  <h3 className="font-semibold text-white mb-1">Smart Matching</h3>
+                  <p className="text-slate-300 text-sm">Instant matching across 450+ categories. AI considers price, quality, capacity, and delivery.</p>
                 </div>
               </div>
             </div>
 
-            <div>
-              <h3 className="text-lg font-semibold text-neutral-900 mb-4">AI Recommendations</h3>
-              <div className="space-y-4">
-                <div className="border-l-4 border-red-500 pl-4 py-3">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="font-medium text-neutral-900">Suggested Action</span>
-                    <span className="badge-error">high</span>
-                  </div>
-                  <p className="text-neutral-600 text-sm">Update your RFQ for better response rates</p>
+            {/* Right Column */}
+            <div className="space-y-6">
+              <div className="flex items-start">
+                <span className="text-2xl mr-4 flex-shrink-0">📊</span>
+                <div>
+                  <h3 className="font-semibold text-white mb-1">Predictive Analytics</h3>
+                  <p className="text-slate-300 text-sm">Forecast market trends, pricing movements, and demand patterns for your industry.</p>
                 </div>
-                <div className="border-l-4 border-yellow-500 pl-4 py-3">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="font-medium text-neutral-900">New Feature</span>
-                    <span className="badge-warning">medium</span>
-                  </div>
-                  <p className="text-neutral-600 text-sm">Try voice RFQ for faster communication</p>
+              </div>
+
+              <div className="flex items-start">
+                <span className="text-2xl mr-4 flex-shrink-0">⭐</span>
+                <div>
+                  <h3 className="font-semibold text-white mb-1">Quality Assessment</h3>
+                  <p className="text-slate-300 text-sm">AI analyzes supplier profiles, ratings, and historical performance.</p>
                 </div>
-                <div className="border-l-4 border-blue-500 pl-4 py-3">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="font-medium text-neutral-900">Optimization</span>
-                    <span className="badge-info">low</span>
-                  </div>
-                  <p className="text-neutral-600 text-sm">Consider expanding to 2 new categories</p>
+              </div>
+
+              <div className="flex items-start">
+                <span className="text-2xl mr-4 flex-shrink-0">💬</span>
+                <div>
+                  <h3 className="font-semibold text-white mb-1">AI Chat Assistant</h3>
+                  <p className="text-slate-300 text-sm">24/7 AI support for RFQ creation, supplier finding, and marketplace navigation.</p>
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Key Benefits */}
+          <div className="bg-slate-700/50 rounded-lg p-6">
+            <h3 className="font-semibold text-white mb-4">Why NVIDIA-Powered AI:</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="flex items-center text-slate-300">
+                <span className="text-green-400 mr-2">✓</span>
+                Enterprise-grade AI models
+              </div>
+              <div className="flex items-center text-slate-300">
+                <span className="text-green-400 mr-2">✓</span>
+                99.9% accuracy in matching
+              </div>
+              <div className="flex items-center text-slate-300">
+                <span className="text-green-400 mr-2">✓</span>
+                Sub-second response times
+              </div>
+              <div className="flex items-center text-slate-300">
+                <span className="text-green-400 mr-2">✓</span>
+                Continuous learning and improvement
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* CTA Buttons */}
+        <div className="text-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/dashboard/rfqs"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors"
+            >
+              Try AI RFQ Now
+            </Link>
+            <Link
+              href="/auth/register"
+              className="bg-slate-700 hover:bg-slate-600 text-white font-semibold py-3 px-8 rounded-lg transition-colors"
+            >
+              Register to Access
+            </Link>
+          </div>
+
+          <div className="mt-12">
+            <Link href="/" className="text-slate-400 hover:text-slate-200 font-medium">
+              ← Back to Home
+            </Link>
           </div>
         </div>
       </div>

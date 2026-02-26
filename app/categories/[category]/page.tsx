@@ -14,13 +14,16 @@ export const revalidate = 300; // cache 5 minutes
 async function getCategory(slug: string) {
   try {
     console.log('[Category Page] Fetching category with slug:', slug);
-    const category = await prisma.category.findUnique({
-      where: { slug },
+    const category = await prisma.category.findFirst({
+      where: {
+        slug: slug,
+        isActive: true
+      },
       include: {
         children: {
           where: { isActive: true },
           orderBy: { priority: 'asc' },
-          take: 12,
+          take: 20,
         },
         _count: {
           select: { rfqs: true },

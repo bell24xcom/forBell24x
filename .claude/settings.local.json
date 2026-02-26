@@ -11,7 +11,9 @@
       "Bash(du:*)",
       "Bash(git mv:*)",
       "Bash(move:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(npx tsc:*)",
+      "Bash(dir:*)"
     ]
   }
 }
