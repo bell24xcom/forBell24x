@@ -14,9 +14,16 @@ export const revalidate = 300; // cache 5 minutes
 async function getCategory(slug: string) {
   try {
     console.log('[Category Page] Fetching category with slug:', slug);
+    // Flexible slug matching: handle hyphens vs underscores, case differences
     const category = await prisma.category.findFirst({
       where: {
-        slug: slug,
+        OR: [
+          { slug: slug },
+          { slug: slug.replace(/-/g, '_') },
+          { slug: slug.replace(/_/g, '-') },
+          { name: { contains: slug.replace(/-/g, ' '), mode: 'insensitive' } },
+          { name: { contains: slug.replace(/_/g, ' '), mode: 'insensitive' } },
+        ],
         isActive: true
       },
       include: {

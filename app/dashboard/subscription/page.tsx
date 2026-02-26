@@ -1,4 +1,5 @@
 'use client';
+import DashboardNav from '@/components/dashboard/DashboardNav';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -191,6 +192,7 @@ export default function SubscriptionDashboard() {
   if (loading) {
     return (
       <div className="page-container flex items-center justify-center">
+        <DashboardNav />
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
       </div>
     );

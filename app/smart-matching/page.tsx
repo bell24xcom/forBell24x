@@ -119,7 +119,7 @@ export default function SmartMatchingPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
-      <div className="bg-white shadow-sm border-b">
+      <div className="bg-slate-800/50 shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div>
@@ -137,7 +137,7 @@ export default function SmartMatchingPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-xl shadow-sm border p-6 sticky top-6">
+            <div className="bg-slate-800/50 rounded-xl shadow-sm border p-6 sticky top-6">
               <div className="flex items-center gap-2 mb-6">
                 <Search className="h-5 w-5 text-blue-600" />
                 <h2 className="text-xl font-semibold text-white">Search Requirements</h2>
@@ -153,7 +153,7 @@ export default function SmartMatchingPage() {
                     value={requirement.title}
                     onChange={e => setRequirement(prev => ({ ...prev, title: e.target.value }))}
                     placeholder="e.g., Circuit Boards for Industrial Controllers"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
 
@@ -164,7 +164,7 @@ export default function SmartMatchingPage() {
                   <select
                     value={requirement.category}
                     onChange={e => setRequirement(prev => ({ ...prev, category: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     aria-label="Select category"
                   >
                     {categories.map(cat => (
@@ -184,7 +184,7 @@ export default function SmartMatchingPage() {
                     value={requirement.quantity}
                     onChange={e => setRequirement(prev => ({ ...prev, quantity: e.target.value }))}
                     placeholder="e.g., 500 units"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
 
@@ -197,7 +197,7 @@ export default function SmartMatchingPage() {
                     value={requirement.targetPrice}
                     onChange={e => setRequirement(prev => ({ ...prev, targetPrice: e.target.value }))}
                     placeholder="e.g., ₹2,50,000"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
 
@@ -210,7 +210,7 @@ export default function SmartMatchingPage() {
                     value={requirement.location}
                     onChange={e => setRequirement(prev => ({ ...prev, location: e.target.value }))}
                     placeholder="e.g., Mumbai"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
 
@@ -249,7 +249,7 @@ export default function SmartMatchingPage() {
             {matches.length > 0 || isLoading ? (
               <div className="space-y-6">
                 {isLoading ? (
-                  <div className="bg-white rounded-xl shadow-sm border p-8">
+                  <div className="bg-slate-800/50 rounded-xl shadow-sm border p-8">
                     <div className="text-center">
                       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
                       <h3 className="text-lg font-semibold text-white mb-2">AI is analyzing your requirements...</h3>
@@ -258,7 +258,7 @@ export default function SmartMatchingPage() {
                   </div>
                 ) : (
                   <>
-                    <div className="bg-white rounded-xl shadow-sm border p-6">
+                    <div className="bg-slate-800/50 rounded-xl shadow-sm border p-6">
                       <h3 className="text-lg font-semibold text-white mb-4">
                         Found {matches.length} Smart Matches
                       </h3>
@@ -268,7 +268,7 @@ export default function SmartMatchingPage() {
                     </div>
 
                     {matches.map((supplier) => (
-                      <div key={supplier.id} className="bg-white rounded-xl shadow-sm border p-6">
+                      <div key={supplier.id} className="bg-slate-800/50 rounded-xl shadow-sm border p-6">
                         <div className="flex justify-between items-start mb-4">
                           <div className="flex-1">
                             <div className="flex items-center gap-3 mb-2">
@@ -333,10 +333,10 @@ export default function SmartMatchingPage() {
                           <button className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
                             Contact Supplier
                           </button>
-                          <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-slate-900 transition-colors">
+                          <button className="px-4 py-2 border border-slate-700 rounded-lg hover:bg-slate-900 transition-colors">
                             View Profile
                           </button>
-                          <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-slate-900 transition-colors">
+                          <button className="px-4 py-2 border border-slate-700 rounded-lg hover:bg-slate-900 transition-colors">
                             Save
                           </button>
                         </div>
@@ -346,7 +346,7 @@ export default function SmartMatchingPage() {
                 )}
               </div>
             ) : (
-              <div className="bg-white rounded-xl shadow-sm border p-8">
+              <div className="bg-slate-800/50 rounded-xl shadow-sm border p-8">
                 <div className="text-center">
                   <div className="bg-blue-100 rounded-full p-6 w-24 h-24 mx-auto mb-6 flex items-center justify-center">
                     <Sparkles className="h-12 w-12 text-blue-600" />
