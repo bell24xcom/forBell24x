@@ -1,4 +1,5 @@
 'use client';
+import SupplierNav from '@/components/supplier/SupplierNav';
 
 import React, { useState } from 'react';
 import UserDashboardLayout from '@/components/dashboard/UserDashboardLayout';
@@ -39,6 +40,7 @@ export default function GSTPage() {
 
   return (
     <UserDashboardLayout>
+        <SupplierNav />
       <div className="w-full max-w-4xl">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-white flex items-center gap-2">

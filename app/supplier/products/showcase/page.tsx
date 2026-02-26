@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import UserDashboardLayout from '@/components/dashboard/UserDashboardLayout';
+import SupplierNav from '@/components/supplier/SupplierNav';
 import ProductShowcaseGrid from '@/components/suppliers/ProductShowcaseGrid';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
@@ -45,6 +46,7 @@ export default function ProductShowcasePage() {
   return (
     <UserDashboardLayout>
       <div className="w-full">
+        <SupplierNav />
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-3xl font-bold text-white">Product Showcase</h1>

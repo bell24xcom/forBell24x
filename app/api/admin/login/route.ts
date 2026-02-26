@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     const { email, password } = await request.json();
 
     const ADMIN_EMAIL    = process.env.ADMIN_EMAIL    || 'admin@bell24h.com';
-    const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
+    const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Bell@2026';
 
     if (!email || !password) {
       return NextResponse.json(

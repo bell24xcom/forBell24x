@@ -1,11 +1,13 @@
 'use client';
 
 import React, { useState, useRef, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Video, VideoOff, Upload, Play, Square, Trash2, Camera, FileVideo } from 'lucide-react';
 
 export default function VideoRFQPage() {
+  const router = useRouter();
   const [isRecording, setIsRecording] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [videoBlob, setVideoBlob] = useState<Blob | null>(null);
@@ -15,6 +17,7 @@ export default function VideoRFQPage() {
   const [rfqData, setRfqData] = useState<any>(null);
   const [error, setError] = useState('');
   const [recordingTime, setRecordingTime] = useState(0);
+  const [isCreatingRFQ, setIsCreatingRFQ] = useState(false);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -152,9 +155,50 @@ export default function VideoRFQPage() {
     setRfqData(null);
     setError('');
     setRecordingTime(0);
-    
+
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
+    }
+  };
+
+  const createRFQ = async () => {
+    if (!rfqData) return;
+
+    setIsCreatingRFQ(true);
+    try {
+      const response = await fetch('/api/rfq/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: rfqData.title,
+          category: rfqData.category,
+          subcategory: rfqData.subcategory,
+          quantity: rfqData.quantity,
+          unit: rfqData.unit,
+          budget: rfqData.budget,
+          currency: rfqData.currency,
+          location: rfqData.location,
+          deliveryDeadline: rfqData.deliveryDeadline,
+          priority: rfqData.priority,
+          specifications: rfqData.specifications,
+          requirements: rfqData.requirements,
+          description: transcription,
+          source: 'video',
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        router.push('/dashboard/rfqs');
+      } else {
+        setError(data.message || 'Failed to create RFQ');
+      }
+    } catch (error) {
+      console.error('Error creating RFQ:', error);
+      setError('Failed to create RFQ. Please try again.');
+    } finally {
+      setIsCreatingRFQ(false);
     }
   };
 
@@ -367,8 +411,12 @@ export default function VideoRFQPage() {
                   </div>
                   
                   <div className="flex gap-2 pt-4">
-                    <Button className="flex-1">
-                      Create RFQ
+                    <Button
+                      className="flex-1"
+                      onClick={createRFQ}
+                      disabled={isCreatingRFQ}
+                    >
+                      {isCreatingRFQ ? 'Creating RFQ...' : 'Create RFQ'}
                     </Button>
                     <Button variant="outline" onClick={resetVideo}>
                       Start Over
