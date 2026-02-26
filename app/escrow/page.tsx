@@ -114,6 +114,14 @@ export default function EscrowPage() {
     return colors[status] || 'text-slate-400';
   };
 
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-[#0F172A] flex items-center justify-center">
+        <p className="text-white">Loading...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#0F172A] text-white">
       <div className="max-w-6xl mx-auto px-4 py-8">

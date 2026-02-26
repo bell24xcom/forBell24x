@@ -1,4 +1,5 @@
 'use client';
+import DashboardNav from '@/components/dashboard/DashboardNav';
 
 import { useState } from 'react';
 import Link from 'next/link';
@@ -102,6 +103,7 @@ function ReportCard({
 }) {
   return (
     <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col gap-4 hover:shadow-md transition-shadow">
+        <DashboardNav />
       {/* Icon & Title */}
       <div className="flex items-start gap-4">
         <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${report.accentColor}`}>

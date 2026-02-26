@@ -34,7 +34,7 @@ const PLACEHOLDER_CONTACTS: PlaceholderContact[] = [
     time: '2h ago',
     unread: 2,
     initials: 'PS',
-    avatarColor: 'bg-purple-100 text-purple-700',
+    avatarColor: 'bg-purple-900 text-purple-300',
   },
   {
     id: '2',
@@ -44,7 +44,7 @@ const PLACEHOLDER_CONTACTS: PlaceholderContact[] = [
     time: '1d ago',
     unread: 0,
     initials: 'RK',
-    avatarColor: 'bg-green-100 text-green-700',
+    avatarColor: 'bg-green-900 text-green-300',
   },
   {
     id: '3',
@@ -54,7 +54,7 @@ const PLACEHOLDER_CONTACTS: PlaceholderContact[] = [
     time: '3d ago',
     unread: 0,
     initials: 'AD',
-    avatarColor: 'bg-amber-100 text-amber-700',
+    avatarColor: 'bg-amber-900 text-amber-300',
   },
 ];
 
@@ -71,7 +71,7 @@ function ContactListItem({
     <button
       onClick={onClick}
       className={`w-full text-left px-4 py-3 flex items-start gap-3 transition-colors ${
-        isSelected ? 'bg-blue-50 border-r-2 border-blue-600' : 'hover:bg-slate-900'
+        isSelected ? 'bg-blue-900/30 border-r-2 border-blue-600' : 'hover:bg-slate-900'
       }`}
     >
       <div
@@ -167,7 +167,7 @@ export default function MessagesPage() {
         </div>
 
         {/* Main Chat UI */}
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden flex" style={{ minHeight: '520px' }}>
+        <div className="bg-slate-800/50 rounded-xl shadow-sm overflow-hidden flex" style={{ minHeight: '520px' }}>
 
           {/* Sidebar */}
           <aside className="w-full sm:w-72 flex-shrink-0 border-r border-gray-100 flex flex-col">
@@ -280,7 +280,7 @@ export default function MessagesPage() {
               /* No conversation selected */
               <div className="flex-1 flex items-center justify-center">
                 <div className="text-center space-y-4 max-w-sm px-6">
-                  <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto">
+                  <div className="w-20 h-20 bg-blue-900/30 rounded-full flex items-center justify-center mx-auto">
                     <MessageCircle className="w-10 h-10 text-blue-400" />
                   </div>
                   <div>

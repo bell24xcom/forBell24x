@@ -1,4 +1,5 @@
 'use client';
+import DashboardNav from '@/components/dashboard/DashboardNav';
 
 import { useState, useEffect } from 'react';
 import { 
@@ -156,6 +157,7 @@ export default function UserAnalyticsDashboard() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
+        <DashboardNav />
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-slate-300">Loading analytics...</p>

@@ -16,14 +16,12 @@ export default function WalletPage() {
   const { user } = useSession();
 
   useEffect(() => {
-    if (!user) {
+    if (user === null) {
       window.location.href = '/login';
+      return;
     }
-  }, [user]);
-
-  useEffect(() => {
     fetchWalletData();
-  }, []);
+  }, [user]);
 
   const fetchWalletData = async () => {
     try {
@@ -112,6 +110,14 @@ export default function WalletPage() {
     return colors[status] || 'text-slate-400';
   };
 
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-[#0F172A] flex items-center justify-center">
+        <p className="text-white">Loading...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#0F172A] text-white">
       <div className="max-w-6xl mx-auto px-4 py-8">
@@ -148,7 +154,7 @@ export default function WalletPage() {
         )}
 
         {/* Balance Card */}
-        <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+        <div className="bg-slate-800/50 rounded-xl shadow-sm p-6 mb-6">
           <h2 className="text-lg font-semibold mb-4">Current Balance</h2>
           <div className="text-3xl font-bold text-green-600">
             {formatCurrency(balance)}
@@ -159,7 +165,7 @@ export default function WalletPage() {
         </div>
 
         {/* Deposit Form */}
-        <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+        <div className="bg-slate-800/50 rounded-xl shadow-sm p-6 mb-6">
           <h2 className="text-lg font-semibold mb-4">Add Funds</h2>
           <form className="space-y-4">
             <div>
@@ -169,7 +175,7 @@ export default function WalletPage() {
                 value={depositAmount}
                 onChange={(e) => setDepositAmount(e.target.value)}
                 placeholder="1000"
-                className="w-full px-4 py-2 bg-slate-50 border border-slate-300 text-slate-900 rounded-lg focus:outline-none focus:border-indigo-500"
+                className="w-full px-4 py-2 bg-slate-900 border border-slate-700 text-white rounded-lg focus:outline-none focus:border-indigo-500"
                 required
               />
             </div>
@@ -180,7 +186,7 @@ export default function WalletPage() {
                 value={depositDescription}
                 onChange={(e) => setDepositDescription(e.target.value)}
                 placeholder="Top-up for RFQ purchases"
-                className="w-full px-4 py-2 bg-slate-50 border border-slate-300 text-slate-900 rounded-lg focus:outline-none focus:border-indigo-500"
+                className="w-full px-4 py-2 bg-slate-900 border border-slate-700 text-white rounded-lg focus:outline-none focus:border-indigo-500"
               />
             </div>
             <div>
@@ -202,37 +208,37 @@ export default function WalletPage() {
         </div>
 
         {/* Transaction History */}
-        <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="bg-slate-800/50 rounded-xl shadow-sm p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold">Transaction History</h2>
-            <span className="text-sm text-slate-500">
+            <span className="text-sm text-slate-400">
               Showing last 50 transactions
             </span>
           </div>
 
           {isLoading ? (
-            <div className="text-center py-8 text-slate-500">
+            <div className="text-center py-8 text-slate-400">
               <p>Loading transactions...</p>
             </div>
           ) : transactions.length === 0 ? (
-            <div className="text-center py-8 text-slate-500">
+            <div className="text-center py-8 text-slate-400">
               <p>No transactions found</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-slate-200">
-                    <th className="text-left py-2 px-4 text-sm font-medium text-slate-500">Date</th>
-                    <th className="text-left py-2 px-4 text-sm font-medium text-slate-500">Type</th>
-                    <th className="text-left py-2 px-4 text-sm font-medium text-slate-500">Amount</th>
-                    <th className="text-left py-2 px-4 text-sm font-medium text-slate-500">Description</th>
-                    <th className="text-left py-2 px-4 text-sm font-medium text-slate-500">Status</th>
+                  <tr className="border-b border-slate-700">
+                    <th className="text-left py-2 px-4 text-sm font-medium text-slate-400">Date</th>
+                    <th className="text-left py-2 px-4 text-sm font-medium text-slate-400">Type</th>
+                    <th className="text-left py-2 px-4 text-sm font-medium text-slate-400">Amount</th>
+                    <th className="text-left py-2 px-4 text-sm font-medium text-slate-400">Description</th>
+                    <th className="text-left py-2 px-4 text-sm font-medium text-slate-400">Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   {transactions.map((tx: any) => (
-                    <tr key={tx.id} className="border-b border-slate-50 hover:bg-slate-50">
+                    <tr key={tx.id} className="border-b border-slate-50 hover:bg-slate-700/30">
                       <td className="py-3 px-4 text-sm text-slate-900">
                         {formatDate(tx.createdAt)}
                       </td>

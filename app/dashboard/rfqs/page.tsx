@@ -1,4 +1,5 @@
 'use client';
+import DashboardNav from '@/components/dashboard/DashboardNav';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -64,6 +65,7 @@ function SkeletonRow() {
       {[1, 2, 3, 4, 5, 6].map(i => (
         <td key={i} className="px-6 py-4">
           <div className="h-4 bg-gray-200 rounded w-full" />
+        <DashboardNav />
         </td>
       ))}
     </tr>
