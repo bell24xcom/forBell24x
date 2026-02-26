@@ -63,12 +63,12 @@ export default function SuppliersExportersPage() {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-slate-900">
         {/* Hero Section */}
         <section className="bg-white py-12">
           <div className="container mx-auto px-4">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">Export Suppliers</h1>
-            <p className="text-lg text-gray-600 mb-8">
+            <h1 className="text-4xl font-bold text-white mb-4">Export Suppliers</h1>
+            <p className="text-lg text-slate-300 mb-8">
               Connect with verified export suppliers for international trade
             </p>
             
@@ -115,8 +115,8 @@ export default function SuppliersExportersPage() {
                   <div key={supplier.id} className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6">
                     <div className="flex items-start justify-between mb-4">
                       <div>
-                        <h3 className="text-xl font-semibold text-gray-900">{supplier.company}</h3>
-                        <p className="text-gray-600">{supplier.name}</p>
+                        <h3 className="text-xl font-semibold text-white">{supplier.company}</h3>
+                        <p className="text-slate-300">{supplier.name}</p>
                       </div>
                       <div className="flex flex-col items-end">
                         {supplier.verified && (
@@ -126,22 +126,22 @@ export default function SuppliersExportersPage() {
                         )}
                         <div className="flex items-center">
                           <span className="text-yellow-400">★</span>
-                          <span className="text-sm text-gray-600 ml-1">{supplier.rating}</span>
+                          <span className="text-sm text-slate-300 ml-1">{supplier.rating}</span>
                         </div>
                       </div>
                     </div>
                     
                     <div className="space-y-2 mb-4">
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-slate-300">
                         <span className="font-medium">Location:</span> {supplier.location}
                       </p>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-slate-300">
                         <span className="font-medium">Export Countries:</span> {supplier.exportCountries.join(', ')}
                       </p>
                     </div>
                     
                     <div className="mb-4">
-                      <p className="text-sm font-medium text-gray-700 mb-2">Certifications:</p>
+                      <p className="text-sm font-medium text-slate-400 mb-2">Certifications:</p>
                       <div className="flex flex-wrap gap-1">
                         {supplier.certifications.map((cert, index) => (
                           <span key={index} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
@@ -152,10 +152,10 @@ export default function SuppliersExportersPage() {
                     </div>
                     
                     <div className="mb-4">
-                      <p className="text-sm font-medium text-gray-700 mb-2">Products:</p>
+                      <p className="text-sm font-medium text-slate-400 mb-2">Products:</p>
                       <div className="flex flex-wrap gap-1">
                         {supplier.products.map((product, index) => (
-                          <span key={index} className="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">
+                          <span key={index} className="bg-slate-800 text-slate-100 text-xs px-2 py-1 rounded">
                             {product}
                           </span>
                         ))}
@@ -171,8 +171,8 @@ export default function SuppliersExportersPage() {
             ) : (
               <div className="text-center py-12">
                 <div className="text-gray-400 text-6xl mb-4">🌍</div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">No export suppliers found</h3>
-                <p className="text-gray-600">Try adjusting your search criteria</p>
+                <h3 className="text-xl font-semibold text-white mb-2">No export suppliers found</h3>
+                <p className="text-slate-300">Try adjusting your search criteria</p>
               </div>
             )}
           </div>

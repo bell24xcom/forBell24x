@@ -63,9 +63,9 @@ export default function SupplierDashboardPage() {
       PENDING: 'bg-yellow-500',
       ACCEPTED: 'bg-green-500',
       REJECTED: 'bg-red-500',
-      EXPIRED: 'bg-gray-500',
+      EXPIRED: 'bg-slate-9000',
     };
-    return colors[status as keyof typeof colors] || 'bg-gray-500';
+    return colors[status as keyof typeof colors] || 'bg-slate-9000';
   };
 
   const formatDateTime = (date: Date) => {
@@ -153,7 +153,7 @@ export default function SupplierDashboardPage() {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-lg font-semibold mb-2">Looking for new opportunities?</h3>
-              <p className="text-slate-600">Browse new RFQs and submit your quotes</p>
+              <p className="text-slate-300">Browse new RFQs and submit your quotes</p>
             </div>
             <a href="/rfq" className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg">
               Browse RFQs

@@ -123,12 +123,12 @@ export default function SmartMatchingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">AI Smart Matching</h1>
-              <p className="text-gray-600 mt-1">Find perfect suppliers using advanced AI</p>
+              <h1 className="text-3xl font-bold text-white">AI Smart Matching</h1>
+              <p className="text-slate-300 mt-1">Find perfect suppliers using advanced AI</p>
             </div>
             <div className="flex items-center gap-2 text-sm">
               <Sparkles className="h-5 w-5 text-yellow-500" />
-              <span className="text-gray-600">98.5% Accuracy</span>
+              <span className="text-slate-300">98.5% Accuracy</span>
             </div>
           </div>
         </div>
@@ -140,12 +140,12 @@ export default function SmartMatchingPage() {
             <div className="bg-white rounded-xl shadow-sm border p-6 sticky top-6">
               <div className="flex items-center gap-2 mb-6">
                 <Search className="h-5 w-5 text-blue-600" />
-                <h2 className="text-xl font-semibold text-gray-900">Search Requirements</h2>
+                <h2 className="text-xl font-semibold text-white">Search Requirements</h2>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-slate-400 mb-1">
                     Product/Service Title *
                   </label>
                   <input
@@ -158,7 +158,7 @@ export default function SmartMatchingPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-slate-400 mb-1">
                     Category *
                   </label>
                   <select
@@ -176,7 +176,7 @@ export default function SmartMatchingPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-slate-400 mb-1">
                     Quantity
                   </label>
                   <input
@@ -189,7 +189,7 @@ export default function SmartMatchingPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-slate-400 mb-1">
                     Target Price
                   </label>
                   <input
@@ -202,7 +202,7 @@ export default function SmartMatchingPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-slate-400 mb-1">
                     Location
                   </label>
                   <input
@@ -252,17 +252,17 @@ export default function SmartMatchingPage() {
                   <div className="bg-white rounded-xl shadow-sm border p-8">
                     <div className="text-center">
                       <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">AI is analyzing your requirements...</h3>
-                      <p className="text-gray-600">Finding the best supplier matches using advanced algorithms</p>
+                      <h3 className="text-lg font-semibold text-white mb-2">AI is analyzing your requirements...</h3>
+                      <p className="text-slate-300">Finding the best supplier matches using advanced algorithms</p>
                     </div>
                   </div>
                 ) : (
                   <>
                     <div className="bg-white rounded-xl shadow-sm border p-6">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                      <h3 className="text-lg font-semibold text-white mb-4">
                         Found {matches.length} Smart Matches
                       </h3>
-                      <p className="text-gray-600">
+                      <p className="text-slate-300">
                         AI-powered matching for: <strong>{requirement.title}</strong>
                       </p>
                     </div>
@@ -272,12 +272,12 @@ export default function SmartMatchingPage() {
                         <div className="flex justify-between items-start mb-4">
                           <div className="flex-1">
                             <div className="flex items-center gap-3 mb-2">
-                              <h4 className="text-xl font-semibold text-gray-900">{supplier.name}</h4>
+                              <h4 className="text-xl font-semibold text-white">{supplier.name}</h4>
                               {supplier.verified && (
                                 <CheckCircle className="h-5 w-5 text-green-500" />
                               )}
                             </div>
-                            <div className="flex items-center gap-4 text-sm text-gray-600">
+                            <div className="flex items-center gap-4 text-sm text-slate-300">
                               <div className="flex items-center gap-1">
                                 <Star className="h-4 w-4 text-yellow-500" />
                                 <span>{supplier.rating}</span>
@@ -296,27 +296,27 @@ export default function SmartMatchingPage() {
                             <div className="text-2xl font-bold text-blue-600">
                               {supplier.matchScore}%
                             </div>
-                            <div className="text-sm text-gray-500">Match Score</div>
+                            <div className="text-sm text-slate-400">Match Score</div>
                           </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                           <div>
-                            <div className="text-sm text-gray-600">Category</div>
+                            <div className="text-sm text-slate-300">Category</div>
                             <div className="font-medium">{supplier.category}</div>
                           </div>
                           <div>
-                            <div className="text-sm text-gray-600">Price Range</div>
+                            <div className="text-sm text-slate-300">Price Range</div>
                             <div className="font-medium">{supplier.priceRange}</div>
                           </div>
                           <div>
-                            <div className="text-sm text-gray-600">Products</div>
+                            <div className="text-sm text-slate-300">Products</div>
                             <div className="font-medium">{supplier.products} items</div>
                           </div>
                         </div>
 
                         <div className="mb-4">
-                          <div className="text-sm text-gray-600 mb-2">Why this match?</div>
+                          <div className="text-sm text-slate-300 mb-2">Why this match?</div>
                           <div className="flex flex-wrap gap-2">
                             {supplier.matchReasons.map((reason, index) => (
                               <span
@@ -333,10 +333,10 @@ export default function SmartMatchingPage() {
                           <button className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
                             Contact Supplier
                           </button>
-                          <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                          <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-slate-900 transition-colors">
                             View Profile
                           </button>
-                          <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                          <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-slate-900 transition-colors">
                             Save
                           </button>
                         </div>
@@ -351,10 +351,10 @@ export default function SmartMatchingPage() {
                   <div className="bg-blue-100 rounded-full p-6 w-24 h-24 mx-auto mb-6 flex items-center justify-center">
                     <Sparkles className="h-12 w-12 text-blue-600" />
                   </div>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                  <h2 className="text-2xl font-bold text-white mb-4">
                     AI-Powered Smart Matching
                   </h2>
-                  <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
+                  <p className="text-slate-300 mb-8 max-w-2xl mx-auto">
                     Enter your requirements to find perfect suppliers using advanced AI algorithms.
                   </p>
 
@@ -364,9 +364,9 @@ export default function SmartMatchingPage() {
                         <div className="bg-green-100 p-2 rounded-lg">
                           <span>⚡</span>
                         </div>
-                        <h3 className="font-semibold text-gray-900">98.5% Accuracy</h3>
+                        <h3 className="font-semibold text-white">98.5% Accuracy</h3>
                       </div>
-                      <p className="text-gray-600 text-sm">
+                      <p className="text-slate-300 text-sm">
                         Advanced AI ensures highly accurate supplier matching.
                       </p>
                     </div>
@@ -376,9 +376,9 @@ export default function SmartMatchingPage() {
                         <div className="bg-blue-100 p-2 rounded-lg">
                           <span>🔍</span>
                         </div>
-                        <h3 className="font-semibold text-gray-900">Smart Filtering</h3>
+                        <h3 className="font-semibold text-white">Smart Filtering</h3>
                       </div>
-                      <p className="text-gray-600 text-sm">
+                      <p className="text-slate-300 text-sm">
                         Intelligent filtering for optimal supplier matches.
                       </p>
                     </div>

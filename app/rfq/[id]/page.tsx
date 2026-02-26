@@ -146,7 +146,7 @@ export default function RFQDetailPage() {
             {/* RFQ Header */}
             <div className="mb-6">
               <h1 className="text-2xl font-bold mb-2">{rfq.title}</h1>
-              <div className="flex items-center gap-4 text-sm text-slate-600">
+              <div className="flex items-center gap-4 text-sm text-slate-300">
                 <span>RFQ #{rfq.id}</span>
                 <span>Posted {new Date(rfq.createdAt).toLocaleDateString()}</span>
                 <span>Views: {rfq.views}</span>

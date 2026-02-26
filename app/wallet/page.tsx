@@ -109,7 +109,7 @@ export default function WalletPage() {
       PENDING: 'text-yellow-500',
       FAILED: 'text-red-500',
     };
-    return colors[status] || 'text-gray-500';
+    return colors[status] || 'text-slate-400';
   };
 
   return (
@@ -153,7 +153,7 @@ export default function WalletPage() {
           <div className="text-3xl font-bold text-green-600">
             {formatCurrency(balance)}
           </div>
-          <p className="text-slate-600 mt-2">
+          <p className="text-slate-300 mt-2">
             Last updated: {formatDate(new Date())}
           </p>
         </div>

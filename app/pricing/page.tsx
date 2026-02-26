@@ -353,7 +353,7 @@ export default function PricingPage() {
             
             {/* Billing Toggle */}
             <div className="flex items-center justify-center space-x-4 mb-8">
-              <span className={`text-sm font-medium ${billingPeriod === 'monthly' ? 'text-neutral-900' : 'text-neutral-500'}`}>
+              <span className={`text-sm font-medium ${billingPeriod === 'monthly' ? 'text-neutral-900' : 'text-slate-400'}`}>
                 Monthly
               </span>
               <button
@@ -366,7 +366,7 @@ export default function PricingPage() {
                   }`}
                 />
               </button>
-              <span className={`text-sm font-medium ${billingPeriod === 'yearly' ? 'text-neutral-900' : 'text-neutral-500'}`}>
+              <span className={`text-sm font-medium ${billingPeriod === 'yearly' ? 'text-neutral-900' : 'text-slate-400'}`}>
                 Yearly
               </span>
               {billingPeriod === 'yearly' && (
@@ -413,20 +413,20 @@ export default function PricingPage() {
 
               <div className="page-header">
                 <h3 className="text-2xl font-bold text-neutral-900 mb-2">{tier.name}</h3>
-                <p className="text-neutral-600 mb-6">{tier.description}</p>
+                <p className="text-slate-300 mb-6">{tier.description}</p>
                 
                 <div className="mb-4">
                   <span className="text-5xl font-bold text-neutral-900">
                     {tier.price === 0 ? 'Free' : `${tier.currency}${getDiscountedPrice(tier).toLocaleString()}`}
                   </span>
                   {tier.price > 0 && (
-                    <span className="text-neutral-500 ml-2">/{billingPeriod === 'yearly' ? 'year' : 'month'}</span>
+                    <span className="text-slate-400 ml-2">/{billingPeriod === 'yearly' ? 'year' : 'month'}</span>
                   )}
                 </div>
                 
                 {tier.originalPrice && (
                   <div className="flex items-center justify-center space-x-2 mb-4">
-                    <span className="text-lg text-neutral-500 line-through">
+                    <span className="text-lg text-slate-400 line-through">
                       {tier.currency}{tier.originalPrice.toLocaleString()}
                     </span>
                     <span className="bg-red-100 text-red-800 text-sm font-medium px-2 py-1 rounded">
@@ -441,7 +441,7 @@ export default function PricingPage() {
                 {tier.features.map((feature, index) => (
                   <div key={index} className="flex items-start">
                     <span className="text-green-500 mr-3 mt-1">✓</span>
-                    <span className="text-neutral-700">{feature}</span>
+                    <span className="text-slate-400">{feature}</span>
                   </div>
                 ))}
               </div>
@@ -449,11 +449,11 @@ export default function PricingPage() {
               {/* Limitations */}
               {tier.limitations.length > 0 && (
                 <div className="space-y-2 mb-8">
-                  <h4 className="text-sm font-medium text-neutral-500 uppercase tracking-wide">Limitations</h4>
+                  <h4 className="text-sm font-medium text-slate-400 uppercase tracking-wide">Limitations</h4>
                   {tier.limitations.map((limitation, index) => (
                     <div key={index} className="flex items-start">
                       <span className="text-gray-400 mr-3 mt-1">✗</span>
-                      <span className="text-neutral-500 text-sm">{limitation}</span>
+                      <span className="text-slate-400 text-sm">{limitation}</span>
                     </div>
                   ))}
                 </div>
@@ -498,7 +498,7 @@ export default function PricingPage() {
               <table className="w-full">
                 <thead className="bg-neutral-50">
                   <tr>
-                    <th className="px-6 py-4 text-left text-sm font-medium text-neutral-500 uppercase tracking-wide">
+                    <th className="px-6 py-4 text-left text-sm font-medium text-slate-400 uppercase tracking-wide">
                       Features
                     </th>
                     {pricingTiers.map((tier) => (
@@ -512,7 +512,7 @@ export default function PricingPage() {
                   <tr>
                     <td className="px-6 py-4 text-sm font-medium text-neutral-900">Monthly RFQs</td>
                     {pricingTiers.map((tier) => (
-                      <td key={tier.id} className="px-6 py-4 text-center text-sm text-neutral-500">
+                      <td key={tier.id} className="px-6 py-4 text-center text-sm text-slate-400">
                         {tier.maxRFQs === -1 ? 'Unlimited' : tier.maxRFQs}
                       </td>
                     ))}
@@ -520,7 +520,7 @@ export default function PricingPage() {
                   <tr>
                     <td className="px-6 py-4 text-sm font-medium text-neutral-900">AI Matching</td>
                     {pricingTiers.map((tier) => (
-                      <td key={tier.id} className="px-6 py-4 text-center text-sm text-neutral-500">
+                      <td key={tier.id} className="px-6 py-4 text-center text-sm text-slate-400">
                         {tier.aiFeatures ? '✓' : '✗'}
                       </td>
                     ))}
@@ -528,7 +528,7 @@ export default function PricingPage() {
                   <tr>
                     <td className="px-6 py-4 text-sm font-medium text-neutral-900">Voice RFQ</td>
                     {pricingTiers.map((tier) => (
-                      <td key={tier.id} className="px-6 py-4 text-center text-sm text-neutral-500">
+                      <td key={tier.id} className="px-6 py-4 text-center text-sm text-slate-400">
                         {tier.voiceRFQ ? '✓' : '✗'}
                       </td>
                     ))}
@@ -536,7 +536,7 @@ export default function PricingPage() {
                   <tr>
                     <td className="px-6 py-4 text-sm font-medium text-neutral-900">Video RFQ</td>
                     {pricingTiers.map((tier) => (
-                      <td key={tier.id} className="px-6 py-4 text-center text-sm text-neutral-500">
+                      <td key={tier.id} className="px-6 py-4 text-center text-sm text-slate-400">
                         {tier.videoRFQ ? '✓' : '✗'}
                       </td>
                     ))}
@@ -544,7 +544,7 @@ export default function PricingPage() {
                   <tr>
                     <td className="px-6 py-4 text-sm font-medium text-neutral-900">Escrow Protection</td>
                     {pricingTiers.map((tier) => (
-                      <td key={tier.id} className="px-6 py-4 text-center text-sm text-neutral-500">
+                      <td key={tier.id} className="px-6 py-4 text-center text-sm text-slate-400">
                         {tier.escrowProtection ? '✓' : '✗'}
                       </td>
                     ))}
@@ -552,7 +552,7 @@ export default function PricingPage() {
                   <tr>
                     <td className="px-6 py-4 text-sm font-medium text-neutral-900">API Access</td>
                     {pricingTiers.map((tier) => (
-                      <td key={tier.id} className="px-6 py-4 text-center text-sm text-neutral-500">
+                      <td key={tier.id} className="px-6 py-4 text-center text-sm text-slate-400">
                         {tier.apiAccess ? '✓' : '✗'}
                       </td>
                     ))}
@@ -560,7 +560,7 @@ export default function PricingPage() {
                   <tr>
                     <td className="px-6 py-4 text-sm font-medium text-neutral-900">White Label</td>
                     {pricingTiers.map((tier) => (
-                      <td key={tier.id} className="px-6 py-4 text-center text-sm text-neutral-500">
+                      <td key={tier.id} className="px-6 py-4 text-center text-sm text-slate-400">
                         {tier.whiteLabel ? '✓' : '✗'}
                       </td>
                     ))}
@@ -568,7 +568,7 @@ export default function PricingPage() {
                   <tr>
                     <td className="px-6 py-4 text-sm font-medium text-neutral-900">Dedicated Manager</td>
                     {pricingTiers.map((tier) => (
-                      <td key={tier.id} className="px-6 py-4 text-center text-sm text-neutral-500">
+                      <td key={tier.id} className="px-6 py-4 text-center text-sm text-slate-400">
                         {tier.dedicatedManager ? '✓' : '✗'}
                       </td>
                     ))}
@@ -582,7 +582,7 @@ export default function PricingPage() {
 
       {/* Dynamic Pricing Calculator */}
       {showCalculator && (
-        <div className="py-16 bg-gray-50">
+        <div className="py-16 bg-slate-900">
           <DynamicPricingCalculator 
             onPlanSelect={handleTierSelect}
             showRevenueProjection={true}
@@ -611,13 +611,13 @@ export default function PricingPage() {
                   <span className="text-2xl font-bold text-neutral-900">
                     {addon.currency}{addon.price.toLocaleString()}
                   </span>
-                  <span className="text-neutral-500 ml-1">{addon.unit}</span>
+                  <span className="text-slate-400 ml-1">{addon.unit}</span>
                 </div>
                 <ul className="space-y-2">
                   {addon.features.map((feature, featureIndex) => (
                     <li key={featureIndex} className="flex items-start">
                       <span className="text-green-500 mr-2 mt-1">✓</span>
-                      <span className="text-sm text-neutral-700">{feature}</span>
+                      <span className="text-sm text-slate-400">{feature}</span>
                     </li>
                   ))}
                 </ul>
@@ -644,7 +644,7 @@ export default function PricingPage() {
               <h3 className="text-lg font-semibold text-neutral-900 mb-2">
                 Can I change my plan anytime?
               </h3>
-              <p className="text-neutral-600">
+              <p className="text-slate-300">
                 Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately, and we'll prorate any billing differences.
               </p>
             </div>
@@ -653,7 +653,7 @@ export default function PricingPage() {
               <h3 className="text-lg font-semibold text-neutral-900 mb-2">
                 What happens if I exceed my RFQ limit?
               </h3>
-              <p className="text-neutral-600">
+              <p className="text-slate-300">
                 You can purchase additional RFQs as add-ons, or upgrade to a higher plan. We'll notify you when you're approaching your limit.
               </p>
             </div>
@@ -662,7 +662,7 @@ export default function PricingPage() {
               <h3 className="text-lg font-semibold text-neutral-900 mb-2">
                 Is there a free trial?
               </h3>
-              <p className="text-neutral-600">
+              <p className="text-slate-300">
                 Yes, all paid plans come with a 14-day free trial. No credit card required to start.
               </p>
             </div>
@@ -671,7 +671,7 @@ export default function PricingPage() {
               <h3 className="text-lg font-semibold text-neutral-900 mb-2">
                 What payment methods do you accept?
               </h3>
-              <p className="text-neutral-600">
+              <p className="text-slate-300">
                 We accept all major credit cards, UPI, net banking, and Razorpay. Enterprise customers can also pay via bank transfer.
               </p>
             </div>

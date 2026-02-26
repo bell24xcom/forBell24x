@@ -70,13 +70,13 @@ export default function AboutPage() {
         </section>
 
         {/* Stats Section */}
-        <section className="py-16 bg-gray-50">
+        <section className="py-16 bg-slate-900">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
               {stats.map((stat, index) => (
                 <div key={index} className="text-center">
                   <div className="text-4xl font-bold text-blue-600 mb-2">{stat.number}</div>
-                  <div className="text-gray-600">{stat.label}</div>
+                  <div className="text-slate-300">{stat.label}</div>
                 </div>
               ))}
             </div>
@@ -96,7 +96,7 @@ export default function AboutPage() {
                     className={`px-6 py-3 m-2 rounded-lg font-medium transition-colors ${
                       activeTab === tab.id
                         ? 'bg-blue-600 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        : 'bg-slate-800 text-slate-400 hover:bg-gray-200'
                     }`}
                   >
                     <span className="mr-2">{tab.icon}</span>
@@ -109,8 +109,8 @@ export default function AboutPage() {
               <div className="bg-white rounded-lg shadow-lg p-8">
                 {activeTab === 'mission' && (
                   <div>
-                    <h2 className="text-3xl font-bold text-gray-900 mb-6">Our Mission</h2>
-                    <p className="text-lg text-gray-700 mb-6">
+                    <h2 className="text-3xl font-bold text-white mb-6">Our Mission</h2>
+                    <p className="text-lg text-slate-400 mb-6">
                       To transform B2B commerce by creating the world's most intelligent 
                       marketplace that connects buyers and suppliers through AI-powered 
                       matching, seamless communication, and automated workflows.
@@ -140,8 +140,8 @@ export default function AboutPage() {
 
                 {activeTab === 'vision' && (
                   <div>
-                    <h2 className="text-3xl font-bold text-gray-900 mb-6">Our Vision</h2>
-                    <p className="text-lg text-gray-700 mb-6">
+                    <h2 className="text-3xl font-bold text-white mb-6">Our Vision</h2>
+                    <p className="text-lg text-slate-400 mb-6">
                       To become the global standard for B2B commerce, where every business 
                       transaction is intelligent, efficient, and transparent.
                     </p>
@@ -151,8 +151,8 @@ export default function AboutPage() {
                           <span className="text-2xl">🌍</span>
                         </div>
                         <div>
-                          <h3 className="text-xl font-semibold text-gray-900 mb-2">Global Reach</h3>
-                          <p className="text-gray-700">Connecting businesses across continents with localized support and multi-language capabilities.</p>
+                          <h3 className="text-xl font-semibold text-white mb-2">Global Reach</h3>
+                          <p className="text-slate-400">Connecting businesses across continents with localized support and multi-language capabilities.</p>
                         </div>
                       </div>
                       <div className="flex items-start">
@@ -160,8 +160,8 @@ export default function AboutPage() {
                           <span className="text-2xl">🤖</span>
                         </div>
                         <div>
-                          <h3 className="text-xl font-semibold text-gray-900 mb-2">AI-First Approach</h3>
-                          <p className="text-gray-700">Leveraging artificial intelligence to make every interaction smarter and more efficient.</p>
+                          <h3 className="text-xl font-semibold text-white mb-2">AI-First Approach</h3>
+                          <p className="text-slate-400">Leveraging artificial intelligence to make every interaction smarter and more efficient.</p>
                         </div>
                       </div>
                       <div className="flex items-start">
@@ -169,8 +169,8 @@ export default function AboutPage() {
                           <span className="text-2xl">⚡</span>
                         </div>
                         <div>
-                          <h3 className="text-xl font-semibold text-gray-900 mb-2">Instant Results</h3>
-                          <p className="text-gray-700">Delivering real-time matching, instant communication, and immediate transaction processing.</p>
+                          <h3 className="text-xl font-semibold text-white mb-2">Instant Results</h3>
+                          <p className="text-slate-400">Delivering real-time matching, instant communication, and immediate transaction processing.</p>
                         </div>
                       </div>
                     </div>
@@ -179,7 +179,7 @@ export default function AboutPage() {
 
                 {activeTab === 'values' && (
                   <div>
-                    <h2 className="text-3xl font-bold text-gray-900 mb-6">Our Values</h2>
+                    <h2 className="text-3xl font-bold text-white mb-6">Our Values</h2>
                     <div className="grid md:grid-cols-2 gap-8">
                       <div className="space-y-6">
                         <div className="flex items-start">
@@ -187,8 +187,8 @@ export default function AboutPage() {
                             <span className="text-2xl">🎯</span>
                           </div>
                           <div>
-                            <h3 className="text-xl font-semibold text-gray-900 mb-2">Excellence</h3>
-                            <p className="text-gray-700">We strive for the highest quality in everything we do, from our technology to our customer service.</p>
+                            <h3 className="text-xl font-semibold text-white mb-2">Excellence</h3>
+                            <p className="text-slate-400">We strive for the highest quality in everything we do, from our technology to our customer service.</p>
                           </div>
                         </div>
                         <div className="flex items-start">
@@ -196,8 +196,8 @@ export default function AboutPage() {
                             <span className="text-2xl">🤝</span>
                           </div>
                           <div>
-                            <h3 className="text-xl font-semibold text-gray-900 mb-2">Integrity</h3>
-                            <p className="text-gray-700">We conduct business with honesty, transparency, and ethical practices in all our interactions.</p>
+                            <h3 className="text-xl font-semibold text-white mb-2">Integrity</h3>
+                            <p className="text-slate-400">We conduct business with honesty, transparency, and ethical practices in all our interactions.</p>
                           </div>
                         </div>
                       </div>
@@ -207,8 +207,8 @@ export default function AboutPage() {
                             <span className="text-2xl">🚀</span>
                           </div>
                           <div>
-                            <h3 className="text-xl font-semibold text-gray-900 mb-2">Innovation</h3>
-                            <p className="text-gray-700">We continuously push boundaries and embrace new technologies to solve complex business challenges.</p>
+                            <h3 className="text-xl font-semibold text-white mb-2">Innovation</h3>
+                            <p className="text-slate-400">We continuously push boundaries and embrace new technologies to solve complex business challenges.</p>
                           </div>
                         </div>
                         <div className="flex items-start">
@@ -216,8 +216,8 @@ export default function AboutPage() {
                             <span className="text-2xl">👥</span>
                           </div>
                           <div>
-                            <h3 className="text-xl font-semibold text-gray-900 mb-2">Collaboration</h3>
-                            <p className="text-gray-700">We believe in the power of teamwork and building strong relationships with our customers and partners.</p>
+                            <h3 className="text-xl font-semibold text-white mb-2">Collaboration</h3>
+                            <p className="text-slate-400">We believe in the power of teamwork and building strong relationships with our customers and partners.</p>
                           </div>
                         </div>
                       </div>
@@ -227,15 +227,15 @@ export default function AboutPage() {
 
                 {activeTab === 'team' && (
                   <div>
-                    <h2 className="text-3xl font-bold text-gray-900 mb-6">Our Team</h2>
-                    <p className="text-lg text-gray-700 mb-8">
+                    <h2 className="text-3xl font-bold text-white mb-6">Our Team</h2>
+                    <p className="text-lg text-slate-400 mb-8">
                       Meet the passionate individuals behind Bell24h's success. 
                       Our diverse team brings together expertise in technology, 
                       business, and innovation.
                     </p>
                     <div className="grid md:grid-cols-2 gap-8">
                       {teamMembers.map((member, index) => (
-                        <div key={index} className="bg-gray-50 rounded-lg p-6">
+                        <div key={index} className="bg-slate-900 rounded-lg p-6">
                           <div className="flex items-center mb-4">
                             <img
                               src={member.image}
@@ -243,11 +243,11 @@ export default function AboutPage() {
                               className="w-16 h-16 rounded-full object-cover mr-4"
                             />
                             <div>
-                              <h3 className="text-xl font-semibold text-gray-900">{member.name}</h3>
+                              <h3 className="text-xl font-semibold text-white">{member.name}</h3>
                               <p className="text-blue-600 font-medium">{member.role}</p>
                             </div>
                           </div>
-                          <p className="text-gray-700">{member.bio}</p>
+                          <p className="text-slate-400">{member.bio}</p>
                         </div>
                       ))}
                     </div>

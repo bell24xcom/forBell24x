@@ -48,7 +48,7 @@ export default function RFQPage() {
       case 'HIGH': return 'bg-orange-100 text-orange-800';
       case 'MEDIUM': return 'bg-yellow-100 text-yellow-800';
       case 'LOW': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
+      default: return 'bg-slate-800 text-slate-100';
     }
   };
 
@@ -56,9 +56,9 @@ export default function RFQPage() {
     switch (status) {
       case 'active': return 'bg-green-100 text-green-800';
       case 'pending': return 'bg-yellow-100 text-yellow-800';
-      case 'closed': return 'bg-gray-100 text-gray-800';
+      case 'closed': return 'bg-slate-800 text-slate-100';
       case 'expired': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      default: return 'bg-slate-800 text-slate-100';
     }
   };
 
@@ -99,11 +99,11 @@ export default function RFQPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-900">
         <section className="bg-white py-12">
           <div className="container mx-auto px-4">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">Request for Quotations</h1>
-            <p className="text-lg text-gray-600 mb-8">
+            <h1 className="text-4xl font-bold text-white mb-4">Request for Quotations</h1>
+            <p className="text-lg text-slate-300 mb-8">
               Browse and respond to RFQs from buyers
             </p>
             
@@ -166,8 +166,8 @@ export default function RFQPage() {
             ) : error ? (
               <div className="text-center py-12">
                 <div className="text-red-500 text-6xl mb-4">⚠️</div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Error Loading RFQs</h3>
-                <p className="text-gray-600 mb-4">{error}</p>
+                <h3 className="text-xl font-semibold text-white mb-2">Error Loading RFQs</h3>
+                <p className="text-slate-300 mb-4">{error}</p>
                 <button
                   onClick={() => fetchRFQs()}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
@@ -182,9 +182,9 @@ export default function RFQPage() {
                     <div key={rfq.id} className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6">
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex-1">
-                          <h3 className="text-xl font-semibold text-gray-900 mb-2">{rfq.title}</h3>
-                          <p className="text-gray-600 mb-2">{rfq.description}</p>
-                          <div className="flex items-center space-x-4 text-sm text-gray-500">
+                          <h3 className="text-xl font-semibold text-white mb-2">{rfq.title}</h3>
+                          <p className="text-slate-300 mb-2">{rfq.description}</p>
+                          <div className="flex items-center space-x-4 text-sm text-slate-400">
                             <span>By: {rfq.buyer?.name || 'Unknown'}</span>
                             <span>Budget: ₹{rfq.budget?.toLocaleString() || 'N/A'}</span>
                             <span>Qty: {rfq.quantity}</span>
@@ -202,7 +202,7 @@ export default function RFQPage() {
                       </div>
                       
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4 text-sm text-gray-500">
+                        <div className="flex items-center space-x-4 text-sm text-slate-400">
                           <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">
                             {rfq.category}
                           </span>
@@ -225,17 +225,17 @@ export default function RFQPage() {
                       <button
                         onClick={() => handlePageChange(pagination.page - 1)}
                         disabled={!pagination.hasPrev}
-                        className="px-3 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                        className="px-3 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-900"
                       >
                         Previous
                       </button>
-                      <span className="px-3 py-2 text-gray-600">
+                      <span className="px-3 py-2 text-slate-300">
                         Page {pagination.page} of {pagination.totalPages}
                       </span>
                       <button
                         onClick={() => handlePageChange(pagination.page + 1)}
                         disabled={!pagination.hasNext}
-                        className="px-3 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                        className="px-3 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-900"
                       >
                         Next
                       </button>
@@ -246,8 +246,8 @@ export default function RFQPage() {
             ) : (
               <div className="text-center py-12">
                 <div className="text-gray-400 text-6xl mb-4">📋</div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">No RFQs found</h3>
-                <p className="text-gray-600">Try adjusting your search criteria</p>
+                <h3 className="text-xl font-semibold text-white mb-2">No RFQs found</h3>
+                <p className="text-slate-300">Try adjusting your search criteria</p>
               </div>
             )}
           </div>

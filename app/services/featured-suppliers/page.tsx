@@ -74,7 +74,7 @@ export default function FeaturedSuppliersPage() {
               <Star className="w-8 h-8 text-yellow-600" />
             </div>
             <h3 className="text-lg font-semibold text-neutral-900 mb-2">Premium Visibility</h3>
-            <p className="text-neutral-600">Featured placement on homepage and category pages</p>
+            <p className="text-slate-300">Featured placement on homepage and category pages</p>
           </div>
 
           <div className="text-center">
@@ -82,7 +82,7 @@ export default function FeaturedSuppliersPage() {
               <Eye className="w-8 h-8 text-blue-600" />
             </div>
             <h3 className="text-lg font-semibold text-neutral-900 mb-2">5x More Inquiries</h3>
-            <p className="text-neutral-600">Get significantly more leads than regular suppliers</p>
+            <p className="text-slate-300">Get significantly more leads than regular suppliers</p>
           </div>
 
           <div className="text-center">
@@ -90,7 +90,7 @@ export default function FeaturedSuppliersPage() {
               <CheckCircle className="w-8 h-8 text-green-600" />
             </div>
             <h3 className="text-lg font-semibold text-neutral-900 mb-2">Quality Leads</h3>
-            <p className="text-neutral-600">Attract serious buyers with verified requirements</p>
+            <p className="text-slate-300">Attract serious buyers with verified requirements</p>
           </div>
         </div>
 
@@ -99,12 +99,12 @@ export default function FeaturedSuppliersPage() {
           <div className="text-center">
             <h2 className="page-title">Pricing</h2>
             <div className="text-5xl font-bold text-blue-600 mb-2">₹1,000</div>
-            <p className="text-neutral-600 mb-6">Per month</p>
+            <p className="text-slate-300 mb-6">Per month</p>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
               <div>
                 <h3 className="font-semibold text-neutral-900 mb-3">What's Included:</h3>
-                <ul className="space-y-2 text-neutral-600">
+                <ul className="space-y-2 text-slate-300">
                   <li className="flex items-center">
                     <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
                     Featured placement on homepage
@@ -130,7 +130,7 @@ export default function FeaturedSuppliersPage() {
               
               <div>
                 <h3 className="font-semibold text-neutral-900 mb-3">Additional Benefits:</h3>
-                <ul className="space-y-2 text-neutral-600">
+                <ul className="space-y-2 text-slate-300">
                   <li className="flex items-center">
                     <Clock className="w-5 h-5 text-blue-500 mr-2" />
                     Monthly renewal
@@ -163,14 +163,14 @@ export default function FeaturedSuppliersPage() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-neutral-900">Supplier {i}</h3>
-                    <p className="text-sm text-neutral-600">Electronics</p>
+                    <p className="text-sm text-slate-300">Electronics</p>
                   </div>
                   <Star className="w-5 h-5 text-yellow-500 ml-auto" />
                 </div>
-                <p className="text-neutral-600 text-sm mb-4">
+                <p className="text-slate-300 text-sm mb-4">
                   Leading manufacturer of electronic components with 10+ years experience.
                 </p>
-                <div className="flex items-center text-sm text-neutral-500">
+                <div className="flex items-center text-sm text-slate-400">
                   <MapPin className="w-4 h-4 mr-1" />
                   <span>Mumbai, India</span>
                 </div>
@@ -337,7 +337,7 @@ export default function FeaturedSuppliersPage() {
               >
                 Pay ₹1,000 & Get Featured
               </button>
-              <p className="text-sm text-neutral-500 mt-2">
+              <p className="text-sm text-slate-400 mt-2">
                 Payment processed securely via Razorpay • GST extra as applicable • Monthly renewal
               </p>
             </div>
@@ -358,7 +358,7 @@ export default function FeaturedSuppliersPage() {
                 <div className="w-10 h-10 bg-gray-300 rounded-full mr-3"></div>
                 <div>
                   <p className="font-semibold">Rajesh Electronics</p>
-                  <p className="text-sm text-neutral-500">Featured Supplier</p>
+                  <p className="text-sm text-slate-400">Featured Supplier</p>
                 </div>
               </div>
             </div>
@@ -371,7 +371,7 @@ export default function FeaturedSuppliersPage() {
                 <div className="w-10 h-10 bg-gray-300 rounded-full mr-3"></div>
                 <div>
                   <p className="font-semibold">Mumbai Textiles</p>
-                  <p className="text-sm text-neutral-500">Featured Supplier</p>
+                  <p className="text-sm text-slate-400">Featured Supplier</p>
                 </div>
               </div>
             </div>

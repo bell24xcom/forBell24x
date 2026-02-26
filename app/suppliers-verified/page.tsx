@@ -52,18 +52,18 @@ export default function SuppliersVerifiedPage() {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-slate-900">
         <section className="bg-white py-12">
           <div className="container mx-auto px-4">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">Verified Suppliers</h1>
-            <p className="text-lg text-gray-600 mb-8">
+            <h1 className="text-4xl font-bold text-white mb-4">Verified Suppliers</h1>
+            <p className="text-lg text-slate-300 mb-8">
               Connect with verified suppliers across India
             </p>
             
-            <div className="bg-gray-50 rounded-lg p-6 mb-8">
+            <div className="bg-slate-900 rounded-lg p-6 mb-8">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
+                  <label className="block text-sm font-medium text-slate-400 mb-2">Search</label>
                   <input
                     type="text"
                     placeholder="Search suppliers, companies, products..."
@@ -73,7 +73,7 @@ export default function SuppliersVerifiedPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                  <label className="block text-sm font-medium text-slate-400 mb-2">Category</label>
                   <select
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
@@ -85,7 +85,7 @@ export default function SuppliersVerifiedPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
+                  <label className="block text-sm font-medium text-slate-400 mb-2">Sort By</label>
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
@@ -119,8 +119,8 @@ export default function SuppliersVerifiedPage() {
                   <div key={supplier.id} className="bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 p-6 group">
                     <div className="flex items-start justify-between mb-4">
                       <div>
-                        <h3 className="text-xl font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">{supplier.company}</h3>
-                        <p className="text-gray-600">{supplier.name}</p>
+                        <h3 className="text-xl font-semibold text-white group-hover:text-blue-600 transition-colors">{supplier.company}</h3>
+                        <p className="text-slate-300">{supplier.name}</p>
                       </div>
                       <div className="flex flex-col items-end">
                         {supplier.verified && (
@@ -130,22 +130,22 @@ export default function SuppliersVerifiedPage() {
                         )}
                         <div className="flex items-center">
                           <span className="text-yellow-400">★</span>
-                          <span className="text-sm text-gray-600 ml-1">{supplier.rating}</span>
+                          <span className="text-sm text-slate-300 ml-1">{supplier.rating}</span>
                         </div>
                       </div>
                     </div>
                     
                     <div className="space-y-2 mb-4">
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-slate-300">
                         <span className="font-medium">📍</span> {supplier.location}
                       </p>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-slate-300">
                         <span className="font-medium">🏷️</span> {supplier.category}
                       </p>
                     </div>
                     
                     <div className="mb-4">
-                      <p className="text-sm font-medium text-gray-700 mb-2">Products:</p>
+                      <p className="text-sm font-medium text-slate-400 mb-2">Products:</p>
                       <div className="flex flex-wrap gap-1">
                         {supplier.products?.slice(0, 3).map((product, index) => (
                           <span key={index} className="bg-blue-50 text-blue-700 text-xs px-2 py-1 rounded-full">
@@ -153,7 +153,7 @@ export default function SuppliersVerifiedPage() {
                           </span>
                         ))}
                         {supplier.products?.length > 3 && (
-                          <span className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full">
+                          <span className="bg-slate-800 text-slate-300 text-xs px-2 py-1 rounded-full">
                             +{supplier.products.length - 3} more
                           </span>
                         )}
@@ -164,7 +164,7 @@ export default function SuppliersVerifiedPage() {
                       <button className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
                         View Profile
                       </button>
-                      <button className="bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors">
+                      <button className="bg-slate-800 text-slate-400 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors">
                         💬
                       </button>
                     </div>
@@ -174,8 +174,8 @@ export default function SuppliersVerifiedPage() {
             ) : (
               <div className="text-center py-12">
                 <div className="text-gray-400 text-6xl mb-4">🔍</div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">No suppliers found</h3>
-                <p className="text-gray-600">Try adjusting your search criteria or filters</p>
+                <h3 className="text-xl font-semibold text-white mb-2">No suppliers found</h3>
+                <p className="text-slate-300">Try adjusting your search criteria or filters</p>
               </div>
             )}
           </div>

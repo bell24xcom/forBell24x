@@ -111,18 +111,18 @@ export default function TestLivePage() {
       case 'pending':
         return 'text-yellow-600';
       default:
-        return 'text-gray-600';
+        return 'text-slate-300';
     }
   };
 
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-slate-900">
         <section className="bg-white py-12">
           <div className="container mx-auto px-4">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">Live API Testing</h1>
-            <p className="text-lg text-gray-600 mb-8">
+            <h1 className="text-4xl font-bold text-white mb-4">Live API Testing</h1>
+            <p className="text-lg text-slate-300 mb-8">
               Testing all API endpoints for functionality
             </p>
           </div>
@@ -134,13 +134,13 @@ export default function TestLivePage() {
               {/* Categories API Test */}
               <div className="bg-white rounded-lg shadow-md p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900">Categories API</h3>
+                  <h3 className="text-lg font-semibold text-white">Categories API</h3>
                   <span className={`text-2xl ${getStatusColor(testResults.categories.status)}`}>
                     {getStatusIcon(testResults.categories.status)}
                   </span>
                 </div>
                 <div className="space-y-2">
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-slate-300">
                     <span className="font-medium">Status:</span> {testResults.categories.status}
                   </p>
                   {testResults.categories.error && (
@@ -159,13 +159,13 @@ export default function TestLivePage() {
               {/* Suppliers API Test */}
               <div className="bg-white rounded-lg shadow-md p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900">Suppliers API</h3>
+                  <h3 className="text-lg font-semibold text-white">Suppliers API</h3>
                   <span className={`text-2xl ${getStatusColor(testResults.suppliers.status)}`}>
                     {getStatusIcon(testResults.suppliers.status)}
                   </span>
                 </div>
                 <div className="space-y-2">
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-slate-300">
                     <span className="font-medium">Status:</span> {testResults.suppliers.status}
                   </p>
                   {testResults.suppliers.error && (
@@ -184,13 +184,13 @@ export default function TestLivePage() {
               {/* Analytics API Test */}
               <div className="bg-white rounded-lg shadow-md p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900">Analytics API</h3>
+                  <h3 className="text-lg font-semibold text-white">Analytics API</h3>
                   <span className={`text-2xl ${getStatusColor(testResults.analytics.status)}`}>
                     {getStatusIcon(testResults.analytics.status)}
                   </span>
                 </div>
                 <div className="space-y-2">
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-slate-300">
                     <span className="font-medium">Status:</span> {testResults.analytics.status}
                   </p>
                   {testResults.analytics.error && (
@@ -209,13 +209,13 @@ export default function TestLivePage() {
               {/* Users API Test */}
               <div className="bg-white rounded-lg shadow-md p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900">Users API</h3>
+                  <h3 className="text-lg font-semibold text-white">Users API</h3>
                   <span className={`text-2xl ${getStatusColor(testResults.users.status)}`}>
                     {getStatusIcon(testResults.users.status)}
                   </span>
                 </div>
                 <div className="space-y-2">
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-slate-300">
                     <span className="font-medium">Status:</span> {testResults.users.status}
                   </p>
                   {testResults.users.error && (
@@ -234,28 +234,28 @@ export default function TestLivePage() {
 
             {/* Test Summary */}
             <div className="mt-8 bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Test Summary</h3>
+              <h3 className="text-lg font-semibold text-white mb-4">Test Summary</h3>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Categories API</span>
+                  <span className="text-sm text-slate-300">Categories API</span>
                   <span className={`text-sm ${getStatusColor(testResults.categories.status)}`}>
                     {getStatusIcon(testResults.categories.status)} {testResults.categories.status}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Suppliers API</span>
+                  <span className="text-sm text-slate-300">Suppliers API</span>
                   <span className={`text-sm ${getStatusColor(testResults.suppliers.status)}`}>
                     {getStatusIcon(testResults.suppliers.status)} {testResults.suppliers.status}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Analytics API</span>
+                  <span className="text-sm text-slate-300">Analytics API</span>
                   <span className={`text-sm ${getStatusColor(testResults.analytics.status)}`}>
                     {getStatusIcon(testResults.analytics.status)} {testResults.analytics.status}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Users API</span>
+                  <span className="text-sm text-slate-300">Users API</span>
                   <span className={`text-sm ${getStatusColor(testResults.users.status)}`}>
                     {getStatusIcon(testResults.users.status)} {testResults.users.status}
                   </span>

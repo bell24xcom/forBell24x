@@ -77,23 +77,23 @@ function SupplierCard({ supplier }: { supplier: SupplierSummary }) {
           <span className="text-blue-700 font-bold text-sm">{initials}</span>
         </div>
         <div className="flex-1 min-w-0">
-          <p className="font-semibold text-gray-900 truncate">{supplier.name}</p>
+          <p className="font-semibold text-white truncate">{supplier.name}</p>
           <div className="flex items-center gap-1.5 mt-0.5">
             <Building2 className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
-            <p className="text-sm text-gray-500 truncate">{supplier.company}</p>
+            <p className="text-sm text-slate-400 truncate">{supplier.company}</p>
           </div>
         </div>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="bg-gray-50 rounded-lg p-3 text-center">
-          <p className="text-xl font-bold text-gray-900">{supplier.quotesCount}</p>
-          <p className="text-xs text-gray-500 mt-0.5">Quote{supplier.quotesCount !== 1 ? 's' : ''} submitted</p>
+        <div className="bg-slate-900 rounded-lg p-3 text-center">
+          <p className="text-xl font-bold text-white">{supplier.quotesCount}</p>
+          <p className="text-xs text-slate-400 mt-0.5">Quote{supplier.quotesCount !== 1 ? 's' : ''} submitted</p>
         </div>
-        <div className="bg-gray-50 rounded-lg p-3 text-center">
-          <p className="text-xl font-bold text-gray-900">{formatCurrency(supplier.totalValue)}</p>
-          <p className="text-xs text-gray-500 mt-0.5">Total value quoted</p>
+        <div className="bg-slate-900 rounded-lg p-3 text-center">
+          <p className="text-xl font-bold text-white">{formatCurrency(supplier.totalValue)}</p>
+          <p className="text-xs text-slate-400 mt-0.5">Total value quoted</p>
         </div>
       </div>
 
@@ -109,7 +109,7 @@ function SupplierCard({ supplier }: { supplier: SupplierSummary }) {
             </span>
           ))}
           {supplier.categories.length > 3 && (
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs text-gray-500 bg-gray-100">
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs text-slate-400 bg-slate-800">
               +{supplier.categories.length - 3} more
             </span>
           )}
@@ -139,8 +139,8 @@ function SkeletonCard() {
         </div>
       </div>
       <div className="grid grid-cols-2 gap-3">
-        <div className="h-16 bg-gray-100 rounded-lg" />
-        <div className="h-16 bg-gray-100 rounded-lg" />
+        <div className="h-16 bg-slate-800 rounded-lg" />
+        <div className="h-16 bg-slate-800 rounded-lg" />
       </div>
       <div className="h-8 bg-gray-200 rounded-lg" />
     </div>
@@ -194,7 +194,7 @@ export default function MySuppliersPage() {
           <Link href="/dashboard" className="text-blue-400 hover:text-blue-300 transition-colors">
             Dashboard
           </Link>
-          <ChevronRight className="w-4 h-4 text-gray-500" />
+          <ChevronRight className="w-4 h-4 text-slate-400" />
           <span className="text-gray-300">My Suppliers</span>
         </nav>
 
@@ -271,8 +271,8 @@ export default function MySuppliersPage() {
                 <Users className="w-8 h-8 text-blue-400" />
               </div>
               <div>
-                <p className="text-gray-800 font-semibold text-lg">No suppliers yet</p>
-                <p className="text-gray-500 text-sm mt-1">
+                <p className="text-slate-100 font-semibold text-lg">No suppliers yet</p>
+                <p className="text-slate-400 text-sm mt-1">
                   Once suppliers quote on your RFQs, they will appear here.
                 </p>
               </div>
@@ -289,7 +289,7 @@ export default function MySuppliersPage() {
         {/* No search results */}
         {!loading && !error && suppliers.length > 0 && filteredSuppliers.length === 0 && (
           <div className="bg-white rounded-xl shadow-sm p-12 text-center">
-            <p className="text-gray-600">No suppliers match your search.</p>
+            <p className="text-slate-300">No suppliers match your search.</p>
             <button
               onClick={() => setSearchQuery('')}
               className="mt-3 text-blue-600 hover:text-blue-700 text-sm underline"

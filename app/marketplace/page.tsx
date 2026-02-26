@@ -175,7 +175,7 @@ function MarketplaceContent() {
             </div>
           ) : rfqs.length === 0 ? (
             <div className="bg-slate-800 rounded-xl p-12 text-center text-slate-400">
-              <Search className="w-12 h-12 mx-auto mb-3 text-slate-600" />
+              <Search className="w-12 h-12 mx-auto mb-3 text-slate-300" />
               <p className="font-medium">No RFQs found</p>
               <p className="text-sm mt-1">Try a different search or category</p>
             </div>

@@ -111,7 +111,7 @@ export default function EscrowPage() {
       RELEASED: 'text-green-500',
       REFUNDED: 'text-red-500',
     };
-    return colors[status] || 'text-gray-500';
+    return colors[status] || 'text-slate-400';
   };
 
   return (
@@ -153,17 +153,17 @@ export default function EscrowPage() {
         <div className="bg-white rounded-xl shadow-sm p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold">Escrow Transactions</h2>
-            <span className="text-sm text-slate-600">
+            <span className="text-sm text-slate-300">
               Showing all escrow transactions
             </span>
           </div>
 
           {isLoading ? (
-            <div className="text-center py-8 text-slate-600">
+            <div className="text-center py-8 text-slate-300">
               <p>Loading escrow transactions...</p>
             </div>
           ) : escrows.length === 0 ? (
-            <div className="text-center py-8 text-slate-600">
+            <div className="text-center py-8 text-slate-300">
               <p>No escrow transactions found</p>
             </div>
           ) : (
@@ -184,19 +184,19 @@ export default function EscrowPage() {
                     <tr key={escrow.id} className="border-b border-slate-50 hover:bg-slate-50">
                       <td className="py-3 px-4 text-sm text-slate-900">
                         <div className="font-medium">{escrow.quote.rfq.title}</div>
-                        <div className="text-xs text-slate-600">
+                        <div className="text-xs text-slate-300">
                           #{escrow.quote.rfqId}
                         </div>
                       </td>
                       <td className="py-3 px-4 text-sm text-slate-900">
                         <div className="font-medium">{escrow.buyer.company}</div>
-                        <div className="text-xs text-slate-600">
+                        <div className="text-xs text-slate-300">
                           {escrow.buyer.name}
                         </div>
                       </td>
                       <td className="py-3 px-4 text-sm text-slate-900">
                         <div className="font-medium">{escrow.supplier.company}</div>
-                        <div className="text-xs text-slate-600">
+                        <div className="text-xs text-slate-300">
                           {escrow.supplier.name}
                         </div>
                       </td>

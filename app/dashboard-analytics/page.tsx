@@ -37,7 +37,7 @@ export default function DashboardAnalyticsPage() {
     return (
       <>
         <Header />
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-slate-900">
           <div className="container mx-auto px-4 py-12">
             <div className="animate-pulse">
               <div className="h-8 bg-gray-200 rounded w-1/4 mb-8"></div>
@@ -60,14 +60,14 @@ export default function DashboardAnalyticsPage() {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-slate-900">
         {/* Header */}
         <section className="bg-white py-8">
           <div className="container mx-auto px-4">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">Analytics Dashboard</h1>
-                <p className="text-gray-600">Monitor your business performance and insights</p>
+                <h1 className="text-3xl font-bold text-white mb-2">Analytics Dashboard</h1>
+                <p className="text-slate-300">Monitor your business performance and insights</p>
               </div>
               <div className="mt-4 md:mt-0">
                 <select
@@ -91,8 +91,8 @@ export default function DashboardAnalyticsPage() {
               <div className="bg-white p-6 rounded-lg shadow">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Total Users</p>
-                    <p className="text-2xl font-bold text-gray-900">
+                    <p className="text-sm font-medium text-slate-300">Total Users</p>
+                    <p className="text-2xl font-bold text-white">
                       {analytics?.metrics?.totalUsers?.toLocaleString() || '0'}
                     </p>
                   </div>
@@ -112,8 +112,8 @@ export default function DashboardAnalyticsPage() {
               <div className="bg-white p-6 rounded-lg shadow">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Active Suppliers</p>
-                    <p className="text-2xl font-bold text-gray-900">
+                    <p className="text-sm font-medium text-slate-300">Active Suppliers</p>
+                    <p className="text-2xl font-bold text-white">
                       {analytics?.metrics?.activeSuppliers?.toLocaleString() || '0'}
                     </p>
                   </div>
@@ -133,8 +133,8 @@ export default function DashboardAnalyticsPage() {
               <div className="bg-white p-6 rounded-lg shadow">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Total Revenue</p>
-                    <p className="text-2xl font-bold text-gray-900">
+                    <p className="text-sm font-medium text-slate-300">Total Revenue</p>
+                    <p className="text-2xl font-bold text-white">
                       ₹{analytics?.metrics?.totalRevenue?.toLocaleString() || '0'}
                     </p>
                   </div>
@@ -154,8 +154,8 @@ export default function DashboardAnalyticsPage() {
               <div className="bg-white p-6 rounded-lg shadow">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">System Health</p>
-                    <p className="text-2xl font-bold text-gray-900">
+                    <p className="text-sm font-medium text-slate-300">System Health</p>
+                    <p className="text-2xl font-bold text-white">
                       {analytics?.metrics?.systemHealth || 0}%
                     </p>
                   </div>
@@ -174,23 +174,23 @@ export default function DashboardAnalyticsPage() {
             {/* Additional Metrics */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div className="bg-white p-6 rounded-lg shadow">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
+                <h3 className="text-lg font-semibold text-white mb-4">Recent Activity</h3>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">New RFQs</span>
-                    <span className="text-sm font-medium text-gray-900">
+                    <span className="text-sm text-slate-300">New RFQs</span>
+                    <span className="text-sm font-medium text-white">
                       {analytics?.metrics?.recentRfqs || 0}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">New Leads</span>
-                    <span className="text-sm font-medium text-gray-900">
+                    <span className="text-sm text-slate-300">New Leads</span>
+                    <span className="text-sm font-medium text-white">
                       {analytics?.metrics?.recentLeads || 0}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">AI Accuracy</span>
-                    <span className="text-sm font-medium text-gray-900">
+                    <span className="text-sm text-slate-300">AI Accuracy</span>
+                    <span className="text-sm font-medium text-white">
                       {analytics?.metrics?.aiAccuracy || 0}%
                     </span>
                   </div>
@@ -198,23 +198,23 @@ export default function DashboardAnalyticsPage() {
               </div>
 
               <div className="bg-white p-6 rounded-lg shadow">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Performance</h3>
+                <h3 className="text-lg font-semibold text-white mb-4">Performance</h3>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Uptime</span>
-                    <span className="text-sm font-medium text-gray-900">
+                    <span className="text-sm text-slate-300">Uptime</span>
+                    <span className="text-sm font-medium text-white">
                       {analytics?.metrics?.uptime || 0}%
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Performance Score</span>
-                    <span className="text-sm font-medium text-gray-900">
+                    <span className="text-sm text-slate-300">Performance Score</span>
+                    <span className="text-sm font-medium text-white">
                       {analytics?.metrics?.performanceScore || 0}%
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Fraud Detection</span>
-                    <span className="text-sm font-medium text-gray-900">
+                    <span className="text-sm text-slate-300">Fraud Detection</span>
+                    <span className="text-sm font-medium text-white">
                       {analytics?.metrics?.fraudDetection || 0}%
                     </span>
                   </div>
@@ -222,7 +222,7 @@ export default function DashboardAnalyticsPage() {
               </div>
 
               <div className="bg-white p-6 rounded-lg shadow">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+                <h3 className="text-lg font-semibold text-white mb-4">Quick Actions</h3>
                 <div className="space-y-2">
                   <button className="w-full text-left px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-lg">
                     Export Report

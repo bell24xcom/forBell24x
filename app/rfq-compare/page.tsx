@@ -74,12 +74,12 @@ export default function RFQComparePage() {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-slate-900">
         {/* Hero Section */}
         <section className="bg-white py-12">
           <div className="container mx-auto px-4">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">Compare RFQ Quotes</h1>
-            <p className="text-lg text-gray-600 mb-8">
+            <h1 className="text-4xl font-bold text-white mb-4">Compare RFQ Quotes</h1>
+            <p className="text-lg text-slate-300 mb-8">
               Compare quotes from different suppliers to make the best decision
             </p>
           </div>
@@ -110,7 +110,7 @@ export default function RFQComparePage() {
                             onChange={() => toggleQuoteSelection(quote.id)}
                             className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                           />
-                          <h3 className="text-xl font-semibold text-gray-900">{quote.supplier}</h3>
+                          <h3 className="text-xl font-semibold text-white">{quote.supplier}</h3>
                           {quote.verified && (
                             <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
                               Verified
@@ -120,30 +120,30 @@ export default function RFQComparePage() {
                         
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                           <div>
-                            <p className="text-sm font-medium text-gray-600">Price</p>
+                            <p className="text-sm font-medium text-slate-300">Price</p>
                             <p className="text-2xl font-bold text-blue-600">₹{quote.price.toLocaleString()}</p>
                           </div>
                           <div>
-                            <p className="text-sm font-medium text-gray-600">Delivery Time</p>
-                            <p className="text-lg font-semibold text-gray-900">{quote.deliveryTime}</p>
+                            <p className="text-sm font-medium text-slate-300">Delivery Time</p>
+                            <p className="text-lg font-semibold text-white">{quote.deliveryTime}</p>
                           </div>
                           <div>
-                            <p className="text-sm font-medium text-gray-600">Rating</p>
+                            <p className="text-sm font-medium text-slate-300">Rating</p>
                             <div className="flex items-center">
                               <span className="text-yellow-400">★</span>
-                              <span className="text-lg font-semibold text-gray-900 ml-1">{quote.rating}</span>
+                              <span className="text-lg font-semibold text-white ml-1">{quote.rating}</span>
                             </div>
                           </div>
                         </div>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
-                            <p className="text-sm font-medium text-gray-600">Specifications</p>
-                            <p className="text-gray-900">{quote.specifications}</p>
+                            <p className="text-sm font-medium text-slate-300">Specifications</p>
+                            <p className="text-white">{quote.specifications}</p>
                           </div>
                           <div>
-                            <p className="text-sm font-medium text-gray-600">Terms</p>
-                            <p className="text-gray-900">{quote.terms}</p>
+                            <p className="text-sm font-medium text-slate-300">Terms</p>
+                            <p className="text-white">{quote.terms}</p>
                           </div>
                         </div>
                       </div>
@@ -165,11 +165,11 @@ export default function RFQComparePage() {
         {selectedQuotesData.length > 0 && (
           <section className="py-12 bg-white">
             <div className="container mx-auto px-4">
-              <h2 className="text-2xl font-bold text-gray-900 mb-8">Quote Comparison</h2>
+              <h2 className="text-2xl font-bold text-white mb-8">Quote Comparison</h2>
               <div className="overflow-x-auto">
                 <table className="w-full border-collapse border border-gray-300">
                   <thead>
-                    <tr className="bg-gray-50">
+                    <tr className="bg-slate-900">
                       <th className="border border-gray-300 px-4 py-2 text-left">Supplier</th>
                       <th className="border border-gray-300 px-4 py-2 text-left">Price</th>
                       <th className="border border-gray-300 px-4 py-2 text-left">Delivery Time</th>

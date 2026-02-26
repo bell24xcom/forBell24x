@@ -86,7 +86,7 @@ export default function RFQManagementPage() {
       case 'expired':
         return <XCircle className="h-4 w-4 text-red-600" />;
       default:
-        return <Clock className="h-4 w-4 text-neutral-600" />;
+        return <Clock className="h-4 w-4 text-slate-300" />;
     }
   };
 
@@ -102,7 +102,7 @@ export default function RFQManagementPage() {
     switch (type) {
       case 'video': return 'bg-red-100 text-red-600';
       case 'voice': return 'bg-blue-100 text-blue-600';
-      default: return 'bg-neutral-100 text-neutral-600';
+      default: return 'bg-neutral-100 text-slate-300';
     }
   };
 
@@ -133,7 +133,7 @@ export default function RFQManagementPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-neutral-900">RFQ Management</h1>
-              <p className="mt-2 text-neutral-600">Review and moderate Request for Quotations</p>
+              <p className="mt-2 text-slate-300">Review and moderate Request for Quotations</p>
             </div>
             <button
               onClick={fetchRFQs}
@@ -154,7 +154,7 @@ export default function RFQManagementPage() {
                 <FileText className="h-6 w-6 text-blue-600" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-neutral-600">Total RFQs</p>
+                <p className="text-sm font-medium text-slate-300">Total RFQs</p>
                 <p className="text-2xl font-bold text-neutral-900">{loading ? '...' : stats.total}</p>
               </div>
             </div>
@@ -166,7 +166,7 @@ export default function RFQManagementPage() {
                 <Clock className="h-6 w-6 text-green-600" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-neutral-600">Active</p>
+                <p className="text-sm font-medium text-slate-300">Active</p>
                 <p className="text-2xl font-bold text-neutral-900">{loading ? '...' : stats.active}</p>
               </div>
             </div>
@@ -178,7 +178,7 @@ export default function RFQManagementPage() {
                 <Clock className="h-6 w-6 text-yellow-600" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-neutral-600">Pending</p>
+                <p className="text-sm font-medium text-slate-300">Pending</p>
                 <p className="text-2xl font-bold text-neutral-900">{loading ? '...' : stats.pending}</p>
               </div>
             </div>
@@ -190,7 +190,7 @@ export default function RFQManagementPage() {
                 <XCircle className="h-6 w-6 text-red-600" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-neutral-600">Closed</p>
+                <p className="text-sm font-medium text-slate-300">Closed</p>
                 <p className="text-2xl font-bold text-neutral-900">{loading ? '...' : stats.closed}</p>
               </div>
             </div>
@@ -251,16 +251,16 @@ export default function RFQManagementPage() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-neutral-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">RFQ Details</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Type</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Buyer</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Category</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Budget</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Urgency</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Responses</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Time</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Actions</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">RFQ Details</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Type</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Buyer</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Category</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Budget</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Urgency</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Responses</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Time</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -269,13 +269,13 @@ export default function RFQManagementPage() {
                     <td colSpan={10} className="px-6 py-8 text-center">
                       <div className="flex items-center justify-center min-h-64">
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
-                        <span className="ml-2 text-neutral-600">Loading RFQs...</span>
+                        <span className="ml-2 text-slate-300">Loading RFQs...</span>
                       </div>
                     </td>
                   </tr>
                 ) : filteredRFQs.length === 0 ? (
                   <tr>
-                    <td colSpan={10} className="px-6 py-8 text-center text-neutral-500">
+                    <td colSpan={10} className="px-6 py-8 text-center text-slate-400">
                       No RFQs found matching your criteria
                     </td>
                   </tr>
@@ -285,7 +285,7 @@ export default function RFQManagementPage() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>
                           <div className="text-sm font-medium text-neutral-900 line-clamp-2">{rfq.title}</div>
-                          <div className="text-sm text-neutral-500">ID: {rfq.id}</div>
+                          <div className="text-sm text-slate-400">ID: {rfq.id}</div>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -297,7 +297,7 @@ export default function RFQManagementPage() {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-900">
                         <div>
                           <div className="font-medium">{rfq.buyer.name}</div>
-                          <div className="text-neutral-500">{rfq.buyer.company}</div>
+                          <div className="text-slate-400">{rfq.buyer.company}</div>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -311,7 +311,7 @@ export default function RFQManagementPage() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
                           <div className={`w-2 h-2 rounded-full ${getUrgencyColor(rfq.urgency)}`}></div>
-                          <span className="text-xs font-medium text-neutral-600">{rfq.urgency}</span>
+                          <span className="text-xs font-medium text-slate-300">{rfq.urgency}</span>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -326,13 +326,13 @@ export default function RFQManagementPage() {
                           </span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">
                         <div className="flex items-center gap-4">
                           <span>{rfq.responses} quotes</span>
                           <span>{rfq.views} views</span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">
                         {rfq.timeAgo}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">

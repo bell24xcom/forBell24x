@@ -14,18 +14,18 @@ export default function NewHomepage() {
                   <div className="font-bold text-2xl bg-gradient-to-r from-indigo-600 to-emerald-600 bg-clip-text text-transparent">
                     Bell24h
                   </div>
-                  <div className="text-sm text-neutral-600 font-medium">Verified B2B Platform</div>
+                  <div className="text-sm text-slate-300 font-medium">Verified B2B Platform</div>
                 </div>
               </div>
               <div className="hidden md:flex items-center gap-8">
-                <a href="/suppliers" className="text-neutral-700 hover:text-primary-600 font-medium transition-colors">Suppliers</a>
-                <a href="/rfq/create" className="text-neutral-700 hover:text-primary-600 font-medium transition-colors">Post RFQ</a>
-                <a href="/wallet" className="text-neutral-700 hover:text-primary-600 font-medium transition-colors">Wallet</a>
-                <a href="/about" className="text-neutral-700 hover:text-primary-600 font-medium transition-colors">About</a>
+                <a href="/suppliers" className="text-slate-400 hover:text-primary-600 font-medium transition-colors">Suppliers</a>
+                <a href="/rfq/create" className="text-slate-400 hover:text-primary-600 font-medium transition-colors">Post RFQ</a>
+                <a href="/wallet" className="text-slate-400 hover:text-primary-600 font-medium transition-colors">Wallet</a>
+                <a href="/about" className="text-slate-400 hover:text-primary-600 font-medium transition-colors">About</a>
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <a href="/auth/login" className="text-neutral-700 hover:text-primary-600 font-medium transition-colors">Login</a>
+              <a href="/auth/login" className="text-slate-400 hover:text-primary-600 font-medium transition-colors">Login</a>
               <button className="px-8 py-3 bg-gradient-to-r from-indigo-600 to-emerald-600 hover:from-indigo-700 hover:to-emerald-700 text-white rounded-lg font-semibold text-lg shadow-lg transition-all duration-300 transform hover:scale-105">
                 Get Started
               </button>
@@ -42,7 +42,7 @@ export default function NewHomepage() {
           </span>
         </h1>
         
-        <p className="text-2xl md:text-3xl text-neutral-700 mb-8 max-w-5xl mx-auto font-medium">
+        <p className="text-2xl md:text-3xl text-slate-400 mb-8 max-w-5xl mx-auto font-medium">
           200 live data signals—GST, credit, logistics, ESG—to match you with 3 pre-qualified suppliers. 
           <span className="text-indigo-600 font-semibold"> Escrow-secured payments</span> until goods arrive.
         </p>
@@ -64,19 +64,19 @@ export default function NewHomepage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16 max-w-4xl mx-auto">
           <div className="bg-white rounded-lg p-6 shadow-lg">
             <div className="text-3xl font-bold text-indigo-600">4,321</div>
-            <div className="text-neutral-600 font-medium">RFQs processed yesterday</div>
+            <div className="text-slate-300 font-medium">RFQs processed yesterday</div>
           </div>
           <div className="bg-white rounded-lg p-6 shadow-lg">
             <div className="text-3xl font-bold text-emerald-600">98%</div>
-            <div className="text-neutral-600 font-medium">Escrow success rate</div>
+            <div className="text-slate-300 font-medium">Escrow success rate</div>
           </div>
           <div className="bg-white rounded-lg p-6 shadow-lg">
             <div className="text-3xl font-bold text-purple-600">12,400</div>
-            <div className="text-neutral-600 font-medium">Verified suppliers</div>
+            <div className="text-slate-300 font-medium">Verified suppliers</div>
           </div>
           <div className="bg-white rounded-lg p-6 shadow-lg">
             <div className="text-3xl font-bold text-blue-600">50+</div>
-            <div className="text-neutral-600 font-medium">Product categories</div>
+            <div className="text-slate-300 font-medium">Product categories</div>
           </div>
         </div>
 
@@ -109,7 +109,7 @@ export default function NewHomepage() {
                 1
               </div>
               <h3 className="text-3xl font-bold mb-4 text-neutral-800">Post Your RFQ</h3>
-              <p className="text-xl text-neutral-600 leading-relaxed">
+              <p className="text-xl text-slate-300 leading-relaxed">
                 Submit by voice, video, or text. Our AI understands your requirements and matches with verified suppliers.
               </p>
             </div>
@@ -118,7 +118,7 @@ export default function NewHomepage() {
                 2
               </div>
               <h3 className="text-3xl font-bold mb-4 text-neutral-800">Get 3 Verified Quotes</h3>
-              <p className="text-xl text-neutral-600 leading-relaxed">
+              <p className="text-xl text-slate-300 leading-relaxed">
                 Receive AI-scored, GST-verified supplier quotes within 24 hours. 200+ data points analyzed.
               </p>
             </div>
@@ -127,7 +127,7 @@ export default function NewHomepage() {
                 3
               </div>
               <h3 className="text-3xl font-bold mb-4 text-neutral-800">Secure Escrow Payment</h3>
-              <p className="text-xl text-neutral-600 leading-relaxed">
+              <p className="text-xl text-slate-300 leading-relaxed">
                 Payment held in ICICI escrow until goods arrive. Full protection guaranteed.
               </p>
             </div>
@@ -141,7 +141,7 @@ export default function NewHomepage() {
             <div className="bg-white p-10 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
               <div className="text-6xl mb-6">🏗️</div>
               <h3 className="text-3xl font-bold text-indigo-700 mb-4">Steel & Metals</h3>
-              <p className="text-lg text-neutral-600 mb-6 leading-relaxed">
+              <p className="text-lg text-slate-300 mb-6 leading-relaxed">
                 Find verified suppliers for TMT bars, structural steel, aluminum, and specialty metals.
               </p>
               <button className="text-indigo-600 font-bold text-lg hover:underline hover:text-indigo-800 transition-colors">
@@ -152,7 +152,7 @@ export default function NewHomepage() {
             <div className="bg-white p-10 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
               <div className="text-6xl mb-6">🧵</div>
               <h3 className="text-3xl font-bold text-emerald-700 mb-4">Textiles & Garments</h3>
-              <p className="text-lg text-neutral-600 mb-6 leading-relaxed">
+              <p className="text-lg text-slate-300 mb-6 leading-relaxed">
                 Connect with manufacturers for cotton, silk, synthetic fabrics, and ready-made garments.
               </p>
               <button className="text-emerald-600 font-bold text-lg hover:underline hover:text-emerald-800 transition-colors">
@@ -163,7 +163,7 @@ export default function NewHomepage() {
             <div className="bg-white p-10 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
               <div className="text-6xl mb-6">📱</div>
               <h3 className="text-3xl font-bold text-purple-700 mb-4">Electronics & IT</h3>
-              <p className="text-lg text-neutral-600 mb-6 leading-relaxed">
+              <p className="text-lg text-slate-300 mb-6 leading-relaxed">
                 Source semiconductors, mobile components, LED displays, and IT hardware.
               </p>
               <button className="text-purple-600 font-bold text-lg hover:underline hover:text-purple-800 transition-colors">
@@ -180,22 +180,22 @@ export default function NewHomepage() {
             <div className="text-center">
               <div className="text-4xl mb-4">🤖</div>
               <h3 className="text-xl font-bold text-neutral-800 mb-2">AI Matching</h3>
-              <p className="text-neutral-600">200+ data points analysis</p>
+              <p className="text-slate-300">200+ data points analysis</p>
             </div>
             <div className="text-center">
               <div className="text-4xl mb-4">🎤</div>
               <h3 className="text-xl font-bold text-neutral-800 mb-2">Voice RFQ</h3>
-              <p className="text-neutral-600">Speak your requirements</p>
+              <p className="text-slate-300">Speak your requirements</p>
             </div>
             <div className="text-center">
               <div className="text-4xl mb-4">📊</div>
               <h3 className="text-xl font-bold text-neutral-800 mb-2">Trust Scoring</h3>
-              <p className="text-neutral-600">AI-generated risk assessment</p>
+              <p className="text-slate-300">AI-generated risk assessment</p>
             </div>
             <div className="text-center">
               <div className="text-4xl mb-4">💳</div>
               <h3 className="text-xl font-bold text-neutral-800 mb-2">Smart Escrow</h3>
-              <p className="text-neutral-600">Automated payment protection</p>
+              <p className="text-slate-300">Automated payment protection</p>
             </div>
           </div>
         </section>

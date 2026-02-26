@@ -185,7 +185,7 @@ export default function SuppliersPage() {
                       <button
                         onClick={() => handlePageChange(pagination.page - 1)}
                         disabled={!pagination.hasPrev}
-                        className="px-3 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                        className="px-3 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-900"
                       >
                         Previous
                       </button>
@@ -195,7 +195,7 @@ export default function SuppliersPage() {
                       <button
                         onClick={() => handlePageChange(pagination.page + 1)}
                         disabled={!pagination.hasNext}
-                        className="px-3 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                        className="px-3 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-900"
                       >
                         Next
                       </button>

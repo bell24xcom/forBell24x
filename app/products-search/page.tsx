@@ -54,18 +54,18 @@ export default function ProductsSearchPage() {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-slate-900">
         <section className="bg-white py-12">
           <div className="container mx-auto px-4">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">Product Search</h1>
-            <p className="text-lg text-gray-600 mb-8">
+            <h1 className="text-4xl font-bold text-white mb-4">Product Search</h1>
+            <p className="text-lg text-slate-300 mb-8">
               Discover and compare products from verified suppliers
             </p>
             
-            <div className="bg-gray-50 rounded-lg p-6 mb-8">
+            <div className="bg-slate-900 rounded-lg p-6 mb-8">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
+                  <label className="block text-sm font-medium text-slate-400 mb-2">Search</label>
                   <input
                     type="text"
                     placeholder="Search products..."
@@ -75,7 +75,7 @@ export default function ProductsSearchPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                  <label className="block text-sm font-medium text-slate-400 mb-2">Category</label>
                   <select
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
@@ -87,7 +87,7 @@ export default function ProductsSearchPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Price Range</label>
+                  <label className="block text-sm font-medium text-slate-400 mb-2">Price Range</label>
                   <div className="flex space-x-2">
                     <input
                       type="number"
@@ -127,7 +127,7 @@ export default function ProductsSearchPage() {
                   </span>
                 ))}
               </div>
-              <button className="bg-white text-blue-600 px-6 py-2 rounded-lg hover:bg-gray-100 transition-colors">
+              <button className="bg-white text-blue-600 px-6 py-2 rounded-lg hover:bg-slate-800 transition-colors">
                 Compare Now
               </button>
             </div>
@@ -162,27 +162,27 @@ export default function ProductsSearchPage() {
                     </div>
                     <div className="p-4">
                       <div className="flex items-start justify-between mb-2">
-                        <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">{product.name}</h3>
+                        <h3 className="text-lg font-semibold text-white group-hover:text-blue-600 transition-colors">{product.name}</h3>
                         <button
                           onClick={() => toggleCompare(product)}
-                          className={'p-2 rounded-full ' + (compareList.find(p => p.id === product.id) ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200')}
+                          className={'p-2 rounded-full ' + (compareList.find(p => p.id === product.id) ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-gray-200')}
                         >
                           {compareList.find(p => p.id === product.id) ? '✓' : '+'}
                         </button>
                       </div>
-                      <p className="text-gray-600 text-sm mb-2 line-clamp-2">{product.description}</p>
+                      <p className="text-slate-300 text-sm mb-2 line-clamp-2">{product.description}</p>
                       <div className="flex items-center justify-between mb-3">
                         <span className="text-2xl font-bold text-blue-600">₹{product.price?.toLocaleString()}</span>
                         <div className="flex items-center">
                           <span className="text-yellow-400">★</span>
-                          <span className="text-sm text-gray-600 ml-1">{product.rating}</span>
+                          <span className="text-sm text-slate-300 ml-1">{product.rating}</span>
                         </div>
                       </div>
                       <div className="flex space-x-2">
                         <button className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
                           View Details
                         </button>
-                        <button className="bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors">
+                        <button className="bg-slate-800 text-slate-400 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors">
                           💬
                         </button>
                       </div>
@@ -193,8 +193,8 @@ export default function ProductsSearchPage() {
             ) : (
               <div className="text-center py-12">
                 <div className="text-gray-400 text-6xl mb-4">📦</div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">No products found</h3>
-                <p className="text-gray-600">Try adjusting your search criteria or filters</p>
+                <h3 className="text-xl font-semibold text-white mb-2">No products found</h3>
+                <p className="text-slate-300">Try adjusting your search criteria or filters</p>
               </div>
             )}
           </div>

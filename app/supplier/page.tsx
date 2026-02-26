@@ -28,11 +28,11 @@ export default function SupplierPage() {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-slate-900">
         <section className="bg-white py-12">
           <div className="container mx-auto px-4">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">Suppliers</h1>
-            <p className="text-lg text-gray-600 mb-8">
+            <h1 className="text-4xl font-bold text-white mb-4">Suppliers</h1>
+            <p className="text-lg text-slate-300 mb-8">
               Connect with verified suppliers across India
             </p>
           </div>
@@ -56,8 +56,8 @@ export default function SupplierPage() {
                   <div key={supplier.id} className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6">
                     <div className="flex items-start justify-between mb-4">
                       <div>
-                        <h3 className="text-xl font-semibold text-gray-900">{supplier.company}</h3>
-                        <p className="text-gray-600">{supplier.name}</p>
+                        <h3 className="text-xl font-semibold text-white">{supplier.company}</h3>
+                        <p className="text-slate-300">{supplier.name}</p>
                       </div>
                       <div className="flex flex-col items-end">
                         {supplier.verified && (
@@ -67,16 +67,16 @@ export default function SupplierPage() {
                         )}
                         <div className="flex items-center">
                           <span className="text-yellow-400">★</span>
-                          <span className="text-sm text-gray-600 ml-1">{supplier.rating}</span>
+                          <span className="text-sm text-slate-300 ml-1">{supplier.rating}</span>
                         </div>
                       </div>
                     </div>
                     
                     <div className="space-y-2 mb-4">
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-slate-300">
                         <span className="font-medium">Location:</span> {supplier.location}
                       </p>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-slate-300">
                         <span className="font-medium">Category:</span> {supplier.category}
                       </p>
                     </div>
@@ -90,8 +90,8 @@ export default function SupplierPage() {
             ) : (
               <div className="text-center py-12">
                 <div className="text-gray-400 text-6xl mb-4">🔍</div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">No suppliers found</h3>
-                <p className="text-gray-600">Try adjusting your search criteria</p>
+                <h3 className="text-xl font-semibold text-white mb-2">No suppliers found</h3>
+                <p className="text-slate-300">Try adjusting your search criteria</p>
               </div>
             )}
           </div>
