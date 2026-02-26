@@ -76,7 +76,7 @@ export default function PaymentSecurityPage() {
                 <p className="feature-description">
                   Bell24h uses Razorpay's secure payment infrastructure. Your payment information is:
                 </p>
-                <ul className="list-disc list-inside space-y-2 text-neutral-600">
+                <ul className="list-disc list-inside space-y-2 text-slate-300">
                   <li>Encrypted using industry-standard AES-256 encryption</li>
                   <li>Never stored on our servers - processed directly by Razorpay</li>
                   <li>Protected by PCI DSS Level 1 security standards</li>
@@ -89,7 +89,7 @@ export default function PaymentSecurityPage() {
                 <p className="feature-description">
                   We collect only necessary information and protect it according to:
                 </p>
-                <ul className="list-disc list-inside space-y-2 text-neutral-600">
+                <ul className="list-disc list-inside space-y-2 text-slate-300">
                   <li>GDPR (General Data Protection Regulation)</li>
                   <li>India's Personal Data Protection Bill</li>
                   <li>RBI's data localization requirements</li>
@@ -111,10 +111,10 @@ export default function PaymentSecurityPage() {
                 </p>
                 <div className="bg-neutral-100 rounded-lg p-4 font-mono text-sm">
                   <div className="mb-2">
-                    <span className="text-neutral-600">Key ID:</span> rzp_test_1DP5mmOlF5G5ag
+                    <span className="text-slate-300">Key ID:</span> rzp_test_1DP5mmOlF5G5ag
                   </div>
                   <div>
-                    <span className="text-neutral-600">Key Secret:</span> [Available in Razorpay Dashboard]
+                    <span className="text-slate-300">Key Secret:</span> [Available in Razorpay Dashboard]
                   </div>
                 </div>
               </div>
@@ -124,7 +124,7 @@ export default function PaymentSecurityPage() {
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
                     <h4 className="font-semibold text-neutral-900 mb-2">Successful Payments</h4>
-                    <ul className="text-sm text-neutral-600 space-y-1">
+                    <ul className="text-sm text-slate-300 space-y-1">
                       <li>4111 1111 1111 1111</li>
                       <li>5555 5555 5555 4444</li>
                       <li>4000 0000 0000 0002</li>
@@ -132,7 +132,7 @@ export default function PaymentSecurityPage() {
                   </div>
                   <div>
                     <h4 className="font-semibold text-neutral-900 mb-2">Failed Payments</h4>
-                    <ul className="text-sm text-neutral-600 space-y-1">
+                    <ul className="text-sm text-slate-300 space-y-1">
                       <li>4000 0000 0000 0002</li>
                       <li>4000 0000 0000 0069</li>
                       <li>4000 0000 0000 0119</li>
@@ -146,19 +146,19 @@ export default function PaymentSecurityPage() {
           {/* Contact */}
           <div className="bg-white rounded-2xl shadow-xl p-8">
             <h2 className="text-3xl font-bold text-neutral-900 mb-6">Security Questions?</h2>
-            <p className="text-neutral-600 mb-6">
+            <p className="text-slate-300 mb-6">
               If you have any questions about payment security or need to report a security issue, please contact us:
             </p>
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <h3 className="font-semibold text-neutral-900 mb-2">Security Team</h3>
-                <p className="text-neutral-600">security@bell24h.com</p>
-                <p className="text-neutral-600">+91 98765 43210</p>
+                <p className="text-slate-300">security@bell24h.com</p>
+                <p className="text-slate-300">+91 98765 43210</p>
               </div>
               <div>
                 <h3 className="font-semibold text-neutral-900 mb-2">Support</h3>
-                <p className="text-neutral-600">support@bell24h.com</p>
-                <p className="text-neutral-600">24/7 Customer Support</p>
+                <p className="text-slate-300">support@bell24h.com</p>
+                <p className="text-slate-300">24/7 Customer Support</p>
               </div>
             </div>
           </div>

@@ -160,7 +160,7 @@ export default function LaunchMetricsPage() {
       case 'completed':
         return 'text-blue-600 bg-blue-100';
       default:
-        return 'text-neutral-600 bg-neutral-100';
+        return 'text-slate-300 bg-neutral-100';
     }
   };
 
@@ -186,7 +186,7 @@ export default function LaunchMetricsPage() {
       case 'down':
         return <span className="text-red-600">↘️</span>;
       default:
-        return <span className="text-neutral-600">📊</span>;
+        return <span className="text-slate-300">📊</span>;
     }
   };
 
@@ -196,7 +196,7 @@ export default function LaunchMetricsPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-neutral-900">Launch Metrics</h1>
-          <p className="mt-2 text-neutral-600">Track marketing campaign performance and launch metrics</p>
+          <p className="mt-2 text-slate-300">Track marketing campaign performance and launch metrics</p>
         </div>
 
         {/* Tab Navigation */}
@@ -212,7 +212,7 @@ export default function LaunchMetricsPage() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${activeTab === tab.id
                     ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-neutral-500 hover:text-neutral-700 hover:border-neutral-300'
+                    : 'border-transparent text-slate-400 hover:text-slate-400 hover:border-neutral-300'
                   }`}
               >
                 <span className="text-lg">{tab.icon}</span>
@@ -249,14 +249,14 @@ export default function LaunchMetricsPage() {
                         <span className={`text-2xl ${metric.color}`}>{metric.icon}</span>
                       </div>
                       <div className="ml-4">
-                        <p className="text-sm font-medium text-neutral-600">{metric.name}</p>
+                        <p className="text-sm font-medium text-slate-300">{metric.name}</p>
                         <p className="text-2xl font-bold text-neutral-900">{metric.value}</p>
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
                       {getTrendIcon(metric.trend)}
                       <span className={`text-sm font-medium ${metric.trend === 'up' ? 'text-green-600' :
-                          metric.trend === 'down' ? 'text-red-600' : 'text-neutral-600'
+                          metric.trend === 'down' ? 'text-red-600' : 'text-slate-300'
                         }`}>
                         {metric.change > 0 ? '+' : ''}{metric.change}%
                       </span>
@@ -272,7 +272,7 @@ export default function LaunchMetricsPage() {
               <div className="h-64 bg-neutral-50 rounded-lg flex items-center justify-center">
                 <div className="text-center">
                   <span className="text-5xl text-gray-400 mx-auto mb-4">📊</span>
-                  <p className="text-neutral-500">Performance chart would be displayed here</p>
+                  <p className="text-slate-400">Performance chart would be displayed here</p>
                 </div>
               </div>
             </div>
@@ -290,14 +290,14 @@ export default function LaunchMetricsPage() {
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-neutral-50">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Campaign</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Type</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Status</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Budget</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Spent</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Impressions</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">CTR</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">ROAS</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Campaign</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Type</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Status</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Budget</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Spent</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Impressions</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">CTR</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">ROAS</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
@@ -306,7 +306,7 @@ export default function LaunchMetricsPage() {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div>
                             <div className="text-sm font-medium text-neutral-900">{campaign.name}</div>
-                            <div className="text-sm text-neutral-500">{campaign.startDate} - {campaign.endDate}</div>
+                            <div className="text-sm text-slate-400">{campaign.startDate} - {campaign.endDate}</div>
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -326,7 +326,7 @@ export default function LaunchMetricsPage() {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-900">
                           {campaign.spent}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-500">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">
                           {campaign.impressions.toLocaleString()}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-900">
@@ -359,12 +359,12 @@ export default function LaunchMetricsPage() {
                         </div>
                         <div className="ml-3">
                           <p className="text-sm font-medium text-neutral-900">{campaign.name}</p>
-                          <p className="text-sm text-neutral-500">{campaign.type}</p>
+                          <p className="text-sm text-slate-400">{campaign.type}</p>
                         </div>
                       </div>
                       <div className="text-right">
                         <p className="text-sm font-medium text-neutral-900">{campaign.roas}x ROAS</p>
-                        <p className="text-sm text-neutral-500">{campaign.ctr}% CTR</p>
+                        <p className="text-sm text-slate-400">{campaign.ctr}% CTR</p>
                       </div>
                     </div>
                   ))}
@@ -375,7 +375,7 @@ export default function LaunchMetricsPage() {
                 <h3 className="text-lg font-medium text-neutral-900 mb-4">Channel Performance</h3>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-neutral-600">Paid Advertising</span>
+                    <span className="text-sm text-slate-300">Paid Advertising</span>
                     <div className="flex items-center space-x-2">
                       <span className="text-sm font-medium text-neutral-900">4.2x ROAS</span>
                       <div className="w-16 bg-neutral-200 rounded-full h-2">
@@ -384,7 +384,7 @@ export default function LaunchMetricsPage() {
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-neutral-600">Email Marketing</span>
+                    <span className="text-sm text-slate-300">Email Marketing</span>
                     <div className="flex items-center space-x-2">
                       <span className="text-sm font-medium text-neutral-900">3.2x ROAS</span>
                       <div className="w-16 bg-neutral-200 rounded-full h-2">
@@ -393,7 +393,7 @@ export default function LaunchMetricsPage() {
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-neutral-600">Social Media</span>
+                    <span className="text-sm text-slate-300">Social Media</span>
                     <div className="flex items-center space-x-2">
                       <span className="text-sm font-medium text-neutral-900">2.8x ROAS</span>
                       <div className="w-16 bg-neutral-200 rounded-full h-2">
@@ -402,7 +402,7 @@ export default function LaunchMetricsPage() {
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-neutral-600">Content Marketing</span>
+                    <span className="text-sm text-slate-300">Content Marketing</span>
                     <div className="flex items-center space-x-2">
                       <span className="text-sm font-medium text-neutral-900">5.1x ROAS</span>
                       <div className="w-16 bg-neutral-200 rounded-full h-2">

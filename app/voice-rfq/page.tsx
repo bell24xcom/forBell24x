@@ -409,7 +409,7 @@ export default function VoiceRFQPage() {
               ) : (
                 <div className="text-center py-8">
                   <p className="text-slate-300">No recent voice RFQs found</p>
-                  <p className="text-sm text-neutral-500 mt-2">Create your first voice RFQ above!</p>
+                  <p className="text-sm text-slate-400 mt-2">Create your first voice RFQ above!</p>
                 </div>
               )}
             </div>

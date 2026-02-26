@@ -137,7 +137,7 @@ export default function NegotiationPage() {
       ACCEPTED: 'bg-green-500',
       REJECTED: 'bg-red-500',
     };
-    return colors[status as keyof typeof colors] || 'bg-gray-500';
+    return colors[status as keyof typeof colors] || 'bg-slate-9000';
   };
 
   const formatDateTime = (date: Date) => {
@@ -182,7 +182,7 @@ export default function NegotiationPage() {
         {/* Quotes List */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {quotes.length === 0 ? (
-            <div className="col-span-full bg-white rounded-xl shadow-sm p-6 text-center text-slate-600">
+            <div className="col-span-full bg-white rounded-xl shadow-sm p-6 text-center text-slate-300">
               <p>No pending quotes to negotiate</p>
             </div>
           ) : (

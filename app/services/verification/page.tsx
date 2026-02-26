@@ -77,7 +77,7 @@ export default function VerificationServicePage() {
               <Shield className="w-8 h-8 text-green-600" />
             </div>
             <h3 className="text-lg font-semibold text-neutral-900 mb-2">GST Verification</h3>
-            <p className="text-neutral-600">Verify GST registration and compliance status</p>
+            <p className="text-slate-300">Verify GST registration and compliance status</p>
           </div>
 
           <div className="text-center">
@@ -85,7 +85,7 @@ export default function VerificationServicePage() {
               <FileText className="w-8 h-8 text-blue-600" />
             </div>
             <h3 className="text-lg font-semibold text-neutral-900 mb-2">Business Legitimacy</h3>
-            <p className="text-neutral-600">Check company registration and business history</p>
+            <p className="text-slate-300">Check company registration and business history</p>
           </div>
 
           <div className="text-center">
@@ -93,7 +93,7 @@ export default function VerificationServicePage() {
               <Star className="w-8 h-8 text-purple-600" />
             </div>
             <h3 className="text-lg font-semibold text-neutral-900 mb-2">Quality Assessment</h3>
-            <p className="text-neutral-600">Evaluate supplier capabilities and reputation</p>
+            <p className="text-slate-300">Evaluate supplier capabilities and reputation</p>
           </div>
         </div>
 
@@ -102,12 +102,12 @@ export default function VerificationServicePage() {
           <div className="text-center">
             <h2 className="page-title">Pricing</h2>
             <div className="text-5xl font-bold text-blue-600 mb-2">₹2,000</div>
-            <p className="text-neutral-600 mb-6">Per verification report</p>
+            <p className="text-slate-300 mb-6">Per verification report</p>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
               <div>
                 <h3 className="font-semibold text-neutral-900 mb-3">What's Included:</h3>
-                <ul className="space-y-2 text-neutral-600">
+                <ul className="space-y-2 text-slate-300">
                   <li className="flex items-center">
                     <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
                     GST registration verification
@@ -133,7 +133,7 @@ export default function VerificationServicePage() {
               
               <div>
                 <h3 className="font-semibold text-neutral-900 mb-3">Delivery:</h3>
-                <ul className="space-y-2 text-neutral-600">
+                <ul className="space-y-2 text-slate-300">
                   <li className="flex items-center">
                     <Clock className="w-5 h-5 text-blue-500 mr-2" />
                     24-48 hours delivery
@@ -306,7 +306,7 @@ export default function VerificationServicePage() {
                   'Pay ₹2,000 & Order Report'
                 )}
               </button>
-              <p className="text-sm text-neutral-500 mt-2">
+              <p className="text-sm text-slate-400 mt-2">
                 Payment processed securely via Razorpay • GST extra as applicable
               </p>
             </div>
@@ -327,7 +327,7 @@ export default function VerificationServicePage() {
                 <div className="w-10 h-10 bg-gray-300 rounded-full mr-3"></div>
                 <div>
                   <p className="font-semibold">Rajesh Kumar</p>
-                  <p className="text-sm text-neutral-500">Manufacturing Company</p>
+                  <p className="text-sm text-slate-400">Manufacturing Company</p>
                 </div>
               </div>
             </div>
@@ -340,7 +340,7 @@ export default function VerificationServicePage() {
                 <div className="w-10 h-10 bg-gray-300 rounded-full mr-3"></div>
                 <div>
                   <p className="font-semibold">Priya Sharma</p>
-                  <p className="text-sm text-neutral-500">Trading Company</p>
+                  <p className="text-sm text-slate-400">Trading Company</p>
                 </div>
               </div>
             </div>

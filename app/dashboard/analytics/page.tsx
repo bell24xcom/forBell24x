@@ -140,7 +140,7 @@ export default function UserAnalyticsDashboard() {
       case 'success': return <CheckCircle className="w-4 h-4 text-green-600" />;
       case 'pending': return <Clock className="w-4 h-4 text-yellow-600" />;
       case 'failed': return <AlertTriangle className="w-4 h-4 text-red-600" />;
-      default: return <Activity className="w-4 h-4 text-gray-600" />;
+      default: return <Activity className="w-4 h-4 text-slate-300" />;
     }
   };
 
@@ -149,7 +149,7 @@ export default function UserAnalyticsDashboard() {
       case 'success': return 'text-green-600 bg-green-100';
       case 'pending': return 'text-yellow-600 bg-yellow-100';
       case 'failed': return 'text-red-600 bg-red-100';
-      default: return 'text-gray-600 bg-gray-100';
+      default: return 'text-slate-300 bg-slate-800';
     }
   };
 
@@ -158,7 +158,7 @@ export default function UserAnalyticsDashboard() {
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading analytics...</p>
+          <p className="text-slate-300">Loading analytics...</p>
         </div>
       </div>
     );
@@ -167,7 +167,7 @@ export default function UserAnalyticsDashboard() {
   if (!analytics) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-600">No analytics data available</p>
+        <p className="text-slate-300">No analytics data available</p>
       </div>
     );
   }
@@ -178,8 +178,8 @@ export default function UserAnalyticsDashboard() {
       <div className="bg-white rounded-lg shadow-sm p-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">User Analytics Dashboard</h1>
-            <p className="text-gray-600">Live analytics and performance metrics for {analytics.userName}</p>
+            <h1 className="text-2xl font-bold text-white">User Analytics Dashboard</h1>
+            <p className="text-slate-300">Live analytics and performance metrics for {analytics.userName}</p>
           </div>
           <div className="flex items-center space-x-4">
             <select
@@ -207,8 +207,8 @@ export default function UserAnalyticsDashboard() {
               <BarChart3 className="w-6 h-6" />
             </div>
             <div className="ml-4">
-              <p className="text-sm text-gray-600">Total RFQs</p>
-              <p className="text-2xl font-bold text-gray-900">{analytics.metrics.totalRFQs}</p>
+              <p className="text-sm text-slate-300">Total RFQs</p>
+              <p className="text-2xl font-bold text-white">{analytics.metrics.totalRFQs}</p>
             </div>
           </div>
         </div>
@@ -219,8 +219,8 @@ export default function UserAnalyticsDashboard() {
               <DollarSign className="w-6 h-6" />
             </div>
             <div className="ml-4">
-              <p className="text-sm text-gray-600">Total Spent</p>
-              <p className="text-2xl font-bold text-gray-900">{formatCurrency(analytics.metrics.totalSpent)}</p>
+              <p className="text-sm text-slate-300">Total Spent</p>
+              <p className="text-2xl font-bold text-white">{formatCurrency(analytics.metrics.totalSpent)}</p>
             </div>
           </div>
         </div>
@@ -231,8 +231,8 @@ export default function UserAnalyticsDashboard() {
               <TrendingUp className="w-6 h-6" />
             </div>
             <div className="ml-4">
-              <p className="text-sm text-gray-600">Success Rate</p>
-              <p className="text-2xl font-bold text-gray-900">{analytics.metrics.successRate}%</p>
+              <p className="text-sm text-slate-300">Success Rate</p>
+              <p className="text-2xl font-bold text-white">{analytics.metrics.successRate}%</p>
             </div>
           </div>
         </div>
@@ -243,8 +243,8 @@ export default function UserAnalyticsDashboard() {
               <Award className="w-6 h-6" />
             </div>
             <div className="ml-4">
-              <p className="text-sm text-gray-600">Trust Score</p>
-              <p className="text-2xl font-bold text-gray-900">{analytics.metrics.trustScore}</p>
+              <p className="text-sm text-slate-300">Trust Score</p>
+              <p className="text-2xl font-bold text-white">{analytics.metrics.trustScore}</p>
             </div>
           </div>
         </div>
@@ -252,13 +252,13 @@ export default function UserAnalyticsDashboard() {
 
       {/* Live Features Status */}
       <div className="bg-white rounded-lg shadow-sm p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Live Features Status</h2>
+        <h2 className="text-lg font-semibold text-white mb-4">Live Features Status</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {Object.entries(analytics.liveFeatures).map(([feature, isActive]) => (
             <div key={feature} className="flex items-center justify-between p-4 border rounded-lg">
               <div className="flex items-center">
                 <div className={`w-3 h-3 rounded-full mr-3 ${isActive ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                <span className="text-sm font-medium text-gray-900 capitalize">
+                <span className="text-sm font-medium text-white capitalize">
                   {feature.replace(/([A-Z])/g, ' $1').trim()}
                 </span>
               </div>
@@ -275,40 +275,40 @@ export default function UserAnalyticsDashboard() {
       {/* Performance Metrics */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-lg shadow-sm p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Performance Metrics</h3>
+          <h3 className="text-lg font-semibold text-white mb-4">Performance Metrics</h3>
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600">Response Time</span>
-              <span className="text-sm font-medium text-gray-900">{analytics.metrics.responseTime}h avg</span>
+              <span className="text-sm text-slate-300">Response Time</span>
+              <span className="text-sm font-medium text-white">{analytics.metrics.responseTime}h avg</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600">Active RFQs</span>
-              <span className="text-sm font-medium text-gray-900">{analytics.metrics.activeRFQs}</span>
+              <span className="text-sm text-slate-300">Active RFQs</span>
+              <span className="text-sm font-medium text-white">{analytics.metrics.activeRFQs}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600">Completed Transactions</span>
-              <span className="text-sm font-medium text-gray-900">{analytics.metrics.completedTransactions}</span>
+              <span className="text-sm text-slate-300">Completed Transactions</span>
+              <span className="text-sm font-medium text-white">{analytics.metrics.completedTransactions}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600">Total Earned</span>
-              <span className="text-sm font-medium text-gray-900">{formatCurrency(analytics.metrics.totalEarned)}</span>
+              <span className="text-sm text-slate-300">Total Earned</span>
+              <span className="text-sm font-medium text-white">{formatCurrency(analytics.metrics.totalEarned)}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600">Last Activity</span>
-              <span className="text-sm font-medium text-gray-900">{analytics.metrics.lastActivity}</span>
+              <span className="text-sm text-slate-300">Last Activity</span>
+              <span className="text-sm font-medium text-white">{analytics.metrics.lastActivity}</span>
             </div>
           </div>
         </div>
 
         <div className="bg-white rounded-lg shadow-sm p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
+          <h3 className="text-lg font-semibold text-white mb-4">Recent Activity</h3>
           <div className="space-y-3">
             {analytics.recentActivity.map((activity) => (
-              <div key={activity.id} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+              <div key={activity.id} className="flex items-center space-x-3 p-3 bg-slate-900 rounded-lg">
                 {getStatusIcon(activity.status)}
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">{activity.description}</p>
-                  <p className="text-xs text-gray-500">{activity.timestamp}</p>
+                  <p className="text-sm font-medium text-white">{activity.description}</p>
+                  <p className="text-xs text-slate-400">{activity.timestamp}</p>
                 </div>
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(activity.status)}`}>
                   {activity.status}
@@ -321,19 +321,19 @@ export default function UserAnalyticsDashboard() {
 
       {/* User Profile Summary */}
       <div className="bg-white rounded-lg shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">User Profile Summary</h3>
+        <h3 className="text-lg font-semibold text-white mb-4">User Profile Summary</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
-            <p className="text-sm text-gray-600">User Type</p>
-            <p className="text-lg font-semibold text-gray-900 capitalize">{analytics.userType}</p>
+            <p className="text-sm text-slate-300">User Type</p>
+            <p className="text-lg font-semibold text-white capitalize">{analytics.userType}</p>
           </div>
           <div>
-            <p className="text-sm text-gray-600">Plan</p>
-            <p className="text-lg font-semibold text-gray-900">{analytics.plan}</p>
+            <p className="text-sm text-slate-300">Plan</p>
+            <p className="text-lg font-semibold text-white">{analytics.plan}</p>
           </div>
           <div>
-            <p className="text-sm text-gray-600">Member Since</p>
-            <p className="text-lg font-semibold text-gray-900">{analytics.joinDate}</p>
+            <p className="text-sm text-slate-300">Member Since</p>
+            <p className="text-lg font-semibold text-white">{analytics.joinDate}</p>
           </div>
         </div>
       </div>

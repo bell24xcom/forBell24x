@@ -35,9 +35,9 @@ function renderValue(v: number | boolean): React.ReactNode {
   if (typeof v === 'boolean') {
     return v
       ? <span className="text-green-400 font-semibold">✓ Yes</span>
-      : <span className="text-slate-600">✗ No</span>;
+      : <span className="text-slate-300">✗ No</span>;
   }
-  if (v === 0) return <span className="text-slate-600">0</span>;
+  if (v === 0) return <span className="text-slate-300">0</span>;
   return <span className="text-white font-semibold">{fmt(v)}</span>;
 }
 

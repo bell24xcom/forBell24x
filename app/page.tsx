@@ -244,7 +244,7 @@ function VideoDemoContent() {
     <div className="flex flex-col items-center justify-center h-full space-y-6">
       {/* Camera Visual */}
       <div className="relative w-full max-w-md aspect-video bg-slate-900 rounded-xl border-2 border-slate-700 flex items-center justify-center overflow-hidden">
-        <Video className="w-16 h-16 text-slate-600" />
+        <Video className="w-16 h-16 text-slate-300" />
         {isRecording && (
           <div className="absolute top-4 right-4 flex items-center gap-2 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium">
             <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
@@ -516,7 +516,7 @@ function CategoriesSection() {
                   {cat.rfqs.toLocaleString()} RFQs &middot; {cat.subcategories} subcategories
                 </p>
               </div>
-              <ChevronRight className="w-4 h-4 text-slate-600 group-hover:text-blue-400 transition-colors" />
+              <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-blue-400 transition-colors" />
             </Link>
           ))}
         </div>

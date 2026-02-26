@@ -180,14 +180,14 @@ export default function CRMPage() {
                   <td className="px-4 py-3 text-xs">
                     {u.gstNumber
                       ? <span className="text-green-400" title={u.gstNumber}>✓ {u.gstNumber.slice(0, 6)}…</span>
-                      : <span className="text-slate-600">—</span>}
+                      : <span className="text-slate-300">—</span>}
                   </td>
 
                   {/* Udyam */}
                   <td className="px-4 py-3 text-xs">
                     {u.udyamNumber
                       ? <span className="text-green-400" title={u.udyamNumber}>✓</span>
-                      : <span className="text-slate-600">—</span>}
+                      : <span className="text-slate-300">—</span>}
                   </td>
 
                   {/* RFQs */}

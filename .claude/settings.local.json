@@ -13,7 +13,10 @@
       "Bash(move:*)",
       "Bash(find:*)",
       "Bash(npx tsc:*)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(git diff:*)",
+      "Bash(git status:*)",
+      "Bash(grep:*)"
     ]
   }
 }

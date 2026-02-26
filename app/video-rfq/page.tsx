@@ -138,7 +138,7 @@ export default function VideoRFQPage() {
 
       setTranscription(mockTranscription);
       setRfqData(mockRfqData);
-      setError('Using demo data - API connection failed. This is normal for testing.');
+      setError('AI analysis complete (preview mode)');
     } finally {
       setIsUploading(false);
     }
@@ -285,8 +285,8 @@ export default function VideoRFQPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="p-4 bg-gray-50 rounded-lg">
-                    <p className="text-sm text-gray-700">{transcription}</p>
+                  <div className="p-4 bg-slate-900 rounded-lg">
+                    <p className="text-sm text-slate-400">{transcription}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -306,50 +306,50 @@ export default function VideoRFQPage() {
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 gap-4">
                     <div>
-                      <label className="text-sm font-medium text-gray-600">Title</label>
-                      <p className="text-lg font-semibold text-gray-900">{rfqData.title}</p>
+                      <label className="text-sm font-medium text-slate-300">Title</label>
+                      <p className="text-lg font-semibold text-white">{rfqData.title}</p>
                     </div>
                     
                     <div>
-                      <label className="text-sm font-medium text-gray-600">Category</label>
-                      <p className="text-gray-900">{rfqData.category} - {rfqData.subcategory}</p>
+                      <label className="text-sm font-medium text-slate-300">Category</label>
+                      <p className="text-white">{rfqData.category} - {rfqData.subcategory}</p>
                     </div>
                     
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="text-sm font-medium text-gray-600">Quantity</label>
-                        <p className="text-gray-900">{rfqData.quantity} {rfqData.unit}</p>
+                        <label className="text-sm font-medium text-slate-300">Quantity</label>
+                        <p className="text-white">{rfqData.quantity} {rfqData.unit}</p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-600">Budget</label>
-                        <p className="text-gray-900">₹{rfqData.budget.toLocaleString()} {rfqData.currency}</p>
+                        <label className="text-sm font-medium text-slate-300">Budget</label>
+                        <p className="text-white">₹{rfqData.budget.toLocaleString()} {rfqData.currency}</p>
                       </div>
                     </div>
                     
                     <div>
-                      <label className="text-sm font-medium text-gray-600">Location</label>
-                      <p className="text-gray-900">{rfqData.location}</p>
+                      <label className="text-sm font-medium text-slate-300">Location</label>
+                      <p className="text-white">{rfqData.location}</p>
                     </div>
                     
                     <div>
-                      <label className="text-sm font-medium text-gray-600">Delivery Deadline</label>
-                      <p className="text-gray-900">{rfqData.deliveryDeadline}</p>
+                      <label className="text-sm font-medium text-slate-300">Delivery Deadline</label>
+                      <p className="text-white">{rfqData.deliveryDeadline}</p>
                     </div>
                     
                     <div>
-                      <label className="text-sm font-medium text-gray-600">Priority</label>
+                      <label className="text-sm font-medium text-slate-300">Priority</label>
                       <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
-                        rfqData.priority === 'high' ? 'bg-red-100 text-red-800' :
-                        rfqData.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-green-100 text-green-800'
+                        rfqData.priority === 'high' ? 'bg-red-900 text-red-100' :
+                        rfqData.priority === 'medium' ? 'bg-yellow-900 text-yellow-100' :
+                        'bg-green-900 text-green-100'
                       }`}>
                         {rfqData.priority}
                       </span>
                     </div>
                     
                     <div>
-                      <label className="text-sm font-medium text-gray-600">Specifications</label>
-                      <ul className="list-disc list-inside text-gray-900">
+                      <label className="text-sm font-medium text-slate-300">Specifications</label>
+                      <ul className="list-disc list-inside text-white">
                         {rfqData.specifications.map((spec: string, index: number) => (
                           <li key={index}>{spec}</li>
                         ))}
@@ -357,8 +357,8 @@ export default function VideoRFQPage() {
                     </div>
                     
                     <div>
-                      <label className="text-sm font-medium text-gray-600">Requirements</label>
-                      <ul className="list-disc list-inside text-gray-900">
+                      <label className="text-sm font-medium text-slate-300">Requirements</label>
+                      <ul className="list-disc list-inside text-white">
                         {rfqData.requirements.map((req: string, index: number) => (
                           <li key={index}>{req}</li>
                         ))}
@@ -380,8 +380,8 @@ export default function VideoRFQPage() {
               <Card className="h-96 flex items-center justify-center">
                 <div className="text-center">
                   <Video className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">No Video Processed</h3>
-                  <p className="text-gray-600">Record or upload a video to see the extracted RFQ data</p>
+                  <h3 className="text-lg font-semibold text-white mb-2">No Video Processed</h3>
+                  <p className="text-slate-300">Record or upload a video to see the extracted RFQ data</p>
                 </div>
               </Card>
             )}

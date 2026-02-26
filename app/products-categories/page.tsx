@@ -78,12 +78,12 @@ export default function ProductsCategoriesPage() {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-slate-900">
         {/* Hero Section */}
         <section className="bg-white py-12">
           <div className="container mx-auto px-4">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">Product Categories</h1>
-            <p className="text-lg text-gray-600 mb-8">
+            <h1 className="text-4xl font-bold text-white mb-4">Product Categories</h1>
+            <p className="text-lg text-slate-300 mb-8">
               Browse products by category to find exactly what you need
             </p>
           </div>
@@ -117,11 +117,11 @@ export default function ProductsCategoriesPage() {
                       />
                     </div>
                     <div className="p-6">
-                      <h3 className="text-xl font-semibold text-gray-900 mb-2">{category.name}</h3>
-                      <p className="text-gray-600 mb-4">{category.description}</p>
+                      <h3 className="text-xl font-semibold text-white mb-2">{category.name}</h3>
+                      <p className="text-slate-300 mb-4">{category.description}</p>
                       
                       <div className="mb-4">
-                        <p className="text-sm font-medium text-gray-700 mb-2">Subcategories:</p>
+                        <p className="text-sm font-medium text-slate-400 mb-2">Subcategories:</p>
                         <div className="flex flex-wrap gap-1">
                           {category.subcategories.map((sub, index) => (
                             <span key={index} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
@@ -132,7 +132,7 @@ export default function ProductsCategoriesPage() {
                       </div>
                       
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-500">
+                        <span className="text-sm text-slate-400">
                           {category.productCount.toLocaleString()} products
                         </span>
                         <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">

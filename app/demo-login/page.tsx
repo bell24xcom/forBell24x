@@ -83,11 +83,11 @@ export default function DemoLoginPage() {
             <div className="w-12 h-12 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-2xl">B</div>
             <div>
               <div className="font-bold text-2xl">Bell24h</div>
-              <div className="text-sm text-neutral-600">Verified B2B Platform</div>
+              <div className="text-sm text-slate-300">Verified B2B Platform</div>
             </div>
           </Link>
           <h1 className="text-3xl font-bold text-neutral-900 mb-2">Login with OTP</h1>
-          <p className="text-neutral-600">Secure mobile authentication</p>
+          <p className="text-slate-300">Secure mobile authentication</p>
         </div>
 
         {/* Info */}
@@ -130,7 +130,7 @@ export default function DemoLoginPage() {
                   pattern="[0-9]{10}"
                   maxLength={10}
                 />
-                <p className="text-xs text-neutral-500 mt-1">
+                <p className="text-xs text-slate-400 mt-1">
                   Demo: Use any 10-digit number (e.g., 9876543210)
                 </p>
               </div>
@@ -195,7 +195,7 @@ export default function DemoLoginPage() {
                 <button
                   type="button"
                   onClick={() => setStep('phone')}
-                  className="flex-1 border border-neutral-300 text-neutral-700 py-3 rounded-lg hover:bg-neutral-50 transition-colors"
+                  className="flex-1 border border-neutral-300 text-slate-400 py-3 rounded-lg hover:bg-neutral-50 transition-colors"
                 >
                   Back
                 </button>
@@ -228,7 +228,7 @@ export default function DemoLoginPage() {
             </div>
             <h2 className="text-2xl font-semibold text-neutral-900 mb-2">Login Successful!</h2>
             <p className="feature-description">Welcome to Bell24h Demo</p>
-            <p className="text-sm text-neutral-500">Redirecting to dashboard...</p>
+            <p className="text-sm text-slate-400">Redirecting to dashboard...</p>
           </div>
         )}
 
@@ -236,16 +236,16 @@ export default function DemoLoginPage() {
         <div className="mt-6 text-center">
           <p className="text-sm feature-description">Quick Access:</p>
           <div className="flex flex-wrap gap-2 justify-center">
-            <Link href="/marketplace" className="px-4 py-2 bg-white text-neutral-700 rounded-lg hover:bg-neutral-50 transition-colors text-sm">
+            <Link href="/marketplace" className="px-4 py-2 bg-white text-slate-400 rounded-lg hover:bg-neutral-50 transition-colors text-sm">
               Marketplace
             </Link>
-            <Link href="/suppliers" className="px-4 py-2 bg-white text-neutral-700 rounded-lg hover:bg-neutral-50 transition-colors text-sm">
+            <Link href="/suppliers" className="px-4 py-2 bg-white text-slate-400 rounded-lg hover:bg-neutral-50 transition-colors text-sm">
               Suppliers
             </Link>
-            <Link href="/admin" className="px-4 py-2 bg-white text-neutral-700 rounded-lg hover:bg-neutral-50 transition-colors text-sm">
+            <Link href="/admin" className="px-4 py-2 bg-white text-slate-400 rounded-lg hover:bg-neutral-50 transition-colors text-sm">
               Admin
             </Link>
-            <Link href="/test-live" className="px-4 py-2 bg-white text-neutral-700 rounded-lg hover:bg-neutral-50 transition-colors text-sm">
+            <Link href="/test-live" className="px-4 py-2 bg-white text-slate-400 rounded-lg hover:bg-neutral-50 transition-colors text-sm">
               Test APIs
             </Link>
           </div>

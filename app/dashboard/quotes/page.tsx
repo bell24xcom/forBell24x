@@ -34,11 +34,11 @@ const QUOTE_STATUS_CONFIG: Record<QuoteStatus, { label: string; classes: string 
   PENDING: { label: 'Pending', classes: 'bg-yellow-100 text-yellow-800' },
   ACCEPTED: { label: 'Accepted', classes: 'bg-green-100 text-green-800' },
   REJECTED: { label: 'Rejected', classes: 'bg-red-100 text-red-700' },
-  EXPIRED: { label: 'Expired', classes: 'bg-gray-100 text-gray-600' },
+  EXPIRED: { label: 'Expired', classes: 'bg-slate-800 text-slate-300' },
 };
 
 function QuoteStatusBadge({ status }: { status: QuoteStatus }) {
-  const cfg = QUOTE_STATUS_CONFIG[status] ?? { label: status, classes: 'bg-gray-100 text-gray-700' };
+  const cfg = QUOTE_STATUS_CONFIG[status] ?? { label: status, classes: 'bg-slate-800 text-slate-400' };
   return (
     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${cfg.classes}`}>
       {cfg.label}
@@ -137,7 +137,7 @@ export default function MyQuotesPage() {
           <Link href="/dashboard" className="text-blue-400 hover:text-blue-300 transition-colors">
             Dashboard
           </Link>
-          <ChevronRight className="w-4 h-4 text-gray-500" />
+          <ChevronRight className="w-4 h-4 text-slate-400" />
           <span className="text-gray-300">My Quotes</span>
         </nav>
 
@@ -211,7 +211,7 @@ export default function MyQuotesPage() {
             <div className="px-6 py-4 border-b border-gray-100 grid grid-cols-2 sm:grid-cols-4 gap-4">
               {(
                 [
-                  { label: 'Total', value: quotes.length, color: 'text-gray-900' },
+                  { label: 'Total', value: quotes.length, color: 'text-white' },
                   { label: 'Pending', value: quotes.filter(q => q.status === 'PENDING').length, color: 'text-yellow-600' },
                   { label: 'Accepted', value: quotes.filter(q => q.status === 'ACCEPTED').length, color: 'text-green-600' },
                   { label: 'Rejected', value: quotes.filter(q => q.status === 'REJECTED').length, color: 'text-red-600' },
@@ -219,7 +219,7 @@ export default function MyQuotesPage() {
               ).map(stat => (
                 <div key={stat.label} className="text-center">
                   <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
-                  <p className="text-xs text-gray-500">{stat.label}</p>
+                  <p className="text-xs text-slate-400">{stat.label}</p>
                 </div>
               ))}
             </div>
@@ -227,12 +227,12 @@ export default function MyQuotesPage() {
 
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-100">
-              <thead className="bg-gray-50">
+              <thead className="bg-slate-900">
                 <tr>
                   {['RFQ Title', 'Supplier / Company', 'Price', 'Timeline', 'Status', 'Actions'].map(h => (
                     <th
                       key={h}
-                      className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider"
+                      className="px-6 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider"
                     >
                       {h}
                     </th>
@@ -256,8 +256,8 @@ export default function MyQuotesPage() {
                           <MessageSquare className="w-8 h-8 text-yellow-400" />
                         </div>
                         <div>
-                          <p className="text-gray-800 font-semibold text-lg">No quotes received yet</p>
-                          <p className="text-gray-500 text-sm mt-1">
+                          <p className="text-slate-100 font-semibold text-lg">No quotes received yet</p>
+                          <p className="text-slate-400 text-sm mt-1">
                             Post an RFQ to start receiving quotes from verified suppliers.
                           </p>
                         </div>
@@ -273,20 +273,20 @@ export default function MyQuotesPage() {
                 )}
 
                 {!loading && !error && quotes.map(quote => (
-                  <tr key={quote.id} className="hover:bg-gray-50 transition-colors">
+                  <tr key={quote.id} className="hover:bg-slate-900 transition-colors">
                     <td className="px-6 py-4">
-                      <p className="text-sm font-medium text-gray-900 max-w-[200px] truncate">{quote.rfqTitle}</p>
-                      <p className="text-xs text-gray-500 mt-0.5">{quote.rfqCategory}</p>
+                      <p className="text-sm font-medium text-white max-w-[200px] truncate">{quote.rfqTitle}</p>
+                      <p className="text-xs text-slate-400 mt-0.5">{quote.rfqCategory}</p>
                     </td>
                     <td className="px-6 py-4">
-                      <p className="text-sm font-medium text-gray-900">{quote.supplierName}</p>
-                      <p className="text-xs text-gray-500 mt-0.5">{quote.supplierCompany}</p>
+                      <p className="text-sm font-medium text-white">{quote.supplierName}</p>
+                      <p className="text-xs text-slate-400 mt-0.5">{quote.supplierCompany}</p>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="text-sm font-semibold text-gray-900">{formatPrice(quote.price)}</span>
+                      <span className="text-sm font-semibold text-white">{formatPrice(quote.price)}</span>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="text-sm text-gray-600">{quote.timeline ?? '—'}</span>
+                      <span className="text-sm text-slate-300">{quote.timeline ?? '—'}</span>
                     </td>
                     <td className="px-6 py-4">
                       <QuoteStatusBadge status={quote.status} />

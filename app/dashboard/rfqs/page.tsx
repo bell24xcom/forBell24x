@@ -26,14 +26,14 @@ interface RFQItem {
 const STATUS_CONFIG: Record<RFQStatus, { label: string; classes: string }> = {
   ACTIVE: { label: 'Active', classes: 'bg-green-100 text-green-800' },
   QUOTED: { label: 'Quoted', classes: 'bg-blue-100 text-blue-800' },
-  COMPLETED: { label: 'Completed', classes: 'bg-gray-100 text-gray-700' },
+  COMPLETED: { label: 'Completed', classes: 'bg-slate-800 text-slate-400' },
   EXPIRED: { label: 'Expired', classes: 'bg-red-100 text-red-700' },
   CANCELLED: { label: 'Cancelled', classes: 'bg-red-100 text-red-700' },
   DRAFT: { label: 'Draft', classes: 'bg-yellow-100 text-yellow-800' },
 };
 
 function StatusBadge({ status }: { status: RFQStatus }) {
-  const config = STATUS_CONFIG[status] ?? { label: status, classes: 'bg-gray-100 text-gray-700' };
+  const config = STATUS_CONFIG[status] ?? { label: status, classes: 'bg-slate-800 text-slate-400' };
   return (
     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.classes}`}>
       {config.label}
@@ -103,7 +103,7 @@ export default function MyRFQsPage() {
           <Link href="/dashboard" className="text-blue-400 hover:text-blue-300 transition-colors">
             Dashboard
           </Link>
-          <ChevronRight className="w-4 h-4 text-gray-500" />
+          <ChevronRight className="w-4 h-4 text-slate-400" />
           <span className="text-gray-300">My RFQs</span>
         </nav>
 
@@ -156,15 +156,15 @@ export default function MyRFQsPage() {
             <div className="px-6 py-4 border-b border-gray-100 grid grid-cols-2 sm:grid-cols-4 gap-4">
               {(
                 [
-                  { label: 'Total', value: rfqs.length, color: 'text-gray-900' },
+                  { label: 'Total', value: rfqs.length, color: 'text-white' },
                   { label: 'Active', value: rfqs.filter(r => r.status === 'ACTIVE').length, color: 'text-green-600' },
                   { label: 'Quoted', value: rfqs.filter(r => r.status === 'QUOTED').length, color: 'text-blue-600' },
-                  { label: 'Completed', value: rfqs.filter(r => r.status === 'COMPLETED').length, color: 'text-gray-500' },
+                  { label: 'Completed', value: rfqs.filter(r => r.status === 'COMPLETED').length, color: 'text-slate-400' },
                 ] as const
               ).map(stat => (
                 <div key={stat.label} className="text-center">
                   <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
-                  <p className="text-xs text-gray-500">{stat.label}</p>
+                  <p className="text-xs text-slate-400">{stat.label}</p>
                 </div>
               ))}
             </div>
@@ -173,12 +173,12 @@ export default function MyRFQsPage() {
           {/* Table */}
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-100">
-              <thead className="bg-gray-50">
+              <thead className="bg-slate-900">
                 <tr>
                   {['Title', 'Category', 'Status', 'Quotes', 'Budget', 'Created'].map(h => (
                     <th
                       key={h}
-                      className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider"
+                      className="px-6 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider"
                     >
                       {h}
                     </th>
@@ -203,8 +203,8 @@ export default function MyRFQsPage() {
                           <FileText className="w-8 h-8 text-blue-400" />
                         </div>
                         <div>
-                          <p className="text-gray-800 font-semibold text-lg">No RFQs yet</p>
-                          <p className="text-gray-500 text-sm mt-1">
+                          <p className="text-slate-100 font-semibold text-lg">No RFQs yet</p>
+                          <p className="text-slate-400 text-sm mt-1">
                             Post your first Request for Quotation and get quotes from verified suppliers.
                           </p>
                         </div>
@@ -221,19 +221,19 @@ export default function MyRFQsPage() {
                 )}
 
                 {!loading && !error && rfqs.map(rfq => (
-                  <tr key={rfq.id} className="hover:bg-gray-50 transition-colors">
+                  <tr key={rfq.id} className="hover:bg-slate-900 transition-colors">
                     <td className="px-6 py-4">
                       <div className="max-w-xs">
-                        <p className="text-sm font-medium text-gray-900 truncate">{rfq.title}</p>
+                        <p className="text-sm font-medium text-white truncate">{rfq.title}</p>
                         {rfq.quantity != null && (
-                          <p className="text-xs text-gray-500 mt-0.5">
+                          <p className="text-xs text-slate-400 mt-0.5">
                             {rfq.quantity} {rfq.unit}
                           </p>
                         )}
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="text-sm text-gray-600">{rfq.category}</span>
+                      <span className="text-sm text-slate-300">{rfq.category}</span>
                     </td>
                     <td className="px-6 py-4">
                       <StatusBadge status={rfq.status} />
@@ -244,12 +244,12 @@ export default function MyRFQsPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="text-sm text-gray-700 whitespace-nowrap">
+                      <span className="text-sm text-slate-400 whitespace-nowrap">
                         {formatBudget(rfq.minBudget, rfq.maxBudget)}
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="text-sm text-gray-500 whitespace-nowrap">
+                      <span className="text-sm text-slate-400 whitespace-nowrap">
                         {formatDate(rfq.createdAt)}
                       </span>
                     </td>

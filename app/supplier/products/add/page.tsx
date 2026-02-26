@@ -237,7 +237,7 @@ export default function AddProductPage() {
                 className="w-full px-3 py-2 border border-slate-700 bg-slate-800 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 onChange={handleImageChange}
               />
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="mt-1 text-sm text-slate-400">
                 Upload multiple images (JPG, PNG, GIF)
               </p>
             </div>

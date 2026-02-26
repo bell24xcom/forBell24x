@@ -71,7 +71,7 @@ function ContactListItem({
     <button
       onClick={onClick}
       className={`w-full text-left px-4 py-3 flex items-start gap-3 transition-colors ${
-        isSelected ? 'bg-blue-50 border-r-2 border-blue-600' : 'hover:bg-gray-50'
+        isSelected ? 'bg-blue-50 border-r-2 border-blue-600' : 'hover:bg-slate-900'
       }`}
     >
       <div
@@ -81,10 +81,10 @@ function ContactListItem({
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between">
-          <p className="text-sm font-medium text-gray-900 truncate">{contact.name}</p>
+          <p className="text-sm font-medium text-white truncate">{contact.name}</p>
           <span className="text-xs text-gray-400 flex-shrink-0 ml-2">{contact.time}</span>
         </div>
-        <p className="text-xs text-gray-500 truncate mt-0.5">{contact.company}</p>
+        <p className="text-xs text-slate-400 truncate mt-0.5">{contact.company}</p>
         <p className="text-xs text-gray-400 truncate mt-0.5">{contact.lastMessage}</p>
       </div>
       {contact.unread > 0 && (
@@ -125,7 +125,7 @@ export default function MessagesPage() {
           <Link href="/dashboard" className="text-blue-400 hover:text-blue-300 transition-colors">
             Dashboard
           </Link>
-          <ChevronRight className="w-4 h-4 text-gray-500" />
+          <ChevronRight className="w-4 h-4 text-slate-400" />
           <span className="text-gray-300">Messages</span>
         </nav>
 
@@ -180,7 +180,7 @@ export default function MessagesPage() {
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
                   placeholder="Search contacts..."
-                  className="w-full pl-9 pr-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full pl-9 pr-3 py-2 text-sm bg-slate-900 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
             </div>
@@ -216,8 +216,8 @@ export default function MessagesPage() {
                     {selectedContact.initials}
                   </div>
                   <div>
-                    <p className="font-semibold text-gray-900 text-sm">{selectedContact.name}</p>
-                    <p className="text-xs text-gray-500">{selectedContact.company}</p>
+                    <p className="font-semibold text-white text-sm">{selectedContact.name}</p>
+                    <p className="text-xs text-slate-400">{selectedContact.company}</p>
                   </div>
                   <div className="ml-auto flex items-center gap-1.5 text-xs text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full">
                     <Info className="w-3.5 h-3.5" />
@@ -234,8 +234,8 @@ export default function MessagesPage() {
                     >
                       {selectedContact.initials}
                     </div>
-                    <div className="bg-gray-100 rounded-2xl rounded-bl-none px-4 py-3">
-                      <p className="text-sm text-gray-800">{selectedContact.lastMessage}</p>
+                    <div className="bg-slate-800 rounded-2xl rounded-bl-none px-4 py-3">
+                      <p className="text-sm text-slate-100">{selectedContact.lastMessage}</p>
                       <p className="text-xs text-gray-400 mt-1">{selectedContact.time}</p>
                     </div>
                   </div>
@@ -265,7 +265,7 @@ export default function MessagesPage() {
                       onChange={e => setDraftMessage(e.target.value)}
                       placeholder="Type a message... (messaging not yet active)"
                       disabled
-                      className="flex-1 px-4 py-2.5 text-sm bg-gray-50 border border-gray-200 rounded-lg text-gray-400 cursor-not-allowed"
+                      className="flex-1 px-4 py-2.5 text-sm bg-slate-900 border border-gray-200 rounded-lg text-gray-400 cursor-not-allowed"
                     />
                     <button
                       disabled
@@ -284,8 +284,8 @@ export default function MessagesPage() {
                     <MessageCircle className="w-10 h-10 text-blue-400" />
                   </div>
                   <div>
-                    <h3 className="text-gray-900 font-semibold text-lg">No messages yet</h3>
-                    <p className="text-gray-500 text-sm mt-2">
+                    <h3 className="text-white font-semibold text-lg">No messages yet</h3>
+                    <p className="text-slate-400 text-sm mt-2">
                       Select a conversation from the sidebar, or wait for suppliers to reach out once messaging launches.
                     </p>
                   </div>

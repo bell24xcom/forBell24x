@@ -227,7 +227,7 @@ export default function PhoneEmailAuth() {
                 <Shield className="w-8 h-8 text-blue-600" />
               </div>
               <h1 className="text-2xl font-bold text-neutral-900">Bell24h Login</h1>
-              <p className="text-neutral-600 mt-2">
+              <p className="text-slate-300 mt-2">
                 {step === 'phone' ? 'Enter your mobile number to continue' : 'Enter the OTP sent to your phone'}
               </p>
             </div>
@@ -258,7 +258,7 @@ export default function PhoneEmailAuth() {
                     Mobile Number
                   </label>
                   <div className="flex">
-                    <span className="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-neutral-300 bg-neutral-50 text-neutral-500">
+                    <span className="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-neutral-300 bg-neutral-50 text-slate-400">
                       +91
                     </span>
                     <input
@@ -328,7 +328,7 @@ export default function PhoneEmailAuth() {
             {/* Service Information */}
             <div className="mt-8 bg-neutral-50 rounded-lg p-4">
               <h3 className="text-sm font-semibold text-neutral-900 mb-2">Our Services</h3>
-              <div className="space-y-1 text-sm text-neutral-600">
+              <div className="space-y-1 text-sm text-slate-300">
                 <div className="flex items-center">
                   <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
                   <span>Supplier Verification - &#8377;2,000</span>
@@ -346,7 +346,7 @@ export default function PhoneEmailAuth() {
 
             {/* WhatsApp Contact */}
             <div className="mt-6 text-center">
-              <p className="text-sm text-neutral-600 mb-3">Need help? Contact us on WhatsApp</p>
+              <p className="text-sm text-slate-300 mb-3">Need help? Contact us on WhatsApp</p>
               <a
                 href="https://wa.me/919876543210?text=Hi, I need supplier verification service"
                 target="_blank"

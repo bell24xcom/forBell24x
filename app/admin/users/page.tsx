@@ -106,7 +106,7 @@ export default function UsersPage() {
       <div className="page-container flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-          <p className="mt-4 text-neutral-600">Loading users...</p>
+          <p className="mt-4 text-slate-300">Loading users...</p>
         </div>
       </div>
     );
@@ -138,7 +138,7 @@ export default function UsersPage() {
           <div className="flex justify-between items-center py-6">
             <div>
               <h1 className="text-3xl font-bold text-neutral-900">User Management</h1>
-              <p className="text-neutral-600 mt-1">Manage suppliers, buyers, and user roles</p>
+              <p className="text-slate-300 mt-1">Manage suppliers, buyers, and user roles</p>
             </div>
           </div>
         </div>
@@ -151,7 +151,7 @@ export default function UsersPage() {
             <div className="bg-white rounded-xl shadow-lg p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-neutral-600">Total Users</p>
+                  <p className="text-sm font-medium text-slate-300">Total Users</p>
                   <p className="text-3xl font-bold text-neutral-900">{usersData.stats.totalUsers.toLocaleString()}</p>
                 </div>
                 <div className="p-3 bg-blue-100 rounded-lg">
@@ -163,7 +163,7 @@ export default function UsersPage() {
             <div className="bg-white rounded-xl shadow-lg p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-neutral-600">Buyers</p>
+                  <p className="text-sm font-medium text-slate-300">Buyers</p>
                   <p className="text-3xl font-bold text-neutral-900">{usersData.stats.buyers.toLocaleString()}</p>
                 </div>
                 <div className="p-3 bg-green-100 rounded-lg">
@@ -175,7 +175,7 @@ export default function UsersPage() {
             <div className="bg-white rounded-xl shadow-lg p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-neutral-600">Suppliers</p>
+                  <p className="text-sm font-medium text-slate-300">Suppliers</p>
                   <p className="text-3xl font-bold text-neutral-900">{usersData.stats.suppliers.toLocaleString()}</p>
                 </div>
                 <div className="p-3 bg-purple-100 rounded-lg">
@@ -187,7 +187,7 @@ export default function UsersPage() {
             <div className="bg-white rounded-xl shadow-lg p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-neutral-600">Active Users</p>
+                  <p className="text-sm font-medium text-slate-300">Active Users</p>
                   <p className="text-3xl font-bold text-neutral-900">{usersData.stats.activeUsers.toLocaleString()}</p>
                 </div>
                 <div className="p-3 bg-yellow-100 rounded-lg">
@@ -238,22 +238,22 @@ export default function UsersPage() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-neutral-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
                     User
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
                     Role
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
                     Activity
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
                     Joined
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
@@ -264,8 +264,8 @@ export default function UsersPage() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
                         <div className="text-sm font-medium text-neutral-900">{user.name}</div>
-                        <div className="text-sm text-neutral-500">{user.email}</div>
-                        <div className="text-sm text-neutral-500">{user.phone}</div>
+                        <div className="text-sm text-slate-400">{user.email}</div>
+                        <div className="text-sm text-slate-400">{user.phone}</div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -277,7 +277,7 @@ export default function UsersPage() {
                         {user.role}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">
                       <div>RFQs: {user._count.rfqs}</div>
                       <div>Leads: {user._count.leads}</div>
                       <div>Transactions: {user._count.transactions}</div>
@@ -289,7 +289,7 @@ export default function UsersPage() {
                         {user.isActive ? 'Active' : 'Inactive'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">
                       {new Date(user.createdAt).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -317,21 +317,21 @@ export default function UsersPage() {
                 <button
                   onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                   disabled={currentPage === 1}
-                  className="relative inline-flex items-center px-4 py-2 border border-neutral-300 text-sm font-medium rounded-md text-neutral-700 bg-white hover:bg-neutral-50 disabled:opacity-50"
+                  className="relative inline-flex items-center px-4 py-2 border border-neutral-300 text-sm font-medium rounded-md text-slate-400 bg-white hover:bg-neutral-50 disabled:opacity-50"
                 >
                   Previous
                 </button>
                 <button
                   onClick={() => setCurrentPage(Math.min(usersData.pagination.pages, currentPage + 1))}
                   disabled={currentPage === usersData.pagination.pages}
-                  className="ml-3 relative inline-flex items-center px-4 py-2 border border-neutral-300 text-sm font-medium rounded-md text-neutral-700 bg-white hover:bg-neutral-50 disabled:opacity-50"
+                  className="ml-3 relative inline-flex items-center px-4 py-2 border border-neutral-300 text-sm font-medium rounded-md text-slate-400 bg-white hover:bg-neutral-50 disabled:opacity-50"
                 >
                   Next
                 </button>
               </div>
               <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                 <div>
-                  <p className="text-sm text-neutral-700">
+                  <p className="text-sm text-slate-400">
                     Showing{' '}
                     <span className="font-medium">{(currentPage - 1) * usersData.pagination.limit + 1}</span>
                     {' '}to{' '}
@@ -348,14 +348,14 @@ export default function UsersPage() {
                     <button
                       onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                       disabled={currentPage === 1}
-                      className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-neutral-300 bg-white text-sm font-medium text-neutral-500 hover:bg-neutral-50 disabled:opacity-50"
+                      className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-neutral-300 bg-white text-sm font-medium text-slate-400 hover:bg-neutral-50 disabled:opacity-50"
                     >
                       Previous
                     </button>
                     <button
                       onClick={() => setCurrentPage(Math.min(usersData.pagination.pages, currentPage + 1))}
                       disabled={currentPage === usersData.pagination.pages}
-                      className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-neutral-300 bg-white text-sm font-medium text-neutral-500 hover:bg-neutral-50 disabled:opacity-50"
+                      className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-neutral-300 bg-white text-sm font-medium text-slate-400 hover:bg-neutral-50 disabled:opacity-50"
                     >
                       Next
                     </button>

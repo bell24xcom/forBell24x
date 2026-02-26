@@ -61,7 +61,7 @@ export default function RFQWritingServicePage() {
               <Edit3 className="w-8 h-8 text-blue-600" />
             </div>
             <h3 className="text-lg font-semibold text-neutral-900 mb-2">Professional Writing</h3>
-            <p className="text-neutral-600">Expertly crafted RFQs that attract quality suppliers</p>
+            <p className="text-slate-300">Expertly crafted RFQs that attract quality suppliers</p>
           </div>
 
           <div className="text-center">
@@ -69,7 +69,7 @@ export default function RFQWritingServicePage() {
               <FileText className="w-8 h-8 text-green-600" />
             </div>
             <h3 className="text-lg font-semibold text-neutral-900 mb-2">Detailed Specifications</h3>
-            <p className="text-neutral-600">Comprehensive requirements that get accurate quotes</p>
+            <p className="text-slate-300">Comprehensive requirements that get accurate quotes</p>
           </div>
 
           <div className="text-center">
@@ -77,7 +77,7 @@ export default function RFQWritingServicePage() {
               <Star className="w-8 h-8 text-purple-600" />
             </div>
             <h3 className="text-lg font-semibold text-neutral-900 mb-2">Better Results</h3>
-            <p className="text-neutral-600">Get more competitive quotes from quality suppliers</p>
+            <p className="text-slate-300">Get more competitive quotes from quality suppliers</p>
           </div>
         </div>
 
@@ -86,12 +86,12 @@ export default function RFQWritingServicePage() {
           <div className="text-center">
             <h2 className="page-title">Pricing</h2>
             <div className="text-5xl font-bold text-blue-600 mb-2">₹500</div>
-            <p className="text-neutral-600 mb-6">Per RFQ improvement</p>
+            <p className="text-slate-300 mb-6">Per RFQ improvement</p>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
               <div>
                 <h3 className="font-semibold text-neutral-900 mb-3">What's Included:</h3>
-                <ul className="space-y-2 text-neutral-600">
+                <ul className="space-y-2 text-slate-300">
                   <li className="flex items-center">
                     <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
                     Professional RFQ writing
@@ -117,7 +117,7 @@ export default function RFQWritingServicePage() {
               
               <div>
                 <h3 className="font-semibold text-neutral-900 mb-3">Delivery:</h3>
-                <ul className="space-y-2 text-neutral-600">
+                <ul className="space-y-2 text-slate-300">
                   <li className="flex items-center">
                     <Clock className="w-5 h-5 text-blue-500 mr-2" />
                     24 hours delivery
@@ -292,7 +292,7 @@ export default function RFQWritingServicePage() {
               >
                 Pay ₹500 & Get Professional RFQ
               </button>
-              <p className="text-sm text-neutral-500 mt-2">
+              <p className="text-sm text-slate-400 mt-2">
                 Payment processed securely via Razorpay • GST extra as applicable
               </p>
             </div>
@@ -313,7 +313,7 @@ export default function RFQWritingServicePage() {
                 <div className="w-10 h-10 bg-gray-300 rounded-full mr-3"></div>
                 <div>
                   <p className="font-semibold">Amit Patel</p>
-                  <p className="text-sm text-neutral-500">Manufacturing Company</p>
+                  <p className="text-sm text-slate-400">Manufacturing Company</p>
                 </div>
               </div>
             </div>
@@ -326,7 +326,7 @@ export default function RFQWritingServicePage() {
                 <div className="w-10 h-10 bg-gray-300 rounded-full mr-3"></div>
                 <div>
                   <p className="font-semibold">Sneha Reddy</p>
-                  <p className="text-sm text-neutral-500">Trading Company</p>
+                  <p className="text-sm text-slate-400">Trading Company</p>
                 </div>
               </div>
             </div>

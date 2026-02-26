@@ -42,7 +42,7 @@ export default class PageErrorBoundary extends Component<Props, State> {
             <h3 className="text-lg font-medium text-neutral-900 mb-2">
               Something went wrong
             </h3>
-            <p className="text-sm text-neutral-500 mb-4">
+            <p className="text-sm text-slate-400 mb-4">
               We're sorry, but something unexpected happened. Please try refreshing the page.
             </p>
             <div className="space-y-2">
@@ -61,7 +61,7 @@ export default class PageErrorBoundary extends Component<Props, State> {
             </div>
             {process.env.NODE_ENV === 'development' && this.state.error && (
               <details className="mt-4 text-left">
-                <summary className="text-sm text-neutral-500 cursor-pointer">
+                <summary className="text-sm text-slate-400 cursor-pointer">
                   Error Details (Development)
                 </summary>
                 <pre className="mt-2 text-xs text-red-600 bg-red-50 p-2 rounded overflow-auto">

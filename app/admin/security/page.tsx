@@ -141,7 +141,7 @@ export default function SecurityPage() {
       case 'system_change':
         return <Database className="h-4 w-4 text-purple-600" />;
       default:
-        return <Clock className="h-4 w-4 text-neutral-600" />;
+        return <Clock className="h-4 w-4 text-slate-300" />;
     }
   };
 
@@ -154,7 +154,7 @@ export default function SecurityPage() {
       case 'error':
         return 'text-red-600 bg-red-100';
       default:
-        return 'text-neutral-600 bg-neutral-100';
+        return 'text-slate-300 bg-neutral-100';
     }
   };
 
@@ -167,7 +167,7 @@ export default function SecurityPage() {
       case 'expired':
         return 'text-red-600 bg-red-100';
       default:
-        return 'text-neutral-600 bg-neutral-100';
+        return 'text-slate-300 bg-neutral-100';
     }
   };
 
@@ -177,7 +177,7 @@ export default function SecurityPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-neutral-900">Security & Compliance</h1>
-          <p className="mt-2 text-neutral-600">Monitor security events, user access, and compliance status</p>
+          <p className="mt-2 text-slate-300">Monitor security events, user access, and compliance status</p>
         </div>
 
         {/* Tab Navigation */}
@@ -194,7 +194,7 @@ export default function SecurityPage() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${activeTab === tab.id
                     ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-neutral-500 hover:text-neutral-700 hover:border-neutral-300'
+                    : 'border-transparent text-slate-400 hover:text-slate-400 hover:border-neutral-300'
                   }`}
               >
                 <tab.icon className="w-5 h-5" />
@@ -216,7 +216,7 @@ export default function SecurityPage() {
                       <metric.icon className={`h-6 w-6 ${metric.color}`} />
                     </div>
                     <div className="ml-4">
-                      <p className="text-sm font-medium text-neutral-600">{metric.name}</p>
+                      <p className="text-sm font-medium text-slate-300">{metric.name}</p>
                       <p className="text-2xl font-bold text-neutral-900">{metric.value}</p>
                     </div>
                   </div>
@@ -229,7 +229,7 @@ export default function SecurityPage() {
               <h3 className="text-lg font-medium text-neutral-900 mb-4">Security Status</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <h4 className="text-sm font-medium text-neutral-600 mb-2">Authentication</h4>
+                  <h4 className="text-sm font-medium text-slate-300 mb-2">Authentication</h4>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-neutral-900">2FA Enabled</span>
@@ -246,7 +246,7 @@ export default function SecurityPage() {
                   </div>
                 </div>
                 <div>
-                  <h4 className="text-sm font-medium text-neutral-600 mb-2">Data Protection</h4>
+                  <h4 className="text-sm font-medium text-slate-300 mb-2">Data Protection</h4>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-neutral-900">Data Encryption</span>
@@ -281,7 +281,7 @@ export default function SecurityPage() {
                       {getEventIcon(event.type)}
                       <div className="ml-4">
                         <p className="text-sm font-medium text-neutral-900">{event.description}</p>
-                        <p className="text-sm text-neutral-500">
+                        <p className="text-sm text-slate-400">
                           {event.user} • {event.ip} • {event.timestamp}
                         </p>
                       </div>
@@ -309,13 +309,13 @@ export default function SecurityPage() {
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-neutral-50">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">User</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">IP Address</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Location</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Login Time</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Last Activity</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Status</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Actions</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">User</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">IP Address</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Location</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Login Time</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Last Activity</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Status</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
@@ -324,16 +324,16 @@ export default function SecurityPage() {
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-neutral-900">
                           {session.user}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-500">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">
                           {session.ip}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-500">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">
                           {session.location}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-500">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">
                           {session.loginTime}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-500">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">
                           {session.lastActivity}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -363,19 +363,19 @@ export default function SecurityPage() {
                 <h3 className="text-lg font-medium text-neutral-900 mb-4">GDPR Compliance</h3>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-neutral-600">Data Processing Consent</span>
+                    <span className="text-sm text-slate-300">Data Processing Consent</span>
                     <CheckCircle className="h-5 w-5 text-green-600" />
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-neutral-600">Right to Erasure</span>
+                    <span className="text-sm text-slate-300">Right to Erasure</span>
                     <CheckCircle className="h-5 w-5 text-green-600" />
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-neutral-600">Data Portability</span>
+                    <span className="text-sm text-slate-300">Data Portability</span>
                     <CheckCircle className="h-5 w-5 text-green-600" />
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-neutral-600">Privacy Policy</span>
+                    <span className="text-sm text-slate-300">Privacy Policy</span>
                     <CheckCircle className="h-5 w-5 text-green-600" />
                   </div>
                 </div>
@@ -385,19 +385,19 @@ export default function SecurityPage() {
                 <h3 className="text-lg font-medium text-neutral-900 mb-4">Security Standards</h3>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-neutral-600">ISO 27001</span>
+                    <span className="text-sm text-slate-300">ISO 27001</span>
                     <CheckCircle className="h-5 w-5 text-green-600" />
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-neutral-600">SOC 2 Type II</span>
+                    <span className="text-sm text-slate-300">SOC 2 Type II</span>
                     <CheckCircle className="h-5 w-5 text-green-600" />
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-neutral-600">PCI DSS</span>
+                    <span className="text-sm text-slate-300">PCI DSS</span>
                     <CheckCircle className="h-5 w-5 text-green-600" />
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-neutral-600">OWASP Top 10</span>
+                    <span className="text-sm text-slate-300">OWASP Top 10</span>
                     <CheckCircle className="h-5 w-5 text-green-600" />
                   </div>
                 </div>

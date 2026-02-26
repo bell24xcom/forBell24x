@@ -91,7 +91,7 @@ export default function SuppliersManagementPage() {
       case 'rejected':
         return <XCircle className="h-4 w-4 text-red-600" />;
       default:
-        return <Clock className="h-4 w-4 text-neutral-600" />;
+        return <Clock className="h-4 w-4 text-slate-300" />;
     }
   };
 
@@ -101,7 +101,7 @@ export default function SuppliersManagementPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-neutral-900">Supplier Management</h1>
-          <p className="mt-2 text-neutral-600">Verify and manage supplier accounts and performance</p>
+          <p className="mt-2 text-slate-300">Verify and manage supplier accounts and performance</p>
         </div>
 
         {/* Stats Cards */}
@@ -112,7 +112,7 @@ export default function SuppliersManagementPage() {
                 <Building className="h-6 w-6 text-blue-600" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-neutral-600">Total Suppliers</p>
+                <p className="text-sm font-medium text-slate-300">Total Suppliers</p>
                 <p className="text-2xl font-bold text-neutral-900">847</p>
               </div>
             </div>
@@ -124,7 +124,7 @@ export default function SuppliersManagementPage() {
                 <CheckCircle className="h-6 w-6 text-green-600" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-neutral-600">Verified</p>
+                <p className="text-sm font-medium text-slate-300">Verified</p>
                 <p className="text-2xl font-bold text-neutral-900">789</p>
               </div>
             </div>
@@ -136,7 +136,7 @@ export default function SuppliersManagementPage() {
                 <Clock className="h-6 w-6 text-yellow-600" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-neutral-600">Pending</p>
+                <p className="text-sm font-medium text-slate-300">Pending</p>
                 <p className="text-2xl font-bold text-neutral-900">45</p>
               </div>
             </div>
@@ -148,7 +148,7 @@ export default function SuppliersManagementPage() {
                 <XCircle className="h-6 w-6 text-red-600" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-neutral-600">Rejected</p>
+                <p className="text-sm font-medium text-slate-300">Rejected</p>
                 <p className="text-2xl font-bold text-neutral-900">13</p>
               </div>
             </div>
@@ -211,14 +211,14 @@ export default function SuppliersManagementPage() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-neutral-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Supplier</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Category</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Location</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Rating</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Orders</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Revenue</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Actions</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Supplier</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Category</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Location</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Rating</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Orders</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Revenue</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -227,7 +227,7 @@ export default function SuppliersManagementPage() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
                         <div className="text-sm font-medium text-neutral-900">{supplier.name}</div>
-                        <div className="text-sm text-neutral-500">{supplier.email}</div>
+                        <div className="text-sm text-slate-400">{supplier.email}</div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -235,7 +235,7 @@ export default function SuppliersManagementPage() {
                         {supplier.category}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">
                       {supplier.location}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -255,7 +255,7 @@ export default function SuppliersManagementPage() {
                         <span className="text-yellow-400 ml-1">★</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">
                       {supplier.orders.toLocaleString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-neutral-900">

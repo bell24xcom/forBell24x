@@ -86,14 +86,14 @@ function TransactionRow({ tx }: { tx: Transaction }) {
   };
 
   return (
-    <tr className="hover:bg-gray-50 transition-colors">
+    <tr className="hover:bg-slate-900 transition-colors">
       <td className="px-6 py-4">
-        <span className="text-sm text-gray-500">{formatDateTime(tx.timestamp)}</span>
+        <span className="text-sm text-slate-400">{formatDateTime(tx.timestamp)}</span>
       </td>
       <td className="px-6 py-4">
-        <p className="text-sm font-medium text-gray-900">{tx.description}</p>
+        <p className="text-sm font-medium text-white">{tx.description}</p>
         {tx.counterparty && (
-          <p className="text-xs text-gray-500 mt-0.5">{tx.counterparty}</p>
+          <p className="text-xs text-slate-400 mt-0.5">{tx.counterparty}</p>
         )}
       </td>
       <td className="px-6 py-4">
@@ -111,7 +111,7 @@ function TransactionRow({ tx }: { tx: Transaction }) {
           ) : (
             <ArrowUpRight className="w-4 h-4 text-red-500" />
           )}
-          <span className="text-xs text-gray-600">{typeLabel[tx.type]}</span>
+          <span className="text-xs text-slate-300">{typeLabel[tx.type]}</span>
         </div>
       </td>
       <td className="px-6 py-4">
@@ -265,7 +265,7 @@ export default function WalletPage() {
           <Link href="/dashboard" className="text-blue-400 hover:text-blue-300 transition-colors">
             Dashboard
           </Link>
-          <ChevronRight className="w-4 h-4 text-gray-500" />
+          <ChevronRight className="w-4 h-4 text-slate-400" />
           <span className="text-gray-300">Wallet</span>
         </nav>
 
@@ -349,8 +349,8 @@ export default function WalletPage() {
                 <ArrowDownLeft className="w-5 h-5 text-green-600" />
               </div>
               <div>
-                <p className="text-xs text-gray-500 uppercase tracking-wide">Total Earned</p>
-                <p className="text-xl font-bold text-gray-900">{formatCurrency(stats.totalEarned)}</p>
+                <p className="text-xs text-slate-400 uppercase tracking-wide">Total Earned</p>
+                <p className="text-xl font-bold text-white">{formatCurrency(stats.totalEarned)}</p>
               </div>
             </div>
             <div className="bg-white rounded-xl shadow-sm p-5 flex items-center gap-4">
@@ -358,8 +358,8 @@ export default function WalletPage() {
                 <ArrowUpRight className="w-5 h-5 text-red-600" />
               </div>
               <div>
-                <p className="text-xs text-gray-500 uppercase tracking-wide">Total Spent</p>
-                <p className="text-xl font-bold text-gray-900">{formatCurrency(stats.totalSpent)}</p>
+                <p className="text-xs text-slate-400 uppercase tracking-wide">Total Spent</p>
+                <p className="text-xl font-bold text-white">{formatCurrency(stats.totalSpent)}</p>
               </div>
             </div>
           </div>
@@ -368,16 +368,16 @@ export default function WalletPage() {
         {/* Transaction History */}
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-100">
-            <h2 className="text-base font-semibold text-gray-900">Transaction History</h2>
+            <h2 className="text-base font-semibold text-white">Transaction History</h2>
           </div>
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-50">
-              <thead className="bg-gray-50">
+              <thead className="bg-slate-900">
                 <tr>
                   {['Date', 'Description', 'Amount', 'Type', 'Status'].map(h => (
                     <th
                       key={h}
-                      className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider"
+                      className="px-6 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider"
                     >
                       {h}
                     </th>
@@ -396,10 +396,10 @@ export default function WalletPage() {
                   <tr>
                     <td colSpan={5} className="px-6 py-16 text-center">
                       <div className="flex flex-col items-center gap-3">
-                        <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                        <div className="w-12 h-12 bg-slate-800 rounded-full flex items-center justify-center">
                           <Wallet className="w-6 h-6 text-gray-400" />
                         </div>
-                        <p className="text-gray-500 text-sm">No transactions yet</p>
+                        <p className="text-slate-400 text-sm">No transactions yet</p>
                       </div>
                     </td>
                   </tr>

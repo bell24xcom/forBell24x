@@ -105,7 +105,7 @@ export default function NotificationsPage() {
           <div className="text-slate-400 py-12 text-center">Loading notifications…</div>
         ) : notifications.length === 0 ? (
           <div className="bg-slate-800 rounded-xl p-12 text-center text-slate-400">
-            <BellOff className="w-12 h-12 mx-auto mb-3 text-slate-600" />
+            <BellOff className="w-12 h-12 mx-auto mb-3 text-slate-300" />
             <p className="font-medium">No notifications yet</p>
             <p className="text-sm mt-1">You'll see RFQ matches, quotes, and updates here.</p>
           </div>

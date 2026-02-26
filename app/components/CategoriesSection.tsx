@@ -85,7 +85,7 @@ export default function CategoriesSection() {
         {/* Header */}
         <div className="text-center mb-12">
           <h2 className="text-5xl font-bold text-neutral-900 mb-4">400+ Product Categories</h2>
-          <p className="text-xl text-neutral-600 mb-8">Find suppliers across all major industries with live RFQ examples</p>
+          <p className="text-xl text-slate-300 mb-8">Find suppliers across all major industries with live RFQ examples</p>
           
           {/* Search and Filter */}
           <div className="max-w-2xl mx-auto mb-8">
@@ -127,28 +127,28 @@ export default function CategoriesSection() {
 
                   {/* Category Info */}
                   <h3 className="text-xl font-bold text-neutral-900 mb-2">{category.name}</h3>
-                  <p className="text-sm text-neutral-600 mb-3 line-clamp-2">{category.description}</p>
+                  <p className="text-sm text-slate-300 mb-3 line-clamp-2">{category.description}</p>
                   
                   {/* Supplier Count */}
                   <div className="flex items-center gap-2 mb-4">
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-sm font-medium text-neutral-700">{category.supplierCount} Suppliers</span>
+                    <span className="text-sm font-medium text-slate-400">{category.supplierCount} Suppliers</span>
                   </div>
 
                   {/* Subcategories Preview */}
                   <div className="mb-4">
-                    <p className="text-xs text-neutral-500 mb-2">Key Subcategories:</p>
+                    <p className="text-xs text-slate-400 mb-2">Key Subcategories:</p>
                     <div className="flex flex-wrap gap-1">
                       {category.subcategories.slice(0, 3).map((sub, index) => (
                         <span
                           key={index}
-                          className="text-xs bg-neutral-100 text-neutral-700 px-2 py-1 rounded-full"
+                          className="text-xs bg-neutral-100 text-slate-400 px-2 py-1 rounded-full"
                         >
                           {sub}
                         </span>
                       ))}
                       {category.subcategories.length > 3 && (
-                        <span className="text-xs text-neutral-500">+{category.subcategories.length - 3} more</span>
+                        <span className="text-xs text-slate-400">+{category.subcategories.length - 3} more</span>
                       )}
                     </div>
                   </div>
@@ -156,10 +156,10 @@ export default function CategoriesSection() {
                   {/* Live RFQs Preview */}
                   <div className="border-t pt-4">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-medium text-neutral-600">Live RFQs</span>
+                      <span className="text-xs font-medium text-slate-300">Live RFQs</span>
                       <div className="flex items-center gap-1">
                         <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                        <span className="text-xs text-neutral-500">Live</span>
+                        <span className="text-xs text-slate-400">Live</span>
                       </div>
                     </div>
                     
@@ -170,7 +170,7 @@ export default function CategoriesSection() {
                             <span className="text-xs font-medium text-neutral-900 line-clamp-1">{rfq.title}</span>
                             <div className={`w-2 h-2 rounded-full ${getUrgencyColor(rfq.urgency)}`}></div>
                           </div>
-                          <div className="flex items-center justify-between text-xs text-neutral-500">
+                          <div className="flex items-center justify-between text-xs text-slate-400">
                             <span>{rfq.budget}</span>
                             <span>{rfq.timeAgo}</span>
                           </div>
@@ -210,12 +210,12 @@ export default function CategoriesSection() {
                     <div className="text-6xl">{selectedCategory.icon}</div>
                     <div>
                       <h3 className="text-3xl font-bold text-neutral-900">{selectedCategory.name}</h3>
-                      <p className="text-neutral-600">{selectedCategory.supplierCount} Verified Suppliers</p>
+                      <p className="text-slate-300">{selectedCategory.supplierCount} Verified Suppliers</p>
                     </div>
                   </div>
                   <button
                     onClick={() => setSelectedCategory(null)}
-                    className="text-gray-400 hover:text-neutral-600 text-2xl"
+                    className="text-gray-400 hover:text-slate-300 text-2xl"
                   >
                     ×
                   </button>
@@ -244,11 +244,11 @@ export default function CategoriesSection() {
                             <h5 className="font-medium text-neutral-900 line-clamp-1">{rfq.title}</h5>
                             <div className={`w-2 h-2 rounded-full ${getUrgencyColor(rfq.urgency)}`}></div>
                           </div>
-                          <div className="flex items-center justify-between text-sm text-neutral-600">
+                          <div className="flex items-center justify-between text-sm text-slate-300">
                             <span>{rfq.buyer}</span>
                             <span>{rfq.budget}</span>
                           </div>
-                          <div className="flex items-center justify-between text-xs text-neutral-500 mt-1">
+                          <div className="flex items-center justify-between text-xs text-slate-400 mt-1">
                             <span>{rfq.urgency}</span>
                             <span>{rfq.timeAgo}</span>
                           </div>

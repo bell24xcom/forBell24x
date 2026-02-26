@@ -67,18 +67,18 @@ export default function NewRFQPage() {
                 <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">B</div>
                 <div>
                   <div className="font-bold text-xl">Bell24h</div>
-                  <div className="text-xs text-neutral-600">Verified B2B Platform</div>
+                  <div className="text-xs text-slate-300">Verified B2B Platform</div>
                 </div>
               </div>
               <div className="hidden md:flex items-center gap-6">
-                <Link href="/dashboard" className="text-neutral-700 hover:text-primary-600">Dashboard</Link>
-                <Link href="/rfq" className="text-neutral-700 hover:text-primary-600">My RFQs</Link>
+                <Link href="/dashboard" className="text-slate-400 hover:text-primary-600">Dashboard</Link>
+                <Link href="/rfq" className="text-slate-400 hover:text-primary-600">My RFQs</Link>
                 <Link href="/rfq/new" className="text-indigo-600 font-semibold">New RFQ</Link>
-                <Link href="#" className="text-neutral-700 hover:text-primary-600">Suppliers</Link>
+                <Link href="#" className="text-slate-400 hover:text-primary-600">Suppliers</Link>
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <Link href="/dashboard" className="text-neutral-700 hover:text-primary-600">Back to Dashboard</Link>
+              <Link href="/dashboard" className="text-slate-400 hover:text-primary-600">Back to Dashboard</Link>
             </div>
           </div>
         </div>
@@ -219,7 +219,7 @@ export default function NewRFQPage() {
                   className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   placeholder="Enter specifications separated by commas (e.g., Grade A steel, 6 inch diameter, galvanized coating)"
                 />
-                <p className="mt-1 text-sm text-neutral-500">Separate multiple specifications with commas</p>
+                <p className="mt-1 text-sm text-slate-400">Separate multiple specifications with commas</p>
               </div>
 
               <div className="bg-indigo-50 p-6 rounded-lg">
@@ -235,7 +235,7 @@ export default function NewRFQPage() {
               <div className="flex justify-end gap-4">
                 <Link
                   href="/rfq"
-                  className="px-6 py-3 border border-neutral-300 text-neutral-700 rounded-lg hover:bg-neutral-50 transition-colors"
+                  className="px-6 py-3 border border-neutral-300 text-slate-400 rounded-lg hover:bg-neutral-50 transition-colors"
                 >
                   Cancel
                 </Link>

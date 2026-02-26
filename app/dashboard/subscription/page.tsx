@@ -201,7 +201,7 @@ export default function SubscriptionDashboard() {
       <div className="page-container flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-neutral-900 mb-4">No Subscription Found</h2>
-          <p className="text-neutral-600 mb-8">Please contact support if you believe this is an error.</p>
+          <p className="text-slate-300 mb-8">Please contact support if you believe this is an error.</p>
           <Link href="/pricing" className="btn-primary">
             View Plans
           </Link>
@@ -218,7 +218,7 @@ export default function SubscriptionDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-neutral-900">Subscription Dashboard</h1>
-              <p className="text-neutral-600">Manage your Bell24h subscription and usage</p>
+              <p className="text-slate-300">Manage your Bell24h subscription and usage</p>
             </div>
             <div className="flex space-x-4">
               <Link href="/pricing" className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700">
@@ -244,13 +244,13 @@ export default function SubscriptionDashboard() {
                 <span className={`px-3 py-1 rounded-full text-sm font-medium bg-${getStatusColor(subscription.status)}-100 text-${getStatusColor(subscription.status)}-800`}>
                   {subscription.status.charAt(0).toUpperCase() + subscription.status.slice(1)}
                 </span>
-                <span className="text-neutral-600">
+                <span className="text-slate-300">
                   {subscription.billing.currency}{subscription.billing.amount.toLocaleString()}/month
                 </span>
               </div>
             </div>
             <div className="text-right">
-              <p className="text-sm text-neutral-500">Next billing</p>
+              <p className="text-sm text-slate-400">Next billing</p>
               <p className="text-lg font-semibold text-neutral-900">{subscription.billing.nextBilling}</p>
             </div>
           </div>
@@ -259,8 +259,8 @@ export default function SubscriptionDashboard() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-neutral-600">RFQs Used</span>
-                <span className="text-sm text-neutral-500">
+                <span className="text-sm font-medium text-slate-300">RFQs Used</span>
+                <span className="text-sm text-slate-400">
                   {subscription.usage.rfqsUsed} / {subscription.usage.rfqsLimit === -1 ? '∞' : subscription.usage.rfqsLimit}
                 </span>
               </div>
@@ -274,8 +274,8 @@ export default function SubscriptionDashboard() {
 
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-neutral-600">Suppliers</span>
-                <span className="text-sm text-neutral-500">
+                <span className="text-sm font-medium text-slate-300">Suppliers</span>
+                <span className="text-sm text-slate-400">
                   {subscription.usage.suppliersUsed} / {subscription.usage.suppliersLimit === -1 ? '∞' : subscription.usage.suppliersLimit}
                 </span>
               </div>
@@ -289,8 +289,8 @@ export default function SubscriptionDashboard() {
 
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-neutral-600">API Calls</span>
-                <span className="text-sm text-neutral-500">
+                <span className="text-sm font-medium text-slate-300">API Calls</span>
+                <span className="text-sm text-slate-400">
                   {subscription.usage.apiCallsUsed.toLocaleString()} / {subscription.usage.apiCallsLimit === -1 ? '∞' : subscription.usage.apiCallsLimit.toLocaleString()}
                 </span>
               </div>
@@ -316,12 +316,12 @@ export default function SubscriptionDashboard() {
               <div className="text-center">
                 <div className="text-4xl mb-4">{feature.icon}</div>
                 <h3 className="text-lg font-semibold text-neutral-900 mb-2">{feature.name}</h3>
-                <p className="text-neutral-600 text-sm mb-4">{feature.description}</p>
+                <p className="text-slate-300 text-sm mb-4">{feature.description}</p>
                 
                 {feature.available ? (
                   <div className="space-y-2">
                     {feature.usage && (
-                      <div className="text-sm text-neutral-500">
+                      <div className="text-sm text-slate-400">
                         {feature.usage.current} / {feature.usage.limit === -1 ? '∞' : feature.usage.limit}
                       </div>
                     )}
@@ -334,7 +334,7 @@ export default function SubscriptionDashboard() {
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    <span className="inline-block bg-neutral-200 text-neutral-600 px-3 py-1 rounded-full text-sm">
+                    <span className="inline-block bg-neutral-200 text-slate-300 px-3 py-1 rounded-full text-sm">
                       {feature.upgradeRequired ? 'Upgrade Required' : 'Not Available'}
                     </span>
                     {feature.upgradeRequired && (
@@ -361,7 +361,7 @@ export default function SubscriptionDashboard() {
               {subscription.features.map((feature, index) => (
                 <div key={index} className="flex items-center">
                   <span className="text-green-500 mr-3">✓</span>
-                  <span className="text-neutral-700">{feature}</span>
+                  <span className="text-slate-400">{feature}</span>
                 </div>
               ))}
             </div>
@@ -374,7 +374,7 @@ export default function SubscriptionDashboard() {
               {subscription.limitations.map((limitation, index) => (
                 <div key={index} className="flex items-center">
                   <span className="text-gray-400 mr-3">✗</span>
-                  <span className="text-neutral-700">{limitation}</span>
+                  <span className="text-slate-400">{limitation}</span>
                 </div>
               ))}
             </div>
@@ -387,15 +387,15 @@ export default function SubscriptionDashboard() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <h4 className="font-semibold text-neutral-900 mb-2">Payment Method</h4>
-              <p className="text-neutral-600">{subscription.billing.paymentMethod}</p>
+              <p className="text-slate-300">{subscription.billing.paymentMethod}</p>
             </div>
             <div>
               <h4 className="font-semibold text-neutral-900 mb-2">Next Billing Date</h4>
-              <p className="text-neutral-600">{subscription.billing.nextBilling}</p>
+              <p className="text-slate-300">{subscription.billing.nextBilling}</p>
             </div>
             <div>
               <h4 className="font-semibold text-neutral-900 mb-2">Amount</h4>
-              <p className="text-neutral-600">
+              <p className="text-slate-300">
                 {subscription.billing.currency}{subscription.billing.amount.toLocaleString()}/month
               </p>
             </div>

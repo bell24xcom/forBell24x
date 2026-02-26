@@ -152,7 +152,7 @@ export default function DashboardPage() {
       case 'success': return <CheckCircle className="w-4 h-4 text-green-600" />;
       case 'pending': return <Clock className="w-4 h-4 text-yellow-600" />;
       case 'failed': return <AlertTriangle className="w-4 h-4 text-red-600" />;
-      default: return <Activity className="w-4 h-4 text-gray-600" />;
+      default: return <Activity className="w-4 h-4 text-slate-300" />;
     }
   };
 
@@ -161,7 +161,7 @@ export default function DashboardPage() {
       case 'success': return 'text-green-600 bg-green-100';
       case 'pending': return 'text-yellow-600 bg-yellow-100';
       case 'failed': return 'text-red-600 bg-red-100';
-      default: return 'text-gray-600 bg-gray-100';
+      default: return 'text-slate-300 bg-slate-800';
     }
   };
 
@@ -170,7 +170,7 @@ export default function DashboardPage() {
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading dashboard...</p>
+          <p className="text-slate-300">Loading dashboard...</p>
         </div>
       </div>
     );
@@ -184,16 +184,16 @@ export default function DashboardPage() {
       <div className="bg-white rounded-lg shadow-sm p-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            <h1 className="text-3xl font-bold text-white mb-2">
               Welcome back, {user?.name || 'User'}!
             </h1>
-            <p className="text-gray-600">
+            <p className="text-slate-300">
               Here's what's happening with your B2B activities
             </p>
           </div>
           <div className="text-right">
-            <p className="text-sm text-gray-500">Last updated</p>
-            <p className="text-sm font-medium text-gray-900">2 minutes ago</p>
+            <p className="text-sm text-slate-400">Last updated</p>
+            <p className="text-sm font-medium text-white">2 minutes ago</p>
           </div>
         </div>
       </div>
@@ -247,8 +247,8 @@ export default function DashboardPage() {
               <FileText className="w-6 h-6" />
             </div>
             <div className="ml-4">
-              <p className="text-sm text-gray-600">Total RFQs</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.totalRFQs}</p>
+              <p className="text-sm text-slate-300">Total RFQs</p>
+              <p className="text-2xl font-bold text-white">{stats.totalRFQs}</p>
             </div>
           </div>
         </div>
@@ -259,8 +259,8 @@ export default function DashboardPage() {
               <CheckCircle className="w-6 h-6" />
             </div>
             <div className="ml-4">
-              <p className="text-sm text-gray-600">Active RFQs</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.activeRFQs}</p>
+              <p className="text-sm text-slate-300">Active RFQs</p>
+              <p className="text-2xl font-bold text-white">{stats.activeRFQs}</p>
             </div>
           </div>
         </div>
@@ -271,8 +271,8 @@ export default function DashboardPage() {
               <MessageSquare className="w-6 h-6" />
             </div>
             <div className="ml-4">
-              <p className="text-sm text-gray-600">Quotes Received</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.totalQuotesReceived}</p>
+              <p className="text-sm text-slate-300">Quotes Received</p>
+              <p className="text-2xl font-bold text-white">{stats.totalQuotesReceived}</p>
             </div>
           </div>
         </div>
@@ -283,8 +283,8 @@ export default function DashboardPage() {
               <TrendingUp className="w-6 h-6" />
             </div>
             <div className="ml-4">
-              <p className="text-sm text-gray-600">Total Earned</p>
-              <p className="text-2xl font-bold text-gray-900">{formatCurrency(stats.totalEarned)}</p>
+              <p className="text-sm text-slate-300">Total Earned</p>
+              <p className="text-2xl font-bold text-white">{formatCurrency(stats.totalEarned)}</p>
             </div>
           </div>
         </div>
@@ -298,8 +298,8 @@ export default function DashboardPage() {
               <DollarSign className="w-6 h-6" />
             </div>
             <div className="ml-4">
-              <p className="text-sm text-gray-600">Total Spent</p>
-              <p className="text-2xl font-bold text-gray-900">{formatCurrency(stats.totalSpent)}</p>
+              <p className="text-sm text-slate-300">Total Spent</p>
+              <p className="text-2xl font-bold text-white">{formatCurrency(stats.totalSpent)}</p>
             </div>
           </div>
         </div>
@@ -310,8 +310,8 @@ export default function DashboardPage() {
               <TrendingUp className="w-6 h-6" />
             </div>
             <div className="ml-4">
-              <p className="text-sm text-gray-600">Success Rate</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.successRate}%</p>
+              <p className="text-sm text-slate-300">Success Rate</p>
+              <p className="text-2xl font-bold text-white">{stats.successRate}%</p>
             </div>
           </div>
         </div>
@@ -322,8 +322,8 @@ export default function DashboardPage() {
               <Award className="w-6 h-6" />
             </div>
             <div className="ml-4">
-              <p className="text-sm text-gray-600">Quote Rate</p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-sm text-slate-300">Quote Rate</p>
+              <p className="text-2xl font-bold text-white">
                 {stats.totalRFQs > 0 ? Math.round((stats.totalQuotesReceived / stats.totalRFQs) * 100) : 0}%
               </p>
             </div>
@@ -333,18 +333,18 @@ export default function DashboardPage() {
 
       {/* Live Features Status */}
       <div className="bg-white rounded-lg shadow-sm p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Live Features Status</h2>
+        <h2 className="text-lg font-semibold text-white mb-4">Live Features Status</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {liveFeatures.map((feature) => {
             const Icon = feature.icon;
             return (
-              <div key={feature.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+              <div key={feature.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-slate-900 transition-colors">
                 <div className="flex items-center">
                   <div className={`w-3 h-3 rounded-full mr-3 ${feature.status === 'active' ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                  <Icon className="w-5 h-5 text-gray-600 mr-3" />
+                  <Icon className="w-5 h-5 text-slate-300 mr-3" />
                   <div>
-                    <p className="text-sm font-medium text-gray-900">{feature.name}</p>
-                    <p className="text-xs text-gray-500">{feature.description}</p>
+                    <p className="text-sm font-medium text-white">{feature.name}</p>
+                    <p className="text-xs text-slate-400">{feature.description}</p>
                     {feature.lastUsed && (
                       <p className="text-xs text-gray-400">Last used: {feature.lastUsed}</p>
                     )}
@@ -363,21 +363,21 @@ export default function DashboardPage() {
 
       {/* Recent Activity */}
       <div className="bg-white rounded-lg shadow-sm p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h2>
+        <h2 className="text-lg font-semibold text-white mb-4">Recent Activity</h2>
         <div className="space-y-3">
           {recentActivity.length === 0 ? (
             <div className="text-center py-12">
               <Activity className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500 font-medium">No recent activity yet</p>
+              <p className="text-slate-400 font-medium">No recent activity yet</p>
               <p className="text-sm text-gray-400 mt-1">Your activity will appear here as you use the platform</p>
             </div>
           ) : (
             recentActivity.map((activity) => (
-              <div key={activity.id} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+              <div key={activity.id} className="flex items-center space-x-3 p-3 bg-slate-900 rounded-lg">
                 {getStatusIcon(activity.status)}
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">{activity.description}</p>
-                  <p className="text-xs text-gray-500">{activity.timestamp}</p>
+                  <p className="text-sm font-medium text-white">{activity.description}</p>
+                  <p className="text-xs text-slate-400">{activity.timestamp}</p>
                 </div>
                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(activity.status)}`}>
                   {activity.status}
@@ -390,7 +390,7 @@ export default function DashboardPage() {
 
       {/* Quick Actions */}
       <div className="bg-white rounded-lg shadow-sm p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
+        <h2 className="text-lg font-semibold text-white mb-4">Quick Actions</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <button className="flex items-center justify-center p-4 border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors">
             <Brain className="w-5 h-5 text-blue-600 mr-2" />

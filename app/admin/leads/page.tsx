@@ -94,7 +94,7 @@ export default function LeadsManagementPage() {
       case '60days':
         return 'text-green-600 bg-green-100';
       default:
-        return 'text-neutral-600 bg-neutral-100';
+        return 'text-slate-300 bg-neutral-100';
     }
   };
 
@@ -103,7 +103,7 @@ export default function LeadsManagementPage() {
       <div className="page-container flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-neutral-600">Loading leads...</p>
+          <p className="mt-4 text-slate-300">Loading leads...</p>
         </div>
       </div>
     );
@@ -115,7 +115,7 @@ export default function LeadsManagementPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-neutral-900">Lead Management</h1>
-          <p className="mt-2 text-neutral-600">Monitor and manage buyer leads and supplier interactions</p>
+          <p className="mt-2 text-slate-300">Monitor and manage buyer leads and supplier interactions</p>
         </div>
 
         {/* Stats Cards */}
@@ -126,7 +126,7 @@ export default function LeadsManagementPage() {
                 <Users className="h-6 w-6 text-blue-600" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-neutral-600">Total Leads</p>
+                <p className="text-sm font-medium text-slate-300">Total Leads</p>
                 <p className="text-2xl font-bold text-neutral-900">{stats.total}</p>
               </div>
             </div>
@@ -138,7 +138,7 @@ export default function LeadsManagementPage() {
                 <Unlock className="h-6 w-6 text-green-600" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-neutral-600">Unlocked</p>
+                <p className="text-sm font-medium text-slate-300">Unlocked</p>
                 <p className="text-2xl font-bold text-neutral-900">{stats.unlocked}</p>
               </div>
             </div>
@@ -150,7 +150,7 @@ export default function LeadsManagementPage() {
                 <DollarSign className="h-6 w-6 text-purple-600" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-neutral-600">Revenue</p>
+                <p className="text-sm font-medium text-slate-300">Revenue</p>
                 <p className="text-2xl font-bold text-neutral-900">₹{stats.revenue.toLocaleString()}</p>
               </div>
             </div>
@@ -194,14 +194,14 @@ export default function LeadsManagementPage() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-neutral-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Lead Details</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Buyer</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Budget</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Urgency</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Unlocked By</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Date</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">Actions</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Lead Details</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Buyer</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Budget</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Urgency</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Unlocked By</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Date</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -210,9 +210,9 @@ export default function LeadsManagementPage() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
                         <div className="text-sm font-medium text-neutral-900">{lead.product}</div>
-                        <div className="text-sm text-neutral-500">{lead.category}</div>
+                        <div className="text-sm text-slate-400">{lead.category}</div>
                         {lead.quantity && (
-                          <div className="text-sm text-neutral-500">Qty: {lead.quantity}</div>
+                          <div className="text-sm text-slate-400">Qty: {lead.quantity}</div>
                         )}
                       </div>
                     </td>
@@ -220,10 +220,10 @@ export default function LeadsManagementPage() {
                       <div>
                         <div className="text-sm font-medium text-neutral-900">{lead.buyerName}</div>
                         {lead.buyerCompany && (
-                          <div className="text-sm text-neutral-500">{lead.buyerCompany}</div>
+                          <div className="text-sm text-slate-400">{lead.buyerCompany}</div>
                         )}
                         {lead.location && (
-                          <div className="text-sm text-neutral-500 flex items-center">
+                          <div className="text-sm text-slate-400 flex items-center">
                             <MapPin className="h-3 w-3 mr-1" />
                             {lead.location}
                           </div>
@@ -243,10 +243,10 @@ export default function LeadsManagementPage() {
                         {lead.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">
                       {lead.suppliers.filter(s => s.unlocked).length} suppliers
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">
                       {new Date(lead.createdAt).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -273,7 +273,7 @@ export default function LeadsManagementPage() {
                   <h3 className="text-lg font-medium text-neutral-900">Lead Details</h3>
                   <button
                     onClick={() => setSelectedLead(null)}
-                    className="text-gray-400 hover:text-neutral-600"
+                    className="text-gray-400 hover:text-slate-300"
                   >
                     ✕
                   </button>
@@ -282,58 +282,58 @@ export default function LeadsManagementPage() {
                 <div className="space-y-4">
                   <div>
                     <h4 className="font-semibold text-neutral-900">{selectedLead.product}</h4>
-                    <p className="text-sm text-neutral-600">{selectedLead.category}</p>
+                    <p className="text-sm text-slate-300">{selectedLead.category}</p>
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="text-sm font-medium text-neutral-500">Buyer</label>
+                      <label className="text-sm font-medium text-slate-400">Buyer</label>
                       <p className="text-sm text-neutral-900">{selectedLead.buyerName}</p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-neutral-500">Company</label>
+                      <label className="text-sm font-medium text-slate-400">Company</label>
                       <p className="text-sm text-neutral-900">{selectedLead.buyerCompany || 'N/A'}</p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-neutral-500">Phone</label>
+                      <label className="text-sm font-medium text-slate-400">Phone</label>
                       <p className="text-sm text-neutral-900">{selectedLead.buyerPhone || 'N/A'}</p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-neutral-500">Email</label>
+                      <label className="text-sm font-medium text-slate-400">Email</label>
                       <p className="text-sm text-neutral-900">{selectedLead.buyerEmail || 'N/A'}</p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-neutral-500">Budget</label>
+                      <label className="text-sm font-medium text-slate-400">Budget</label>
                       <p className="text-sm text-neutral-900">
                         {selectedLead.budget ? `₹${selectedLead.budget.toLocaleString()}` : 'N/A'}
                       </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-neutral-500">Quantity</label>
+                      <label className="text-sm font-medium text-slate-400">Quantity</label>
                       <p className="text-sm text-neutral-900">{selectedLead.quantity || 'N/A'}</p>
                     </div>
                   </div>
                   
                   {selectedLead.description && (
                     <div>
-                      <label className="text-sm font-medium text-neutral-500">Description</label>
+                      <label className="text-sm font-medium text-slate-400">Description</label>
                       <p className="text-sm text-neutral-900">{selectedLead.description}</p>
                     </div>
                   )}
                   
                   <div>
-                    <label className="text-sm font-medium text-neutral-500">Unlocked by Suppliers</label>
+                    <label className="text-sm font-medium text-slate-400">Unlocked by Suppliers</label>
                     <div className="mt-2 space-y-2">
                       {selectedLead.suppliers.filter(s => s.unlocked).map((supplier) => (
                         <div key={supplier.id} className="flex items-center justify-between p-2 bg-green-50 rounded">
                           <span className="text-sm text-neutral-900">Supplier {supplier.supplierId}</span>
-                          <span className="text-xs text-neutral-500">
+                          <span className="text-xs text-slate-400">
                             {supplier.unlockedAt ? new Date(supplier.unlockedAt).toLocaleDateString() : 'N/A'}
                           </span>
                         </div>
                       ))}
                       {selectedLead.suppliers.filter(s => s.unlocked).length === 0 && (
-                        <p className="text-sm text-neutral-500">No suppliers have unlocked this lead yet</p>
+                        <p className="text-sm text-slate-400">No suppliers have unlocked this lead yet</p>
                       )}
                     </div>
                   </div>

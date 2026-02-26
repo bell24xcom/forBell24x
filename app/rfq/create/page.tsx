@@ -244,7 +244,7 @@ export default function CreateRFQPage() {
                       placeholder="Minimum"
                       min="0"
                     />
-                    <label className="text-xs text-neutral-500 mt-1">Minimum Budget</label>
+                    <label className="text-xs text-slate-400 mt-1">Minimum Budget</label>
                   </div>
                   <div>
                     <input 
@@ -258,7 +258,7 @@ export default function CreateRFQPage() {
                       placeholder="Maximum"
                       min="0"
                     />
-                    <label className="text-xs text-neutral-500 mt-1">Maximum Budget</label>
+                    <label className="text-xs text-slate-400 mt-1">Maximum Budget</label>
                   </div>
                 </div>
               </div>

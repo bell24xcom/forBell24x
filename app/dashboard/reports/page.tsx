@@ -108,8 +108,8 @@ function ReportCard({
           {report.icon}
         </div>
         <div>
-          <h3 className="font-semibold text-gray-900">{report.title}</h3>
-          <p className="text-sm text-gray-500 mt-1 leading-relaxed">{report.description}</p>
+          <h3 className="font-semibold text-white">{report.title}</h3>
+          <p className="text-sm text-slate-400 mt-1 leading-relaxed">{report.description}</p>
         </div>
       </div>
 
@@ -222,7 +222,7 @@ export default function ReportsPage() {
           <Link href="/dashboard" className="text-blue-400 hover:text-blue-300 transition-colors">
             Dashboard
           </Link>
-          <ChevronRight className="w-4 h-4 text-gray-500" />
+          <ChevronRight className="w-4 h-4 text-slate-400" />
           <span className="text-gray-300">Reports</span>
         </nav>
 
@@ -242,7 +242,7 @@ export default function ReportsPage() {
                 onClick={() => setDateRange(opt.value)}
                 className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                   dateRange === opt.value
-                    ? 'bg-white text-gray-900 shadow-sm'
+                    ? 'bg-white text-white shadow-sm'
                     : 'text-gray-400 hover:text-gray-200'
                 }`}
               >
@@ -255,13 +255,13 @@ export default function ReportsPage() {
         {/* Summary Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="bg-white rounded-xl shadow-sm p-5">
-            <p className="text-xs text-gray-500 uppercase tracking-wide font-medium">Total Reports Generated</p>
-            <p className="text-3xl font-bold text-gray-900 mt-1">{generatedCount}</p>
+            <p className="text-xs text-slate-400 uppercase tracking-wide font-medium">Total Reports Generated</p>
+            <p className="text-3xl font-bold text-white mt-1">{generatedCount}</p>
             <p className="text-xs text-gray-400 mt-1">This session</p>
           </div>
           <div className="bg-white rounded-xl shadow-sm p-5">
-            <p className="text-xs text-gray-500 uppercase tracking-wide font-medium">Last Generated</p>
-            <p className="text-lg font-semibold text-gray-900 mt-1">
+            <p className="text-xs text-slate-400 uppercase tracking-wide font-medium">Last Generated</p>
+            <p className="text-lg font-semibold text-white mt-1">
               {lastGeneratedDate ?? '—'}
             </p>
             <p className="text-xs text-gray-400 mt-1">Date &amp; time</p>

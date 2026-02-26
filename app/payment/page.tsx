@@ -203,19 +203,19 @@ export default function PaymentPage() {
                 <div className="space-y-4">
                   <div className="flex items-center">
                     <Shield className="w-6 h-6 text-green-600 mr-3" />
-                    <span className="text-neutral-700">PCI DSS Compliant</span>
+                    <span className="text-slate-400">PCI DSS Compliant</span>
                   </div>
                   <div className="flex items-center">
                     <Lock className="w-6 h-6 text-green-600 mr-3" />
-                    <span className="text-neutral-700">256-bit SSL Encryption</span>
+                    <span className="text-slate-400">256-bit SSL Encryption</span>
                   </div>
                   <div className="flex items-center">
                     <CheckCircle className="w-6 h-6 text-green-600 mr-3" />
-                    <span className="text-neutral-700">RBI Approved</span>
+                    <span className="text-slate-400">RBI Approved</span>
                   </div>
                   <div className="flex items-center">
                     <CheckCircle className="w-6 h-6 text-green-600 mr-3" />
-                    <span className="text-neutral-700">Fraud Detection</span>
+                    <span className="text-slate-400">Fraud Detection</span>
                   </div>
                 </div>
               </div>
@@ -226,27 +226,27 @@ export default function PaymentPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="text-center p-4 border border-neutral-200 rounded-lg">
                     <div className="text-2xl mb-2">💳</div>
-                    <span className="text-sm text-neutral-600">Credit Cards</span>
+                    <span className="text-sm text-slate-300">Credit Cards</span>
                   </div>
                   <div className="text-center p-4 border border-neutral-200 rounded-lg">
                     <div className="text-2xl mb-2">🏦</div>
-                    <span className="text-sm text-neutral-600">Debit Cards</span>
+                    <span className="text-sm text-slate-300">Debit Cards</span>
                   </div>
                   <div className="text-center p-4 border border-neutral-200 rounded-lg">
                     <div className="text-2xl mb-2">📱</div>
-                    <span className="text-sm text-neutral-600">UPI</span>
+                    <span className="text-sm text-slate-300">UPI</span>
                   </div>
                   <div className="text-center p-4 border border-neutral-200 rounded-lg">
                     <div className="text-2xl mb-2">🏧</div>
-                    <span className="text-sm text-neutral-600">Net Banking</span>
+                    <span className="text-sm text-slate-300">Net Banking</span>
                   </div>
                   <div className="text-center p-4 border border-neutral-200 rounded-lg">
                     <div className="text-2xl mb-2">💰</div>
-                    <span className="text-sm text-neutral-600">Wallets</span>
+                    <span className="text-sm text-slate-300">Wallets</span>
                   </div>
                   <div className="text-center p-4 border border-neutral-200 rounded-lg">
                     <div className="text-2xl mb-2">🏪</div>
-                    <span className="text-sm text-neutral-600">EMI</span>
+                    <span className="text-sm text-slate-300">EMI</span>
                   </div>
                 </div>
               </div>
@@ -254,7 +254,7 @@ export default function PaymentPage() {
               {/* Compliance Info */}
               <div className="bg-neutral-50">
                 <h3 className="text-xl font-bold text-neutral-900 mb-4">Compliance & Security</h3>
-                <ul className="text-sm text-neutral-600 space-y-2">
+                <ul className="text-sm text-slate-300 space-y-2">
                   <li>• PCI DSS Level 1 Certified</li>
                   <li>• RBI Licensed Payment Aggregator</li>
                   <li>• ISO 27001 Certified</li>
