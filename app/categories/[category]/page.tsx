@@ -53,8 +53,46 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const category = await getCategory(params.category);
 
-  if (!category || !category.isActive) {
-    notFound();
+  if (!category) {
+    return (
+      <div className="min-h-screen bg-[#0F172A] flex items-center justify-center py-12 px-4">
+        <div className="text-center max-w-2xl">
+          <h1 className="text-4xl font-bold text-white mb-4">Category Not Found</h1>
+          <p className="text-lg text-slate-300 mb-8">
+            The category "{params.category}" doesn't exist or has been moved.
+          </p>
+          <div className="flex gap-4 justify-center">
+            <a href="/categories" className="bg-blue-500 hover:bg-blue-600 text-white font-medium px-6 py-3 rounded-lg transition-colors">
+              Browse All Categories
+            </a>
+            <a href="/rfq/create" className="bg-slate-700 hover:bg-slate-600 text-white font-medium px-6 py-3 rounded-lg transition-colors">
+              Post RFQ
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!category.isActive) {
+    return (
+      <div className="min-h-screen bg-[#0F172A] flex items-center justify-center py-12 px-4">
+        <div className="text-center max-w-2xl">
+          <h1 className="text-4xl font-bold text-white mb-4">Category Unavailable</h1>
+          <p className="text-lg text-slate-300 mb-8">
+            This category is currently not available. Please browse other categories or post your RFQ.
+          </p>
+          <div className="flex gap-4 justify-center">
+            <a href="/categories" className="bg-blue-500 hover:bg-blue-600 text-white font-medium px-6 py-3 rounded-lg transition-colors">
+              Browse All Categories
+            </a>
+            <a href="/rfq/create" className="bg-slate-700 hover:bg-slate-600 text-white font-medium px-6 py-3 rounded-lg transition-colors">
+              Post RFQ
+            </a>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (

@@ -72,7 +72,7 @@ frontend/
 backend/
 src/
 2nd-SSH/
-admin/
+# admin/ - REMOVED: Admin pages need to deploy
 ai-explainability-service/
 AppData/
 audit-results/
