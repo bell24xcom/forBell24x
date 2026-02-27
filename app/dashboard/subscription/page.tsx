@@ -414,6 +414,7 @@ export default function SubscriptionDashboard() {
           </div>
         </div>
       </div>
+      </div>
     </DashboardLayout>
   );
 }

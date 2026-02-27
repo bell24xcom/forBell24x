@@ -126,12 +126,25 @@ export async function PUT(request: NextRequest) {
       data: { status: action === 'accept' ? 'ACCEPTED' : 'REJECTED' },
     });
 
-    // If accepting, update RFQ status
+    // If accepting, reject all other pending quotes for this RFQ and update RFQ status
     if (action === 'accept') {
+      // Reject all other PENDING quotes for the same RFQ
+      await prisma.quote.updateMany({
+        where: {
+          rfqId: quote.rfqId,
+          id: { not: quoteId },
+          status: 'PENDING',
+        },
+        data: { status: 'REJECTED' },
+      });
+
+      // Update RFQ status to IN_PROGRESS (deal is now active)
       await prisma.rFQ.update({
         where: { id: quote.rfqId },
-        data: { status: 'QUOTED' },
-      });
+        data: { status: 'IN_PROGRESS' },
+      }).catch(e => console.error('[Quote Accept] RFQ status update failed:', e));
+
+      console.log('[Quote] Accepted:', quoteId, '| RFQ:', quote.rfqId, '| Other quotes rejected');
     }
 
     return NextResponse.json({
@@ -140,6 +153,7 @@ export async function PUT(request: NextRequest) {
         id: updatedQuote.id,
         status: updatedQuote.status,
       },
+      message: action === 'accept' ? 'Quote accepted! Deal created.' : 'Quote rejected',
     });
   } catch (error) {
     console.error('Error updating quote:', error);
