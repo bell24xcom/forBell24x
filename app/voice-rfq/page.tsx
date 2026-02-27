@@ -22,44 +22,13 @@ export default function VoiceRFQPage() {
   const [transcript, setTranscript] = useState('');
   const [generatedRFQ, setGeneratedRFQ] = useState<VoiceRFQData | null>(null);
   const [recentRFQs, setRecentRFQs] = useState<VoiceRFQData[]>([]);
-  const [recognition, setRecognition] = useState<SpeechRecognition | null>(null);
   const [error, setError] = useState<string | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
+  const streamRef = useRef<MediaStream | null>(null);
 
   useEffect(() => {
-    // Initialize speech recognition
-    if (typeof window !== 'undefined' && 'webkitSpeechRecognition' in window) {
-      const SpeechRecognition = (window as any).webkitSpeechRecognition;
-      const recognitionInstance = new SpeechRecognition();
-      recognitionInstance.continuous = false;
-      recognitionInstance.interimResults = true;
-      recognitionInstance.lang = 'en-US';
-
-      recognitionInstance.onresult = (event: any) => {
-        const transcript = Array.from(event.results)
-          .map((result: any) => result[0])
-          .map((result: any) => result.transcript)
-          .join('');
-        setTranscript(transcript);
-      };
-
-      recognitionInstance.onerror = (event: any) => {
-        setError('Speech recognition error: ' + event.error);
-        setIsRecording(false);
-      };
-
-      recognitionInstance.onend = () => {
-        setIsRecording(false);
-        if (transcript.trim()) {
-          processVoiceInput(transcript);
-        }
-      };
-
-      setRecognition(recognitionInstance);
-    }
-
-    // Load recent RFQs
+    // Load recent RFQs on mount
     loadRecentRFQs();
   }, []);
 
@@ -75,23 +44,105 @@ export default function VoiceRFQPage() {
     }
   };
 
-  const startRecording = () => {
-    if (!recognition) {
-      setError('Speech recognition not supported in this browser');
-      return;
-    }
+  const startRecording = async () => {
+    try {
+      setError(null);
+      setTranscript('');
+      audioChunksRef.current = [];
 
-    setError(null);
-    setTranscript('');
-    setIsRecording(true);
-    recognition.start();
+      // Get microphone access
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
+
+      // Create MediaRecorder
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = async () => {
+        // Create audio blob from recorded chunks
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+
+        // Stop all tracks
+        if (streamRef.current) {
+          streamRef.current.getTracks().forEach(track => track.stop());
+        }
+
+        // Process the audio
+        await processAudioBlob(audioBlob);
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+    } catch (err) {
+      console.error('Error starting recording:', err);
+      setError('Microphone access denied. Please allow microphone access and try again.');
+      setIsRecording(false);
+    }
   };
 
   const stopRecording = () => {
-    if (recognition) {
-      recognition.stop();
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
     }
-    setIsRecording(false);
+  };
+
+  const processAudioBlob = async (audioBlob: Blob) => {
+    setIsProcessing(true);
+    setError(null);
+    setTranscript('Transcribing audio...');
+
+    try {
+      // Step 1: Transcribe audio using Groq Whisper or NVIDIA ASR
+      const formData = new FormData();
+      formData.append('audio', audioBlob, 'recording.webm');
+
+      const transcribeRes = await fetch('/api/voice-rfq/transcribe', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!transcribeRes.ok) {
+        throw new Error('Transcription failed');
+      }
+
+      const transcribeData = await transcribeRes.json();
+      const transcription = transcribeData.transcription || '';
+
+      setTranscript(transcription);
+
+      if (!transcription || transcription.includes('Demo mode')) {
+        setError('⚠️ Transcription in demo mode. Add GROQ_API_KEY for real AI transcription.');
+      }
+
+      // Step 2: Extract RFQ structure using LLM
+      const processRes = await fetch('/api/voice-rfq/process', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ voiceText: transcription }),
+      });
+
+      if (processRes.ok) {
+        const processData = await processRes.json();
+        setGeneratedRFQ(processData.rfq);
+        loadRecentRFQs(); // Refresh recent RFQs
+      } else {
+        setError('Failed to extract RFQ structure');
+      }
+    } catch (error) {
+      setError('Error processing audio: ' + (error instanceof Error ? error.message : 'Unknown error'));
+      console.error('Audio processing error:', error);
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const processVoiceInput = async (voiceText: string) => {

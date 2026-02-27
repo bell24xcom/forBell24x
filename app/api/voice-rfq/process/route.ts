@@ -36,8 +36,19 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// NVIDIA DeepSeek V3.2 - real AI extraction
+// AI extraction with multiple fallbacks: Groq → NVIDIA DeepSeek → Keywords
 async function processVoiceWithNvidiaAI(voiceText: string) {
+  // Try Groq LLM first (FREE, fast)
+  const GROQ_API_KEY = process.env.GROQ_API_KEY;
+  if (GROQ_API_KEY && GROQ_API_KEY !== 'your-groq-api-key-here') {
+    try {
+      return await extractWithGroqLLM(voiceText);
+    } catch (e) {
+      console.warn('[Voice RFQ] Groq LLM failed, trying NVIDIA:', e);
+    }
+  }
+
+  // Fallback to NVIDIA DeepSeek
   const client = aiClient.getClient('text'); // DeepSeek V3.2
 
   if (!client) throw new Error('NVIDIA AI client not available');
@@ -94,6 +105,74 @@ Return this exact JSON structure:
     createdVia: 'voice' as const,
     aiPowered: true,
     aiModel: 'NVIDIA DeepSeek V3.2'
+  };
+}
+
+// Groq LLM extraction (FREE alternative to NVIDIA)
+async function extractWithGroqLLM(voiceText: string) {
+  const systemPrompt = `You are an expert B2B procurement assistant for Bell24h.com, an Indian B2B marketplace.
+Extract a structured RFQ from the user's voice input. Always respond with valid JSON only, no other text.
+
+Return this exact JSON structure:
+{
+  "title": "product/service name (concise, 5-10 words)",
+  "description": "detailed description of what is needed",
+  "category": "one of: Agriculture, Apparel & Fashion, Automobile, Chemical, Electronics & Electrical, Food Products & Beverage, Industrial Machinery, Packaging & Paper, Real Estate & Construction, Textiles, Tools & Equipment, Health & Beauty, Logistics, Other",
+  "quantity": "e.g. 500 pieces, 10 tons, 1000 units",
+  "unit": "pieces/kg/tons/meters/liters/boxes",
+  "budget": "e.g. ₹50,000 or 'Not specified'",
+  "timeline": "e.g. 2 weeks, 1 month, urgent",
+  "specifications": ["spec1", "spec2", "spec3"],
+  "location": "delivery city/state or 'Not specified'",
+  "urgency": "low/medium/high"
+}`;
+
+  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'llama-3.1-70b-versatile',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: `Extract RFQ from this voice input: "${voiceText}"` }
+      ],
+      max_tokens: 500,
+      temperature: 0.1,
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Groq API returned ${res.status}`);
+  }
+
+  const data = await res.json();
+  const content = data.choices?.[0]?.message?.content || '';
+  const jsonMatch = content.match(/\{[\s\S]*\}/);
+
+  if (!jsonMatch) throw new Error('No JSON in Groq response');
+
+  const extracted = JSON.parse(jsonMatch[0]);
+
+  return {
+    id: `voice-rfq-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    title: extracted.title || 'Voice RFQ',
+    description: extracted.description || voiceText,
+    category: extracted.category || 'Other',
+    quantity: extracted.quantity || 'Not specified',
+    unit: extracted.unit || 'units',
+    budget: extracted.budget || 'To be discussed',
+    timeline: extracted.timeline || '2 weeks',
+    specifications: extracted.specifications || [],
+    location: extracted.location || 'Not specified',
+    urgency: extracted.urgency || 'medium',
+    status: 'draft' as const,
+    createdAt: new Date().toISOString(),
+    createdVia: 'voice' as const,
+    aiPowered: true,
+    aiModel: 'Groq Llama 3.1 70B'
   };
 }
 
