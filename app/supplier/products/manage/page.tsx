@@ -1,5 +1,5 @@
 'use client';
-import SupplierNav from '@/components/supplier/SupplierNav';
+import DashboardLayout from '@/components/dashboard/DashboardLayout';
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
@@ -58,14 +58,16 @@ export default function ManageProductsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0F172A] flex items-center justify-center">
-        <div className="text-slate-400">Loading products...</div>
-      </div>
+      <DashboardLayout>
+        <div className="flex items-center justify-center h-64">
+          <div className="text-slate-400">Loading products...</div>
+        </div>
+      </DashboardLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0F172A] p-8">
+    <DashboardLayout>
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -163,7 +165,7 @@ export default function ManageProductsPage() {
           </div>
         )}
       </div>
-    </div>
+    </DashboardLayout>
   );
 }
 

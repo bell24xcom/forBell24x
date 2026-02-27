@@ -1,5 +1,5 @@
 'use client';
-import DashboardNav from '@/components/dashboard/DashboardNav';
+import DashboardLayout from '@/components/dashboard/DashboardLayout';
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
@@ -66,7 +66,6 @@ function SkeletonRow() {
       {[1, 2, 3, 4, 5, 6].map(i => (
         <td key={i} className="px-6 py-4">
           <div className="h-4 bg-gray-200 rounded w-full" />
-        <DashboardNav />
         </td>
       ))}
     </tr>
@@ -131,7 +130,7 @@ export default function MyQuotesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0F172A]">
+    <DashboardLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
 
         {/* Breadcrumb */}
@@ -324,6 +323,6 @@ export default function MyQuotesPage() {
           </div>
         </div>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }

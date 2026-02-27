@@ -1,5 +1,5 @@
 'use client';
-import SupplierNav from '@/components/supplier/SupplierNav';
+import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -74,7 +74,7 @@ export default function SupplierDashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0F172A] text-white">
+    <DashboardLayout>
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Breadcrumb */}
         <nav className="mb-6">
@@ -213,6 +213,6 @@ export default function SupplierDashboardPage() {
           </div>
         </div>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }
