@@ -50,8 +50,22 @@ export default function VoiceRFQPage() {
       setTranscript('');
       audioChunksRef.current = [];
 
-      // Get microphone access
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      // Get microphone access with fallback strategy
+      let stream: MediaStream;
+      try {
+        // Try with high-quality constraints first
+        stream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            sampleRate: 16000
+          }
+        });
+      } catch (constraintError) {
+        // Fallback to basic audio if constraints fail
+        console.log('High-quality constraints failed, using basic audio');
+        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      }
       streamRef.current = stream;
 
       // Create MediaRecorder
@@ -105,43 +119,67 @@ export default function VoiceRFQPage() {
     setTranscript('Transcribing audio...');
 
     try {
-      // Step 1: Transcribe audio using Groq Whisper or NVIDIA ASR
+      // COMBINED: Transcribe + Extract in ONE API call
       const formData = new FormData();
       formData.append('audio', audioBlob, 'recording.webm');
 
-      const transcribeRes = await fetch('/api/voice-rfq/transcribe', {
+      const response = await fetch('/api/voice-rfq/transcribe', {
         method: 'POST',
         body: formData,
       });
 
-      if (!transcribeRes.ok) {
-        throw new Error('Transcription failed');
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('API error:', errorData);
+        throw new Error(errorData.error || 'Processing failed');
       }
 
-      const transcribeData = await transcribeRes.json();
-      const transcription = transcribeData.transcription || '';
+      const data = await response.json();
 
+      // Check if we got valid data
+      if (!data.success) {
+        throw new Error(data.error || 'API returned unsuccessful response');
+      }
+
+      console.log('API response:', data);
+
+      // Set transcription
+      const transcription = data.transcription || '';
       setTranscript(transcription);
 
-      if (!transcription || transcription.includes('Demo mode')) {
-        setError('⚠️ Transcription in demo mode. Add GROQ_API_KEY for real AI transcription.');
+      // Check for API key issues
+      if (data.debug && !data.debug.groqKeyPresent) {
+        setError('⚠️ GROQ_API_KEY not configured in Vercel. Using demo mode.');
       }
 
-      // Step 2: Extract RFQ structure using LLM
-      const processRes = await fetch('/api/voice-rfq/process', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ voiceText: transcription }),
-      });
+      // Set extracted RFQ data (already structured!)
+      if (data.extractedData) {
+        const rfq: VoiceRFQData = {
+          id: `voice-rfq-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          title: data.extractedData.product || 'Voice RFQ',
+          description: transcription,
+          category: data.extractedData.category || 'Other',
+          quantity: data.extractedData.quantity
+            ? `${data.extractedData.quantity} ${data.extractedData.unit || 'units'}`
+            : 'Not specified',
+          specifications: data.extractedData.specifications
+            ? [data.extractedData.specifications]
+            : [],
+          timeline: data.extractedData.urgency || 'flexible',
+          budget: data.extractedData.budgetMin && data.extractedData.budgetMax
+            ? `₹${data.extractedData.budgetMin} - ₹${data.extractedData.budgetMax}`
+            : data.extractedData.budgetMin
+            ? `₹${data.extractedData.budgetMin}+`
+            : 'To be discussed',
+          status: 'draft',
+          createdAt: new Date().toISOString(),
+          createdVia: 'voice',
+        };
 
-      if (processRes.ok) {
-        const processData = await processRes.json();
-        setGeneratedRFQ(processData.rfq);
+        setGeneratedRFQ(rfq);
         loadRecentRFQs(); // Refresh recent RFQs
       } else {
-        setError('Failed to extract RFQ structure');
+        setError('⚠️ No structured data extracted from audio');
       }
     } catch (error) {
       setError('Error processing audio: ' + (error instanceof Error ? error.message : 'Unknown error'));

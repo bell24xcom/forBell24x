@@ -5,107 +5,167 @@ export const dynamic = 'force-dynamic';
 /**
  * POST /api/voice-rfq/transcribe
  *
- * Transcribes audio using Groq Whisper (FREE) or NVIDIA ASR
- * Handles Hindi + English mixed audio
+ * COMBINED: Transcribes audio + Extracts structured RFQ in ONE call
+ * Uses Groq Whisper v3 (handles Hindi + English)
  *
  * Input: FormData with 'audio' blob
- * Output: { transcription: string, language: string }
+ * Output: { transcription, extractedData }
  */
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
-    const audioFile = formData.get('audio') as File | null;
+    const audioFile = formData.get('audio') as File;
+    const groqKey = process.env.GROQ_API_KEY;
 
+    // Validation
     if (!audioFile) {
       return NextResponse.json(
-        { success: false, error: 'Audio file is required' },
+        { success: false, error: 'No audio file provided' },
         { status: 400 }
       );
     }
 
+    if (!groqKey || groqKey === 'your-groq-api-key-here') {
+      console.error('[Voice RFQ] GROQ_API_KEY not configured properly');
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Groq API key not configured',
+          debug: { groqKeyPresent: !!groqKey, groqKeyValid: groqKey !== 'your-groq-api-key-here' }
+        },
+        { status: 500 }
+      );
+    }
+
     const audioBuffer = Buffer.from(await audioFile.arrayBuffer());
+    console.log('[Voice RFQ] Processing audio:', audioBuffer.length, 'bytes');
 
+    // STEP 1: Transcribe with Groq Whisper v3
     let transcription = '';
-    let transcriptionSource = '';
+    try {
+      const fd = new FormData();
+      fd.append('file', new Blob([audioBuffer], { type: 'audio/webm' }), 'audio.webm');
+      fd.append('model', 'whisper-large-v3');
+      fd.append('response_format', 'json');
 
-    // Option 1: Groq Whisper (FREE, excellent for Hindi+English)
-    const GROQ_API_KEY = process.env.GROQ_API_KEY;
-    if (GROQ_API_KEY && GROQ_API_KEY !== 'your-groq-api-key-here') {
-      try {
-        const fd = new FormData();
-        fd.append('file', new Blob([audioBuffer], { type: audioFile.type }), audioFile.name || 'recording.webm');
-        fd.append('model', 'whisper-large-v3');
-        fd.append('language', 'hi'); // Hindi (also handles English mixed)
-        fd.append('response_format', 'json');
+      const groqRes = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${groqKey}` },
+        body: fd,
+      });
 
-        const res = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${GROQ_API_KEY}` },
-          body: fd,
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          transcription = data.text || '';
-          transcriptionSource = 'Groq Whisper v3';
-          console.log('[Voice Transcribe] Groq success:', transcription.substring(0, 100));
-        } else {
-          const errorText = await res.text();
-          console.warn('[Voice Transcribe] Groq failed:', res.status, errorText);
-        }
-      } catch (e) {
-        console.error('[Voice Transcribe] Groq error:', e);
+      if (!groqRes.ok) {
+        const errorText = await groqRes.text();
+        console.error('[Voice RFQ] Groq Whisper failed:', groqRes.status, errorText);
+        throw new Error(`Groq Whisper returned ${groqRes.status}`);
       }
-    }
 
-    // Option 2: NVIDIA ASR fallback
-    if (!transcription && process.env.NVIDIA_API_KEY) {
-      try {
-        const fd = new FormData();
-        fd.append('file', new Blob([audioBuffer], { type: audioFile.type }), 'audio.webm');
+      const groqData = await groqRes.json();
+      transcription = groqData.text || '';
+      console.log('[Voice RFQ] Transcription success:', transcription.substring(0, 100));
 
-        const res = await fetch('https://integrate.api.nvidia.com/v1/audio/transcriptions', {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${process.env.NVIDIA_API_KEY}` },
-          body: fd,
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          transcription = data.text || '';
-          transcriptionSource = 'NVIDIA Parakeet ASR';
-          console.log('[Voice Transcribe] NVIDIA success:', transcription.substring(0, 100));
-        }
-      } catch (e) {
-        console.error('[Voice Transcribe] NVIDIA ASR error:', e);
+      if (!transcription) {
+        throw new Error('Groq returned empty transcription');
       }
+    } catch (transcriptionError) {
+      console.error('[Voice RFQ] Transcription error:', transcriptionError);
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Transcription failed: ' + String(transcriptionError),
+          debug: { stage: 'transcription', groqKeyPresent: true }
+        },
+        { status: 500 }
+      );
     }
 
-    // Option 3: Demo fallback (development only)
-    if (!transcription) {
-      transcription = 'Demo mode: I need 500 kg steel rods, grade 60, delivery to Mumbai within one week.';
-      transcriptionSource = 'demo-fallback';
-      console.error('[Voice Transcribe] BOTH APIs FAILED - GROQ_API_KEY present:', !!GROQ_API_KEY, 'NVIDIA_API_KEY present:', !!process.env.NVIDIA_API_KEY);
-      console.error('[Voice Transcribe] GROQ_API_KEY value check:', GROQ_API_KEY?.substring(0, 10) + '...');
+    // STEP 2: Extract structured RFQ with Groq LLM
+    let extractedData: any = null;
+    try {
+      const extractionPrompt = `Extract RFQ details from this requirement. Return ONLY valid JSON, no markdown, no extra text.
+
+Text: "${transcription}"
+
+JSON format (all fields required, use null if not mentioned):
+{
+  "product": "product name",
+  "quantity": number or null,
+  "unit": "kg/tons/pieces/meters/liters/boxes/units" or null,
+  "location": "city" or null,
+  "urgency": "urgent/1_week/2_weeks/1_month/flexible",
+  "category": "Steel & Metals/Electronics/Textiles/Chemicals/Packaging/Industrial Machinery/Auto Components/Rubber & Plastics/Food & Beverages/Construction/Pharmaceuticals/Paper Products/Electrical/Furniture/Other",
+  "specifications": "specs or null",
+  "budgetMin": number or null,
+  "budgetMax": number or null
+}`;
+
+      const llmRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${groqKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'llama-3.1-8b-instant',
+          messages: [{ role: 'user', content: extractionPrompt }],
+          max_tokens: 500,
+          temperature: 0.1,
+        }),
+      });
+
+      if (!llmRes.ok) {
+        const errorText = await llmRes.text();
+        console.error('[Voice RFQ] Groq LLM failed:', llmRes.status, errorText);
+        throw new Error(`Groq LLM returned ${llmRes.status}`);
+      }
+
+      const llmData = await llmRes.json();
+      const content = llmData.choices?.[0]?.message?.content || '';
+      console.log('[Voice RFQ] LLM raw response:', content.substring(0, 200));
+
+      // Extract JSON from response (handles markdown code blocks)
+      const cleaned = content.replace(/```json\n?|\n?```/g, '').trim();
+      extractedData = JSON.parse(cleaned);
+
+      console.log('[Voice RFQ] Extraction success:', extractedData);
+    } catch (extractionError) {
+      console.error('[Voice RFQ] Extraction error:', extractionError);
+      // Return transcription but with basic extraction fallback
+      extractedData = {
+        product: transcription.substring(0, 50),
+        quantity: null,
+        unit: null,
+        location: null,
+        urgency: 'flexible',
+        category: 'Other',
+        specifications: null,
+        budgetMin: null,
+        budgetMax: null,
+      };
     }
 
+    // Return both transcription and extracted data
     return NextResponse.json({
       success: true,
       transcription,
-      transcriptionSource,
-      audioFormat: audioFile.type,
-      audioSize: audioBuffer.length,
+      transcriptionSource: 'Groq Whisper v3',
+      extractedData,
+      aiModel: 'Groq Llama 3.1 8B',
       timestamp: new Date().toISOString(),
       debug: {
-        groqKeyPresent: !!GROQ_API_KEY,
-        groqKeyValid: GROQ_API_KEY !== 'your-groq-api-key-here',
-        nvidiaKeyPresent: !!process.env.NVIDIA_API_KEY,
+        groqKeyPresent: true,
+        audioSize: audioBuffer.length,
+        transcriptionLength: transcription.length,
       },
     });
   } catch (error) {
-    console.error('[Voice Transcribe] Error:', error);
+    console.error('[Voice RFQ] Fatal error:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to transcribe audio' },
+      {
+        success: false,
+        error: 'Processing failed: ' + String(error),
+        debug: { stage: 'unknown' }
+      },
       { status: 500 }
     );
   }
