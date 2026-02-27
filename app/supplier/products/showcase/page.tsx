@@ -1,8 +1,7 @@
 'use client';
+import DashboardLayout from '@/components/dashboard/DashboardLayout';
 
 import React, { useState, useEffect } from 'react';
-import UserDashboardLayout from '@/components/dashboard/UserDashboardLayout';
-import SupplierNav from '@/components/supplier/SupplierNav';
 import ProductShowcaseGrid from '@/components/suppliers/ProductShowcaseGrid';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
@@ -35,18 +34,17 @@ export default function ProductShowcasePage() {
 
   if (loading) {
     return (
-      <UserDashboardLayout>
+      <DashboardLayout>
         <div className="flex items-center justify-center h-64">
           <div className="text-slate-400">Loading products...</div>
         </div>
-      </UserDashboardLayout>
+      </DashboardLayout>
     );
   }
 
   return (
-    <UserDashboardLayout>
+    <DashboardLayout>
       <div className="w-full">
-        <SupplierNav />
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-3xl font-bold text-white">Product Showcase</h1>
@@ -69,7 +67,7 @@ export default function ProductShowcasePage() {
           categoryPlaceholder="Product"
         />
       </div>
-    </UserDashboardLayout>
+    </DashboardLayout>
   );
 }
 

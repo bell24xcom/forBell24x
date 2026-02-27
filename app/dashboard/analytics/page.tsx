@@ -1,5 +1,5 @@
 'use client';
-import DashboardNav from '@/components/dashboard/DashboardNav';
+import DashboardLayout from '@/components/dashboard/DashboardLayout';
 
 import { useState, useEffect } from 'react';
 import { 
@@ -157,7 +157,6 @@ export default function UserAnalyticsDashboard() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <DashboardNav />
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-slate-300">Loading analytics...</p>
@@ -175,9 +174,10 @@ export default function UserAnalyticsDashboard() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
+    <DashboardLayout>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="bg-white rounded-lg shadow-sm p-6">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-white">User Analytics Dashboard</h1>
@@ -340,5 +340,6 @@ export default function UserAnalyticsDashboard() {
         </div>
       </div>
     </div>
+    </DashboardLayout>
   );
 }

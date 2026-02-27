@@ -1,4 +1,5 @@
 'use client';
+import DashboardLayout from '@/components/dashboard/DashboardLayout';
 
 import { useState, useEffect } from 'react';
 import { Eye, Unlock, Phone, Mail, MapPin, Calendar, DollarSign, CreditCard } from 'lucide-react';
@@ -154,7 +155,7 @@ export default function SupplierLeadsPage() {
   }
 
   return (
-    <div className="page-container">
+    <DashboardLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
@@ -362,6 +363,6 @@ export default function SupplierLeadsPage() {
           </div>
         )}
       </div>
-    </div>
+    </DashboardLayout>
   );
 }

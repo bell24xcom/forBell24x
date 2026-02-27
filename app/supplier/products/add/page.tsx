@@ -1,5 +1,5 @@
 'use client';
-import SupplierNav from '@/components/supplier/SupplierNav';
+import DashboardLayout from '@/components/dashboard/DashboardLayout';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -87,7 +87,7 @@ export default function AddProductPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0F172A] py-8">
+    <DashboardLayout>
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-slate-800/50 border border-slate-700 rounded-lg shadow-lg p-6">
           <div className="mb-8">
@@ -262,6 +262,6 @@ export default function AddProductPage() {
           </form>
         </div>
       </div>
-    </div>
+    </DashboardLayout>
   );
 } 

@@ -1,5 +1,5 @@
 'use client';
-import SupplierNav from '@/components/supplier/SupplierNav';
+import DashboardLayout from '@/components/dashboard/DashboardLayout';
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -42,7 +42,7 @@ export default function EditProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0F172A] p-8">
+    <DashboardLayout>
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold text-white mb-8">
           Edit Profile
@@ -142,7 +142,7 @@ export default function EditProfilePage() {
           </form>
         </Card>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }
 

@@ -1,5 +1,5 @@
 'use client';
-import DashboardNav from '@/components/dashboard/DashboardNav';
+import DashboardLayout from '@/components/dashboard/DashboardLayout';
 
 import { useState } from 'react';
 import Link from 'next/link';
@@ -103,7 +103,6 @@ function ReportCard({
 }) {
   return (
     <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col gap-4 hover:shadow-md transition-shadow">
-        <DashboardNav />
       {/* Icon & Title */}
       <div className="flex items-start gap-4">
         <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${report.accentColor}`}>
@@ -216,7 +215,7 @@ export default function ReportsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0F172A]">
+    <DashboardLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
 
         {/* Breadcrumb */}
@@ -295,6 +294,6 @@ export default function ReportsPage() {
           </div>
         </div>
       </div>
-    </div>
+    </DashboardLayout>
   );
 }

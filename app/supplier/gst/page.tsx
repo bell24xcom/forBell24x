@@ -1,8 +1,8 @@
 'use client';
-import SupplierNav from '@/components/supplier/SupplierNav';
+import DashboardLayout from '@/components/dashboard/DashboardLayout';
 
 import React, { useState } from 'react';
-import UserDashboardLayout from '@/components/dashboard/UserDashboardLayout';
+import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import { Receipt, Building2, FileText, Upload, Save, Download } from 'lucide-react';
 
 export default function GSTPage() {
@@ -39,8 +39,7 @@ export default function GSTPage() {
   };
 
   return (
-    <UserDashboardLayout>
-        <SupplierNav />
+    <DashboardLayout>
       <div className="w-full max-w-4xl">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-white flex items-center gap-2">
@@ -291,7 +290,7 @@ export default function GSTPage() {
           </div>
         </form>
       </div>
-    </UserDashboardLayout>
+    </DashboardLayout>
   );
 }
 
