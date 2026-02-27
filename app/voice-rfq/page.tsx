@@ -176,9 +176,12 @@ export default function VoiceRFQPage() {
           createdVia: 'voice',
         };
 
+        console.log('[Voice RFQ] Setting generatedRFQ:', rfq);
         setGeneratedRFQ(rfq);
+        console.log('[Voice RFQ] State should be updated now');
         loadRecentRFQs(); // Refresh recent RFQs
       } else {
+        console.error('[Voice RFQ] No extractedData in API response:', data);
         setError('⚠️ No structured data extracted from audio');
       }
     } catch (error) {
@@ -311,36 +314,47 @@ export default function VoiceRFQPage() {
               </div>
             )}
 
+            {/* Debug: Show if RFQ data exists */}
+            {transcript && !generatedRFQ && (
+              <div className="bg-yellow-50 p-4 rounded-lg mb-6 border-2 border-yellow-500">
+                <p className="text-yellow-900 text-base">⏳ Extracting RFQ data... (If this stays, data extraction failed)</p>
+              </div>
+            )}
+
             {/* Generated RFQ Display */}
             {generatedRFQ && (
-              <div className="bg-green-50 p-6 rounded-lg mb-6">
-                <h4 className="font-semibold text-green-900 mb-4">Generated RFQ:</h4>
-                <div className="space-y-3">
-                  <div>
-                    <strong>Title:</strong> {generatedRFQ.title}
+              <div className="bg-green-50 p-6 rounded-lg mb-6 border-2 border-green-500">
+                <h4 className="font-semibold text-green-900 mb-4 text-xl">✅ Generated RFQ:</h4>
+                <div className="space-y-3 text-gray-900">
+                  <div className="text-base">
+                    <strong className="text-gray-900">Title:</strong> <span className="text-gray-800">{generatedRFQ.title || 'N/A'}</span>
                   </div>
-                  <div>
-                    <strong>Category:</strong> {generatedRFQ.category}
+                  <div className="text-base">
+                    <strong className="text-gray-900">Category:</strong> <span className="text-gray-800">{generatedRFQ.category || 'N/A'}</span>
                   </div>
-                  <div>
-                    <strong>Description:</strong> {generatedRFQ.description}
+                  <div className="text-base">
+                    <strong className="text-gray-900">Description:</strong> <span className="text-gray-800">{generatedRFQ.description || 'N/A'}</span>
                   </div>
-                  <div>
-                    <strong>Quantity:</strong> {generatedRFQ.quantity}
+                  <div className="text-base">
+                    <strong className="text-gray-900">Quantity:</strong> <span className="text-gray-800">{generatedRFQ.quantity || 'N/A'}</span>
                   </div>
-                  <div>
-                    <strong>Timeline:</strong> {generatedRFQ.timeline}
+                  <div className="text-base">
+                    <strong className="text-gray-900">Timeline:</strong> <span className="text-gray-800">{generatedRFQ.timeline || 'N/A'}</span>
                   </div>
-                  <div>
-                    <strong>Budget:</strong> {generatedRFQ.budget}
+                  <div className="text-base">
+                    <strong className="text-gray-900">Budget:</strong> <span className="text-gray-800">{generatedRFQ.budget || 'N/A'}</span>
                   </div>
-                  <div>
-                    <strong>Specifications:</strong>
-                    <ul className="list-disc list-inside ml-4">
-                      {generatedRFQ.specifications.map((spec, index) => (
-                        <li key={index}>{spec}</li>
-                      ))}
-                    </ul>
+                  <div className="text-base">
+                    <strong className="text-gray-900">Specifications:</strong>
+                    {generatedRFQ.specifications && generatedRFQ.specifications.length > 0 ? (
+                      <ul className="list-disc list-inside ml-4 text-gray-800">
+                        {generatedRFQ.specifications.map((spec, index) => (
+                          <li key={index}>{spec}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <span className="text-gray-800"> N/A</span>
+                    )}
                   </div>
                 </div>
                 <div className="flex gap-4 mt-6">
