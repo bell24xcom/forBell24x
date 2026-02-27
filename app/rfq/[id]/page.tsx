@@ -83,6 +83,8 @@ export default function RFQDetailPage() {
         setShowQuoteForm(false);
         setQuoteData({ price: '', quantity: '', timeline: '', description: '', terms: '' });
         alert('Quote submitted successfully!');
+        // Redirect to My Quotes page
+        router.push('/supplier/my-quotes');
       } else {
         setError(data.error || 'Failed to submit quote');
       }
