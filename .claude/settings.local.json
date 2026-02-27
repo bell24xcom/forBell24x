@@ -18,7 +18,8 @@
       "Bash(git status:*)",
       "Bash(grep:*)",
       "Bash(fi)",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(\"C:\\\\Users\\\\Sanika\\\\Projects\\\\bell24h\\\\.env\" <<'EOF'\n\n# Groq API \\(FREE - for Whisper transcription + LLM\\)\n# Sign up at: https://console.groq.com\nGROQ_API_KEY=your-groq-api-key-here\n\nEOF)"
     ]
   }
 }
