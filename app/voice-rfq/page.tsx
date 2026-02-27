@@ -79,9 +79,15 @@ export default function VoiceRFQPage() {
 
       mediaRecorder.start();
       setIsRecording(true);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error starting recording:', err);
-      setError('Microphone access denied. Please allow microphone access and try again.');
+      if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+        setError('🎤 Microphone access denied. Click the lock/camera icon in your browser address bar, allow microphone access, then refresh the page.');
+      } else if (err.name === 'NotFoundError') {
+        setError('🎤 No microphone found. Please connect a microphone and try again.');
+      } else {
+        setError('🎤 Cannot access microphone: ' + err.message);
+      }
       setIsRecording(false);
     }
   };
