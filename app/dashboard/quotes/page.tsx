@@ -106,24 +106,46 @@ export default function MyQuotesPage() {
   }, [fetchQuotes]);
 
   const handleAccept = async (quoteId: string) => {
+    if (!confirm('Accept this quote? This will create a deal and reject other pending quotes for this RFQ.')) return;
+
     setAcceptingId(quoteId);
     setAcceptError(null);
     try {
       const res = await fetch('/api/rfq/quotes', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ quoteId, status: 'ACCEPTED' }),
+        body: JSON.stringify({ quoteId, action: 'accept' }),
       });
       const data = await res.json();
       if (!data.success) throw new Error(data.error ?? 'Failed to accept quote');
-      // Optimistically update the quote status
-      setQuotes(prev =>
-        prev.map(q =>
-          q.id === quoteId ? { ...q, status: 'ACCEPTED' as QuoteStatus, isAccepted: true } : q
-        )
-      );
+
+      // Refresh quotes to show updated statuses
+      await fetchQuotes();
     } catch (err) {
       setAcceptError(err instanceof Error ? err.message : 'Failed to accept quote');
+    } finally {
+      setAcceptingId(null);
+    }
+  };
+
+  const handleReject = async (quoteId: string) => {
+    if (!confirm('Reject this quote?')) return;
+
+    setAcceptingId(quoteId);
+    setAcceptError(null);
+    try {
+      const res = await fetch('/api/rfq/quotes', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ quoteId, action: 'reject' }),
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error ?? 'Failed to reject quote');
+
+      // Refresh quotes to show updated status
+      await fetchQuotes();
+    } catch (err) {
+      setAcceptError(err instanceof Error ? err.message : 'Failed to reject quote');
     } finally {
       setAcceptingId(null);
     }
@@ -295,18 +317,27 @@ export default function MyQuotesPage() {
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
                         {quote.status === 'PENDING' && (
-                          <button
-                            onClick={() => handleAccept(quote.id)}
-                            disabled={acceptingId === quote.id}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-medium rounded-lg transition-colors disabled:opacity-60"
-                          >
-                            {acceptingId === quote.id ? (
-                              <Loader2 className="w-3 h-3 animate-spin" />
-                            ) : (
-                              <CheckCircle className="w-3 h-3" />
-                            )}
-                            Accept
-                          </button>
+                          <>
+                            <button
+                              onClick={() => handleAccept(quote.id)}
+                              disabled={acceptingId !== null}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-medium rounded-lg transition-colors disabled:opacity-60"
+                            >
+                              {acceptingId === quote.id ? (
+                                <Loader2 className="w-3 h-3 animate-spin" />
+                              ) : (
+                                <CheckCircle className="w-3 h-3" />
+                              )}
+                              Accept
+                            </button>
+                            <button
+                              onClick={() => handleReject(quote.id)}
+                              disabled={acceptingId !== null}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-600/20 hover:bg-red-600/40 text-red-400 text-xs font-medium rounded-lg transition-colors disabled:opacity-60"
+                            >
+                              ✗ Reject
+                            </button>
+                          </>
                         )}
                         <Link
                           href={`/rfq/compare-quotes`}
