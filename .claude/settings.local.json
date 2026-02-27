@@ -19,7 +19,12 @@
       "Bash(grep:*)",
       "Bash(fi)",
       "Bash(done)",
-      "Bash(\"C:\\\\Users\\\\Sanika\\\\Projects\\\\bell24h\\\\.env\" <<'EOF'\n\n# Groq API \\(FREE - for Whisper transcription + LLM\\)\n# Sign up at: https://console.groq.com\nGROQ_API_KEY=your-groq-api-key-here\n\nEOF)"
+      "Bash(\"C:\\\\Users\\\\Sanika\\\\Projects\\\\bell24h\\\\.env\" <<'EOF'\n\n# Groq API \\(FREE - for Whisper transcription + LLM\\)\n# Sign up at: https://console.groq.com\nGROQ_API_KEY=your-groq-api-key-here\n\nEOF)",
+      "Bash(git config:*)",
+      "Bash(if [ -f \"components/dashboard/DashboardLayout.tsx\" ])",
+      "Bash(then grep -E \"href=\"\"/\" components/dashboard/DashboardLayout.tsx)",
+      "Bash(else echo \"DashboardLayout not found in dashboard subfolder\")",
+      "Bash(else echo \"❌ MISSING: $api\")"
     ]
   }
 }

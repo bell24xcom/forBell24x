@@ -85,7 +85,8 @@ export async function POST(request: NextRequest) {
     if (!transcription) {
       transcription = 'Demo mode: I need 500 kg steel rods, grade 60, delivery to Mumbai within one week.';
       transcriptionSource = 'demo-fallback';
-      console.warn('[Voice Transcribe] Using demo transcription - no API keys worked');
+      console.error('[Voice Transcribe] BOTH APIs FAILED - GROQ_API_KEY present:', !!GROQ_API_KEY, 'NVIDIA_API_KEY present:', !!process.env.NVIDIA_API_KEY);
+      console.error('[Voice Transcribe] GROQ_API_KEY value check:', GROQ_API_KEY?.substring(0, 10) + '...');
     }
 
     return NextResponse.json({
@@ -95,6 +96,11 @@ export async function POST(request: NextRequest) {
       audioFormat: audioFile.type,
       audioSize: audioBuffer.length,
       timestamp: new Date().toISOString(),
+      debug: {
+        groqKeyPresent: !!GROQ_API_KEY,
+        groqKeyValid: GROQ_API_KEY !== 'your-groq-api-key-here',
+        nvidiaKeyPresent: !!process.env.NVIDIA_API_KEY,
+      },
     });
   } catch (error) {
     console.error('[Voice Transcribe] Error:', error);
