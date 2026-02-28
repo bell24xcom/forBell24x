@@ -25,7 +25,13 @@
       "Bash(then grep -E \"href=\"\"/\" components/dashboard/DashboardLayout.tsx)",
       "Bash(else echo \"DashboardLayout not found in dashboard subfolder\")",
       "Bash(else echo \"❌ MISSING: $api\")",
-      "Bash(vercel:*)"
+      "Bash(vercel:*)",
+      "Bash(npx ts-node:*)",
+      "Bash(npx tsx:*)",
+      "Bash(node check-db.mjs:*)",
+      "Bash(curl:*)",
+      "Bash(npm run dev:*)",
+      "Bash(node:*)"
     ]
   }
 }
