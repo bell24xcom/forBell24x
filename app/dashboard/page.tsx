@@ -45,6 +45,7 @@ interface RecentActivity {
 export default function DashboardPage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [activeRole, setActiveRole] = useState<'buyer' | 'supplier'>('buyer');
   const [stats, setStats] = useState({
     totalRFQs: 0,
     activeRFQs: 0,
@@ -181,21 +182,45 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       {/* Welcome Section */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
+      <div className="bg-gray-900 border border-gray-700 rounded-lg shadow-sm p-6">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-white mb-2">
               Welcome back, {user?.name || 'User'}!
             </h1>
-            <p className="text-slate-300">
+            <p className="text-gray-300">
               Here's what's happening with your B2B activities
             </p>
           </div>
           <div className="text-right">
-            <p className="text-sm text-slate-400">Last updated</p>
+            <p className="text-sm text-gray-400">Last updated</p>
             <p className="text-sm font-medium text-white">2 minutes ago</p>
           </div>
         </div>
+      </div>
+
+      {/* Buyer/Supplier Role Toggle */}
+      <div className="flex gap-2">
+        <button
+          onClick={() => setActiveRole('buyer')}
+          className={`px-6 py-2 rounded-lg font-medium transition-colors ${
+            activeRole === 'buyer'
+              ? 'bg-blue-600 text-white'
+              : 'bg-gray-800 text-gray-400 hover:text-white'
+          }`}
+        >
+          🛒 Buyer
+        </button>
+        <button
+          onClick={() => setActiveRole('supplier')}
+          className={`px-6 py-2 rounded-lg font-medium transition-colors ${
+            activeRole === 'supplier'
+              ? 'bg-emerald-600 text-white'
+              : 'bg-gray-800 text-gray-400 hover:text-white'
+          }`}
+        >
+          🏭 Supplier
+        </button>
       </div>
 
       {/* Empty State CTA - Show when no activity */}
@@ -241,49 +266,49 @@ export default function DashboardPage() {
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-gray-900 border border-gray-700 rounded-lg shadow-sm p-6">
           <div className="flex items-center">
-            <div className="p-3 rounded-full bg-blue-100 text-blue-600">
+            <div className="p-3 rounded-full bg-blue-500/10 text-blue-400">
               <FileText className="w-6 h-6" />
             </div>
             <div className="ml-4">
-              <p className="text-sm text-slate-300">Total RFQs</p>
+              <p className="text-sm text-gray-400">Total RFQs</p>
               <p className="text-2xl font-bold text-white">{stats.totalRFQs}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-gray-900 border border-gray-700 rounded-lg shadow-sm p-6">
           <div className="flex items-center">
-            <div className="p-3 rounded-full bg-green-100 text-green-600">
+            <div className="p-3 rounded-full bg-green-500/10 text-green-400">
               <CheckCircle className="w-6 h-6" />
             </div>
             <div className="ml-4">
-              <p className="text-sm text-slate-300">Active RFQs</p>
+              <p className="text-sm text-gray-400">Active RFQs</p>
               <p className="text-2xl font-bold text-white">{stats.activeRFQs}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-gray-900 border border-gray-700 rounded-lg shadow-sm p-6">
           <div className="flex items-center">
-            <div className="p-3 rounded-full bg-purple-100 text-purple-600">
+            <div className="p-3 rounded-full bg-purple-500/10 text-purple-400">
               <MessageSquare className="w-6 h-6" />
             </div>
             <div className="ml-4">
-              <p className="text-sm text-slate-300">Quotes Received</p>
+              <p className="text-sm text-gray-400">Quotes Received</p>
               <p className="text-2xl font-bold text-white">{stats.totalQuotesReceived}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-gray-900 border border-gray-700 rounded-lg shadow-sm p-6">
           <div className="flex items-center">
-            <div className="p-3 rounded-full bg-orange-100 text-orange-600">
+            <div className="p-3 rounded-full bg-orange-500/10 text-orange-400">
               <TrendingUp className="w-6 h-6" />
             </div>
             <div className="ml-4">
-              <p className="text-sm text-slate-300">Total Earned</p>
+              <p className="text-sm text-gray-400">Total Earned</p>
               <p className="text-2xl font-bold text-white">{formatCurrency(stats.totalEarned)}</p>
             </div>
           </div>
@@ -292,37 +317,37 @@ export default function DashboardPage() {
 
       {/* Financial Overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-gray-900 border border-gray-700 rounded-lg shadow-sm p-6">
           <div className="flex items-center">
-            <div className="p-3 rounded-full bg-green-100 text-green-600">
+            <div className="p-3 rounded-full bg-green-500/10 text-green-400">
               <DollarSign className="w-6 h-6" />
             </div>
             <div className="ml-4">
-              <p className="text-sm text-slate-300">Total Spent</p>
+              <p className="text-sm text-gray-400">Total Spent</p>
               <p className="text-2xl font-bold text-white">{formatCurrency(stats.totalSpent)}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-gray-900 border border-gray-700 rounded-lg shadow-sm p-6">
           <div className="flex items-center">
-            <div className="p-3 rounded-full bg-blue-100 text-blue-600">
+            <div className="p-3 rounded-full bg-blue-500/10 text-blue-400">
               <TrendingUp className="w-6 h-6" />
             </div>
             <div className="ml-4">
-              <p className="text-sm text-slate-300">Success Rate</p>
+              <p className="text-sm text-gray-400">Success Rate</p>
               <p className="text-2xl font-bold text-white">{stats.successRate}%</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-gray-900 border border-gray-700 rounded-lg shadow-sm p-6">
           <div className="flex items-center">
-            <div className="p-3 rounded-full bg-yellow-100 text-yellow-600">
+            <div className="p-3 rounded-full bg-yellow-500/10 text-yellow-400">
               <Award className="w-6 h-6" />
             </div>
             <div className="ml-4">
-              <p className="text-sm text-slate-300">Quote Rate</p>
+              <p className="text-sm text-gray-400">Quote Rate</p>
               <p className="text-2xl font-bold text-white">
                 {stats.totalRFQs > 0 ? Math.round((stats.totalQuotesReceived / stats.totalRFQs) * 100) : 0}%
               </p>
@@ -332,7 +357,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Live Features Status */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
+      <div className="bg-gray-900 border border-gray-700 rounded-lg shadow-sm p-6">
         <h2 className="text-lg font-semibold text-white mb-4">Live Features Status</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {liveFeatures.map((feature) => {
@@ -362,7 +387,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Recent Activity */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
+      <div className="bg-gray-900 border border-gray-700 rounded-lg shadow-sm p-6">
         <h2 className="text-lg font-semibold text-white mb-4">Recent Activity</h2>
         <div className="space-y-3">
           {recentActivity.length === 0 ? (
@@ -389,7 +414,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
+      <div className="bg-gray-900 border border-gray-700 rounded-lg shadow-sm p-6">
         <h2 className="text-lg font-semibold text-white mb-4">Quick Actions</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <button className="flex items-center justify-center p-4 border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors">

@@ -143,11 +143,11 @@ export default function SuppliersPage() {
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {suppliers.map((supplier) => (
-                    <div key={supplier.id} className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6">
+                    <div key={supplier.id} className="bg-gray-900 border border-gray-700 rounded-lg shadow-md hover:shadow-lg transition-shadow p-6">
                       <div className="flex items-start justify-between mb-4">
                         <div>
                           <h3 className="text-xl font-semibold text-white">{supplier.company}</h3>
-                          <p className="text-slate-300">{supplier.name}</p>
+                          <p className="text-gray-300">{supplier.name}</p>
                         </div>
                         <div className="flex flex-col items-end">
                           {supplier.verified && (
@@ -157,16 +157,16 @@ export default function SuppliersPage() {
                           )}
                           <div className="flex items-center">
                             <span className="text-yellow-400">★</span>
-                            <span className="text-sm text-slate-300 ml-1">{supplier.rating}</span>
+                            <span className="text-sm text-gray-300 ml-1">{supplier.rating}</span>
                           </div>
                         </div>
                       </div>
                       
                       <div className="space-y-2 mb-4">
-                        <p className="text-sm text-slate-300">
+                        <p className="text-sm text-gray-300">
                           <span className="font-medium">Location:</span> {supplier.location}
                         </p>
-                        <p className="text-sm text-slate-300">
+                        <p className="text-sm text-gray-300">
                           <span className="font-medium">Category:</span> {supplier.category}
                         </p>
                       </div>
