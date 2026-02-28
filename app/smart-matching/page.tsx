@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Sparkles, Search, Filter, Star, MapPin, Clock, CheckCircle } from 'lucide-react';
 
 interface Supplier {
@@ -117,18 +118,30 @@ export default function SmartMatchingPage() {
     setIsLoading(false);
   };
 
+  const router = useRouter();
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
-      <div className="bg-slate-800/50 shadow-sm border-b">
+    <div className="min-h-screen bg-gray-950">
+      {/* Back Button */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+        <button
+          onClick={() => router.back()}
+          className="flex items-center gap-2 text-gray-400 hover:text-white mb-2 text-sm transition-colors"
+        >
+          ← Back
+        </button>
+      </div>
+
+      <div className="bg-gray-900 border-b border-gray-800 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-white">AI Smart Matching</h1>
-              <p className="text-slate-300 mt-1">Find perfect suppliers using advanced AI</p>
+              <p className="text-gray-400 mt-1">Find perfect suppliers using advanced AI</p>
             </div>
             <div className="flex items-center gap-2 text-sm">
               <Sparkles className="h-5 w-5 text-yellow-500" />
-              <span className="text-slate-300">98.5% Accuracy</span>
+              <span className="text-gray-400">98.5% Accuracy</span>
             </div>
           </div>
         </div>
@@ -145,7 +158,7 @@ export default function SmartMatchingPage() {
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-400 mb-1">
+                  <label className="block text-sm font-medium text-gray-300 mb-1">
                     Product/Service Title *
                   </label>
                   <input
@@ -153,18 +166,18 @@ export default function SmartMatchingPage() {
                     value={requirement.title}
                     onChange={e => setRequirement(prev => ({ ...prev, title: e.target.value }))}
                     placeholder="e.g., Circuit Boards for Industrial Controllers"
-                    className="w-full px-3 py-2 border border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-400 mb-1">
+                  <label className="block text-sm font-medium text-gray-300 mb-1">
                     Category *
                   </label>
                   <select
                     value={requirement.category}
                     onChange={e => setRequirement(prev => ({ ...prev, category: e.target.value }))}
-                    className="w-full px-3 py-2 border border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     aria-label="Select category"
                   >
                     {categories.map(cat => (
@@ -176,7 +189,7 @@ export default function SmartMatchingPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-400 mb-1">
+                  <label className="block text-sm font-medium text-gray-300 mb-1">
                     Quantity
                   </label>
                   <input
@@ -184,12 +197,12 @@ export default function SmartMatchingPage() {
                     value={requirement.quantity}
                     onChange={e => setRequirement(prev => ({ ...prev, quantity: e.target.value }))}
                     placeholder="e.g., 500 units"
-                    className="w-full px-3 py-2 border border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-400 mb-1">
+                  <label className="block text-sm font-medium text-gray-300 mb-1">
                     Target Price
                   </label>
                   <input
@@ -197,12 +210,12 @@ export default function SmartMatchingPage() {
                     value={requirement.targetPrice}
                     onChange={e => setRequirement(prev => ({ ...prev, targetPrice: e.target.value }))}
                     placeholder="e.g., ₹2,50,000"
-                    className="w-full px-3 py-2 border border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-400 mb-1">
+                  <label className="block text-sm font-medium text-gray-300 mb-1">
                     Location
                   </label>
                   <input
@@ -210,7 +223,7 @@ export default function SmartMatchingPage() {
                     value={requirement.location}
                     onChange={e => setRequirement(prev => ({ ...prev, location: e.target.value }))}
                     placeholder="e.g., Mumbai"
-                    className="w-full px-3 py-2 border border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
 

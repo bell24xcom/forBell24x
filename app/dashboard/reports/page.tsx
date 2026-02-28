@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   ChevronRight,
   FileBarChart,
@@ -101,7 +102,7 @@ function ReportCard({
   onGenerate: (report: ReportType) => void;
 }) {
   return (
-    <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col gap-4 hover:shadow-md transition-shadow">
+    <div className="bg-gray-900 border border-gray-700 rounded-xl shadow-sm p-6 flex flex-col gap-4 hover:shadow-md transition-shadow">
       {/* Icon & Title */}
       <div className="flex items-start gap-4">
         <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${report.accentColor}`}>
@@ -109,7 +110,7 @@ function ReportCard({
         </div>
         <div>
           <h3 className="font-semibold text-white">{report.title}</h3>
-          <p className="text-sm text-slate-400 mt-1 leading-relaxed">{report.description}</p>
+          <p className="text-sm text-gray-400 mt-1 leading-relaxed">{report.description}</p>
         </div>
       </div>
 
@@ -213,8 +214,18 @@ export default function ReportsPage() {
     }
   };
 
+  const router = useRouter();
+
   return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+
+        {/* Back Button */}
+        <button
+          onClick={() => router.back()}
+          className="flex items-center gap-2 text-gray-400 hover:text-white mb-2 text-sm transition-colors"
+        >
+          ← Back
+        </button>
 
         {/* Breadcrumb */}
         <nav className="flex items-center space-x-2 text-sm">
@@ -253,13 +264,13 @@ export default function ReportsPage() {
 
         {/* Summary Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="bg-white rounded-xl shadow-sm p-5">
-            <p className="text-xs text-slate-400 uppercase tracking-wide font-medium">Total Reports Generated</p>
+          <div className="bg-gray-900 border border-gray-700 rounded-xl shadow-sm p-5">
+            <p className="text-xs text-gray-400 uppercase tracking-wide font-medium">Total Reports Generated</p>
             <p className="text-3xl font-bold text-white mt-1">{generatedCount}</p>
             <p className="text-xs text-gray-400 mt-1">This session</p>
           </div>
-          <div className="bg-white rounded-xl shadow-sm p-5">
-            <p className="text-xs text-slate-400 uppercase tracking-wide font-medium">Last Generated</p>
+          <div className="bg-gray-900 border border-gray-700 rounded-xl shadow-sm p-5">
+            <p className="text-xs text-gray-400 uppercase tracking-wide font-medium">Last Generated</p>
             <p className="text-lg font-semibold text-white mt-1">
               {lastGeneratedDate ?? '—'}
             </p>
