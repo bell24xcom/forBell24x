@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSession } from '@/app/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,19 +13,13 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export default function EscrowPage() {
+  const router = useRouter();
   const [escrows, setEscrows] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [selectedEscrow, setSelectedEscrow] = useState(null);
   const [releaseAction, setReleaseAction] = useState('');
-  const { user } = useSession();
-
-  useEffect(() => {
-    if (!user) {
-      window.location.href = '/login';
-    }
-  }, [user]);
 
   useEffect(() => {
     fetchEscrowData();
@@ -114,17 +108,17 @@ export default function EscrowPage() {
     return colors[status] || 'text-slate-400';
   };
 
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-[#0F172A] flex items-center justify-center">
-        <p className="text-white">Loading...</p>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-[#0F172A] text-white">
       <div className="max-w-6xl mx-auto px-4 py-8">
+        {/* Back Button */}
+        <button
+          onClick={() => router.back()}
+          className="flex items-center gap-2 text-gray-400 hover:text-white mb-4 text-sm transition-colors"
+        >
+          ← Back
+        </button>
+
         {/* Breadcrumb */}
         <nav className="mb-6">
           <ol className="flex items-center space-x-2 text-sm text-slate-300">
@@ -158,57 +152,57 @@ export default function EscrowPage() {
         )}
 
         {/* Escrow List */}
-        <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="bg-gray-900 border border-gray-700 rounded-xl shadow-sm p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold">Escrow Transactions</h2>
-            <span className="text-sm text-slate-300">
+            <h2 className="text-lg font-semibold text-white">Escrow Transactions</h2>
+            <span className="text-sm text-gray-400">
               Showing all escrow transactions
             </span>
           </div>
 
           {isLoading ? (
-            <div className="text-center py-8 text-slate-300">
+            <div className="text-center py-8 text-gray-300">
               <p>Loading escrow transactions...</p>
             </div>
           ) : escrows.length === 0 ? (
-            <div className="text-center py-8 text-slate-300">
+            <div className="text-center py-8 text-gray-300">
               <p>No escrow transactions found</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-slate-200">
-                    <th className="text-left py-2 px-4 text-sm font-medium text-slate-500">Quote</th>
-                    <th className="text-left py-2 px-4 text-sm font-medium text-slate-500">Buyer</th>
-                    <th className="text-left py-2 px-4 text-sm font-medium text-slate-500">Supplier</th>
-                    <th className="text-left py-2 px-4 text-sm font-medium text-slate-500">Amount</th>
-                    <th className="text-left py-2 px-4 text-sm font-medium text-slate-500">Status</th>
-                    <th className="text-left py-2 px-4 text-sm font-medium text-slate-500">Actions</th>
+                  <tr className="border-b border-gray-700">
+                    <th className="text-left py-2 px-4 text-sm font-medium text-gray-400">Quote</th>
+                    <th className="text-left py-2 px-4 text-sm font-medium text-gray-400">Buyer</th>
+                    <th className="text-left py-2 px-4 text-sm font-medium text-gray-400">Supplier</th>
+                    <th className="text-left py-2 px-4 text-sm font-medium text-gray-400">Amount</th>
+                    <th className="text-left py-2 px-4 text-sm font-medium text-gray-400">Status</th>
+                    <th className="text-left py-2 px-4 text-sm font-medium text-gray-400">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {escrows.map((escrow: any) => (
-                    <tr key={escrow.id} className="border-b border-slate-50 hover:bg-slate-50">
-                      <td className="py-3 px-4 text-sm text-slate-900">
+                    <tr key={escrow.id} className="border-b border-gray-700 hover:bg-gray-800">
+                      <td className="py-3 px-4 text-sm text-white">
                         <div className="font-medium">{escrow.quote.rfq.title}</div>
-                        <div className="text-xs text-slate-300">
+                        <div className="text-xs text-gray-400">
                           #{escrow.quote.rfqId}
                         </div>
                       </td>
-                      <td className="py-3 px-4 text-sm text-slate-900">
+                      <td className="py-3 px-4 text-sm text-white">
                         <div className="font-medium">{escrow.buyer.company}</div>
-                        <div className="text-xs text-slate-300">
+                        <div className="text-xs text-gray-400">
                           {escrow.buyer.name}
                         </div>
                       </td>
-                      <td className="py-3 px-4 text-sm text-slate-900">
+                      <td className="py-3 px-4 text-sm text-white">
                         <div className="font-medium">{escrow.supplier.company}</div>
-                        <div className="text-xs text-slate-300">
+                        <div className="text-xs text-gray-400">
                           {escrow.supplier.name}
                         </div>
                       </td>
-                      <td className="py-3 px-4 text-sm text-slate-900">
+                      <td className="py-3 px-4 text-sm text-white">
                         {formatCurrency(escrow.amount)}
                       </td>
                       <td className="py-3 px-4 text-sm">

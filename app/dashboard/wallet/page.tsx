@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   ChevronRight,
   Wallet,
@@ -256,8 +257,18 @@ export default function WalletPage() {
     }
   };
 
+  const router = useRouter();
+
   return (
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+
+        {/* Back Button */}
+        <button
+          onClick={() => router.back()}
+          className="flex items-center gap-2 text-gray-400 hover:text-white mb-2 text-sm transition-colors"
+        >
+          ← Back
+        </button>
 
         {/* Breadcrumb */}
         <nav className="flex items-center space-x-2 text-sm">
@@ -343,21 +354,21 @@ export default function WalletPage() {
         {/* Stats Row */}
         {stats && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="bg-white rounded-xl shadow-sm p-5 flex items-center gap-4">
-              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <ArrowDownLeft className="w-5 h-5 text-green-600" />
+            <div className="bg-gray-900 border border-gray-700 rounded-xl shadow-sm p-5 flex items-center gap-4">
+              <div className="w-10 h-10 bg-green-500/10 rounded-full flex items-center justify-center flex-shrink-0">
+                <ArrowDownLeft className="w-5 h-5 text-green-400" />
               </div>
               <div>
-                <p className="text-xs text-slate-400 uppercase tracking-wide">Total Earned</p>
+                <p className="text-xs text-gray-400 uppercase tracking-wide">Total Earned</p>
                 <p className="text-xl font-bold text-white">{formatCurrency(stats.totalEarned)}</p>
               </div>
             </div>
-            <div className="bg-white rounded-xl shadow-sm p-5 flex items-center gap-4">
-              <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <ArrowUpRight className="w-5 h-5 text-red-600" />
+            <div className="bg-gray-900 border border-gray-700 rounded-xl shadow-sm p-5 flex items-center gap-4">
+              <div className="w-10 h-10 bg-red-500/10 rounded-full flex items-center justify-center flex-shrink-0">
+                <ArrowUpRight className="w-5 h-5 text-red-400" />
               </div>
               <div>
-                <p className="text-xs text-slate-400 uppercase tracking-wide">Total Spent</p>
+                <p className="text-xs text-gray-400 uppercase tracking-wide">Total Spent</p>
                 <p className="text-xl font-bold text-white">{formatCurrency(stats.totalSpent)}</p>
               </div>
             </div>
@@ -365,25 +376,25 @@ export default function WalletPage() {
         )}
 
         {/* Transaction History */}
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-100">
+        <div className="bg-gray-900 border border-gray-700 rounded-xl shadow-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-700">
             <h2 className="text-base font-semibold text-white">Transaction History</h2>
           </div>
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-50">
-              <thead className="bg-slate-900">
+            <table className="min-w-full divide-y divide-gray-700">
+              <thead className="bg-gray-800">
                 <tr>
                   {['Date', 'Description', 'Amount', 'Type', 'Status'].map(h => (
                     <th
                       key={h}
-                      className="px-6 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider"
+                      className="px-6 py-3 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider"
                     >
                       {h}
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-50">
+              <tbody className="bg-gray-900 divide-y divide-gray-700">
                 {loadingTxns && (
                   <>
                     <SkeletonRow />
@@ -395,10 +406,10 @@ export default function WalletPage() {
                   <tr>
                     <td colSpan={5} className="px-6 py-16 text-center">
                       <div className="flex flex-col items-center gap-3">
-                        <div className="w-12 h-12 bg-slate-800 rounded-full flex items-center justify-center">
+                        <div className="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center">
                           <Wallet className="w-6 h-6 text-gray-400" />
                         </div>
-                        <p className="text-slate-400 text-sm">No transactions yet</p>
+                        <p className="text-gray-400 text-sm">No transactions yet</p>
                       </div>
                     </td>
                   </tr>
