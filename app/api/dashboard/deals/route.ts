@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
           },
         },
       },
-      orderBy: { acceptedAt: 'desc' },
+      orderBy: { updatedAt: 'desc' },
       take: 50,
     });
 
@@ -90,7 +90,7 @@ export async function GET(request: NextRequest) {
         amount: parseFloat(quote.price),
         status,
         timeline: quote.deliveryDays ? `${quote.deliveryDays} days` : 'Not specified',
-        createdAt: quote.acceptedAt?.toISOString() || quote.createdAt.toISOString(),
+        createdAt: quote.updatedAt?.toISOString() || quote.createdAt.toISOString(),
       };
     });
 
