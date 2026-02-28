@@ -1,5 +1,4 @@
 'use client';
-import DashboardLayout from '@/components/dashboard/DashboardLayout';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -191,17 +190,14 @@ export default function SubscriptionDashboard() {
 
   if (loading) {
     return (
-      <DashboardLayout>
         <div className="page-container flex items-center justify-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
         </div>
-      </DashboardLayout>
     );
   }
 
   if (!subscription) {
     return (
-      <DashboardLayout>
         <div className="page-container flex items-center justify-center">
           <div className="text-center">
             <h2 className="text-2xl font-bold text-neutral-900 mb-4">No Subscription Found</h2>
@@ -211,12 +207,10 @@ export default function SubscriptionDashboard() {
             </Link>
           </div>
         </div>
-      </DashboardLayout>
     );
   }
 
   return (
-    <DashboardLayout>
       <div className="page-container">
       {/* Header */}
       <div className="bg-white shadow-sm">
@@ -415,6 +409,5 @@ export default function SubscriptionDashboard() {
         </div>
       </div>
       </div>
-    </DashboardLayout>
   );
 }

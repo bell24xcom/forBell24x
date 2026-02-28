@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import { Bell, Globe, Moon, Shield, Trash2 } from 'lucide-react';
 
 export default function SettingsPage() {
@@ -20,7 +19,6 @@ export default function SettingsPage() {
   };
 
   return (
-    <DashboardLayout>
       <div className="max-w-4xl">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-white mb-2">Settings</h1>
@@ -143,6 +141,5 @@ export default function SettingsPage() {
           </div>
         </div>
       </div>
-    </DashboardLayout>
   );
 }

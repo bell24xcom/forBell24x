@@ -1,5 +1,4 @@
 'use client';
-import DashboardLayout from '@/components/dashboard/DashboardLayout';
 
 import { useState, useEffect } from 'react';
 import { 
@@ -174,7 +173,6 @@ export default function UserAnalyticsDashboard() {
   }
 
   return (
-    <DashboardLayout>
       <div className="space-y-6">
         {/* Header */}
         <div className="bg-white rounded-lg shadow-sm p-6">
@@ -340,6 +338,5 @@ export default function UserAnalyticsDashboard() {
         </div>
       </div>
     </div>
-    </DashboardLayout>
   );
 }
