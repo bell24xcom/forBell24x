@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useDashboardMode } from '@/contexts/DashboardContext';
 import {
   LayoutDashboard, PlusCircle, FileText, MessageSquare, Users2,
   Mail, Wallet, BarChart3, User, Bell, Settings, Search, Star,
@@ -38,46 +39,48 @@ const buyerNavItems: NavItem[] = [
 ];
 
 const supplierNavItems: NavItem[] = [
-  { icon: LayoutDashboard, label: 'Dashboard', href: '/supplier/dashboard' },
+  { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
   { divider: true, label: 'BUSINESS' },
   { icon: Search, label: 'Browse RFQs', href: '/supplier/browse-rfqs', highlight: true },
   { icon: FileText, label: 'My Quotes', href: '/supplier/my-quotes' },
-  { icon: Users2, label: 'Active Deals', href: '/supplier/deals' },
+  { icon: Users2, label: 'Active Deals', href: '/dashboard/deals' },
   { divider: true, label: 'PRODUCTS' },
   { icon: Package, label: 'Product Showcase', href: '/supplier/products/showcase' },
   { icon: PlusCircle, label: 'Add Product', href: '/supplier/products/add' },
+  { icon: Package, label: 'Manage Products', href: '/supplier/products/manage' },
   { divider: true, label: 'TOOLS' },
-  { icon: Mail, label: 'Messages', href: '/supplier/messages' },
-  { icon: Wallet, label: 'Wallet & Earnings', href: '/supplier/wallet' },
-  { icon: BarChart3, label: 'Performance', href: '/supplier/performance' },
+  { icon: Mail, label: 'Messages', href: '/dashboard/messages' },
+  { icon: Wallet, label: 'Wallet & Earnings', href: '/dashboard/wallet' },
+  { icon: BarChart3, label: 'Analytics', href: '/dashboard/analytics' },
   { divider: true, label: 'PROFILE' },
   { icon: Star, label: 'Profile & Trust Score', href: '/supplier/profile/edit' },
+  { icon: Building2, label: 'Public Profile', href: '/supplier' },
   { icon: CreditCard, label: 'GST Verification', href: '/supplier/gst' },
   { icon: Bell, label: 'Notifications', href: '/notifications' },
+  { icon: Settings, label: 'Settings', href: '/dashboard/settings' },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const [mode, setMode] = useState<'buyer' | 'supplier'>('buyer');
+  const { mode, setMode } = useDashboardMode();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Determine initial mode based on current path
+  // Auto-switch mode based on current path
   useEffect(() => {
-    const savedMode = localStorage.getItem('bell24h-dashboard-mode') as 'buyer' | 'supplier' | null;
-    if (savedMode) {
-      setMode(savedMode);
-    } else if (pathname?.startsWith('/supplier')) {
+    if (pathname?.startsWith('/supplier')) {
       setMode('supplier');
-      localStorage.setItem('bell24h-dashboard-mode', 'supplier');
-    } else {
-      setMode('buyer');
-      localStorage.setItem('bell24h-dashboard-mode', 'buyer');
+    } else if (pathname?.startsWith('/dashboard') || pathname?.startsWith('/rfq') || pathname?.startsWith('/voice-rfq') || pathname?.startsWith('/video-rfq')) {
+      // Keep current mode or default to buyer for dashboard/rfq paths
+      if (mode === 'supplier') {
+        // Stay as supplier if already in supplier mode
+      } else {
+        setMode('buyer');
+      }
     }
   }, [pathname]);
 
   const switchMode = (newMode: 'buyer' | 'supplier') => {
     setMode(newMode);
-    localStorage.setItem('bell24h-dashboard-mode', newMode);
     setSidebarOpen(false);
   };
 

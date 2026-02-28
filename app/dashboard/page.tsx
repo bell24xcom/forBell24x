@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { 
-  BarChart3, 
-  TrendingUp, 
-  Users, 
-  DollarSign, 
-  ShoppingCart, 
+import { useDashboardMode } from '@/contexts/DashboardContext';
+import {
+  BarChart3,
+  TrendingUp,
+  Users,
+  DollarSign,
+  ShoppingCart,
   Activity,
   Zap,
   Target,
@@ -45,7 +46,7 @@ interface RecentActivity {
 export default function DashboardPage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeRole, setActiveRole] = useState<'buyer' | 'supplier'>('buyer');
+  const { mode, setMode } = useDashboardMode();
   const [stats, setStats] = useState({
     totalRFQs: 0,
     activeRFQs: 0,
@@ -202,9 +203,9 @@ export default function DashboardPage() {
       {/* Buyer/Supplier Role Toggle */}
       <div className="flex gap-2">
         <button
-          onClick={() => setActiveRole('buyer')}
+          onClick={() => setMode('buyer')}
           className={`px-6 py-2 rounded-lg font-medium transition-colors ${
-            activeRole === 'buyer'
+            mode === 'buyer'
               ? 'bg-blue-600 text-white'
               : 'bg-gray-800 text-gray-400 hover:text-white'
           }`}
@@ -212,9 +213,9 @@ export default function DashboardPage() {
           🛒 Buyer
         </button>
         <button
-          onClick={() => setActiveRole('supplier')}
+          onClick={() => setMode('supplier')}
           className={`px-6 py-2 rounded-lg font-medium transition-colors ${
-            activeRole === 'supplier'
+            mode === 'supplier'
               ? 'bg-emerald-600 text-white'
               : 'bg-gray-800 text-gray-400 hover:text-white'
           }`}
