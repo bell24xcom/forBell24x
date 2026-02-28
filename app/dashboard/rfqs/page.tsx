@@ -1,5 +1,4 @@
 'use client';
-import DashboardLayout from '@/components/dashboard/DashboardLayout';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -96,7 +95,6 @@ export default function MyRFQsPage() {
   }, []);
 
   return (
-    <DashboardLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
 
         {/* Breadcrumb */}
@@ -261,6 +259,5 @@ export default function MyRFQsPage() {
           </div>
         </div>
       </div>
-    </DashboardLayout>
   );
 }

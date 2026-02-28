@@ -1,5 +1,4 @@
 'use client';
-import DashboardLayout from '@/components/dashboard/DashboardLayout';
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
@@ -152,8 +151,7 @@ export default function MyQuotesPage() {
   };
 
   return (
-    <DashboardLayout>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
 
         {/* Breadcrumb */}
         <nav className="flex items-center space-x-2 text-sm">
@@ -354,6 +352,5 @@ export default function MyQuotesPage() {
           </div>
         </div>
       </div>
-    </DashboardLayout>
   );
 }

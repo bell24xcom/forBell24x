@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import { Handshake, Package, Truck, CheckCircle, Clock, IndianRupee } from 'lucide-react';
 
 interface Deal {
@@ -63,7 +62,6 @@ export default function DealsPage() {
   };
 
   return (
-    <DashboardLayout>
       <div className="max-w-7xl">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-white mb-2">Active Deals</h1>
@@ -169,6 +167,5 @@ export default function DealsPage() {
           </div>
         )}
       </div>
-    </DashboardLayout>
   );
 }
