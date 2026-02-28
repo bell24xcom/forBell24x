@@ -24,7 +24,8 @@
       "Bash(if [ -f \"components/dashboard/DashboardLayout.tsx\" ])",
       "Bash(then grep -E \"href=\"\"/\" components/dashboard/DashboardLayout.tsx)",
       "Bash(else echo \"DashboardLayout not found in dashboard subfolder\")",
-      "Bash(else echo \"❌ MISSING: $api\")"
+      "Bash(else echo \"❌ MISSING: $api\")",
+      "Bash(vercel:*)"
     ]
   }
 }

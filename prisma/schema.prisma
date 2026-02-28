@@ -61,7 +61,7 @@ model OTPVerification {
 // Category — hierarchical (parent-child relationship)
 model Category {
   id          Int        @id @default(autoincrement())
-  name        String
+  name        String     @unique
   slug        String     @unique
   description String?
   parentId    Int?       @map("parent_id")
@@ -71,7 +71,7 @@ model Category {
   priority    Int        @default(0)
   icon        String?    // emoji or icon name for UI
   createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  updatedAt   DateTime   @default(now()) @updatedAt
 
   rfqs        RFQ[]
 
@@ -101,7 +101,7 @@ model RFQ {
   unit        String   @default("units")
   minBudget   Float?
   maxBudget   Float?
-  timeline    String
+  timeline    String?
   requirements String?
   urgency     RFQUrgency @default(NORMAL)
   status      RFQStatus @default(ACTIVE)
@@ -118,8 +118,8 @@ model RFQ {
   updatedAt      DateTime  @updatedAt
 
   // Relations
-  createdBy   String   @map("created_by")
-  user        User     @relation(fields: [createdBy], references: [id])
+  createdBy   String?  @map("created_by")
+  user        User?    @relation(fields: [createdBy], references: [id])
   categoryRel Category? @relation(fields: [categoryId], references: [id])
   quotes      Quote[]
   transactions Transaction[]
@@ -130,11 +130,11 @@ model RFQ {
 // Quote model for supplier responses
 model Quote {
   id          String   @id @default(cuid())
-  rfqId       String   @map("rfq_id")
-  supplierId  String   @map("supplier_id")
+  rfqId       String?  @map("rfq_id")
+  supplierId  String?  @map("supplier_id")
   price       Float
   quantity    String
-  timeline    String
+  timeline    String?
   description String?
   terms       String?
   status      QuoteStatus @default(PENDING)
@@ -143,8 +143,8 @@ model Quote {
   updatedAt   DateTime @updatedAt
 
   // Relations
-  rfq         RFQ      @relation(fields: [rfqId], references: [id])
-  supplier    User     @relation(fields: [supplierId], references: [id])
+  rfq         RFQ?     @relation(fields: [rfqId], references: [id])
+  supplier    User?    @relation(fields: [supplierId], references: [id])
   transactions Transaction[]
 
   @@map("quotes")
@@ -200,7 +200,7 @@ model Lead {
 // Notification model
 model Notification {
   id        String   @id @default(cuid())
-  userId    String   @map("user_id")
+  userId    String?  @map("user_id")
   title     String
   message   String
   type      NotificationType
@@ -209,7 +209,7 @@ model Notification {
   createdAt DateTime @default(now())
 
   // Relations
-  user      User     @relation(fields: [userId], references: [id])
+  user      User?    @relation(fields: [userId], references: [id])
 
   @@map("notifications")
 }
@@ -329,12 +329,14 @@ enum UserPlan {
 
 enum RFQStatus {
   DRAFT
+  OPEN            // legacy - keep for existing data
   ACTIVE
   QUOTED
   ACCEPTED        // quote accepted — deal locked, in-progress
   IN_PROGRESS     // buyer confirmed work started
   COMPLETED       // buyer confirmed deal done
   CANCELLED
+  CLOSED          // legacy - keep for existing data
   EXPIRED
   CLOSED_EXTERNAL // deal completed outside platform (manual override)
 }
@@ -378,10 +380,13 @@ enum NotificationType {
   WARNING
   ERROR
   RFQ_CREATED
+  RFQ_NEW         // legacy - keep for existing data
   QUOTE_RECEIVED
   QUOTE_ACCEPTED
   DEAL_CHECK      // 7-day follow-up: "Was this deal completed?"
   DEAL_CONFIRMED  // buyer confirmed deal complete
+  ORDER_UPDATE    // legacy - keep for existing data
+  PAYMENT_UPDATE  // legacy - keep for existing data
   TRANSACTION_UPDATE
   SYSTEM_ALERT
 }

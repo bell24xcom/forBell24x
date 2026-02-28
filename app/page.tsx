@@ -67,14 +67,6 @@ function HeroSection() {
   return (
     <section className="relative pt-8 pb-12 lg:pt-12 lg:pb-16">
       <div className="max-w-6xl mx-auto px-4">
-        {/* Badge */}
-        <div className="text-center mb-6">
-          <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-4 py-1.5">
-            <span className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" />
-            <span className="text-blue-300 text-sm font-medium">India&apos;s #1 Multi-Modal B2B Platform</span>
-          </div>
-        </div>
-
         {/* Headline */}
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4 text-center">
           Post RFQs in{' '}
@@ -87,82 +79,46 @@ function HeroSection() {
         </p>
 
         {/* 3-Tab Switcher */}
-        <div className="max-w-4xl mx-auto mb-8">
+        <div className="max-w-5xl mx-auto mb-8">
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-8">
             <button
               onClick={() => setActiveTab('voice')}
-              className={`flex items-center justify-center gap-3 px-6 py-4 rounded-xl font-semibold transition-all duration-300 ${
+              className={`flex items-center justify-center gap-3 px-8 py-4 rounded-xl font-semibold transition-all duration-300 ${
                 activeTab === 'voice'
                   ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/25'
-                  : 'bg-slate-800/50 text-slate-300 hover:bg-slate-800 border border-slate-700/50'
+                  : 'bg-transparent text-slate-300 hover:bg-slate-800 border-2 border-slate-700/50'
               }`}
             >
-              <Mic className="w-5 h-5" />
-              <span>Voice RFQ</span>
+              🎤 Voice RFQ
             </button>
             <button
               onClick={() => setActiveTab('video')}
-              className={`flex items-center justify-center gap-3 px-6 py-4 rounded-xl font-semibold transition-all duration-300 ${
+              className={`flex items-center justify-center gap-3 px-8 py-4 rounded-xl font-semibold transition-all duration-300 ${
                 activeTab === 'video'
                   ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/25'
-                  : 'bg-slate-800/50 text-slate-300 hover:bg-slate-800 border border-slate-700/50'
+                  : 'bg-transparent text-slate-300 hover:bg-slate-800 border-2 border-slate-700/50'
               }`}
             >
-              <Video className="w-5 h-5" />
-              <span>Video RFQ</span>
+              📹 Video RFQ
             </button>
             <button
               onClick={() => setActiveTab('text')}
-              className={`flex items-center justify-center gap-3 px-6 py-4 rounded-xl font-semibold transition-all duration-300 ${
+              className={`flex items-center justify-center gap-3 px-8 py-4 rounded-xl font-semibold transition-all duration-300 ${
                 activeTab === 'text'
                   ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/25'
-                  : 'bg-slate-800/50 text-slate-300 hover:bg-slate-800 border border-slate-700/50'
+                  : 'bg-transparent text-slate-300 hover:bg-slate-800 border-2 border-slate-700/50'
               }`}
             >
-              <FileText className="w-5 h-5" />
-              <span>Text RFQ</span>
+              📝 Text RFQ
             </button>
           </div>
 
           {/* Demo Container */}
-          <div className="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-8 min-h-[400px]">
+          <div className="bg-slate-800/30 border border-slate-700/50 rounded-2xl p-8 md:p-12 min-h-[500px]">
             {activeTab === 'voice' && <VoiceDemoContent />}
             {activeTab === 'video' && <VideoDemoContent />}
             {activeTab === 'text' && <TextDemoContent />}
           </div>
-        </div>
-
-        {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
-          <Link
-            href="/rfq/create"
-            className="inline-flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold px-8 py-3.5 rounded-lg text-lg transition-all duration-200 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40"
-          >
-            Post Your RFQ Free
-            <ArrowRight className="w-5 h-5" />
-          </Link>
-          <Link
-            href="/suppliers"
-            className="inline-flex items-center gap-2 text-slate-300 hover:text-white font-medium px-6 py-3.5 rounded-lg border border-slate-600 hover:border-slate-500 transition-all duration-200"
-          >
-            Browse Suppliers
-          </Link>
-        </div>
-
-        {/* Trust Signals */}
-        <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-slate-300">
-          <span className="flex items-center gap-1.5">
-            <CheckCircle className="w-4 h-4 text-green-400" />
-            No credit card required
-          </span>
-          <span className="flex items-center gap-1.5">
-            <CheckCircle className="w-4 h-4 text-green-400" />
-            Free during beta
-          </span>
-          <span className="flex items-center gap-1.5">
-            <CheckCircle className="w-4 h-4 text-green-400" />
-            AI-powered matching
-          </span>
         </div>
       </div>
     </section>
@@ -171,61 +127,108 @@ function HeroSection() {
 
 /* ---- VOICE DEMO CONTENT ---- */
 function VoiceDemoContent() {
-  const [isListening, setIsListening] = useState(false);
+  const [step, setStep] = useState(0);
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsListening(true), 500);
-    return () => clearTimeout(timer);
+    const timers = [
+      setTimeout(() => setStep(1), 800),   // Show Hindi text
+      setTimeout(() => setStep(2), 2200),  // Show English text
+      setTimeout(() => setStep(3), 3600),  // Show AI card
+    ];
+    return () => timers.forEach(clearTimeout);
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center h-full space-y-6">
-      {/* Microphone Visual */}
-      <div className="relative">
-        <div className={`w-24 h-24 rounded-full bg-blue-500/20 border-2 border-blue-500 flex items-center justify-center transition-all duration-300 ${
-          isListening ? 'scale-110' : ''
-        }`}>
-          <Mic className="w-10 h-10 text-blue-400" />
+    <div className="flex flex-col items-center justify-center space-y-8">
+      <style jsx>{`
+        @keyframes bar-animation {
+          0%, 100% { height: 20px; }
+          50% { height: 60px; }
+        }
+        .bar {
+          animation: bar-animation 1.2s ease-in-out infinite;
+        }
+        .bar:nth-child(1) { animation-delay: 0s; }
+        .bar:nth-child(2) { animation-delay: 0.15s; }
+        .bar:nth-child(3) { animation-delay: 0.3s; }
+        .bar:nth-child(4) { animation-delay: 0.45s; }
+        .bar:nth-child(5) { animation-delay: 0.6s; }
+        .bar:nth-child(6) { animation-delay: 0.75s; }
+        .bar:nth-child(7) { animation-delay: 0.9s; }
+        .bar:nth-child(8) { animation-delay: 1.05s; }
+        @keyframes typewriter {
+          from { width: 0; }
+          to { width: 100%; }
+        }
+        .typewriter {
+          overflow: hidden;
+          white-space: nowrap;
+          animation: typewriter 1.2s steps(40) forwards;
+        }
+      `}</style>
+
+      {/* Animated Microphone with Bars */}
+      <div className="relative flex items-center justify-center gap-2">
+        {/* Left bars */}
+        <div className="bar w-1.5 bg-orange-500 rounded-full" style={{ height: '20px' }} />
+        <div className="bar w-1.5 bg-orange-500 rounded-full" style={{ height: '30px' }} />
+        <div className="bar w-1.5 bg-orange-500 rounded-full" style={{ height: '40px' }} />
+        <div className="bar w-1.5 bg-orange-500 rounded-full" style={{ height: '50px' }} />
+
+        {/* Pulsing Mic */}
+        <div className="w-24 h-24 bg-red-500 rounded-full flex items-center justify-center animate-pulse mx-4">
+          <Mic className="w-12 h-12 text-white" />
         </div>
-        {isListening && (
-          <div className="absolute inset-0 rounded-full bg-blue-500/30 animate-ping" />
-        )}
+
+        {/* Right bars */}
+        <div className="bar w-1.5 bg-orange-500 rounded-full" style={{ height: '50px' }} />
+        <div className="bar w-1.5 bg-orange-500 rounded-full" style={{ height: '40px' }} />
+        <div className="bar w-1.5 bg-orange-500 rounded-full" style={{ height: '30px' }} />
+        <div className="bar w-1.5 bg-orange-500 rounded-full" style={{ height: '20px' }} />
       </div>
 
-      {/* Status Text */}
-      <div className="text-center space-y-2">
-        <p className="text-xl font-semibold text-white">
-          {isListening ? 'Listening...' : 'Click to speak'}
-        </p>
-        <p className="text-sm text-slate-300 max-w-md">
-          {isListening
-            ? '"I need 5000 meters of corrugated packaging boxes with 3-ply strength..."'
-            : 'Just speak naturally. AI will extract all product details.'}
-        </p>
-      </div>
+      {/* Typewriter Text - Hindi */}
+      {step >= 1 && (
+        <div className="text-center">
+          <p className="text-xl md:text-2xl font-semibold text-white typewriter inline-block">
+            मुझे 1000 टी-शर्ट चाहिए, भिवंडी डिलीवरी, अर्जेंट
+          </p>
+        </div>
+      )}
 
-      {/* Features */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full mt-6">
-        <div className="text-center p-4 bg-slate-800/50 rounded-lg">
-          <div className="text-2xl mb-1">🎤</div>
-          <div className="text-xs text-slate-300">Works in any language</div>
+      {/* English Translation */}
+      {step >= 2 && (
+        <div className="text-center">
+          <p className="text-lg text-slate-300 typewriter inline-block">
+            I need 1000 T-Shirts, Bhiwandi delivery, Urgent
+          </p>
         </div>
-        <div className="text-center p-4 bg-slate-800/50 rounded-lg">
-          <div className="text-2xl mb-1">⚡</div>
-          <div className="text-xs text-slate-300">Real-time transcription</div>
-        </div>
-        <div className="text-center p-4 bg-slate-800/50 rounded-lg">
-          <div className="text-2xl mb-1">🤖</div>
-          <div className="text-xs text-slate-300">AI-powered extraction</div>
-        </div>
-      </div>
+      )}
 
-      {/* Try Button */}
+      {/* AI Structured Output */}
+      {step >= 3 && (
+        <div className="w-full max-w-2xl bg-green-500/10 border-2 border-green-500/30 rounded-xl p-6">
+          <div className="flex items-start gap-3">
+            <span className="text-2xl">✅</span>
+            <div>
+              <h4 className="text-green-400 font-bold mb-2">AI Structured RFQ:</h4>
+              <p className="text-white text-sm leading-relaxed">
+                <span className="font-semibold">Product:</span> T-Shirts |
+                <span className="font-semibold"> Qty:</span> 1000 |
+                <span className="font-semibold"> Location:</span> Bhiwandi |
+                <span className="font-semibold"> Urgency:</span> Urgent
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* CTA Button */}
       <Link
         href="/voice-rfq"
-        className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 font-medium transition-colors"
+        className="inline-flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-bold px-8 py-4 rounded-xl text-lg transition-all duration-200 shadow-lg shadow-blue-500/25"
       >
-        Try Voice RFQ <ChevronRight className="w-4 h-4" />
+        Post Voice RFQ Free →
       </Link>
     </div>
   );
@@ -233,139 +236,118 @@ function VoiceDemoContent() {
 
 /* ---- VIDEO DEMO CONTENT ---- */
 function VideoDemoContent() {
-  const [isRecording, setIsRecording] = useState(false);
+  const [field, setField] = useState(0);
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsRecording(true), 500);
-    return () => clearTimeout(timer);
+    const timers = [
+      setTimeout(() => setField(1), 800),
+      setTimeout(() => setField(2), 1600),
+      setTimeout(() => setField(3), 2400),
+    ];
+    return () => timers.forEach(clearTimeout);
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center h-full space-y-6">
-      {/* Camera Visual */}
-      <div className="relative w-full max-w-md aspect-video bg-slate-900 rounded-xl border-2 border-slate-700 flex items-center justify-center overflow-hidden">
-        <Video className="w-16 h-16 text-slate-300" />
-        {isRecording && (
-          <div className="absolute top-4 right-4 flex items-center gap-2 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-            <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
-            REC 0:15
+    <div className="flex flex-col space-y-8">
+      <style jsx>{`
+        @keyframes typing {
+          from { width: 0; }
+          to { width: 100%; }
+        }
+        .typing-animation {
+          overflow: hidden;
+          white-space: nowrap;
+          animation: typing 0.8s steps(20) forwards;
+        }
+      `}</style>
+
+      {/* Split Screen */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Left: Video Recording */}
+        <div className="bg-slate-900 rounded-xl border-2 border-slate-700 flex flex-col items-center justify-center p-8 min-h-[300px]">
+          <Video className="w-20 h-20 text-slate-400 mb-4" />
+          <p className="text-white font-semibold text-lg">📹 Video recording...</p>
+          <div className="mt-4 flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-full">
+            <div className="w-3 h-3 bg-white rounded-full animate-pulse" />
+            <span className="font-mono">0:15</span>
           </div>
-        )}
+        </div>
+
+        {/* Right: AI Extraction */}
+        <div className="space-y-4">
+          <h4 className="text-white font-bold text-lg mb-4">🤖 AI Extracting...</h4>
+
+          {/* Field 1 */}
+          {field >= 1 && (
+            <div className="bg-slate-900 border border-slate-700 rounded-lg p-4">
+              <p className="text-slate-400 text-sm mb-1">Product:</p>
+              <p className="text-white font-semibold typing-animation inline-block">Steel Rods</p>
+            </div>
+          )}
+
+          {/* Field 2 */}
+          {field >= 2 && (
+            <div className="bg-slate-900 border border-slate-700 rounded-lg p-4">
+              <p className="text-slate-400 text-sm mb-1">Grade:</p>
+              <p className="text-white font-semibold typing-animation inline-block">Fe500</p>
+            </div>
+          )}
+
+          {/* Field 3 */}
+          {field >= 3 && (
+            <div className="bg-slate-900 border border-slate-700 rounded-lg p-4">
+              <p className="text-slate-400 text-sm mb-1">Quantity:</p>
+              <p className="text-white font-semibold typing-animation inline-block">500 kg</p>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Status Text */}
-      <div className="text-center space-y-2">
-        <p className="text-xl font-semibold text-white">
-          {isRecording ? 'Recording product demo...' : 'Show us what you need'}
-        </p>
-        <p className="text-sm text-slate-300 max-w-md">
-          Point camera at product, sample, or blueprint. AI extracts specs automatically.
-        </p>
+      {/* CTA Button */}
+      <div className="text-center">
+        <Link
+          href="/video-rfq"
+          className="inline-flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-bold px-8 py-4 rounded-xl text-lg transition-all duration-200 shadow-lg shadow-blue-500/25"
+        >
+          Post Video RFQ Free →
+        </Link>
       </div>
-
-      {/* Features */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full mt-6">
-        <div className="text-center p-4 bg-slate-800/50 rounded-lg">
-          <div className="text-2xl mb-1">📹</div>
-          <div className="text-xs text-slate-300">Visual recognition</div>
-        </div>
-        <div className="text-center p-4 bg-slate-800/50 rounded-lg">
-          <div className="text-2xl mb-1">📏</div>
-          <div className="text-xs text-slate-300">Auto spec extraction</div>
-        </div>
-        <div className="text-center p-4 bg-slate-800/50 rounded-lg">
-          <div className="text-2xl mb-1">🎯</div>
-          <div className="text-xs text-slate-300">Instant matching</div>
-        </div>
-      </div>
-
-      {/* Try Button */}
-      <Link
-        href="/video-rfq"
-        className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 font-medium transition-colors"
-      >
-        Try Video RFQ <ChevronRight className="w-4 h-4" />
-      </Link>
     </div>
   );
 }
 
 /* ---- TEXT DEMO CONTENT ---- */
 function TextDemoContent() {
-  const [showForm, setShowForm] = useState(false);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setShowForm(true), 300);
-    return () => clearTimeout(timer);
-  }, []);
-
   return (
-    <div className="flex flex-col h-full space-y-4">
-      {/* Form Preview */}
-      <div className={`space-y-4 transition-opacity duration-500 ${showForm ? 'opacity-100' : 'opacity-0'}`}>
-        <div>
-          <label className="block text-sm font-medium text-slate-300 mb-2">Product/Service</label>
-          <input
-            type="text"
-            value="Corrugated Packaging Boxes"
-            readOnly
-            className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white"
-          />
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">Quantity</label>
-            <input
-              type="text"
-              value="5000 meters"
-              readOnly
-              className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">Category</label>
-            <input
-              type="text"
-              value="Packaging"
-              readOnly
-              className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white"
-            />
-          </div>
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-slate-300 mb-2">Specifications</label>
-          <textarea
-            value="3-ply strength, brown kraft paper, suitable for export shipping, ISPM 15 compliant"
-            readOnly
-            rows={3}
-            className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white resize-none"
-          />
-        </div>
+    <div className="flex flex-col space-y-6">
+      {/* Textarea */}
+      <div>
+        <label className="block text-slate-300 font-semibold text-lg mb-3">
+          Describe what you need...
+        </label>
+        <textarea
+          value="500 kg MS Pipes, 3 inch diameter, Mumbai delivery, within 2 weeks"
+          readOnly
+          rows={6}
+          className="w-full bg-slate-900 border-2 border-slate-700 rounded-xl px-5 py-4 text-white text-lg resize-none focus:outline-none focus:border-blue-500"
+        />
       </div>
 
-      {/* Features */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-auto">
-        <div className="text-center p-4 bg-slate-800/50 rounded-lg">
-          <div className="text-2xl mb-1">📝</div>
-          <div className="text-xs text-slate-300">Detailed forms</div>
-        </div>
-        <div className="text-center p-4 bg-slate-800/50 rounded-lg">
-          <div className="text-2xl mb-1">💾</div>
-          <div className="text-xs text-slate-300">Save drafts</div>
-        </div>
-        <div className="text-center p-4 bg-slate-800/50 rounded-lg">
-          <div className="text-2xl mb-1">📎</div>
-          <div className="text-xs text-slate-300">Attach files</div>
-        </div>
+      {/* Sample Badge */}
+      <div className="flex items-center gap-2 text-sm text-slate-400">
+        <span className="bg-slate-700/50 px-3 py-1 rounded-full">💡 Sample pre-filled</span>
+        <span>Edit to customize your requirements</span>
       </div>
 
-      {/* Try Button */}
-      <Link
-        href="/rfq/create"
-        className="inline-flex items-center justify-center gap-2 text-blue-400 hover:text-blue-300 font-medium transition-colors"
-      >
-        Try Text RFQ <ChevronRight className="w-4 h-4" />
-      </Link>
+      {/* CTA Button */}
+      <div className="text-center">
+        <Link
+          href="/rfq/create"
+          className="inline-flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-bold px-8 py-4 rounded-xl text-lg transition-all duration-200 shadow-lg shadow-blue-500/25"
+        >
+          Post Text RFQ Free →
+        </Link>
+      </div>
     </div>
   );
 }
@@ -607,29 +589,25 @@ function FinalCTASection() {
 /* ---- LIVE ACTIVITY TICKER ---- */
 function LiveActivityTicker() {
   const activities = [
-    { business: 'Raj Traders, Pune', action: 'Voice RFQ for 200kg Copper Wire', quotes: 3 },
-    { business: 'Mumbai Plastics Ltd', action: 'Video RFQ for Custom Molding', quotes: 5 },
-    { business: 'Delhi Steel Co', action: 'Text RFQ for 5 Tons Steel Rods', quotes: 2 },
-    { business: 'Bengaluru Tech Solutions', action: 'Voice RFQ for IT Equipment', quotes: 7 },
-    { business: 'Chennai Exports', action: 'Video RFQ for Textile Machinery', quotes: 4 },
-    { business: 'Kolkata Chemicals', action: 'Text RFQ for Industrial Solvents', quotes: 6 },
-    { business: 'Hyderabad Pharma', action: 'Voice RFQ for API Ingredients', quotes: 3 },
-    { business: 'Ahmedabad Textiles', action: 'Video RFQ for Fabric Samples', quotes: 8 },
-    { business: 'Jaipur Handicrafts', action: 'Text RFQ for Export Packaging', quotes: 2 },
-    { business: 'Surat Diamond Trading', action: 'Voice RFQ for Lab Equipment', quotes: 4 },
-    { business: 'Lucknow MSME Hub', action: 'Video RFQ for CNC Machinery', quotes: 5 },
-    { business: 'Coimbatore Auto Parts', action: 'Text RFQ for Metal Components', quotes: 9 },
+    '🔴 LIVE: Steel supplier Mumbai quoted ₹2.4L • 2 min ago',
+    '📦 Textile RFQ from Surat — 3 suppliers matched',
+    '✅ Deal closed: Auto Parts Pune ₹85,000',
+    '🎤 Voice RFQ: Chemicals Gujarat — AI processed in 4s',
+    '🔴 LIVE: New supplier registered: Electronics Delhi',
+    '📹 Video RFQ: Steel Rods Maharashtra — Specs extracted',
+    '💰 Payment released: Packaging Mumbai ₹1.2L',
+    '🔴 LIVE: 5 quotes received for Textile Machinery Surat',
   ];
 
   return (
-    <div className="border-y border-slate-800 bg-slate-900/50 py-3 overflow-hidden">
+    <div className="border-y border-slate-800 bg-slate-900 py-4 overflow-hidden">
       <style jsx>{`
-        @keyframes scroll {
+        @keyframes scroll-left {
           0% { transform: translateX(0); }
           100% { transform: translateX(-50%); }
         }
         .ticker-content {
-          animation: scroll 60s linear infinite;
+          animation: scroll-left 40s linear infinite;
         }
         .ticker-wrapper:hover .ticker-content {
           animation-play-state: paused;
@@ -637,38 +615,18 @@ function LiveActivityTicker() {
       `}</style>
 
       <div className="ticker-wrapper relative">
-        <div className="ticker-content flex gap-8 whitespace-nowrap">
+        <div className="ticker-content flex gap-12 whitespace-nowrap">
           {/* First set */}
           {activities.map((activity, idx) => (
-            <div key={`first-${idx}`} className="inline-flex items-center gap-3 text-sm">
-              <span className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
-                <span className="text-red-400 font-semibold text-xs uppercase tracking-wide">LIVE</span>
-              </span>
-              <span className="text-slate-300">
-                <span className="font-medium text-white">{activity.business}</span>
-                {' — '}
-                {activity.action}
-                {' • '}
-                <span className="text-blue-400">{activity.quotes} quotes received</span>
-              </span>
-            </div>
+            <span key={`first-${idx}`} className="text-slate-300 text-sm font-medium">
+              {activity}
+            </span>
           ))}
           {/* Duplicate set for seamless loop */}
           {activities.map((activity, idx) => (
-            <div key={`second-${idx}`} className="inline-flex items-center gap-3 text-sm">
-              <span className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" />
-                <span className="text-red-400 font-semibold text-xs uppercase tracking-wide">LIVE</span>
-              </span>
-              <span className="text-slate-300">
-                <span className="font-medium text-white">{activity.business}</span>
-                {' — '}
-                {activity.action}
-                {' • '}
-                <span className="text-blue-400">{activity.quotes} quotes received</span>
-              </span>
-            </div>
+            <span key={`second-${idx}`} className="text-slate-300 text-sm font-medium">
+              {activity}
+            </span>
           ))}
         </div>
       </div>
