@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface VoiceRFQData {
   id: string;
@@ -17,6 +18,7 @@ interface VoiceRFQData {
 }
 
 export default function VoiceRFQPage() {
+  const router = useRouter();
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [transcript, setTranscript] = useState('');
@@ -236,7 +238,7 @@ export default function VoiceRFQPage() {
         setGeneratedRFQ(null);
         setTranscript('');
         loadRecentRFQs();
-        alert('RFQ saved successfully!');
+        router.push('/dashboard/rfqs');
       } else {
         setError('Failed to save RFQ');
       }
