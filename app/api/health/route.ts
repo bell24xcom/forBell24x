@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
   const memoryUsage = process.memoryUsage();
@@ -17,12 +18,9 @@ export async function GET(request: NextRequest) {
 
   if (hasDatabase) {
     try {
-      const { PrismaClient } = await import('@prisma/client');
-      const prisma = new PrismaClient();
       const startTime = Date.now();
       await prisma.$queryRaw`SELECT 1`;
       const latency = Date.now() - startTime;
-      await prisma.$disconnect();
       dbStatus = { connected: true, latency };
     } catch (err) {
       dbStatus = {

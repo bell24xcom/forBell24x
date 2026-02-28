@@ -31,7 +31,10 @@
       "Bash(node check-db.mjs:*)",
       "Bash(curl:*)",
       "Bash(npm run dev:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(python -m json.tool:*)",
+      "Bash(netstat:*)",
+      "Bash(taskkill:*)"
     ]
   }
 }
