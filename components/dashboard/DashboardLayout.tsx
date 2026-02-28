@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  LayoutDashboard, PlusCircle, FileText, MessageSquare, CheckCircle,
+  LayoutDashboard, PlusCircle, FileText, MessageSquare, Users2,
   Mail, Wallet, BarChart3, User, Bell, Settings, Search, Star,
   Mic, Video, FileEdit, Building2, Package, CreditCard, Menu, X
 } from 'lucide-react';
@@ -26,7 +26,7 @@ const buyerNavItems: NavItem[] = [
   { divider: true, label: 'MY RFQS' },
   { icon: FileText, label: 'My RFQs', href: '/dashboard/rfqs' },
   { icon: MessageSquare, label: 'Quotes Inbox', href: '/dashboard/quotes' },
-  { icon: CheckCircle, label: 'Active Deals', href: '/dashboard/deals' },
+  { icon: Users2, label: 'Active Deals', href: '/dashboard/deals' },
   { divider: true, label: 'TOOLS' },
   { icon: Mail, label: 'Messages', href: '/dashboard/messages' },
   { icon: Wallet, label: 'Wallet', href: '/dashboard/wallet' },
@@ -42,7 +42,7 @@ const supplierNavItems: NavItem[] = [
   { divider: true, label: 'BUSINESS' },
   { icon: Search, label: 'Browse RFQs', href: '/supplier/browse-rfqs', highlight: true },
   { icon: FileText, label: 'My Quotes', href: '/supplier/my-quotes' },
-  { icon: CheckCircle, label: 'Active Deals', href: '/supplier/deals' },
+  { icon: Users2, label: 'Active Deals', href: '/supplier/deals' },
   { divider: true, label: 'PRODUCTS' },
   { icon: Package, label: 'Product Showcase', href: '/supplier/products/showcase' },
   { icon: PlusCircle, label: 'Add Product', href: '/supplier/products/add' },
