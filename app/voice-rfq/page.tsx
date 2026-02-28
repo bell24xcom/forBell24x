@@ -239,6 +239,12 @@ export default function VoiceRFQPage() {
         setTranscript('');
         loadRecentRFQs();
         router.push('/dashboard/rfqs');
+      } else if (response.status === 401) {
+        setError('⚠️ Please login to save your RFQ');
+        // Redirect to login after 2 seconds
+        setTimeout(() => {
+          router.push('/auth/login?redirect=/voice-rfq');
+        }, 2000);
       } else {
         setError('Failed to save RFQ');
       }

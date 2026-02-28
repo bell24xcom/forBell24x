@@ -108,12 +108,12 @@ export default function MessagesPage() {
     router.push('/');
   };
 
-  const selectedContact = PLACEHOLDER_CONTACTS.find(c => c.id === selectedContactId) ?? null;
+  const selectedContact = PLACEHOLDER_CONTACTS?.find(c => c?.id === selectedContactId) ?? null;
 
-  const filteredContacts = PLACEHOLDER_CONTACTS.filter(
+  const filteredContacts = (PLACEHOLDER_CONTACTS || []).filter(
     c =>
-      c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      c.company.toLowerCase().includes(searchQuery.toLowerCase())
+      c?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      c?.company?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (

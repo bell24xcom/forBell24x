@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { 
   BarChart3, 
   TrendingUp, 
@@ -51,6 +52,7 @@ interface UserAnalytics {
 }
 
 export default function UserAnalyticsDashboard() {
+  const router = useRouter();
   const [analytics, setAnalytics] = useState<UserAnalytics | null>(null);
   const [timeframe, setTimeframe] = useState<'7d' | '30d' | '90d' | '1y'>('30d');
   const [loading, setLoading] = useState(true);
@@ -174,12 +176,20 @@ export default function UserAnalyticsDashboard() {
 
   return (
       <div className="space-y-6">
+        {/* Back Button */}
+        <button
+          onClick={() => router.back()}
+          className="flex items-center gap-2 text-gray-400 hover:text-white mb-2 text-sm transition-colors"
+        >
+          ← Back
+        </button>
+
         {/* Header */}
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-gray-900 border border-gray-700 rounded-lg shadow-sm p-6">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-white">User Analytics Dashboard</h1>
-            <p className="text-slate-300">Live analytics and performance metrics for {analytics.userName}</p>
+            <p className="text-gray-300">Live analytics and performance metrics for {analytics.userName}</p>
           </div>
           <div className="flex items-center space-x-4">
             <select
@@ -201,49 +211,49 @@ export default function UserAnalyticsDashboard() {
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-gray-900 border border-gray-700 rounded-lg shadow-sm p-6">
           <div className="flex items-center">
-            <div className="p-3 rounded-full bg-blue-100 text-blue-600">
+            <div className="p-3 rounded-full bg-blue-500/10 text-blue-400">
               <BarChart3 className="w-6 h-6" />
             </div>
             <div className="ml-4">
-              <p className="text-sm text-slate-300">Total RFQs</p>
+              <p className="text-sm text-gray-400">Total RFQs</p>
               <p className="text-2xl font-bold text-white">{analytics.metrics.totalRFQs}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-gray-900 border border-gray-700 rounded-lg shadow-sm p-6">
           <div className="flex items-center">
-            <div className="p-3 rounded-full bg-green-100 text-green-600">
+            <div className="p-3 rounded-full bg-green-500/10 text-green-400">
               <DollarSign className="w-6 h-6" />
             </div>
             <div className="ml-4">
-              <p className="text-sm text-slate-300">Total Spent</p>
+              <p className="text-sm text-gray-400">Total Spent</p>
               <p className="text-2xl font-bold text-white">{formatCurrency(analytics.metrics.totalSpent)}</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-gray-900 border border-gray-700 rounded-lg shadow-sm p-6">
           <div className="flex items-center">
-            <div className="p-3 rounded-full bg-purple-100 text-purple-600">
+            <div className="p-3 rounded-full bg-purple-500/10 text-purple-400">
               <TrendingUp className="w-6 h-6" />
             </div>
             <div className="ml-4">
-              <p className="text-sm text-slate-300">Success Rate</p>
+              <p className="text-sm text-gray-400">Success Rate</p>
               <p className="text-2xl font-bold text-white">{analytics.metrics.successRate}%</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-gray-900 border border-gray-700 rounded-lg shadow-sm p-6">
           <div className="flex items-center">
-            <div className="p-3 rounded-full bg-orange-100 text-orange-600">
+            <div className="p-3 rounded-full bg-orange-500/10 text-orange-400">
               <Award className="w-6 h-6" />
             </div>
             <div className="ml-4">
-              <p className="text-sm text-slate-300">Trust Score</p>
+              <p className="text-sm text-gray-400">Trust Score</p>
               <p className="text-2xl font-bold text-white">{analytics.metrics.trustScore}</p>
             </div>
           </div>
@@ -251,7 +261,7 @@ export default function UserAnalyticsDashboard() {
       </div>
 
       {/* Live Features Status */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
+      <div className="bg-gray-900 border border-gray-700 rounded-lg shadow-sm p-6">
         <h2 className="text-lg font-semibold text-white mb-4">Live Features Status</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {Object.entries(analytics.liveFeatures).map(([feature, isActive]) => (
@@ -274,33 +284,33 @@ export default function UserAnalyticsDashboard() {
 
       {/* Performance Metrics */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-gray-900 border border-gray-700 rounded-lg shadow-sm p-6">
           <h3 className="text-lg font-semibold text-white mb-4">Performance Metrics</h3>
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <span className="text-sm text-slate-300">Response Time</span>
+              <span className="text-sm text-gray-400">Response Time</span>
               <span className="text-sm font-medium text-white">{analytics.metrics.responseTime}h avg</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-slate-300">Active RFQs</span>
+              <span className="text-sm text-gray-400">Active RFQs</span>
               <span className="text-sm font-medium text-white">{analytics.metrics.activeRFQs}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-slate-300">Completed Transactions</span>
+              <span className="text-sm text-gray-400">Completed Transactions</span>
               <span className="text-sm font-medium text-white">{analytics.metrics.completedTransactions}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-slate-300">Total Earned</span>
+              <span className="text-sm text-gray-400">Total Earned</span>
               <span className="text-sm font-medium text-white">{formatCurrency(analytics.metrics.totalEarned)}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-slate-300">Last Activity</span>
+              <span className="text-sm text-gray-400">Last Activity</span>
               <span className="text-sm font-medium text-white">{analytics.metrics.lastActivity}</span>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-gray-900 border border-gray-700 rounded-lg shadow-sm p-6">
           <h3 className="text-lg font-semibold text-white mb-4">Recent Activity</h3>
           <div className="space-y-3">
             {analytics.recentActivity.map((activity) => (
@@ -320,19 +330,19 @@ export default function UserAnalyticsDashboard() {
       </div>
 
       {/* User Profile Summary */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
+      <div className="bg-gray-900 border border-gray-700 rounded-lg shadow-sm p-6">
         <h3 className="text-lg font-semibold text-white mb-4">User Profile Summary</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
-            <p className="text-sm text-slate-300">User Type</p>
+            <p className="text-sm text-gray-400">User Type</p>
             <p className="text-lg font-semibold text-white capitalize">{analytics.userType}</p>
           </div>
           <div>
-            <p className="text-sm text-slate-300">Plan</p>
+            <p className="text-sm text-gray-400">Plan</p>
             <p className="text-lg font-semibold text-white">{analytics.plan}</p>
           </div>
           <div>
-            <p className="text-sm text-slate-300">Member Since</p>
+            <p className="text-sm text-gray-400">Member Since</p>
             <p className="text-lg font-semibold text-white">{analytics.joinDate}</p>
           </div>
         </div>
