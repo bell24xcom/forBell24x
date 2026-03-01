@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Search, Menu, X } from 'lucide-react';
+import { Search, Menu, X, Bell } from 'lucide-react';
 import EnhancedAuthModal from './EnhancedAuthModal';
 
 export default function Header() {
@@ -21,12 +21,26 @@ export default function Header() {
     };
 
     const checkAuth = () => {
-      const token = localStorage.getItem('bell24h_auth_token');
       const userData = localStorage.getItem('bell24h_user');
-      if (token && userData) {
-        setIsLoggedIn(true);
-        setUser(JSON.parse(userData));
+      if (userData) {
+        try {
+          setUser(JSON.parse(userData));
+          setIsLoggedIn(true);
+        } catch {
+          setIsLoggedIn(false);
+        }
       }
+      // Also verify with API (cookie-based auth)
+      fetch('/api/auth/me', { credentials: 'include' })
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+          if (data?.user) {
+            setUser(data.user);
+            setIsLoggedIn(true);
+            localStorage.setItem('bell24h_user', JSON.stringify(data.user));
+          }
+        })
+        .catch(() => {});
     };
 
     checkAuth();
@@ -42,14 +56,15 @@ export default function Header() {
     setUser(userData);
     setIsLoggedIn(true);
     setShowAuthModal(false);
-    localStorage.setItem('bell24h_auth_token', 'mock_jwt_token_' + Date.now());
     localStorage.setItem('bell24h_user', JSON.stringify(userData));
     router.push('/dashboard');
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('bell24h_auth_token');
     localStorage.removeItem('bell24h_user');
+    // Clear auth cookie
+    fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }).catch(() => {});
+    document.cookie = 'auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
     setIsLoggedIn(false);
     setUser(null);
     router.push('/');
@@ -113,9 +128,19 @@ export default function Header() {
 
               {/* Auth */}
               {isLoggedIn ? (
-                <div className="flex items-center gap-3">
-                  <span className="text-slate-400 text-sm">
-                    {user?.name || 'User'}
+                <div className="flex items-center gap-4">
+                  <Link
+                    href="/dashboard"
+                    className="text-slate-300 hover:text-white text-sm font-medium transition-colors"
+                  >
+                    Dashboard
+                  </Link>
+                  <Link href="/notifications" className="relative text-slate-400 hover:text-white transition-colors">
+                    <Bell className="w-5 h-5" />
+                    <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                  </Link>
+                  <span className="text-slate-300 text-sm font-medium">
+                    {user?.name || user?.companyName || 'User'}
                   </span>
                   <button
                     onClick={handleLogout}

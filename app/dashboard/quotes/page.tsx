@@ -228,16 +228,16 @@ export default function MyQuotesPage() {
         )}
 
         {/* Main Card */}
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div className="bg-slate-900 border border-slate-800 rounded-xl shadow-sm overflow-hidden">
           {/* Stats strip */}
           {!loading && !error && quotes.length > 0 && (
-            <div className="px-6 py-4 border-b border-gray-100 grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="px-6 py-4 border-b border-slate-800 grid grid-cols-2 sm:grid-cols-4 gap-4">
               {(
                 [
-                  { label: 'Total', value: quotes.length, color: 'text-white' },
-                  { label: 'Pending', value: quotes.filter(q => q.status === 'PENDING').length, color: 'text-yellow-600' },
-                  { label: 'Accepted', value: quotes.filter(q => q.status === 'ACCEPTED').length, color: 'text-green-600' },
-                  { label: 'Rejected', value: quotes.filter(q => q.status === 'REJECTED').length, color: 'text-red-600' },
+                  { label: 'Total', value: quotes.length, color: 'text-blue-400' },
+                  { label: 'Pending', value: quotes.filter(q => q.status === 'PENDING').length, color: 'text-yellow-400' },
+                  { label: 'Accepted', value: quotes.filter(q => q.status === 'ACCEPTED').length, color: 'text-green-400' },
+                  { label: 'Rejected', value: quotes.filter(q => q.status === 'REJECTED').length, color: 'text-red-400' },
                 ] as const
               ).map(stat => (
                 <div key={stat.label} className="text-center">
@@ -249,7 +249,7 @@ export default function MyQuotesPage() {
           )}
 
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-100">
+            <table className="min-w-full divide-y divide-slate-800">
               <thead className="bg-slate-900">
                 <tr>
                   {['RFQ Title', 'Supplier / Company', 'Price', 'Timeline', 'Status', 'Actions'].map(h => (
@@ -262,7 +262,7 @@ export default function MyQuotesPage() {
                   ))}
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-50">
+              <tbody className="bg-slate-900 divide-y divide-slate-800">
                 {loading && (
                   <>
                     <SkeletonRow />

@@ -156,18 +156,27 @@ export default function VoiceRFQPage() {
 
       // Set extracted RFQ data (already structured!)
       if (data.extractedData) {
+        // Helper: treat "Not specified", "null", empty, etc. as missing
+        const clean = (val: any) => {
+          if (!val) return null;
+          const s = String(val).trim().toLowerCase();
+          if (['not specified', 'null', 'n/a', 'none', 'undefined', ''].includes(s)) return null;
+          return String(val).trim();
+        };
+
+        const productName = clean(data.extractedData.product);
         const rfq: VoiceRFQData = {
           id: `voice-rfq-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-          title: data.extractedData.product || 'Voice RFQ',
+          title: productName || `Voice RFQ - ${transcription.substring(0, 50)}`,
           description: transcription,
-          category: data.extractedData.category || 'Other',
-          quantity: data.extractedData.quantity
+          category: clean(data.extractedData.category) || 'Other',
+          quantity: data.extractedData.quantity && clean(data.extractedData.quantity)
             ? `${data.extractedData.quantity} ${data.extractedData.unit || 'units'}`
-            : 'Not specified',
-          specifications: data.extractedData.specifications
+            : '1 units',
+          specifications: clean(data.extractedData.specifications)
             ? [data.extractedData.specifications]
             : [],
-          timeline: data.extractedData.urgency || 'flexible',
+          timeline: clean(data.extractedData.urgency) || 'flexible',
           budget: data.extractedData.budgetMin && data.extractedData.budgetMax
             ? `₹${data.extractedData.budgetMin} - ₹${data.extractedData.budgetMax}`
             : data.extractedData.budgetMin
