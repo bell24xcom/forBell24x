@@ -7,105 +7,77 @@ export const dynamic = 'force-dynamic';
 /**
  * GET /api/dashboard/deals
  *
- * Returns unified deal tracking for both buyers and suppliers.
- * A "deal" is created when a buyer accepts a supplier's quote.
- *
- * Status flow:
- *   QUOTE_ACCEPTED → PAYMENT_PENDING → PAID → SHIPPING → DELIVERED → COMPLETED
+ * Returns deals for both buyers and suppliers using the Deal model.
  */
 export async function GET(request: NextRequest) {
   try {
-    // Authenticate user from cookie or Authorization header
     const token =
       request.cookies.get('auth-token')?.value ||
       request.headers.get('authorization')?.replace('Bearer ', '');
 
     if (!token) {
-      return NextResponse.json(
-        { success: false, error: 'Authentication required' },
-        { status: 401 }
-      );
+      return NextResponse.json({ success: false, error: 'Authentication required' }, { status: 401 });
     }
 
     const payload = verifyToken(token);
     if (!payload) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid or expired session' },
-        { status: 401 }
-      );
+      return NextResponse.json({ success: false, error: 'Invalid or expired session' }, { status: 401 });
     }
 
     const userId = payload.userId;
 
-    // Fetch accepted quotes for this user (as buyer or supplier)
-    const quotes = await prisma.quote.findMany({
+    // Fetch deals where user is buyer or supplier
+    const deals = await prisma.deal.findMany({
       where: {
-        status: 'ACCEPTED',
         OR: [
-          { supplierId: userId }, // User is the supplier
-          { rfq: { createdBy: userId } }, // User is the buyer
+          { buyerId: userId },
+          { supplierId: userId },
         ],
       },
       include: {
-        rfq: {
-          select: {
-            id: true,
-            title: true,
-            createdBy: true,
-            user: { select: { name: true, company: true } },
-          },
-        },
-        supplier: {
-          select: {
-            id: true,
-            name: true,
-            company: true,
-          },
-        },
+        rfq: { select: { id: true, title: true } },
+        quote: { select: { id: true, deliveryDays: true, timeline: true } },
+        buyer: { select: { id: true, name: true, company: true } },
+        supplier: { select: { id: true, name: true, company: true } },
       },
-      orderBy: { updatedAt: 'desc' },
+      orderBy: { createdAt: 'desc' },
       take: 50,
     });
 
-    // Transform to deal format
-    const deals = quotes.map(quote => {
-      const isBuyer = quote.rfq.createdBy === userId;
-      const otherParty = isBuyer
-        ? (quote.supplier.company || quote.supplier.name || 'Supplier')
-        : (quote.rfq.user.company || quote.rfq.user.name || 'Buyer');
+    const mapped = deals.map(deal => {
+      const isBuyer = deal.buyerId === userId;
+      const other = isBuyer ? deal.supplier : deal.buyer;
+      const otherParty = other.company || other.name || (isBuyer ? 'Supplier' : 'Buyer');
 
-      // Determine deal status based on quote data
-      // In a real app, you'd have a separate Transaction/Deal table with status tracking
-      // For now, we'll derive status from quote fields
-      let status: 'QUOTE_ACCEPTED' | 'PAYMENT_PENDING' | 'PAID' | 'SHIPPING' | 'DELIVERED' | 'COMPLETED' = 'QUOTE_ACCEPTED';
-
-      // You can extend this logic when you add transaction tracking fields
-      // For example: if quote has paymentCompletedAt, status = 'PAID'
-      // if quote has shippedAt, status = 'SHIPPING', etc.
+      // Map deal status to progress status
+      const statusMap: Record<string, string> = {
+        'ACTIVE': 'QUOTE_ACCEPTED',
+        'PAYMENT_PENDING': 'PAYMENT_PENDING',
+        'PAID': 'PAID',
+        'SHIPPING': 'SHIPPING',
+        'DELIVERED': 'DELIVERED',
+        'COMPLETED': 'COMPLETED',
+      };
 
       return {
-        id: quote.id,
-        rfqTitle: quote.rfq.title,
+        id: deal.id,
+        rfqTitle: deal.rfq.title,
         otherParty,
-        amount: parseFloat(quote.price),
-        status,
-        timeline: quote.deliveryDays ? `${quote.deliveryDays} days` : 'Not specified',
-        createdAt: quote.updatedAt?.toISOString() || quote.createdAt.toISOString(),
+        amount: deal.price,
+        status: statusMap[deal.status] || 'QUOTE_ACCEPTED',
+        timeline: deal.quote?.deliveryDays ? `${deal.quote.deliveryDays} days` : (deal.quote?.timeline || 'Not specified'),
+        createdAt: deal.createdAt.toISOString(),
+        role: isBuyer ? 'buyer' : 'supplier',
       };
     });
 
     return NextResponse.json({
       success: true,
-      deals,
-      total: deals.length,
+      deals: mapped,
+      total: mapped.length,
     });
   } catch (error) {
     console.error('Error fetching deals:', error);
-    const { errorLogger } = await import('@/lib/errorLogger');
-    errorLogger.critical(error, { route: '/api/dashboard/deals' });
-    return NextResponse.json(
-      { success: false, error: 'Failed to load deals' },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: 'Failed to load deals' }, { status: 500 });
   }
 }

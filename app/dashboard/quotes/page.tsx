@@ -64,7 +64,7 @@ function SkeletonRow() {
     <tr className="animate-pulse">
       {[1, 2, 3, 4, 5, 6].map(i => (
         <td key={i} className="px-6 py-4">
-          <div className="h-4 bg-gray-200 rounded w-full" />
+          <div className="h-4 bg-slate-700 rounded w-full" />
         </td>
       ))}
     </tr>
@@ -275,7 +275,7 @@ export default function MyQuotesPage() {
                   <tr>
                     <td colSpan={6} className="px-6 py-20 text-center">
                       <div className="flex flex-col items-center gap-4">
-                        <div className="w-16 h-16 bg-yellow-50 rounded-full flex items-center justify-center">
+                        <div className="w-16 h-16 bg-yellow-900/30 rounded-full flex items-center justify-center">
                           <MessageSquare className="w-8 h-8 text-yellow-400" />
                         </div>
                         <div>
@@ -341,7 +341,7 @@ export default function MyQuotesPage() {
                         )}
                         <Link
                           href={`/rfq/compare-quotes`}
-                          className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
+                          className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-blue-400 bg-blue-900/30 hover:bg-blue-900/50 rounded-lg transition-colors"
                         >
                           View
                         </Link>

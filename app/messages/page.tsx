@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 
 export default function MessagesPage() {
   const [threads, setThreads] = useState([]);
-  const [selectedThread, setSelectedThread] = useState(null);
+  const [selectedThread, setSelectedThread] = useState<any>(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -36,7 +36,7 @@ export default function MessagesPage() {
       const response = await fetch('/api/messages', { credentials: 'include' });
       const data = await response.json();
       if (data.success) {
-        setThreads(data.threads);
+        setThreads(data.threads || []);
       } else {
         setError(data.error || 'Failed to load message threads');
       }
@@ -53,7 +53,7 @@ export default function MessagesPage() {
       const response = await fetch(`/api/messages?threadId=${threadId}`, { credentials: 'include' });
       const data = await response.json();
       if (data.success) {
-        setMessages(data.messages);
+        setMessages(data.messages || []);
       } else {
         setError(data.error || 'Failed to load messages');
       }
@@ -77,25 +77,22 @@ export default function MessagesPage() {
       const response = await fetch('/api/messages', {
         method: 'POST',
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          recipientId: selectedThread.participants.find((p: any) => p.id !== user.userId).id,
+          recipientId: selectedThread?.participants?.find((p: any) => p.id !== user?.userId)?.id,
           content: newMessage,
         }),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to send message');
-      }
+      if (!response.ok) throw new Error('Failed to send message');
 
       const data = await response.json();
       if (data.success) {
-        setSuccess('Message sent successfully!');
+        setSuccess('Message sent!');
         setNewMessage('');
         fetchMessages(selectedThread.id);
         fetchThreads();
+        setTimeout(() => setSuccess(''), 3000);
       } else {
         setError(data.error || 'Failed to send message');
       }
@@ -117,89 +114,67 @@ export default function MessagesPage() {
   };
 
   const getInitials = (name: string) => {
+    if (!name) return '?';
     return name.split(' ').map(n => n[0]).join('').toUpperCase();
   };
 
-  const isOwnMessage = (message: any) => message.senderId === user.userId;
+  const isOwnMessage = (message: any) => message.senderId === user?.userId;
 
   return (
     <div className="min-h-screen bg-[#0F172A] text-white">
       <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* Breadcrumb */}
         <nav className="mb-6">
           <ol className="flex items-center space-x-2 text-sm text-slate-300">
-            <li>
-              <a href="/dashboard" className="hover:text-white">Dashboard</a>
-            </li>
-            <li>
-              <span className="text-white">Messages</span>
-            </li>
+            <li><a href="/dashboard" className="hover:text-white">Dashboard</a></li>
+            <li><span className="text-white">Messages</span></li>
           </ol>
         </nav>
 
-        {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-4">Messages</h1>
-          <p className="text-slate-300">
-            Communicate with buyers and suppliers
-          </p>
+          <p className="text-slate-300">Communicate with buyers and suppliers</p>
         </div>
 
-        {/* Success/Error Messages */}
         {success && (
-          <div className="bg-green-900/50 rounded-lg p-4 mb-6 text-green-300">
-            {success}
-          </div>
+          <div className="bg-green-900/50 rounded-lg p-4 mb-6 text-green-300">{success}</div>
         )}
         {error && (
-          <div className="bg-red-900/50 rounded-lg p-4 mb-6 text-red-300">
-            {error}
-          </div>
+          <div className="bg-red-900/50 rounded-lg p-4 mb-6 text-red-300">{error}</div>
         )}
 
-        {/* Messages Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Threads List */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-xl shadow-sm p-4">
-              <h2 className="text-lg font-semibold mb-4">Conversations</h2>
+            <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
+              <h2 className="text-lg font-semibold text-white mb-4">Conversations</h2>
               {isLoading ? (
-                <div className="text-center py-8 text-slate-500">
-                  <p>Loading conversations...</p>
-                </div>
+                <div className="text-center py-8 text-slate-400"><p>Loading conversations...</p></div>
               ) : threads.length === 0 ? (
-                <div className="text-center py-8 text-slate-500">
-                  <p>No conversations found</p>
-                </div>
+                <div className="text-center py-8 text-slate-400"><p>No conversations found</p></div>
               ) : (
                 <div className="space-y-2">
                   {threads.map((thread: any) => (
                     <button
                       key={thread.id}
                       onClick={() => setSelectedThread(thread)}
-                      className={`flex items-center p-3 rounded-lg hover:bg-slate-50 transition-colors ${
-                        selectedThread?.id === thread.id ? 'bg-slate-100' : ''
+                      className={`w-full flex items-center p-3 rounded-lg hover:bg-slate-700/50 transition-colors ${
+                        selectedThread?.id === thread.id ? 'bg-slate-700/50' : ''
                       }`}
                     >
-                      <div className="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center font-medium text-white">
-                        {getInitials(thread.participants[0].name)}
+                      <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center font-medium text-white text-sm">
+                        {getInitials(thread.participants?.[0]?.name || '')}
                       </div>
-                      <div className="ml-3 flex-1">
-                        <div className="font-medium">{thread.participants[0].company}</div>
-                        <div className="text-sm text-slate-500">
-                          {thread.lastMessage.content}
+                      <div className="ml-3 flex-1 text-left">
+                        <div className="font-medium text-white text-sm">{thread.participants?.[0]?.company || thread.participants?.[0]?.name}</div>
+                        <div className="text-xs text-slate-400 truncate">
+                          {thread.lastMessage?.content || 'No messages'}
                         </div>
                       </div>
-                      <div className="text-right">
-                        <div className="text-xs text-slate-500">
-                          {formatDateTime(thread.lastMessage.createdAt)}
-                        </div>
-                        {thread.unreadCount > 0 && (
-                          <span className="inline-block px-2 py-1 text-xs font-medium bg-green-500 text-white rounded-full">
-                            {thread.unreadCount}
-                          </span>
-                        )}
-                      </div>
+                      {thread.unreadCount > 0 && (
+                        <span className="px-2 py-0.5 text-xs font-medium bg-blue-600 text-white rounded-full">
+                          {thread.unreadCount}
+                        </span>
+                      )}
                     </button>
                   ))}
                 </div>
@@ -210,43 +185,31 @@ export default function MessagesPage() {
           {/* Message Thread */}
           <div className="lg:col-span-2">
             {selectedThread ? (
-              <div className="bg-white rounded-xl shadow-sm p-4">
-                <div className="mb-6">
-                  <h2 className="text-lg font-semibold">
-                    {selectedThread.participants[0].company}
+              <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4">
+                <div className="mb-4 pb-4 border-b border-slate-700">
+                  <h2 className="text-lg font-semibold text-white">
+                    {selectedThread.participants?.[0]?.company || selectedThread.participants?.[0]?.name}
                   </h2>
-                  <p className="text-sm text-slate-500">
-                    {selectedThread.participants[0].name}
-                  </p>
+                  <p className="text-sm text-slate-400">{selectedThread.participants?.[0]?.name}</p>
                 </div>
 
-                {/* Messages */}
-                <div className="max-h-96 overflow-y-auto mb-6">
+                <div className="max-h-96 overflow-y-auto mb-4">
                   {messages.length === 0 ? (
-                    <div className="text-center py-8 text-slate-500">
-                      <p>No messages yet</p>
-                    </div>
+                    <div className="text-center py-8 text-slate-400"><p>No messages yet</p></div>
                   ) : (
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                       {messages.map((message: any) => (
                         <div
                           key={message.id}
-                          className={`flex ${
-                            isOwnMessage(message) ? 'justify-end' : 'justify-start'
-                          }`}
+                          className={`flex ${isOwnMessage(message) ? 'justify-end' : 'justify-start'}`}
                         >
-                          <div
-                            className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                              isOwnMessage(message)
-                                ? 'bg-indigo-600 text-white'
-                                : 'bg-slate-100 text-slate-900'
-                            }`}
-                          >
-                            <div className="font-medium text-sm">
-                              {isOwnMessage(message) ? 'You' : selectedThread.participants[0].name}
-                            </div>
+                          <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                            isOwnMessage(message)
+                              ? 'bg-blue-600 text-white'
+                              : 'bg-slate-700 text-white'
+                          }`}>
                             <div className="text-sm">{message.content}</div>
-                            <div className="text-xs text-slate-500 mt-1">
+                            <div className="text-xs text-slate-300 mt-1 opacity-70">
                               {formatDateTime(message.createdAt)}
                             </div>
                           </div>
@@ -256,32 +219,26 @@ export default function MessagesPage() {
                   )}
                 </div>
 
-                {/* Message Composer */}
                 <div className="flex gap-2">
                   <input
                     type="text"
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
                     placeholder="Type a message..."
-                    className="flex-1 px-4 py-2 bg-slate-50 border border-slate-300 text-slate-900 rounded-lg focus:outline-none focus:border-indigo-500"
-                    onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                    className="flex-1 px-4 py-2 bg-slate-900 border border-slate-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
                   />
                   <button
                     onClick={sendMessage}
                     disabled={isLoading || !newMessage.trim()}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg disabled:opacity-50"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg disabled:opacity-50 transition-colors"
                   >
-                    {isLoading ? (
-                      <svg className="animate-spin h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                      </svg>
-                    ) : null}
                     Send
                   </button>
                 </div>
               </div>
             ) : (
-              <div className="bg-white rounded-xl shadow-sm p-6 text-center text-slate-500">
+              <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6 text-center text-slate-400">
                 <p>Select a conversation to start messaging</p>
               </div>
             )}

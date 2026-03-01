@@ -238,17 +238,17 @@ export default function WalletPage() {
                 </thead>
                 <tbody>
                   {transactions.map((tx: any) => (
-                    <tr key={tx.id} className="border-b border-slate-50 hover:bg-slate-700/30">
-                      <td className="py-3 px-4 text-sm text-slate-900">
+                    <tr key={tx.id} className="border-b border-slate-700 hover:bg-slate-700/30">
+                      <td className="py-3 px-4 text-sm text-slate-300">
                         {formatDate(tx.createdAt)}
                       </td>
-                      <td className="py-3 px-4 text-sm text-slate-900">
+                      <td className="py-3 px-4 text-sm text-slate-300">
                         {tx.type}
                       </td>
-                      <td className="py-3 px-4 text-sm text-slate-900">
+                      <td className="py-3 px-4 text-sm text-slate-300">
                         {formatCurrency(tx.amount)}
                       </td>
-                      <td className="py-3 px-4 text-sm text-slate-900">
+                      <td className="py-3 px-4 text-sm text-slate-300">
                         {tx.description}
                       </td>
                       <td className="py-3 px-4 text-sm">
