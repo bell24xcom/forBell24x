@@ -13,13 +13,13 @@ export default function MessagesPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const { user } = useSession();
+  const { user, loading } = useSession();
 
   useEffect(() => {
-    if (!user) {
-      window.location.href = '/login';
+    if (!loading && !user) {
+      window.location.href = '/auth/phone-email';
     }
-  }, [user]);
+  }, [user, loading]);
 
   useEffect(() => {
     fetchThreads();
@@ -33,7 +33,7 @@ export default function MessagesPage() {
 
   const fetchThreads = async () => {
     try {
-      const response = await fetch('/api/messages');
+      const response = await fetch('/api/messages', { credentials: 'include' });
       const data = await response.json();
       if (data.success) {
         setThreads(data.threads);
@@ -50,7 +50,7 @@ export default function MessagesPage() {
 
   const fetchMessages = async (threadId: string) => {
     try {
-      const response = await fetch(`/api/messages?threadId=${threadId}`);
+      const response = await fetch(`/api/messages?threadId=${threadId}`, { credentials: 'include' });
       const data = await response.json();
       if (data.success) {
         setMessages(data.messages);
@@ -76,9 +76,9 @@ export default function MessagesPage() {
     try {
       const response = await fetch('/api/messages', {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('auth-token')}`,
         },
         body: JSON.stringify({
           recipientId: selectedThread.participants.find((p: any) => p.id !== user.userId).id,

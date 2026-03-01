@@ -64,7 +64,7 @@ function MarketplaceContent() {
       params.set('page', String(pg));
       params.set('limit', '20');
 
-      const res = await fetch(`/api/marketplace/rfqs?${params.toString()}`);
+      const res = await fetch(`/api/marketplace/rfqs?${params.toString()}`, { credentials: 'include' });
       const data = await res.json();
       if (data.success) {
         setRfqs(data.rfqs || []);

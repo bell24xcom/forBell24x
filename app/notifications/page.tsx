@@ -34,7 +34,7 @@ export default function NotificationsPage() {
   async function fetchNotifications() {
     setLoading(true);
     try {
-      const res = await fetch('/api/notifications');
+      const res = await fetch('/api/notifications', { credentials: 'include' });
       const data = await res.json();
       if (data.success) {
         setNotifications(data.notifications || []);
@@ -51,6 +51,7 @@ export default function NotificationsPage() {
     try {
       await fetch('/api/notifications', {
         method: 'PUT',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ notificationId: id }),
       });
@@ -68,6 +69,7 @@ export default function NotificationsPage() {
     try {
       await fetch('/api/notifications', {
         method: 'PUT',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ markAll: true }),
       });

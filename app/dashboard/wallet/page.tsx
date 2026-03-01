@@ -174,7 +174,7 @@ export default function WalletPage() {
     setLoadingStats(true);
     setStatsError(null);
     try {
-      const res = await fetch('/api/dashboard/stats');
+      const res = await fetch('/api/dashboard/stats', { credentials: 'include' });
       const data = await res.json();
       if (!data.success) throw new Error(data.error ?? 'Failed to load balance');
       setStats({ totalEarned: data.stats.totalEarned, totalSpent: data.stats.totalSpent });
@@ -188,7 +188,7 @@ export default function WalletPage() {
   const fetchTransactions = useCallback(async () => {
     setLoadingTxns(true);
     try {
-      const res = await fetch('/api/payment/personal', { method: 'GET' });
+      const res = await fetch('/api/payment/personal', { method: 'GET', credentials: 'include' });
       if (res.ok) {
         const data = await res.json();
         if (data.success && Array.isArray(data.transactions)) {
@@ -218,6 +218,7 @@ export default function WalletPage() {
 
       const res = await fetch('/api/payment/create-order', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           amount,

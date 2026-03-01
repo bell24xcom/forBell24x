@@ -25,7 +25,7 @@ export default function WalletPage() {
 
   const fetchWalletData = async () => {
     try {
-      const response = await fetch('/api/wallet');
+      const response = await fetch('/api/wallet', { credentials: 'include' });
       const data = await response.json();
       if (data.success) {
         setBalance(data.balance);
@@ -54,9 +54,9 @@ export default function WalletPage() {
     try {
       const response = await fetch('/api/wallet', {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('auth-token')}`,
         },
         body: JSON.stringify({
           amount: parseFloat(depositAmount),

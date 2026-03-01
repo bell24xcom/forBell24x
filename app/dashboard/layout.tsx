@@ -1,182 +1,195 @@
 'use client';
 
-import {
-  Activity,
-  BarChart3,
-  Brain,
-  FileBarChart,
-  FileText,
-  HelpCircle,
-  Home,
-  MessageCircle,
-  Mic,
-  Settings,
-  Shield,
-  ShoppingCart,
-  Star,
-  Users,
-  Video,
-  Wallet,
-} from 'lucide-react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useDashboardMode } from '@/contexts/DashboardContext';
+import {
+  LayoutDashboard, PlusCircle, FileText, MessageSquare, Users2,
+  Mail, Wallet, BarChart3, User, Bell, Settings, Search, Star,
+  Mic, Video, FileEdit, Building2, Package, CreditCard, Menu, X, Shield
+} from 'lucide-react';
 
-const navigationItems = [
-  // Main
-  { name: 'Dashboard', href: '/dashboard', icon: Home, category: 'main' },
-  { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3, category: 'main' },
+interface NavItem {
+  icon?: any;
+  label: string;
+  href?: string;
+  divider?: boolean;
+  highlight?: boolean;
+}
 
-  // RFQ & Quotes
-  { name: 'Post RFQ', href: '/rfq/create', icon: FileText, category: 'rfq' },
-  { name: 'My RFQs', href: '/dashboard/rfqs', icon: ShoppingCart, category: 'rfq' },
-  { name: 'Quotes Received', href: '/dashboard/quotes', icon: Star, category: 'rfq' },
-  { name: 'Suppliers', href: '/suppliers', icon: Users, category: 'rfq' },
-  { name: 'Messages', href: '/dashboard/messages', icon: MessageCircle, category: 'rfq' },
+const buyerNavItems: NavItem[] = [
+  { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
+  { divider: true, label: 'POST RFQ' },
+  { icon: Mic, label: 'Voice RFQ', href: '/voice-rfq', highlight: true },
+  { icon: Video, label: 'Video RFQ', href: '/video-rfq' },
+  { icon: FileEdit, label: 'Text RFQ', href: '/rfq/create' },
+  { divider: true, label: 'MY RFQS' },
+  { icon: FileText, label: 'My RFQs', href: '/dashboard/rfqs' },
+  { icon: MessageSquare, label: 'Quotes Inbox', href: '/dashboard/quotes' },
+  { icon: Users2, label: 'Active Deals', href: '/dashboard/deals' },
+  { divider: true, label: 'TOOLS' },
+  { icon: Mail, label: 'Messages', href: '/dashboard/messages' },
+  { icon: Wallet, label: 'Wallet', href: '/dashboard/wallet' },
+  { icon: BarChart3, label: 'Analytics', href: '/dashboard/analytics' },
+  { divider: true, label: 'ACCOUNT' },
+  { icon: User, label: 'Profile & KYC', href: '/profile' },
+  { icon: Bell, label: 'Notifications', href: '/notifications' },
+  { icon: Settings, label: 'Settings', href: '/dashboard/settings' },
+];
 
-  // AI Features
-  { name: 'Voice RFQ', href: '/voice-rfq', icon: Mic, category: 'ai' },
-  { name: 'Video RFQ', href: '/video-rfq', icon: Video, category: 'ai' },
-  { name: 'AI Matching', href: '/smart-matching', icon: Brain, category: 'ai' },
-  { name: 'Negotiations', href: '/negotiation', icon: Activity, category: 'ai' },
-
-  // Financial
-  { name: 'Wallet', href: '/wallet', icon: Wallet, category: 'financial' },
-  { name: 'Escrow', href: '/escrow', icon: Shield, category: 'financial' },
-  { name: 'Reports', href: '/dashboard/reports', icon: FileBarChart, category: 'financial' },
-
-  // Account
-  { name: 'Profile', href: '/profile', icon: Settings, category: 'account' },
-  { name: 'Help & Support', href: '/help', icon: HelpCircle, category: 'account' },
+const supplierNavItems: NavItem[] = [
+  { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
+  { divider: true, label: 'BUSINESS' },
+  { icon: Search, label: 'Browse RFQs', href: '/supplier/browse-rfqs', highlight: true },
+  { icon: FileText, label: 'My Quotes', href: '/supplier/my-quotes' },
+  { icon: Users2, label: 'Active Deals', href: '/dashboard/deals' },
+  { divider: true, label: 'PRODUCTS' },
+  { icon: Package, label: 'Product Showcase', href: '/supplier/products/showcase' },
+  { icon: PlusCircle, label: 'Add Product', href: '/supplier/products/add' },
+  { icon: Package, label: 'Manage Products', href: '/supplier/products/manage' },
+  { divider: true, label: 'TOOLS' },
+  { icon: Mail, label: 'Messages', href: '/dashboard/messages' },
+  { icon: Wallet, label: 'Wallet & Earnings', href: '/dashboard/wallet' },
+  { icon: BarChart3, label: 'Performance', href: '/dashboard/analytics' },
+  { divider: true, label: 'PROFILE' },
+  { icon: Star, label: 'Profile & Trust Score', href: '/supplier/profile/edit' },
+  { icon: Building2, label: 'Public Profile', href: '/supplier' },
+  { icon: CreditCard, label: 'GST Verification', href: '/supplier/gst' },
+  { icon: Bell, label: 'Notifications', href: '/notifications' },
+  { icon: Settings, label: 'Settings', href: '/dashboard/settings' },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
+  const { mode, setMode } = useDashboardMode();
 
-  const getCategoryItems = (category: string) => {
-    return navigationItems.filter(item => item.category === category);
-  };
+  const navItems = mode === 'supplier' ? supplierNavItems : buyerNavItems;
 
-  const isActive = (href: string) => {
-    if (href === '/dashboard') {
-      return pathname === '/' || pathname === '/dashboard';
-    }
-    return pathname?.startsWith(href) || false;
+  const switchMode = (newMode: 'buyer' | 'supplier') => {
+    setMode(newMode);
+    setSidebarOpen(false);
   };
 
   return (
-    <div className='min-h-screen bg-slate-900 flex'>
-      {/* Sidebar */}
-      <div
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 text-white shadow-lg transform transition-transform duration-300 ease-in-out ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } lg:translate-x-0 lg:static lg:inset-0`}
-      >
-        {/* Sidebar Header */}
-        <div className='flex items-center justify-between h-16 px-6 border-b border-gray-800'>
-          <div className='flex items-center'>
-            <div className='w-8 h-8 bg-gradient-to-r from-blue-600 to-amber-600 rounded-lg flex items-center justify-center'>
-              <span className='text-white font-bold text-sm'>B24</span>
-            </div>
-            <span className='ml-2 text-xl font-bold text-gray-100'>Bell24H</span>
+    <div className="min-h-screen bg-[#0F172A] text-white">
+      {/* Top Bar */}
+      <div className="bg-slate-900 border-b border-slate-800 sticky top-0 z-40">
+        <div className="flex items-center justify-between px-4 h-16">
+          {/* Left: Logo + Hamburger */}
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="lg:hidden p-2 hover:bg-slate-800 rounded-lg"
+            >
+              {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+            <Link href="/" className="text-xl font-bold">Bell24h</Link>
           </div>
-          <button
-            onClick={() => setSidebarOpen(false)}
-            className='lg:hidden text-gray-400 hover:text-white'
-          >
-            <span>❌</span>
-          </button>
-        </div>
 
-        {/* Navigation Menu */}
-        <div className='flex-1 overflow-y-auto py-4'>
-          <nav className='px-3 space-y-6'>
-            {[
-              { key: 'main', label: 'Main' },
-              { key: 'rfq', label: 'RFQ & Procurement' },
-              { key: 'ai', label: 'AI Features' },
-              { key: 'financial', label: 'Financial' },
-              { key: 'account', label: 'Account' },
-            ].map(section => (
-              <div key={section.key}>
-                <h3 className='px-2 text-xs font-medium text-gray-400 uppercase tracking-wider mb-2'>
-                  {section.label}
-                </h3>
-                <div className='space-y-1'>
-                  {getCategoryItems(section.key).map(item => {
-                    const Icon = item.icon;
-                    return (
-                      <Link
-                        key={item.name}
-                        href={item.href}
-                        className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors ${
-                          isActive(item.href)
-                            ? 'bg-blue-600 text-white border-r-2 border-blue-400'
-                            : 'text-gray-300 hover:bg-gray-800 hover:text-white'
-                        }`}
-                        onClick={() => setSidebarOpen(false)}
-                      >
-                        <Icon className='mr-3 flex-shrink-0 h-4 w-4' />
-                        {item.name}
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
+          {/* Center: Mode Tabs */}
+          <div className="flex items-center gap-2 bg-slate-800 rounded-lg p-1">
+            <button
+              onClick={() => switchMode('buyer')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                mode === 'buyer'
+                  ? 'bg-blue-600 text-white'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              Buyer Dashboard
+            </button>
+            <button
+              onClick={() => switchMode('supplier')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                mode === 'supplier'
+                  ? 'bg-blue-600 text-white'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              Supplier Dashboard
+            </button>
+          </div>
+
+          {/* Right: User Menu */}
+          <div className="flex items-center gap-2">
+            <Link href="/notifications" className="p-2 hover:bg-slate-800 rounded-lg relative">
+              <Bell className="w-5 h-5" />
+              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+            </Link>
+            <Link href="/profile" className="p-2 hover:bg-slate-800 rounded-lg">
+              <User className="w-5 h-5" />
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex">
+        {/* Left Sidebar */}
+        <aside
+          className={`fixed lg:sticky top-16 left-0 h-[calc(100vh-4rem)] w-64 bg-slate-900 border-r border-slate-800 overflow-y-auto transition-transform z-30 ${
+            sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+          }`}
+        >
+          <nav className="p-4 space-y-1">
+            {navItems.map((item, index) => {
+              if (item.divider) {
+                return (
+                  <div key={index} className="pt-4 pb-2">
+                    <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wide px-3">
+                      {item.label}
+                    </h3>
+                  </div>
+                );
+              }
+
+              const Icon = item.icon;
+              const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname?.startsWith(item.href + '/'));
+
+              if (item.highlight) {
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href!}
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors"
+                    onClick={() => setSidebarOpen(false)}
+                  >
+                    {Icon && <Icon className="w-5 h-5" />}
+                    {item.label}
+                  </Link>
+                );
+              }
+
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href!}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
+                    isActive
+                      ? 'bg-blue-600/20 text-blue-400 border-l-2 border-blue-400'
+                      : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                  }`}
+                  onClick={() => setSidebarOpen(false)}
+                >
+                  {Icon && <Icon className="w-5 h-5" />}
+                  {item.label}
+                </Link>
+              );
+            })}
           </nav>
-        </div>
+        </aside>
 
-        {/* User Profile Section */}
-        <div className='border-t border-gray-800 p-4'>
-          <div className='flex items-center'>
-            <div className='w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center'>
-              <span>👤</span>
-            </div>
-            <div className='ml-3'>
-              <p className='text-sm font-medium text-white'>Enterprise User</p>
-              <p className='text-xs text-gray-400'>Pro Plan</p>
-            </div>
-          </div>
-        </div>
+        {/* Main Content */}
+        <main className="flex-1 p-6 lg:p-8">
+          {children}
+        </main>
       </div>
 
-      {/* Main Content */}
-      <div className='flex-1 flex flex-col overflow-hidden'>
-        {/* Top Header */}
-        <header className='bg-slate-900 border-b border-slate-800 h-14 flex items-center justify-between px-4 lg:px-6'>
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className='lg:hidden text-slate-400 hover:text-white'
-          >
-            <span>☰</span>
-          </button>
-
-          <div className='flex-1 flex justify-center lg:justify-start'>
-            <h1 className='text-lg font-semibold text-white'>
-              {navigationItems.find(item => item.href === pathname)?.name || 'Dashboard'}
-            </h1>
-          </div>
-
-          <div className='flex items-center space-x-4'>
-            <Link href='/notifications' className='text-slate-400 hover:text-white transition-colors'>
-              <span>🔔</span>
-            </Link>
-            <Link href='/profile' className='w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center'>
-              <span>👤</span>
-            </Link>
-          </div>
-        </header>
-
-        {/* Main Content Area */}
-        <main className='flex-1 overflow-y-auto bg-slate-900 p-4 lg:p-6'>{children}</main>
-      </div>
-
-      {/* Mobile Sidebar Overlay */}
+      {/* Mobile Overlay */}
       {sidebarOpen && (
         <div
-          className='fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden'
+          className="fixed inset-0 bg-black/50 z-20 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
