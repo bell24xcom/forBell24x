@@ -2,11 +2,14 @@
 
 import { ReactNode } from 'react';
 import { DashboardProvider } from '@/contexts/DashboardContext';
+import { AuthProvider } from '@/app/contexts/AuthContext';
 
 export default function ClientProviders({ children }: { children: ReactNode }) {
   return (
-    <DashboardProvider>
-      {children}
-    </DashboardProvider>
+    <AuthProvider>
+      <DashboardProvider>
+        {children}
+      </DashboardProvider>
+    </AuthProvider>
   );
 }

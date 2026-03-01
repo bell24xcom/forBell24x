@@ -2,11 +2,13 @@
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import ProductShowcaseGrid from '@/components/suppliers/ProductShowcaseGrid';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
 
 export default function ProductShowcasePage() {
+  const router = useRouter();
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [supplierId] = useState('current-supplier-id'); // TODO: Get from auth context
@@ -45,6 +47,9 @@ export default function ProductShowcasePage() {
   return (
     <DashboardLayout>
       <div className="w-full">
+        <button onClick={() => router.back()} className="flex items-center gap-2 text-gray-400 hover:text-white mb-6 text-sm transition-colors cursor-pointer">
+          ← Back
+        </button>
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-3xl font-bold text-white">Product Showcase</h1>

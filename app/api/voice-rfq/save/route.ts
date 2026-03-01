@@ -34,9 +34,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Parse quantity from string like "1000 units" -> number
-    const quantityMatch = rfqData.quantity?.match(/(\d+)/);
-    const quantity = quantityMatch ? parseInt(quantityMatch[1]) : 1;
+    // Keep quantity as string (Prisma schema is String type)
+    const quantity = rfqData.quantity || '1 units';
 
     // Parse budget from string like "₹2.5L - ₹3.5L" -> numbers
     const budgetMatch = rfqData.budget?.match(/₹([\d.]+)L?\s*-?\s*₹?([\d.]+)?L?/);
@@ -72,10 +71,15 @@ export async function POST(request: NextRequest) {
       },
       message: 'RFQ saved successfully',
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error saving voice RFQ:', error);
+    const errorMessage = error?.code === 'P2002'
+      ? 'Duplicate RFQ entry'
+      : error?.code === 'P2003'
+      ? 'Invalid reference (user not found)'
+      : error?.message || 'Failed to save RFQ';
     return NextResponse.json(
-      { success: false, error: 'Failed to save RFQ' },
+      { success: false, error: errorMessage, code: error?.code },
       { status: 500 }
     );
   }

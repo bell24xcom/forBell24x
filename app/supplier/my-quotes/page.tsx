@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import { FileText, MapPin, IndianRupee, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
@@ -16,6 +17,7 @@ interface Quote {
 }
 
 export default function MyQuotesPage() {
+  const router = useRouter();
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -85,6 +87,9 @@ export default function MyQuotesPage() {
   return (
     <DashboardLayout>
       <div className="max-w-7xl">
+        <button onClick={() => router.back()} className="flex items-center gap-2 text-gray-400 hover:text-white mb-6 text-sm transition-colors cursor-pointer">
+          ← Back
+        </button>
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-white mb-2">My Quotes</h1>
           <p className="text-slate-400">Track all quotes you've submitted to buyers</p>

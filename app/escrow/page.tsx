@@ -27,16 +27,19 @@ export default function EscrowPage() {
 
   const fetchEscrowData = async () => {
     try {
-      const response = await fetch('/api/escrow');
+      const response = await fetch('/api/escrow', { credentials: 'include' });
       const data = await response.json();
       if (data.success) {
-        setEscrows(data.escrows);
+        setEscrows(data.escrows || []);
+      } else if (response.status === 401) {
+        setError('Please login to view escrow transactions');
       } else {
-        setError(data.error || 'Failed to load escrow data');
+        // Don't show error for empty state
+        setEscrows([]);
       }
     } catch (err) {
       console.error('Error fetching escrow data:', err);
-      setError('Failed to load escrow data');
+      setEscrows([]);
     } finally {
       setIsLoading(false);
     }
@@ -165,8 +168,15 @@ export default function EscrowPage() {
               <p>Loading escrow transactions...</p>
             </div>
           ) : escrows.length === 0 ? (
-            <div className="text-center py-8 text-gray-300">
-              <p>No escrow transactions found</p>
+            <div className="text-center py-12">
+              <div className="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl">🔒</span>
+              </div>
+              <p className="text-white font-semibold mb-2">No Escrow Transactions</p>
+              <p className="text-gray-400 text-sm mb-4">Secure escrow payments will appear here once you complete a deal</p>
+              <div className="bg-amber-900/20 border border-amber-700/30 rounded-lg p-4 max-w-md mx-auto">
+                <p className="text-amber-400 text-sm">Razorpay escrow integration coming soon</p>
+              </div>
             </div>
           ) : (
             <div className="overflow-x-auto">

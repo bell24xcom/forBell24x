@@ -89,7 +89,7 @@ export default function MyQuotesPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/dashboard/quotes');
+      const res = await fetch('/api/dashboard/quotes', { credentials: 'include' });
       const data = await res.json();
       if (!data.success) throw new Error(data.error ?? 'Failed to load quotes');
       setQuotes(data.quotes as QuoteItem[]);
@@ -112,6 +112,7 @@ export default function MyQuotesPage() {
     try {
       const res = await fetch('/api/rfq/quotes', {
         method: 'PUT',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ quoteId, action: 'accept' }),
       });
@@ -135,6 +136,7 @@ export default function MyQuotesPage() {
     try {
       const res = await fetch('/api/rfq/quotes', {
         method: 'PUT',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ quoteId, action: 'reject' }),
       });

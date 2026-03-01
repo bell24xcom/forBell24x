@@ -211,6 +211,9 @@ export default function VideoRFQPage() {
   return (
     <div className="min-h-screen bg-[#0F172A] p-6">
       <div className="max-w-6xl mx-auto">
+        <button onClick={() => router.back()} className="flex items-center gap-2 text-gray-400 hover:text-white mb-6 text-sm transition-colors cursor-pointer">
+          ← Back
+        </button>
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">Video RFQ Creator</h1>
           <p className="text-slate-300">Create RFQs using video with AI-powered transcription and analysis</p>

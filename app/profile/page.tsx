@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { User, Building2, MapPin, CheckCircle, Save } from 'lucide-react';
 
 const INDIAN_CITIES = [
@@ -38,6 +39,7 @@ interface UserProfile {
 }
 
 export default function ProfilePage() {
+  const router = useRouter();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -133,6 +135,12 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-[#0F172A] text-white">
+      {/* Back Button */}
+      <div className="max-w-4xl mx-auto px-6 pt-6">
+        <button onClick={() => router.back()} className="flex items-center gap-2 text-gray-400 hover:text-white text-sm transition-colors cursor-pointer">
+          ← Back
+        </button>
+      </div>
       {/* Header */}
       <div className="bg-slate-800/60 border-b border-slate-700/50 py-10">
         <div className="max-w-4xl mx-auto px-6">
