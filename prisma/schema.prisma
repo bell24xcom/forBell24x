@@ -36,6 +36,8 @@ model User {
   buyerTransactions    Transaction[]  @relation("BuyerTransactions")
   supplierTransactions Transaction[]  @relation("SupplierTransactions")
   wallet               Wallet?
+  buyerDeals           Deal[]         @relation("BuyerDeals")
+  supplierDeals        Deal[]         @relation("SupplierDeals")
 
   @@map("users")
 }
@@ -109,6 +111,7 @@ model RFQ {
   views          Int           @default(0)
   urgency        RFQUrgency    @default(NORMAL)
   quotes         Quote[]
+  deals          Deal[]
   categoryRel    Category?     @relation(fields: [categoryId], references: [id])
   user           User?         @relation(fields: [createdBy], references: [id])
   transactions   Transaction[]
@@ -129,11 +132,32 @@ model Quote {
   supplierId   String?       @map("supplier_id")
   terms        String?
   timeline     String?
+  deliveryDays Int?          @map("delivery_days")
+  notes        String?
   rfq          RFQ?          @relation(fields: [rfqId], references: [id])
   supplier     User?         @relation(fields: [supplierId], references: [id])
   transactions Transaction[]
+  deal         Deal?
 
   @@map("quotes")
+}
+
+model Deal {
+  id          String   @id @default(cuid())
+  rfqId       String   @map("rfq_id")
+  quoteId     String   @unique @map("quote_id")
+  buyerId     String   @map("buyer_id")
+  supplierId  String   @map("supplier_id")
+  price       Float
+  status      String   @default("ACTIVE")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  rfq         RFQ      @relation(fields: [rfqId], references: [id])
+  quote       Quote    @relation(fields: [quoteId], references: [id])
+  buyer       User     @relation("BuyerDeals", fields: [buyerId], references: [id])
+  supplier    User     @relation("SupplierDeals", fields: [supplierId], references: [id])
+
+  @@map("deals")
 }
 
 model Transaction {

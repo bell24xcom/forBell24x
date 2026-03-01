@@ -84,6 +84,7 @@ export async function GET(request: NextRequest) {
           status: true,
           priority: true,
           estimatedValue: true,
+          type: true,
           createdAt: true,
           expiresAt: true,
           _count: { select: { quotes: true } },
@@ -92,9 +93,16 @@ export async function GET(request: NextRequest) {
       prisma.rFQ.count({ where }),
     ]);
 
+    // Map to frontend-friendly format
+    const mapped = rfqs.map(r => ({
+      ...r,
+      budget: r.maxBudget || r.estimatedValue || 0,
+      quotesCount: r._count?.quotes || 0,
+    }));
+
     return NextResponse.json({
       success: true,
-      rfqs,
+      rfqs: mapped,
       pagination: {
         total,
         page,

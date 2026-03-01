@@ -9,9 +9,16 @@ import { FileText, MapPin, IndianRupee, Clock, CheckCircle, XCircle, AlertCircle
 interface Quote {
   id: string;
   rfqId: string;
-  rfqTitle: string;
-  myPrice: number;
-  buyerLocation: string;
+  rfq: {
+    id: string;
+    title: string;
+    category: string;
+    location: string | null;
+    buyer: { name: string | null; company: string | null } | null;
+  } | null;
+  price: number;
+  deliveryDays: number | null;
+  notes: string | null;
   status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED';
   createdAt: string;
 }
@@ -149,7 +156,7 @@ export default function MyQuotesPage() {
               href="/supplier/browse-rfqs"
               className="inline-block px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
             >
-              Browse RFQs →
+              Browse RFQs
             </Link>
           </div>
         ) : (
@@ -160,7 +167,7 @@ export default function MyQuotesPage() {
                   <tr>
                     <th className="text-left px-6 py-4 text-sm font-semibold text-slate-300">RFQ Title</th>
                     <th className="text-left px-6 py-4 text-sm font-semibold text-slate-300">My Price</th>
-                    <th className="text-left px-6 py-4 text-sm font-semibold text-slate-300">Location</th>
+                    <th className="text-left px-6 py-4 text-sm font-semibold text-slate-300">Buyer</th>
                     <th className="text-left px-6 py-4 text-sm font-semibold text-slate-300">Status</th>
                     <th className="text-left px-6 py-4 text-sm font-semibold text-slate-300">Date</th>
                     <th className="text-left px-6 py-4 text-sm font-semibold text-slate-300">Action</th>
@@ -169,21 +176,26 @@ export default function MyQuotesPage() {
                 <tbody className="divide-y divide-slate-700">
                   {filteredQuotes.map((quote) => (
                     <tr key={quote.id} className="hover:bg-slate-700/30">
-                      <td className="px-6 py-4 text-white">{quote.rfqTitle}</td>
-                      <td className="px-6 py-4 text-white font-semibold">
-                        ₹{quote.myPrice.toLocaleString()}
+                      <td className="px-6 py-4">
+                        <p className="text-white font-medium">{quote.rfq?.title || 'Untitled RFQ'}</p>
+                        <p className="text-slate-400 text-xs mt-0.5">{quote.rfq?.category}</p>
                       </td>
-                      <td className="px-6 py-4 text-slate-300">{quote.buyerLocation}</td>
+                      <td className="px-6 py-4 text-white font-semibold">
+                        {'\u20B9'}{Number(quote.price).toLocaleString('en-IN')}
+                      </td>
+                      <td className="px-6 py-4 text-slate-300">
+                        {quote.rfq?.buyer?.company || quote.rfq?.buyer?.name || '—'}
+                      </td>
                       <td className="px-6 py-4">{getStatusBadge(quote.status)}</td>
                       <td className="px-6 py-4 text-slate-300 text-sm">
                         {new Date(quote.createdAt).toLocaleDateString()}
                       </td>
                       <td className="px-6 py-4">
                         <Link
-                          href={`/rfq/${quote.rfqId}`}
+                          href={`/rfq/${quote.rfqId || quote.rfq?.id}`}
                           className="text-blue-400 hover:text-blue-300 text-sm font-medium"
                         >
-                          View RFQ →
+                          View RFQ
                         </Link>
                       </td>
                     </tr>
