@@ -1,9 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Bell, Globe, Moon, Shield, Trash2 } from 'lucide-react';
 
 export default function SettingsPage() {
+  const router = useRouter();
   const [notifications, setNotifications] = useState({
     email: true,
     sms: false,
@@ -20,6 +22,9 @@ export default function SettingsPage() {
 
   return (
       <div className="max-w-4xl">
+        <button onClick={() => router.back()} className="flex items-center gap-2 text-gray-400 hover:text-white mb-6 text-sm transition-colors cursor-pointer">
+          ← Back
+        </button>
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-white mb-2">Settings</h1>
           <p className="text-slate-400">Manage your account preferences and notifications</p>

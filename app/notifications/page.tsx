@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Bell, BellOff, CheckCheck } from 'lucide-react';
 
 interface Notification {
@@ -22,6 +23,7 @@ const TYPE_COLORS: Record<string, string> = {
 };
 
 export default function NotificationsPage() {
+  const router = useRouter();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -81,6 +83,9 @@ export default function NotificationsPage() {
   return (
     <div className="min-h-screen bg-[#0F172A] text-white p-6">
       <div className="max-w-3xl mx-auto space-y-4">
+        <button onClick={() => router.back()} className="flex items-center gap-2 text-gray-400 hover:text-white mb-2 text-sm transition-colors cursor-pointer">
+          ← Back
+        </button>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Bell className="w-6 h-6 text-indigo-400" />

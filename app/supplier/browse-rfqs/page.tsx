@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import { Search, Filter, MapPin, IndianRupee, Clock, MessageSquare, Mic, Video, FileText } from 'lucide-react';
@@ -18,6 +19,7 @@ interface RFQ {
 }
 
 export default function BrowseRFQsPage() {
+  const router = useRouter();
   const [rfqs, setRfqs] = useState<RFQ[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -70,6 +72,9 @@ export default function BrowseRFQsPage() {
   return (
     <DashboardLayout>
       <div className="max-w-7xl">
+        <button onClick={() => router.back()} className="flex items-center gap-2 text-gray-400 hover:text-white mb-6 text-sm transition-colors cursor-pointer">
+          ← Back
+        </button>
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-white mb-2">Browse Active RFQs</h1>
           <p className="text-slate-400">Find RFQs matching your business and submit competitive quotes</p>

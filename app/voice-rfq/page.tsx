@@ -228,28 +228,30 @@ export default function VoiceRFQPage() {
     try {
       const response = await fetch('/api/voice-rfq/save', {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(generatedRFQ),
       });
 
-      if (response.ok) {
+      const responseData = await response.json().catch(() => ({}));
+
+      if (response.ok && responseData.success) {
         setGeneratedRFQ(null);
         setTranscript('');
         loadRecentRFQs();
         router.push('/dashboard/rfqs');
       } else if (response.status === 401) {
-        setError('⚠️ Please login to save your RFQ');
-        // Redirect to login after 2 seconds
+        setError('Please login to save your RFQ. Redirecting...');
         setTimeout(() => {
           router.push('/auth/login?redirect=/voice-rfq');
         }, 2000);
       } else {
-        setError('Failed to save RFQ');
+        setError(`Failed to save RFQ: ${responseData.error || responseData.message || 'Unknown error'} (${response.status})`);
       }
     } catch (error) {
-      setError('Error saving RFQ');
+      setError('Network error saving RFQ: ' + (error instanceof Error ? error.message : 'Unknown error'));
       console.error('Save RFQ error:', error);
     }
   };
@@ -261,6 +263,9 @@ export default function VoiceRFQPage() {
   return (
     <div className="min-h-screen bg-[#0F172A] py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <button onClick={() => router.back()} className="flex items-center gap-2 text-gray-400 hover:text-white mb-6 text-sm transition-colors cursor-pointer">
+          ← Back
+        </button>
         {/* Header Section */}
         <div className="text-center mb-10">
           <h1 className="text-3xl sm:text-4xl font-bold text-white mb-4">Voice RFQ</h1>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ChevronRight, Plus, FileText, AlertCircle, RefreshCw } from 'lucide-react';
 
@@ -71,6 +72,7 @@ function SkeletonRow() {
 }
 
 export default function MyRFQsPage() {
+  const router = useRouter();
   const [rfqs, setRfqs] = useState<RFQItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -96,6 +98,10 @@ export default function MyRFQsPage() {
 
   return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+
+        <button onClick={() => router.back()} className="flex items-center gap-2 text-gray-400 hover:text-white mb-2 text-sm transition-colors cursor-pointer">
+          ← Back
+        </button>
 
         {/* Breadcrumb */}
         <nav className="flex items-center space-x-2 text-sm">

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Package, Truck, CheckCircle, Clock, IndianRupee, Users2 } from 'lucide-react';
 
 interface Deal {
@@ -14,6 +15,7 @@ interface Deal {
 }
 
 export default function DealsPage() {
+  const router = useRouter();
   const [deals, setDeals] = useState<Deal[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -63,6 +65,9 @@ export default function DealsPage() {
 
   return (
       <div className="max-w-7xl">
+        <button onClick={() => router.back()} className="flex items-center gap-2 text-gray-400 hover:text-white mb-6 text-sm transition-colors cursor-pointer">
+          ← Back
+        </button>
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-white mb-2">Active Deals</h1>
           <p className="text-slate-400">Track your ongoing transactions from quote to delivery</p>

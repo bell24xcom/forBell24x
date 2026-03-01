@@ -25,25 +25,28 @@ export async function GET(request: NextRequest) {
 
     const userId = payload.userId;
 
-    // Get wallet balance
-    const balance = await prisma.walletTransaction.aggregate({
-      where: { userId, type: 'CREDIT' },
-      _sum: { amount: true },
+    // Find user's wallet first (WalletTransaction links via walletId, not userId)
+    const wallet = await prisma.wallet.findUnique({
+      where: { userId },
     });
 
-    const debits = await prisma.walletTransaction.aggregate({
-      where: { userId, type: 'DEBIT' },
-      _sum: { amount: true },
-    });
-
-    const totalBalance = (balance._sum.amount || 0) - (debits._sum.amount || 0);
+    if (!wallet) {
+      return NextResponse.json({
+        success: true,
+        balance: 0,
+        transactions: [],
+      });
+    }
 
     // Get transaction history
     const transactions = await prisma.walletTransaction.findMany({
-      where: { userId },
+      where: { walletId: wallet.id },
       orderBy: { createdAt: 'desc' },
       take: 50,
     });
+
+    // Calculate balance from wallet model
+    const totalBalance = wallet.balance;
 
     return NextResponse.json({
       success: true,
@@ -53,7 +56,6 @@ export async function GET(request: NextRequest) {
         type: tx.type,
         amount: tx.amount,
         description: tx.description,
-        status: tx.status,
         createdAt: tx.createdAt,
       })),
     });
@@ -98,15 +100,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Find or create wallet
+    let wallet = await prisma.wallet.findUnique({ where: { userId } });
+    if (!wallet) {
+      wallet = await prisma.wallet.create({
+        data: { userId, balance: 0 },
+      });
+    }
+
     // Create wallet transaction
     const transaction = await prisma.walletTransaction.create({
       data: {
-        userId,
+        walletId: wallet.id,
         type: 'CREDIT',
         amount,
         description: description || 'Wallet top-up',
-        status: 'COMPLETED',
       },
+    });
+
+    // Update wallet balance
+    await prisma.wallet.update({
+      where: { id: wallet.id },
+      data: { balance: { increment: amount } },
     });
 
     return NextResponse.json({
