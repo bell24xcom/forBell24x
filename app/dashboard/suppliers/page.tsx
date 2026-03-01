@@ -70,7 +70,7 @@ function SupplierCard({ supplier }: { supplier: SupplierSummary }) {
     .toUpperCase();
 
   return (
-    <div className="bg-white rounded-xl shadow-sm p-5 flex flex-col gap-4 hover:shadow-md transition-shadow">
+    <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 flex flex-col gap-4 hover:border-slate-700 transition-colors">
       {/* Top row */}
       <div className="flex items-start gap-4">
         <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
@@ -130,19 +130,19 @@ function SupplierCard({ supplier }: { supplier: SupplierSummary }) {
 
 function SkeletonCard() {
   return (
-    <div className="bg-white rounded-xl shadow-sm p-5 space-y-4 animate-pulse">
+    <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4 animate-pulse">
       <div className="flex items-start gap-4">
-        <div className="w-12 h-12 bg-gray-200 rounded-full flex-shrink-0" />
+        <div className="w-12 h-12 bg-slate-700 rounded-full flex-shrink-0" />
         <div className="flex-1 space-y-2">
-          <div className="h-4 bg-gray-200 rounded w-3/4" />
-          <div className="h-3 bg-gray-200 rounded w-1/2" />
+          <div className="h-4 bg-slate-700 rounded w-3/4" />
+          <div className="h-3 bg-slate-700 rounded w-1/2" />
         </div>
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div className="h-16 bg-slate-800 rounded-lg" />
         <div className="h-16 bg-slate-800 rounded-lg" />
       </div>
-      <div className="h-8 bg-gray-200 rounded-lg" />
+      <div className="h-8 bg-slate-700 rounded-lg" />
     </div>
   );
 }
@@ -264,9 +264,9 @@ export default function MySuppliersPage() {
 
         {/* Empty state */}
         {!loading && !error && suppliers.length === 0 && (
-          <div className="bg-white rounded-xl shadow-sm p-16 text-center">
+          <div className="bg-slate-900 border border-slate-800 rounded-xl p-16 text-center">
             <div className="flex flex-col items-center gap-4">
-              <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center">
+              <div className="w-16 h-16 bg-blue-900/30 rounded-full flex items-center justify-center">
                 <Users className="w-8 h-8 text-blue-400" />
               </div>
               <div>
@@ -287,7 +287,7 @@ export default function MySuppliersPage() {
 
         {/* No search results */}
         {!loading && !error && suppliers.length > 0 && filteredSuppliers.length === 0 && (
-          <div className="bg-white rounded-xl shadow-sm p-12 text-center">
+          <div className="bg-slate-900 border border-slate-800 rounded-xl p-12 text-center">
             <p className="text-slate-300">No suppliers match your search.</p>
             <button
               onClick={() => setSearchQuery('')}

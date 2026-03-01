@@ -64,7 +64,7 @@ function SkeletonRow() {
     <tr className="animate-pulse">
       {[1, 2, 3, 4, 5, 6].map(i => (
         <td key={i} className="px-6 py-4">
-          <div className="h-4 bg-gray-200 rounded w-full" />
+          <div className="h-4 bg-slate-700 rounded w-full" />
         </td>
       ))}
     </tr>
@@ -81,7 +81,7 @@ export default function MyRFQsPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/dashboard/rfqs');
+      const res = await fetch('/api/dashboard/rfqs', { credentials: 'include' });
       const data = await res.json();
       if (!data.success) throw new Error(data.error ?? 'Failed to load RFQs');
       setRfqs(data.rfqs as RFQItem[]);
@@ -155,15 +155,15 @@ export default function MyRFQsPage() {
         )}
 
         {/* Main Card */}
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div className="bg-slate-900 border border-slate-800 rounded-xl shadow-sm overflow-hidden">
           {/* Stats strip */}
           {!loading && !error && rfqs.length > 0 && (
-            <div className="px-6 py-4 border-b border-gray-100 grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="px-6 py-4 border-b border-slate-800 grid grid-cols-2 sm:grid-cols-4 gap-4">
               {(
                 [
-                  { label: 'Total', value: rfqs.length, color: 'text-white' },
-                  { label: 'Active', value: rfqs.filter(r => r.status === 'ACTIVE').length, color: 'text-green-600' },
-                  { label: 'Quoted', value: rfqs.filter(r => r.status === 'QUOTED').length, color: 'text-blue-600' },
+                  { label: 'Total', value: rfqs.length, color: 'text-blue-400' },
+                  { label: 'Active', value: rfqs.filter(r => r.status === 'ACTIVE').length, color: 'text-green-400' },
+                  { label: 'Quoted', value: rfqs.filter(r => r.status === 'QUOTED').length, color: 'text-cyan-400' },
                   { label: 'Completed', value: rfqs.filter(r => r.status === 'COMPLETED').length, color: 'text-slate-400' },
                 ] as const
               ).map(stat => (
@@ -190,7 +190,7 @@ export default function MyRFQsPage() {
                   ))}
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-50">
+              <tbody className="bg-slate-900 divide-y divide-slate-800">
                 {loading && (
                   <>
                     <SkeletonRow />
@@ -204,7 +204,7 @@ export default function MyRFQsPage() {
                   <tr>
                     <td colSpan={6} className="px-6 py-20 text-center">
                       <div className="flex flex-col items-center gap-4">
-                        <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center">
+                        <div className="w-16 h-16 bg-blue-900/30 rounded-full flex items-center justify-center">
                           <FileText className="w-8 h-8 text-blue-400" />
                         </div>
                         <div>
@@ -226,7 +226,7 @@ export default function MyRFQsPage() {
                 )}
 
                 {!loading && !error && rfqs.map(rfq => (
-                  <tr key={rfq.id} className="hover:bg-slate-900 transition-colors">
+                  <tr key={rfq.id} className="hover:bg-slate-800 transition-colors">
                     <td className="px-6 py-4">
                       <div className="max-w-xs">
                         <p className="text-sm font-medium text-white truncate">{rfq.title}</p>

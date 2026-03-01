@@ -145,10 +145,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Main Content */}
       <div className='flex-1 flex flex-col overflow-hidden'>
         {/* Top Header */}
-        <header className='bg-white shadow-sm border-b border-gray-200 h-16 flex items-center justify-between px-4 lg:px-6'>
+        <header className='bg-slate-900 border-b border-slate-800 h-14 flex items-center justify-between px-4 lg:px-6'>
           <button
             onClick={() => setSidebarOpen(true)}
-            className='lg:hidden text-slate-400 hover:text-slate-400'
+            className='lg:hidden text-slate-400 hover:text-white'
           >
             <span>☰</span>
           </button>
@@ -160,12 +160,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
 
           <div className='flex items-center space-x-4'>
-            <button className='text-slate-400 hover:text-slate-400'>
+            <Link href='/notifications' className='text-slate-400 hover:text-white transition-colors'>
               <span>🔔</span>
-            </button>
-            <div className='w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center'>
+            </Link>
+            <Link href='/profile' className='w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center'>
               <span>👤</span>
-            </div>
+            </Link>
           </div>
         </header>
 
