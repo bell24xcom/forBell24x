@@ -25,7 +25,7 @@ export default function DealsPage() {
 
   const fetchDeals = async () => {
     try {
-      const response = await fetch('/api/dashboard/deals');
+      const response = await fetch('/api/dashboard/deals', { credentials: 'include' });
       if (response.ok) {
         const data = await response.json();
         setDeals(data.deals || []);

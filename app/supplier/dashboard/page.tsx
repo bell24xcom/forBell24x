@@ -33,7 +33,7 @@ export default function SupplierDashboardPage() {
 
   const fetchStats = async () => {
     try {
-      const response = await fetch('/api/supplier/stats');
+      const response = await fetch('/api/supplier/stats', { credentials: 'include' });
       const data = await response.json();
       if (data.success) {
         setStats(data.stats);
@@ -48,7 +48,7 @@ export default function SupplierDashboardPage() {
 
   const fetchQuotes = async () => {
     try {
-      const response = await fetch('/api/supplier/quotes');
+      const response = await fetch('/api/supplier/quotes', { credentials: 'include' });
       const data = await response.json();
       if (data.success) {
         setQuotes(data.quotes);

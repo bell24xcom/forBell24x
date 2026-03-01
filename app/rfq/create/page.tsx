@@ -33,7 +33,7 @@ export default function CreateRFQPage() {
   useEffect(() => {
     async function loadCategories() {
       try {
-        const response = await fetch('/api/categories?level=1');
+        const response = await fetch('/api/categories?level=1', { credentials: 'include' });
         if (response.ok) {
           const data = await response.json();
           if (data.success && data.categories) {
@@ -70,6 +70,7 @@ export default function CreateRFQPage() {
     try {
       const response = await fetch('/api/rfq/create', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });

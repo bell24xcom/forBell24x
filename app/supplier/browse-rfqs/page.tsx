@@ -31,7 +31,7 @@ export default function BrowseRFQsPage() {
 
   const fetchRFQs = async () => {
     try {
-      const response = await fetch('/api/marketplace/rfqs?status=active');
+      const response = await fetch('/api/marketplace/rfqs?status=active', { credentials: 'include' });
       if (response.ok) {
         const data = await response.json();
         setRfqs(data.rfqs || []);

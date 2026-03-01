@@ -28,7 +28,7 @@ export default function MyQuotesPage() {
 
   const fetchQuotes = async () => {
     try {
-      const response = await fetch('/api/supplier/quotes');
+      const response = await fetch('/api/supplier/quotes', { credentials: 'include' });
       if (response.ok) {
         const data = await response.json();
         setQuotes(data.quotes || []);

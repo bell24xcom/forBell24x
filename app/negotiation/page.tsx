@@ -17,13 +17,13 @@ export default function NegotiationPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const router = useRouter();
-  const { user } = useSession();
+  const { user, loading } = useSession();
 
   useEffect(() => {
-    if (!user) {
-      router.push('/login');
+    if (!loading && !user) {
+      router.push('/auth/phone-email');
     }
-  }, [user, router]);
+  }, [user, loading, router]);
 
   useEffect(() => {
     fetchQuotes();
@@ -31,7 +31,7 @@ export default function NegotiationPage() {
 
   const fetchQuotes = async () => {
     try {
-      const response = await fetch('/api/dashboard/quotes');
+      const response = await fetch('/api/dashboard/quotes', { credentials: 'include' });
       const data = await response.json();
       if (data.success) {
         setQuotes(data.quotes.filter((q: any) => q.status === 'PENDING'));
@@ -53,9 +53,9 @@ export default function NegotiationPage() {
       try {
         const response = await fetch('/api/negotiation', {
           method: 'POST',
+          credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('auth-token')}`,
           },
           body: JSON.stringify({
             quoteId,
@@ -95,9 +95,9 @@ export default function NegotiationPage() {
     try {
       const response = await fetch('/api/negotiation', {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('auth-token')}`,
         },
         body: JSON.stringify({
           quoteId: selectedQuote!,

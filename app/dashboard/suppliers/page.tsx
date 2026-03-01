@@ -157,7 +157,7 @@ export default function MySuppliersPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/dashboard/quotes');
+      const res = await fetch('/api/dashboard/quotes', { credentials: 'include' });
       const data = await res.json();
       if (!data.success) throw new Error(data.error ?? 'Failed to load supplier data');
       setQuotes(data.quotes as RawQuote[]);

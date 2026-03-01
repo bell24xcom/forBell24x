@@ -35,7 +35,7 @@ export default function RFQDetailPage() {
 
   const fetchRFQ = async () => {
     try {
-      const response = await fetch(`/api/rfq/${pathname.split('/').pop()}`);
+      const response = await fetch(`/api/rfq/${pathname.split('/').pop()}`, { credentials: 'include' });
       const data = await response.json();
       if (data.success) {
         setRFQ(data.rfq);

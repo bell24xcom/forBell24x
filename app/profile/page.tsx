@@ -55,7 +55,7 @@ export default function ProfilePage() {
   async function fetchProfile() {
     setLoading(true);
     try {
-      const res = await fetch('/api/profile');
+      const res = await fetch('/api/profile', { credentials: 'include' });
       const data = await res.json();
       if (data.success) {
         const u: UserProfile = data.user;
@@ -83,6 +83,7 @@ export default function ProfilePage() {
     try {
       const res = await fetch('/api/profile', {
         method: 'PUT',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...form,

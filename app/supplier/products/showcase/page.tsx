@@ -19,7 +19,7 @@ export default function ProductShowcasePage() {
     // Use existing API: /api/supplier/products
     const fetchProducts = async () => {
       try {
-        const response = await fetch('/api/supplier/products');
+        const response = await fetch('/api/supplier/products', { credentials: 'include' });
         if (response.ok) {
           const data = await response.json();
           setProducts(data.products || []);

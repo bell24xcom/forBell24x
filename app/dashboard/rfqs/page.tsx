@@ -229,8 +229,10 @@ export default function MyRFQsPage() {
                   <tr key={rfq.id} className="hover:bg-slate-800 transition-colors">
                     <td className="px-6 py-4">
                       <div className="max-w-xs">
-                        <p className="text-sm font-medium text-white truncate">{rfq.title}</p>
-                        {rfq.quantity != null && (
+                        <p className="text-sm font-medium text-white truncate">
+                          {rfq.title?.toLowerCase().includes('not specified') ? `Voice RFQ #${rfq.id.slice(-6)}` : rfq.title}
+                        </p>
+                        {rfq.quantity != null && !String(rfq.quantity).toLowerCase().includes('not specified') && (
                           <p className="text-xs text-slate-400 mt-0.5">
                             {rfq.quantity} {rfq.unit}
                           </p>
