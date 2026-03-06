@@ -135,14 +135,41 @@ export async function PUT(request: NextRequest) {
           data: { status: 'ACCEPTED', acceptedAt: new Date() },
         });
 
-        return { accepted, deal };
+        // 5. Escrow lock: deduct deal amount from buyer wallet if sufficient balance
+        const buyerWallet = await tx.wallet.findUnique({ where: { userId: user.userId } });
+        let dealStatus = 'ACTIVE';
+        if (buyerWallet && buyerWallet.balance >= quote.price) {
+          await tx.wallet.update({
+            where: { userId: user.userId },
+            data: { balance: { decrement: quote.price } },
+          });
+          await tx.walletTransaction.create({
+            data: {
+              walletId: buyerWallet.id,
+              type: 'ESCROW_LOCK',
+              amount: quote.price,
+              description: `Escrow locked for: ${quote.rfq?.title || 'RFQ'}`,
+              reference: deal.id,
+            },
+          });
+          dealStatus = 'ESCROW_LOCKED';
+          await tx.deal.update({
+            where: { id: deal.id },
+            data: { status: 'ESCROW_LOCKED' },
+          });
+        }
+
+        return { accepted, deal: { ...deal, status: dealStatus } };
       });
 
+      const escrowLocked = result.deal.status === 'ESCROW_LOCKED';
       return NextResponse.json({
         success: true,
         quote: { id: result.accepted.id, status: result.accepted.status },
         deal: { id: result.deal.id, price: result.deal.price, status: result.deal.status },
-        message: 'Quote accepted and deal created!',
+        message: escrowLocked
+          ? `Quote accepted! ₹${result.deal.price.toLocaleString('en-IN')} held in escrow until delivery.`
+          : 'Quote accepted! Deal created — add funds to your wallet to pay.',
       });
     } else {
       // Reject

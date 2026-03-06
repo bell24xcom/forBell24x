@@ -125,7 +125,7 @@ export default function DashboardPage() {
     const userData = localStorage.getItem('bell24h_user');
 
     if (!userData) {
-      router.push('/auth/login');
+      router.push('/auth/phone-email');
       return;
     }
 

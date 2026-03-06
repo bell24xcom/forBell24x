@@ -1,15 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Razorpay from 'razorpay';
 import crypto from 'crypto';
 import { authenticate } from '@/lib/jwt';
 import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
-
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID!,
-  key_secret: process.env.RAZORPAY_KEY_SECRET!,
-});
 
 // Create a Razorpay order for wallet top-up
 export async function POST(request: NextRequest) {
@@ -29,23 +23,39 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Maximum amount is ₹5,00,000' }, { status: 400 });
     }
 
+    const keyId = process.env.RAZORPAY_KEY_ID;
+    const keySecret = process.env.RAZORPAY_KEY_SECRET;
+
+    // Test mode when keys aren't configured
+    if (!keyId || !keySecret || keyId.includes('placeholder') || keyId === '') {
+      return NextResponse.json({
+        success: true,
+        testMode: true,
+        orderId: `order_test_${Date.now()}`,
+        amount: Math.round(amount * 100),
+        currency,
+        key: 'rzp_test_placeholder',
+      });
+    }
+
+    // Live mode
+    const Razorpay = require('razorpay');
+    const razorpay = new Razorpay({ key_id: keyId, key_secret: keySecret });
+
     const order = await razorpay.orders.create({
-      amount: Math.round(amount * 100), // Convert to paise
+      amount: Math.round(amount * 100),
       currency,
       receipt: `wallet_${user.userId}_${Date.now()}`,
-      notes: {
-        userId: user.userId,
-        type: 'WALLET_DEPOSIT',
-        platform: 'Bell24h',
-      },
+      notes: { userId: user.userId, type: 'WALLET_DEPOSIT', platform: 'Bell24h' },
     });
 
     return NextResponse.json({
       success: true,
+      testMode: false,
       orderId: order.id,
       amount: order.amount,
       currency: order.currency,
-      key: process.env.RAZORPAY_KEY_ID,
+      key: keyId,
     });
   } catch (error) {
     console.error('Razorpay create-order error:', error);

@@ -254,7 +254,7 @@ export default function VoiceRFQPage() {
       } else if (response.status === 401) {
         setError('Please login to save your RFQ. Redirecting...');
         setTimeout(() => {
-          router.push('/auth/login?redirect=/voice-rfq');
+          router.push('/auth/phone-email');
         }, 2000);
       } else {
         setError(`Failed to save RFQ: ${responseData.error || responseData.message || 'Unknown error'} (${response.status})`);
