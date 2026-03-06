@@ -7,6 +7,8 @@ import {
   Building2, MapPin, Shield, Star, Package, Phone, Mail,
   Globe, CheckCircle, Award, Users, Calendar, Eye
 } from 'lucide-react';
+import TrustScore from '@/components/ui/TrustScore';
+import WhatsAppShare from '@/components/ui/WhatsAppShare';
 
 interface ProfileData {
   name: string;
@@ -35,7 +37,7 @@ export default function PublicProfilePreview() {
   const router = useRouter();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [quoteStats, setQuoteStats] = useState({ won: 0, total: 0 });
+  const [quoteStats, setQuoteStats] = useState({ won: 0, total: 0, trustScore: 0, gstVerified: false, profileComplete: 0, responseRate: 0, dealsCompleted: 0 });
 
   useEffect(() => {
     fetchProfile();
@@ -61,7 +63,15 @@ export default function PublicProfilePreview() {
       const res = await fetch('/api/supplier/stats', { credentials: 'include' });
       const data = await res.json();
       if (data.success) {
-        setQuoteStats({ won: data.stats.wonQuotes, total: data.stats.totalQuotes });
+        setQuoteStats({
+          won: data.stats.wonQuotes,
+          total: data.stats.totalQuotes,
+          trustScore: data.stats.trustScore ?? 0,
+          gstVerified: data.stats.gstVerified ?? false,
+          profileComplete: data.stats.profileComplete ?? 0,
+          responseRate: data.stats.responseRateNum ?? 0,
+          dealsCompleted: data.stats.dealsCompleted ?? 0,
+        });
       }
     } catch {}
   };
@@ -105,12 +115,21 @@ export default function PublicProfilePreview() {
             <p className="text-blue-300 font-medium">Public Profile Preview</p>
             <p className="text-blue-400/70 text-sm">This is how buyers see your profile on Bell24h</p>
           </div>
-          <button
-            onClick={() => router.push('/supplier/profile/edit')}
-            className="ml-auto px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
-          >
-            Edit Profile
-          </button>
+          <div className="ml-auto flex items-center gap-2">
+            <WhatsAppShare
+              rfqTitle={`Supplier: ${profile.company || profile.name}`}
+              rfqId={`supplier/profile`}
+              category={profile.preferences?.categories?.[0]}
+              location={profile.location}
+              size="sm"
+            />
+            <button
+              onClick={() => router.push('/supplier/profile/edit')}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
+            >
+              Edit Profile
+            </button>
+          </div>
         </div>
 
         {/* Company Header Card */}
@@ -144,7 +163,7 @@ export default function PublicProfilePreview() {
             <div className="flex items-center justify-center mb-2">
               <Star className="w-5 h-5 text-amber-400" />
             </div>
-            <p className="text-2xl font-bold text-white">{trustScore}</p>
+            <p className="text-2xl font-bold text-white">{quoteStats.trustScore || trustScore}</p>
             <p className="text-slate-400 text-xs">Trust Score</p>
           </div>
           <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4 text-center">
@@ -169,6 +188,15 @@ export default function PublicProfilePreview() {
             <p className="text-slate-400 text-xs">Member Since</p>
           </div>
         </div>
+
+        {/* Full Trust Score */}
+        <TrustScore
+          score={quoteStats.trustScore || trustScore}
+          gstVerified={quoteStats.gstVerified || !!profile.gstNumber}
+          profileComplete={quoteStats.profileComplete}
+          responseRate={quoteStats.responseRate}
+          dealsCompleted={quoteStats.dealsCompleted}
+        />
 
         {/* Details Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

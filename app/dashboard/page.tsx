@@ -30,6 +30,8 @@ import {
   IndianRupee,
   Users2
 } from 'lucide-react';
+import WhatsAppShare from '@/components/ui/WhatsAppShare';
+import TrustScore from '@/components/ui/TrustScore';
 
 interface LiveFeature {
   id: string;
@@ -115,8 +117,10 @@ export default function DashboardPage() {
   const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
   const [supplierStats, setSupplierStats] = useState({
     newRfqs: 0, openQuotes: 0, dealsThisMonth: 0, revenue: 0,
-    trustScore: 65, gstVerified: false, profileComplete: 40,
+    trustScore: 0, gstVerified: false, profileComplete: 0,
+    responseRateNum: 0, dealsCompleted: 0,
   });
+  const [latestRfqs, setLatestRfqs] = useState<Array<{ id: string; title: string; category: string; budget: number; location: string; createdAt: string }>>([]);
 
   const router = useRouter();
 
@@ -131,19 +135,55 @@ export default function DashboardPage() {
 
     setUser(JSON.parse(userData));
     loadDashboardData();
+    const liveInterval = setInterval(fetchLatestRfqs, 30000);
+    return () => clearInterval(liveInterval);
   }, [router]);
+
+  const timeAgo = (dateStr: string): string => {
+    const seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+    if (seconds < 60) return 'just now';
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+    return `${Math.floor(seconds / 86400)}d ago`;
+  };
+
+  const fetchLatestRfqs = async () => {
+    try {
+      const res = await fetch('/api/marketplace/rfqs?limit=5&status=active', { credentials: 'include' });
+      const data = await res.json();
+      if (data.success) setLatestRfqs(data.rfqs || []);
+    } catch {}
+  };
 
   const loadDashboardData = async () => {
     try {
       setLoading(true);
-      const res = await fetch('/api/dashboard/stats', { credentials: 'include' });
-      if (res.ok) {
-        const data = await res.json();
+      const [statsRes, supplierRes] = await Promise.all([
+        fetch('/api/dashboard/stats', { credentials: 'include' }),
+        fetch('/api/supplier/stats', { credentials: 'include' }),
+      ]);
+      if (statsRes.ok) {
+        const data = await statsRes.json();
         if (data.success) {
           setStats(data.stats);
           setRecentActivity(data.recentActivity || []);
         }
       }
+      if (supplierRes.ok) {
+        const sData = await supplierRes.json();
+        if (sData.success) {
+          setSupplierStats(prev => ({
+            ...prev,
+            openQuotes: sData.stats.activeQuotes ?? 0,
+            trustScore: sData.stats.trustScore ?? 0,
+            gstVerified: sData.stats.gstVerified ?? false,
+            profileComplete: sData.stats.profileComplete ?? 0,
+            responseRateNum: sData.stats.responseRateNum ?? 0,
+            dealsCompleted: sData.stats.dealsCompleted ?? 0,
+          }));
+        }
+      }
+      await fetchLatestRfqs();
     } catch (error) {
       console.error('Error loading dashboard data:', error);
     } finally {
@@ -382,6 +422,52 @@ export default function DashboardPage() {
               </Link>
             </div>
           </div>
+
+          {/* Live RFQ Feed */}
+          <div className="bg-gray-900 border border-gray-700 rounded-lg shadow-sm p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-white">Latest RFQs</h2>
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1.5 px-2.5 py-1 bg-green-900/20 border border-green-800 rounded-lg">
+                  <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
+                  <span className="text-green-400 text-xs">Live</span>
+                </div>
+                <Link href="/marketplace" className="text-blue-400 text-sm hover:text-blue-300">View All →</Link>
+              </div>
+            </div>
+            {latestRfqs.length === 0 ? (
+              <div className="text-center py-8">
+                <Search className="w-10 h-10 text-slate-600 mx-auto mb-3" />
+                <p className="text-slate-400 text-sm">No active RFQs yet — check back soon!</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {latestRfqs.map(rfq => (
+                  <div key={rfq.id} className="flex items-center justify-between p-3 bg-slate-800/50 border border-slate-700 rounded-lg hover:border-blue-700 transition-colors">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="text-sm font-medium text-white truncate">{rfq.title}</p>
+                        {rfq.category && (
+                          <span className="text-xs bg-blue-900/40 text-blue-300 px-2 py-0.5 rounded-full flex-shrink-0">{rfq.category}</span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-3 mt-1 text-xs text-slate-400">
+                        {rfq.budget > 0 && <span>₹{rfq.budget.toLocaleString('en-IN')}</span>}
+                        {rfq.location && <span>{rfq.location}</span>}
+                        <span>{timeAgo(rfq.createdAt)}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 flex-shrink-0 ml-3">
+                      <WhatsAppShare rfqTitle={rfq.title} rfqId={rfq.id} category={rfq.category} budget={rfq.budget} location={rfq.location} size="sm" />
+                      <Link href={`/rfq/${rfq.id}`} className="px-3 py-2 bg-blue-900/30 hover:bg-blue-900/50 text-blue-300 text-xs rounded-lg transition-colors min-h-[44px] flex items-center">
+                        View
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </>
       )}
 
@@ -432,36 +518,13 @@ export default function DashboardPage() {
           </div>
 
           {/* Trust Score Card */}
-          <div className="bg-gray-900 border border-gray-700 rounded-xl p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-white">Your Trust Score</h2>
-              <Link href="/supplier/profile/edit" className="text-emerald-400 text-sm hover:text-emerald-300">
-                Improve Score &rarr;
-              </Link>
-            </div>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-              <div className="text-center flex-shrink-0">
-                <p className="text-4xl font-bold text-emerald-400">{supplierStats.trustScore}</p>
-                <p className="text-gray-500 text-xs mt-1">out of 100</p>
-              </div>
-              <div className="flex-1 space-y-2 w-full">
-                {[
-                  { label: 'GST Verified', value: supplierStats.gstVerified ? 100 : 0, color: 'bg-green-500' },
-                  { label: 'Response Time', value: 70, color: 'bg-blue-500' },
-                  { label: 'Delivery History', value: 0, color: 'bg-purple-500' },
-                  { label: 'Profile Complete', value: supplierStats.profileComplete, color: 'bg-amber-500' },
-                ].map(item => (
-                  <div key={item.label} className="flex items-center gap-3">
-                    <span className="text-gray-400 text-xs w-28 flex-shrink-0">{item.label}</span>
-                    <div className="flex-1 bg-gray-800 rounded-full h-2">
-                      <div className={`${item.color} rounded-full h-2 transition-all`} style={{ width: `${item.value}%` }} />
-                    </div>
-                    <span className="text-gray-500 text-xs w-8 text-right">{item.value}%</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+          <TrustScore
+            score={supplierStats.trustScore}
+            gstVerified={supplierStats.gstVerified}
+            profileComplete={supplierStats.profileComplete}
+            responseRate={supplierStats.responseRateNum}
+            dealsCompleted={supplierStats.dealsCompleted}
+          />
 
           {/* Supplier Quick Actions */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -487,15 +550,31 @@ export default function DashboardPage() {
             <div className="bg-gray-900 border border-gray-700 rounded-xl p-5">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-white font-semibold">Latest RFQs</h3>
-                <Link href="/supplier/browse-rfqs" className="text-emerald-400 text-sm hover:text-emerald-300">View All &rarr;</Link>
+                <div className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
+                  <Link href="/supplier/browse-rfqs" className="text-emerald-400 text-sm hover:text-emerald-300">View All →</Link>
+                </div>
               </div>
-              <div className="text-center py-8">
-                <Search className="w-10 h-10 text-gray-600 mx-auto mb-3" />
-                <p className="text-gray-400 text-sm">New RFQs will appear here</p>
-                <Link href="/supplier/browse-rfqs" className="text-emerald-400 text-sm mt-2 inline-block hover:text-emerald-300">
-                  Browse All RFQs &rarr;
-                </Link>
-              </div>
+              {latestRfqs.length === 0 ? (
+                <div className="text-center py-8">
+                  <Search className="w-10 h-10 text-gray-600 mx-auto mb-3" />
+                  <p className="text-gray-400 text-sm">New RFQs will appear here</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {latestRfqs.slice(0, 4).map(rfq => (
+                    <div key={rfq.id} className="flex items-center justify-between p-2.5 bg-slate-800/50 border border-slate-700 rounded-lg">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-white truncate">{rfq.title}</p>
+                        <p className="text-xs text-slate-400">{rfq.category} · {timeAgo(rfq.createdAt)}</p>
+                      </div>
+                      <Link href={`/rfq/${rfq.id}`} className="ml-2 px-2 py-1 text-xs text-emerald-400 hover:text-emerald-300 flex-shrink-0">
+                        Quote →
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             <div className="bg-gray-900 border border-gray-700 rounded-xl p-5">
               <div className="flex items-center justify-between mb-4">

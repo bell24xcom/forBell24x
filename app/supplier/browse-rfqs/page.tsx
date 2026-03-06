@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import { Search, Filter, MapPin, IndianRupee, Clock, MessageSquare, Mic, Video, FileText, X, CheckCircle } from 'lucide-react';
+import WhatsAppShare from '@/components/ui/WhatsAppShare';
 
 interface RFQ {
   id: string;
@@ -34,6 +35,8 @@ export default function BrowseRFQsPage() {
 
   useEffect(() => {
     fetchRFQs();
+    const interval = setInterval(fetchRFQs, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   const fetchRFQs = async () => {
@@ -95,6 +98,14 @@ export default function BrowseRFQsPage() {
     }
   };
 
+  const timeAgo = (dateStr: string): string => {
+    const seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+    if (seconds < 60) return 'just now';
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+    return `${Math.floor(seconds / 86400)}d ago`;
+  };
+
   const getUrgencyColor = (urgency: string) => {
     switch (urgency) {
       case 'HIGH': return 'bg-red-900/40 text-red-300';
@@ -115,9 +126,15 @@ export default function BrowseRFQsPage() {
         <button onClick={() => router.back()} className="flex items-center gap-2 text-gray-400 hover:text-white mb-6 text-sm transition-colors cursor-pointer">
           ← Back
         </button>
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-white mb-2">Browse Active RFQs</h1>
-          <p className="text-slate-400">Find RFQs matching your business and submit competitive quotes</p>
+        <div className="mb-6 flex items-start justify-between flex-wrap gap-3">
+          <div>
+            <h1 className="text-3xl font-bold text-white mb-2">Browse Active RFQs</h1>
+            <p className="text-slate-400">Find RFQs matching your business and submit competitive quotes</p>
+          </div>
+          <div className="flex items-center gap-2 px-3 py-2 bg-green-900/20 border border-green-800 rounded-lg">
+            <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+            <span className="text-green-400 text-xs font-medium">Live — refreshes every 30s</span>
+          </div>
         </div>
 
         {/* Success Toast */}
@@ -212,25 +229,35 @@ export default function BrowseRFQsPage() {
                   )}
                   <div className="flex items-center gap-2 text-slate-400 text-xs">
                     <MessageSquare className="w-4 h-4" />
-                    {rfq.quotesCount || 0} quotes submitted
+                    {rfq.quotesCount || 0} quotes · {timeAgo(rfq.createdAt)}
                   </div>
                 </div>
 
-                {quotedRfqs.has(rfq.id) ? (
-                  <div className="w-full px-4 py-2.5 bg-emerald-900/30 border border-emerald-700 text-emerald-400 text-center rounded-lg font-medium">
-                    Quoted ✓
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => {
-                      setQuoteModal(rfq);
-                      setSubmitError('');
-                    }}
-                    className="w-full px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-center rounded-lg font-medium transition-colors min-h-[44px]"
-                  >
-                    Submit Quote →
-                  </button>
-                )}
+                <div className="flex gap-2">
+                  <WhatsAppShare
+                    rfqTitle={rfq.title}
+                    rfqId={rfq.id}
+                    category={rfq.category}
+                    budget={rfq.budget}
+                    location={rfq.location}
+                    size="sm"
+                  />
+                  {quotedRfqs.has(rfq.id) ? (
+                    <div className="flex-1 px-4 py-2.5 bg-emerald-900/30 border border-emerald-700 text-emerald-400 text-center rounded-lg font-medium flex items-center justify-center">
+                      Quoted ✓
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        setQuoteModal(rfq);
+                        setSubmitError('');
+                      }}
+                      className="flex-1 px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-center rounded-lg font-medium transition-colors min-h-[44px]"
+                    >
+                      Submit Quote →
+                    </button>
+                  )}
+                </div>
               </div>
             ))}
           </div>
