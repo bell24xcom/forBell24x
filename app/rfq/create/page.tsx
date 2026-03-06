@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import AiSparkle from '@/components/ui/AiSparkle';
 
 type Category = {
   id: number;
@@ -131,9 +132,17 @@ export default function CreateRFQPage() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="title" className="block text-sm font-medium text-slate-300 mb-2">
-                RFQ Title *
-              </label>
+              <div className="flex items-center justify-between mb-2">
+                <label htmlFor="title" className="block text-sm font-medium text-slate-300">
+                  RFQ Title *
+                </label>
+                <AiSparkle
+                  fieldName="RFQ Title"
+                  currentValue={formData.title || formData.description || ''}
+                  context={formData.category}
+                  onSuggestion={(text) => setFormData(prev => ({ ...prev, title: text }))}
+                />
+              </div>
               <input
                 id="title"
                 name="title"
@@ -168,10 +177,18 @@ export default function CreateRFQPage() {
               </div>
               
               <div>
-                <label htmlFor="description" className="block text-sm font-medium text-slate-300 mb-2">
-                  Product/Service Description *
-                </label>
-                <textarea 
+                <div className="flex items-center justify-between mb-2">
+                  <label htmlFor="description" className="block text-sm font-medium text-slate-300">
+                    Product/Service Description *
+                  </label>
+                  <AiSparkle
+                    fieldName="RFQ Description"
+                    currentValue={formData.description || formData.title}
+                    context={formData.category}
+                    onSuggestion={(text) => setFormData(prev => ({ ...prev, description: text }))}
+                  />
+                </div>
+                <textarea
                   id="description"
                   name="description"
                   rows={4}
