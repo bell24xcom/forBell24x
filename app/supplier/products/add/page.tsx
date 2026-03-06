@@ -1,5 +1,6 @@
 'use client';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
+import AiSparkle from '@/components/ui/AiSparkle';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -119,9 +120,17 @@ export default function AddProductPage() {
             </div>
 
             <div>
-              <label htmlFor="description" className="block text-sm font-medium text-slate-300 mb-2">
-                Description *
-              </label>
+              <div className="flex items-center justify-between mb-2">
+                <label htmlFor="description" className="block text-sm font-medium text-slate-300">
+                  Description *
+                </label>
+                <AiSparkle
+                  fieldName="Supplier Product Description"
+                  currentValue={formData.name}
+                  context={formData.category}
+                  onSuggestion={(text) => setFormData(prev => ({ ...prev, description: text }))}
+                />
+              </div>
               <textarea
                 id="description"
                 name="description"

@@ -26,6 +26,46 @@ export default function EditProfilePage() {
   const [loading, setLoading] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+  const [gstVerifying, setGstVerifying] = useState(false);
+  const [gstStatus, setGstStatus] = useState<{ msg: string; type: 'success' | 'warn' | 'error' } | null>(null);
+
+  const handleGstVerify = async () => {
+    const gst = formData.gstNumber?.trim().toUpperCase();
+    if (!gst || gst.length !== 15) {
+      setGstStatus({ msg: 'Enter a 15-character GST number first', type: 'error' });
+      return;
+    }
+    setGstVerifying(true);
+    setGstStatus(null);
+    try {
+      const res = await fetch('/api/gst/verify', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ gstNumber: gst }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        const { legalName, tradeName, state, status } = data.gstData;
+        const updates: Partial<typeof formData> = { state: state || formData.state };
+        if (legalName && !formData.companyName) updates.companyName = legalName;
+        else if (tradeName && !formData.companyName) updates.companyName = tradeName;
+        setFormData(prev => ({ ...prev, ...updates }));
+        setGstStatus({
+          msg: data.verified
+            ? `✓ Verified: ${legalName || tradeName || status} (${state})`
+            : `Format valid — State: ${state}. ${data.note || ''}`,
+          type: data.verified ? 'success' : 'warn',
+        });
+      } else {
+        setGstStatus({ msg: data.error || 'Verification failed', type: 'error' });
+      }
+    } catch {
+      setGstStatus({ msg: 'Network error', type: 'error' });
+    } finally {
+      setGstVerifying(false);
+    }
+  };
 
   const [formData, setFormData] = useState({
     companyName: '',
@@ -184,9 +224,29 @@ export default function EditProfilePage() {
               <div>
                 <label className={labelClass}>GST Number</label>
                 <div className="flex gap-2">
-                  <input type="text" value={formData.gstNumber} onChange={(e) => setFormData({ ...formData, gstNumber: e.target.value })} className={`${inputClass} flex-1`} placeholder="22AAAAA0000A1Z5" />
-                  <Link href="/supplier/gst" className="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm rounded-lg whitespace-nowrap transition-colors">Verify</Link>
+                  <input
+                    type="text"
+                    value={formData.gstNumber}
+                    onChange={(e) => { setFormData({ ...formData, gstNumber: e.target.value.toUpperCase() }); setGstStatus(null); }}
+                    className={`${inputClass} flex-1`}
+                    placeholder="27AAAAA0000A1Z5"
+                    maxLength={15}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleGstVerify}
+                    disabled={gstVerifying}
+                    className="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm rounded-lg whitespace-nowrap transition-colors disabled:opacity-50 min-h-[44px]"
+                  >
+                    {gstVerifying ? '…' : 'Auto-fill'}
+                  </button>
                 </div>
+                {gstStatus && (
+                  <p className={`text-xs mt-1 ${
+                    gstStatus.type === 'success' ? 'text-emerald-400' :
+                    gstStatus.type === 'warn' ? 'text-amber-400' : 'text-red-400'
+                  }`}>{gstStatus.msg}</p>
+                )}
               </div>
               <div>
                 <label className={labelClass}>Udyam Registration (Optional)</label>
