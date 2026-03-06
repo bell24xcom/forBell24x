@@ -54,7 +54,7 @@ const supplierNavItems: NavItem[] = [
   { icon: BarChart3, label: 'Analytics', href: '/dashboard/analytics' },
   { divider: true, label: 'PROFILE' },
   { icon: Star, label: 'Profile & Trust Score', href: '/supplier/profile/edit' },
-  { icon: Building2, label: 'Public Profile', href: '/supplier' },
+  { icon: Building2, label: 'Public Profile', href: '/supplier/public-profile' },
   { icon: CreditCard, label: 'GST Verification', href: '/supplier/gst' },
   { icon: Bell, label: 'Notifications', href: '/notifications' },
   { icon: Settings, label: 'Settings', href: '/dashboard/settings' },
@@ -95,7 +95,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <div className="flex items-center gap-4">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="lg:hidden p-2 hover:bg-slate-800 rounded-lg"
+              className="lg:hidden p-3 hover:bg-slate-800 rounded-lg min-w-[44px] min-h-[44px] flex items-center justify-center"
             >
               {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -128,11 +128,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
           {/* Right: User Menu */}
           <div className="flex items-center gap-2">
-            <Link href="/notifications" className="p-2 hover:bg-slate-800 rounded-lg relative">
+            <Link href="/notifications" className="p-3 hover:bg-slate-800 rounded-lg relative min-w-[44px] min-h-[44px] flex items-center justify-center">
               <Bell className="w-5 h-5" />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
             </Link>
-            <Link href="/profile" className="p-2 hover:bg-slate-800 rounded-lg">
+            <Link href="/profile" className="p-3 hover:bg-slate-800 rounded-lg min-w-[44px] min-h-[44px] flex items-center justify-center">
               <User className="w-5 h-5" />
             </Link>
           </div>

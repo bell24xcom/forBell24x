@@ -321,7 +321,7 @@ export default function MyQuotesPage() {
                             <button
                               onClick={() => handleAccept(quote.id)}
                               disabled={acceptingId !== null}
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-medium rounded-lg transition-colors disabled:opacity-60"
+                              className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-green-600 hover:bg-green-700 text-white text-xs font-medium rounded-lg transition-colors disabled:opacity-60 min-h-[44px]"
                             >
                               {acceptingId === quote.id ? (
                                 <Loader2 className="w-3 h-3 animate-spin" />
@@ -333,7 +333,7 @@ export default function MyQuotesPage() {
                             <button
                               onClick={() => handleReject(quote.id)}
                               disabled={acceptingId !== null}
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-600/20 hover:bg-red-600/40 text-red-400 text-xs font-medium rounded-lg transition-colors disabled:opacity-60"
+                              className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-red-600/20 hover:bg-red-600/40 text-red-400 text-xs font-medium rounded-lg transition-colors disabled:opacity-60 min-h-[44px]"
                             >
                               ✗ Reject
                             </button>
@@ -341,7 +341,7 @@ export default function MyQuotesPage() {
                         )}
                         <Link
                           href={`/rfq/compare-quotes`}
-                          className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-blue-400 bg-blue-900/30 hover:bg-blue-900/50 rounded-lg transition-colors"
+                          className="inline-flex items-center px-4 py-2.5 text-xs font-medium text-blue-400 bg-blue-900/30 hover:bg-blue-900/50 rounded-lg transition-colors min-h-[44px]"
                         >
                           View
                         </Link>
