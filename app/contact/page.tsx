@@ -62,23 +62,23 @@ export default function ContactPage() {
   const contactInfo = [
     {
       icon: '📍',
-      title: 'Office Address',
-      details: ['123 Business District', 'Suite 456', 'New York, NY 10001', 'United States']
+      title: 'Registered Address',
+      details: ['Digitex Studio', 'Lodha Upper Thane, Sarang', 'Bhiwandi, Thane – 421302', 'Maharashtra, India']
     },
     {
       icon: '📞',
       title: 'Phone',
-      details: ['+1 (555) 123-4567', 'Mon-Fri: 9AM-6PM EST']
+      details: ['+91 9004962871', 'Mon–Sat: 9:00 AM – 7:00 PM IST']
     },
     {
       icon: '✉️',
       title: 'Email',
-      details: ['hello@bell24h.com', 'support@bell24h.com', 'sales@bell24h.com']
+      details: ['bell24h.helpline@gmail.com (Helpline)', 'digitex.studio@gmail.com (Business)']
     },
     {
-      icon: '💬',
-      title: 'Live Chat',
-      details: ['Available 24/7', 'Average response: 2 minutes']
+      icon: '🏢',
+      title: 'Business Details',
+      details: ['Digitex Studio', 'GSTIN: 27AAAPP9753F2ZF', 'bell24h.com']
     }
   ];
 
@@ -88,10 +88,11 @@ export default function ContactPage() {
         <section className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto text-center">
-              <h1 className="text-4xl font-bold mb-6">Contact Us</h1>
+              <h1 className="text-4xl font-bold mb-6">Contact Bell24h</h1>
               <p className="text-xl mb-8">
-                We'd love to hear from you. Send us a message and we'll respond as soon as possible.
+                We're here to help with your B2B procurement needs. Reach us via email, phone, or the form below.
               </p>
+              <p className="text-sm text-blue-200">Bell24h is operated by Digitex Studio | GSTIN: 27AAAPP9753F2ZF</p>
             </div>
           </div>
         </section>

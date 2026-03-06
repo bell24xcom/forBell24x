@@ -42,7 +42,7 @@ export default function ShippingPolicyPage() {
             <h2 className="text-xl font-semibold text-white mb-3">4. Disputes</h2>
             <p>
               For any shipping-related disputes between buyers and suppliers, Bell24h provides mediation support.
-              Please contact our support team at <a href="mailto:support@bell24h.com" className="text-blue-400 hover:text-blue-300">support@bell24h.com</a>.
+              Please contact our support team at <a href="mailto:bell24h.helpline@gmail.com" className="text-blue-400 hover:text-blue-300">bell24h.helpline@gmail.com</a>.
             </p>
           </section>
 
@@ -50,7 +50,7 @@ export default function ShippingPolicyPage() {
             <h2 className="text-xl font-semibold text-white mb-3">5. Contact Us</h2>
             <p>
               If you have questions about this shipping policy, please contact us at{' '}
-              <a href="mailto:support@bell24h.com" className="text-blue-400 hover:text-blue-300">support@bell24h.com</a>.
+              <a href="mailto:bell24h.helpline@gmail.com" className="text-blue-400 hover:text-blue-300">bell24h.helpline@gmail.com</a>.
             </p>
           </section>
         </div>

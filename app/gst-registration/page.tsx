@@ -67,7 +67,7 @@ export default function GSTRegistrationPage() {
               Register as Supplier
             </Link>
             <a
-              href="mailto:support@bell24h.com"
+              href="mailto:bell24h.helpline@gmail.com"
               className="bg-slate-700 hover:bg-slate-600 text-white font-semibold py-3 px-8 rounded-lg transition-colors text-center"
             >
               Contact Support
@@ -78,8 +78,8 @@ export default function GSTRegistrationPage() {
         {/* Contact Email */}
         <div className="text-center text-slate-300 mb-8">
           <p className="mb-2">Need GST registration assistance?</p>
-          <a href="mailto:support@bell24h.com" className="text-blue-400 hover:text-blue-300 font-semibold">
-            support@bell24h.com
+          <a href="mailto:bell24h.helpline@gmail.com" className="text-blue-400 hover:text-blue-300 font-semibold">
+            bell24h.helpline@gmail.com
           </a>
         </div>
 

@@ -126,8 +126,8 @@ export default function ReportIssuePage() {
         {/* Contact Info */}
         <div className="text-center text-slate-300 mb-8">
           <p className="mb-2">Urgent issue? Contact support directly:</p>
-          <a href="mailto:support@bell24h.com" className="text-blue-400 hover:text-blue-300 font-semibold">
-            support@bell24h.com
+          <a href="mailto:bell24h.helpline@gmail.com" className="text-blue-400 hover:text-blue-300 font-semibold">
+            bell24h.helpline@gmail.com
           </a>
         </div>
 

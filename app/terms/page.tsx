@@ -19,7 +19,7 @@ export default function TermsPage() {
                 If you do not agree to these Terms, you must not access or use the Platform. These Terms constitute a legally binding agreement between you and DIGITEX STUDIO.
               </p>
               <p className="mb-4">
-                <strong className="text-white">Jurisdiction:</strong> These Terms are governed by the laws of India. All disputes shall be subject to the exclusive jurisdiction of courts in Mumbai, Maharashtra, India.
+                <strong className="text-white">Jurisdiction:</strong> These Terms are governed by the laws of India. All disputes shall be subject to the exclusive jurisdiction of courts in Thane, Maharashtra, India.
               </p>
             </section>
 
@@ -157,7 +157,7 @@ export default function TermsPage() {
               </p>
               <p className="mb-4">
                 <strong className="text-white">9.2 Arbitration:</strong> Disputes that cannot be resolved internally shall be submitted to binding arbitration under the Arbitration and
-                Conciliation Act, 1996. Arbitration shall take place in Mumbai, Maharashtra, India. Arbitrator's decision is final and binding.
+                Conciliation Act, 1996. Arbitration shall take place in Thane, Maharashtra, India. Arbitrator's decision is final and binding.
               </p>
               <p className="mb-4">
                 <strong className="text-white">9.3 Legal Action:</strong> Bell24h reserves the right to take legal action against users engaging in fraud, financial misconduct, or violations
@@ -189,7 +189,7 @@ export default function TermsPage() {
             <section>
               <h2 className="text-2xl font-semibold text-white mb-4">11. Termination and Account Suspension</h2>
               <p className="mb-4">
-                <strong className="text-white">11.1 Termination by User:</strong> You may terminate your account at any time by contacting support@bell24h.com. Unused Credits will be forfeited upon termination.
+                <strong className="text-white">11.1 Termination by User:</strong> You may terminate your account at any time by contacting bell24h.helpline@gmail.com. Unused Credits will be forfeited upon termination.
               </p>
               <p className="mb-4">
                 <strong className="text-white">11.2 Termination by Bell24h:</strong> We reserve the right to suspend or terminate your account immediately, without prior notice, for violations of these Terms,
@@ -233,9 +233,10 @@ export default function TermsPage() {
               </p>
               <div className="bg-slate-900 rounded-lg p-6 space-y-2">
                 <p><strong className="text-white">Company Name:</strong> DIGITEX STUDIO (Bell24h)</p>
-                <p><strong className="text-white">Registered Address:</strong> Mumbai, Maharashtra, India</p>
-                <p><strong className="text-white">Email:</strong> legal@bell24h.com</p>
-                <p><strong className="text-white">Support:</strong> support@bell24h.com</p>
+                <p><strong className="text-white">Registered Address:</strong> Digitex Studio, Lodha Upper Thane, Sarang, Bhiwandi, Thane – 421302, Maharashtra, India</p>
+                <p><strong className="text-white">GSTIN:</strong> 27AAAPP9753F2ZF</p>
+                <p><strong className="text-white">Email:</strong> bell24h.helpline@gmail.com</p>
+                <p><strong className="text-white">Support:</strong> bell24h.helpline@gmail.com</p>
                 <p><strong className="text-white">Phone:</strong> +91-9004962871</p>
                 <p><strong className="text-white">Business Hours:</strong> Monday-Saturday, 10:00 AM - 7:00 PM IST</p>
               </div>

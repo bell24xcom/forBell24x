@@ -14,56 +14,28 @@ export default function AboutPage() {
     { id: 'team', label: 'Our Team', icon: '👥' }
   ];
 
-  const teamMembers = [
-    {
-      name: 'Sarah Johnson',
-      role: 'CEO & Founder',
-      image: '/api/placeholder/300/300',
-      bio: '15+ years in B2B technology and supply chain management.'
-    },
-    {
-      name: 'Michael Chen',
-      role: 'CTO',
-      image: '/api/placeholder/300/300',
-      bio: 'Expert in AI/ML and enterprise software architecture.'
-    },
-    {
-      name: 'Emily Rodriguez',
-      role: 'Head of Operations',
-      image: '/api/placeholder/300/300',
-      bio: 'Specialist in process optimization and customer success.'
-    },
-    {
-      name: 'David Kim',
-      role: 'Head of Product',
-      image: '/api/placeholder/300/300',
-      bio: 'Product strategist with deep B2B marketplace experience.'
-    }
-  ];
-
   const stats = [
-    { number: '10,000+', label: 'Active Suppliers' },
-    { number: '50,000+', label: 'Products Listed' },
-    { number: '1M+', label: 'RFQs Processed' },
+    { number: '12 Languages', label: 'Voice RFQ Support' },
+    { number: '30 Seconds', label: 'To Post an RFQ' },
+    { number: '100%', label: 'Indian Made' },
     { number: '99.9%', label: 'Uptime' }
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#0F172A]">
         {/* Hero Section */}
         <section className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-20">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto text-center">
               <h1 className="text-5xl font-bold mb-6">About Bell24h</h1>
               <p className="text-xl mb-8">
-                Revolutionizing B2B commerce through AI-powered matching, 
-                voice/video RFQ, and automated workflow management.
+                India's first AI-powered B2B procurement intelligence platform — built by Digitex Studio.
               </p>
               <div className="flex flex-wrap justify-center gap-4">
-                <span className="bg-white/20 px-4 py-2 rounded-full">AI-Powered</span>
-                <span className="bg-white/20 px-4 py-2 rounded-full">Voice/Video RFQ</span>
-                <span className="bg-white/20 px-4 py-2 rounded-full">Automated Workflows</span>
-                <span className="bg-white/20 px-4 py-2 rounded-full">Global Marketplace</span>
+                <span className="bg-white/20 px-4 py-2 rounded-full">AI-Powered Matching</span>
+                <span className="bg-white/20 px-4 py-2 rounded-full">Voice &amp; Video RFQ</span>
+                <span className="bg-white/20 px-4 py-2 rounded-full">Secure Escrow Payments</span>
+                <span className="bg-white/20 px-4 py-2 rounded-full">Made in India 🇮🇳</span>
               </div>
             </div>
           </div>
@@ -106,7 +78,7 @@ export default function AboutPage() {
               </div>
 
               {/* Tab Content */}
-              <div className="bg-white rounded-lg shadow-lg p-8">
+              <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-8">
                 {activeTab === 'mission' && (
                   <div>
                     <h2 className="text-3xl font-bold text-white mb-6">Our Mission</h2>
@@ -227,29 +199,23 @@ export default function AboutPage() {
 
                 {activeTab === 'team' && (
                   <div>
-                    <h2 className="text-3xl font-bold text-white mb-6">Our Team</h2>
-                    <p className="text-lg text-slate-400 mb-8">
-                      Meet the passionate individuals behind Bell24h's success. 
-                      Our diverse team brings together expertise in technology, 
-                      business, and innovation.
-                    </p>
-                    <div className="grid md:grid-cols-2 gap-8">
-                      {teamMembers.map((member, index) => (
-                        <div key={index} className="bg-slate-900 rounded-lg p-6">
-                          <div className="flex items-center mb-4">
-                            <img
-                              src={member.image}
-                              alt={member.name}
-                              className="w-16 h-16 rounded-full object-cover mr-4"
-                            />
-                            <div>
-                              <h3 className="text-xl font-semibold text-white">{member.name}</h3>
-                              <p className="text-blue-600 font-medium">{member.role}</p>
-                            </div>
-                          </div>
-                          <p className="text-slate-400">{member.bio}</p>
+                    <h2 className="text-3xl font-bold text-white mb-6">The Company</h2>
+                    <div className="space-y-6">
+                      <div className="bg-slate-900/60 border border-slate-700 rounded-xl p-6">
+                        <h3 className="text-xl font-semibold text-white mb-2">Digitex Studio</h3>
+                        <p className="text-slate-400 mb-4">The technology studio behind Bell24h. We build India-first B2B digital infrastructure.</p>
+                        <div className="grid sm:grid-cols-2 gap-3 text-sm text-slate-400">
+                          <div><span className="text-slate-300 font-medium">GSTIN:</span> 27AAAPP9753F2ZF</div>
+                          <div><span className="text-slate-300 font-medium">State:</span> Maharashtra, India</div>
+                          <div className="sm:col-span-2"><span className="text-slate-300 font-medium">Address:</span> Lodha Upper Thane, Sarang, Bhiwandi, Thane – 421302</div>
+                          <div><span className="text-slate-300 font-medium">Helpline:</span> bell24h.helpline@gmail.com</div>
+                          <div><span className="text-slate-300 font-medium">Business:</span> digitex.studio@gmail.com</div>
                         </div>
-                      ))}
+                      </div>
+                      <div className="bg-blue-900/20 border border-blue-800 rounded-xl p-6">
+                        <h3 className="text-xl font-semibold text-white mb-3">Our Mission</h3>
+                        <p className="text-slate-300">Make B2B procurement as fast and transparent as ordering food online — for every Indian manufacturer and supplier.</p>
+                      </div>
                     </div>
                   </div>
                 )}

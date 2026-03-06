@@ -52,7 +52,7 @@ export default function CookiePolicyPage() {
             <h2 className="text-xl font-semibold text-white mb-3">5. Contact Us</h2>
             <p>
               If you have questions about our cookie policy, please contact us at{' '}
-              <a href="mailto:support@bell24h.com" className="text-blue-400 hover:text-blue-300">support@bell24h.com</a>.
+              <a href="mailto:bell24h.helpline@gmail.com" className="text-blue-400 hover:text-blue-300">bell24h.helpline@gmail.com</a>.
             </p>
           </section>
         </div>

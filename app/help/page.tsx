@@ -83,8 +83,8 @@ export default function HelpPage() {
                 <span className="text-2xl">📧</span>
               </div>
               <h3 className="font-semibold text-white mb-1">Email Support</h3>
-              <a href="mailto:support@bell24h.com" className="text-blue-400 hover:text-blue-300 text-sm">
-                support@bell24h.com
+              <a href="mailto:bell24h.helpline@gmail.com" className="text-blue-400 hover:text-blue-300 text-sm">
+                bell24h.helpline@gmail.com
               </a>
               <p className="text-slate-400 text-xs mt-2">Response within 24 hours</p>
             </div>

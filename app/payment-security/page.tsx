@@ -157,7 +157,7 @@ export default function PaymentSecurityPage() {
               </div>
               <div>
                 <h3 className="font-semibold text-neutral-900 mb-2">Support</h3>
-                <p className="text-slate-300">support@bell24h.com</p>
+                <p className="text-slate-300">bell24h.helpline@gmail.com</p>
                 <p className="text-slate-300">24/7 Customer Support</p>
               </div>
             </div>

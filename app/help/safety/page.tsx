@@ -104,7 +104,7 @@ export default function SafetyPage() {
               <li>Insist on proper GST invoice with GSTIN and HSN codes</li>
               <li>Never share OTPs, passwords, or bank details via chat/call</li>
               <li>Inspect goods thoroughly before confirming delivery (for escrow)</li>
-              <li>Report suspicious behavior immediately to support@bell24h.com</li>
+              <li>Report suspicious behavior immediately to bell24h.helpline@gmail.com</li>
             </ul>
           </section>
 
@@ -128,7 +128,7 @@ export default function SafetyPage() {
             <h2 className="text-2xl font-semibold text-white mb-4">🚨 What to Do If You're Scammed</h2>
             <ol className="list-decimal list-inside space-y-3 text-slate-300 ml-4">
               <li>
-                <strong className="text-white">Immediately Report:</strong> Contact support@bell24h.com with transaction details, screenshots, and evidence
+                <strong className="text-white">Immediately Report:</strong> Contact bell24h.helpline@gmail.com with transaction details, screenshots, and evidence
               </li>
               <li>
                 <strong className="text-white">Stop Further Payment:</strong> Do not send any additional money. If using escrow, do not confirm delivery
@@ -153,7 +153,7 @@ export default function SafetyPage() {
               </p>
               <div className="space-y-2 text-slate-300">
                 <p><strong className="text-white">Security Email:</strong> <a href="mailto:security@bell24h.com" className="text-blue-400 hover:text-blue-300">security@bell24h.com</a></p>
-                <p><strong className="text-white">Support Email:</strong> <a href="mailto:support@bell24h.com" className="text-blue-400 hover:text-blue-300">support@bell24h.com</a></p>
+                <p><strong className="text-white">Support Email:</strong> <a href="mailto:bell24h.helpline@gmail.com" className="text-blue-400 hover:text-blue-300">bell24h.helpline@gmail.com</a></p>
                 <p><strong className="text-white">Phone:</strong> +91-9004962871 (24/7 for emergencies)</p>
                 <p className="text-sm text-slate-400 mt-4">All reports are confidential and investigated within 24-48 hours.</p>
               </div>

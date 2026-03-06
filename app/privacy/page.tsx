@@ -187,7 +187,7 @@ export default function PrivacyPage() {
 
               <h3 className="text-xl font-semibold text-white mb-3 mt-6">7.1 Access and Portability</h3>
               <p className="mb-4">
-                You can request a copy of your personal data in a structured, machine-readable format. Contact privacy@bell24h.com.
+                You can request a copy of your personal data in a structured, machine-readable format. Contact bell24h.helpline@gmail.com.
               </p>
 
               <h3 className="text-xl font-semibold text-white mb-3 mt-6">7.2 Correction and Update</h3>
@@ -197,7 +197,7 @@ export default function PrivacyPage() {
 
               <h3 className="text-xl font-semibold text-white mb-3 mt-6">7.3 Deletion</h3>
               <p className="mb-4">
-                You can request account deletion by emailing support@bell24h.com. Note: Transaction records will be retained for legal compliance.
+                You can request account deletion by emailing bell24h.helpline@gmail.com. Note: Transaction records will be retained for legal compliance.
               </p>
 
               <h3 className="text-xl font-semibold text-white mb-3 mt-6">7.4 Marketing Opt-Out</h3>
@@ -208,7 +208,7 @@ export default function PrivacyPage() {
 
               <h3 className="text-xl font-semibold text-white mb-3 mt-6">7.5 Object to Processing</h3>
               <p className="mb-4">
-                You can object to certain data processing activities (e.g., profiling for marketing). Contact privacy@bell24h.com to exercise this right.
+                You can object to certain data processing activities (e.g., profiling for marketing). Contact bell24h.helpline@gmail.com to exercise this right.
               </p>
 
               <h3 className="text-xl font-semibold text-white mb-3 mt-6">7.6 Withdraw Consent</h3>
@@ -241,7 +241,7 @@ export default function PrivacyPage() {
               <h2 className="text-2xl font-semibold text-white mb-4">9. Children's Privacy</h2>
               <p className="mb-4">
                 Bell24h is intended for business users aged 18 and above. We do not knowingly collect personal information from individuals under 18.
-                If we become aware of such collection, we will delete the data promptly. Parents or guardians who believe their child has provided information to us should contact privacy@bell24h.com.
+                If we become aware of such collection, we will delete the data promptly. Parents or guardians who believe their child has provided information to us should contact bell24h.helpline@gmail.com.
               </p>
             </section>
 
@@ -277,8 +277,8 @@ export default function PrivacyPage() {
               </p>
               <div className="bg-slate-900 rounded-lg p-6 space-y-2">
                 <p><strong className="text-white">Data Protection Officer:</strong> DIGITEX STUDIO (Bell24h)</p>
-                <p><strong className="text-white">Email:</strong> privacy@bell24h.com</p>
-                <p><strong className="text-white">Support:</strong> support@bell24h.com</p>
+                <p><strong className="text-white">Email:</strong> bell24h.helpline@gmail.com</p>
+                <p><strong className="text-white">Support:</strong> bell24h.helpline@gmail.com</p>
                 <p><strong className="text-white">Phone:</strong> +91-9004962871</p>
                 <p><strong className="text-white">Address:</strong> Mumbai, Maharashtra, India</p>
                 <p><strong className="text-white">Response Time:</strong> We aim to respond within 7 business days</p>
