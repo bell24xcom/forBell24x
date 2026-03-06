@@ -53,6 +53,7 @@ export async function GET(request: NextRequest) {
       const statusMap: Record<string, string> = {
         'ACTIVE': 'QUOTE_ACCEPTED',
         'PAYMENT_PENDING': 'PAYMENT_PENDING',
+        'ESCROW_LOCKED': 'ESCROW_LOCKED',
         'PAID': 'PAID',
         'SHIPPING': 'SHIPPING',
         'DELIVERED': 'DELIVERED',
@@ -128,10 +129,13 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Access denied' }, { status: 403 });
     }
 
-    // --- Action: buyer pays from wallet ---
+    // --- Action: buyer pays from wallet (only needed if NOT already escrow-locked) ---
     if (action === 'pay_wallet') {
       if (!isBuyer) {
         return NextResponse.json({ success: false, error: 'Only the buyer can pay' }, { status: 403 });
+      }
+      if (deal.status === 'ESCROW_LOCKED') {
+        return NextResponse.json({ success: false, error: 'Payment already locked in escrow' }, { status: 400 });
       }
       if (deal.status !== 'ACTIVE' && deal.status !== 'PAYMENT_PENDING') {
         return NextResponse.json({ success: false, error: 'Deal is not awaiting payment' }, { status: 400 });
@@ -151,7 +155,7 @@ export async function PATCH(request: NextRequest) {
         prisma.walletTransaction.create({
           data: {
             walletId: wallet.id,
-            type: 'DEBIT',
+            type: 'ESCROW_LOCK',
             amount: deal.price,
             description: `Payment for: ${deal.rfq.title}`,
             reference: deal.id,
@@ -163,14 +167,14 @@ export async function PATCH(request: NextRequest) {
         }),
         prisma.deal.update({
           where: { id: deal.id },
-          data: { status: 'PAID' },
+          data: { status: 'ESCROW_LOCKED' },
         }),
       ]);
 
       return NextResponse.json({
         success: true,
-        message: `₹${deal.price.toLocaleString('en-IN')} paid. Supplier has been notified.`,
-        newStatus: 'PAID',
+        message: `₹${deal.price.toLocaleString('en-IN')} locked in escrow. Supplier has been notified.`,
+        newStatus: 'ESCROW_LOCKED',
       });
     }
 
@@ -179,7 +183,8 @@ export async function PATCH(request: NextRequest) {
       if (!isSupplier) {
         return NextResponse.json({ success: false, error: 'Only the supplier can mark as shipped' }, { status: 403 });
       }
-      if (deal.status !== 'PAID') {
+      // Allow shipping if escrow is locked OR deal is PAID (manual payment flow)
+      if (deal.status !== 'ESCROW_LOCKED' && deal.status !== 'PAID') {
         return NextResponse.json({ success: false, error: 'Payment must be completed before shipping' }, { status: 400 });
       }
 
@@ -202,15 +207,42 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ success: true, message: 'Delivery confirmed!', newStatus: 'DELIVERED' });
     }
 
-    // --- Action: either party closes the deal ---
+    // --- Action: buyer closes deal + releases escrow to supplier ---
     if (action === 'complete') {
+      if (!isBuyer) {
+        return NextResponse.json({ success: false, error: 'Only the buyer can complete a deal' }, { status: 403 });
+      }
       if (deal.status !== 'DELIVERED') {
         return NextResponse.json({ success: false, error: 'Deal must be delivered before completing' }, { status: 400 });
       }
 
-      await prisma.deal.update({ where: { id: deal.id }, data: { status: 'COMPLETED' } });
+      // Release escrow: credit supplier wallet
+      await prisma.$transaction(async (tx) => {
+        await tx.deal.update({ where: { id: deal.id }, data: { status: 'COMPLETED' } });
+        await tx.rFQ.update({ where: { id: deal.rfqId }, data: { status: 'COMPLETED' } });
 
-      return NextResponse.json({ success: true, message: 'Deal completed!', newStatus: 'COMPLETED' });
+        // Credit supplier
+        const supplierWallet = await tx.wallet.upsert({
+          where: { userId: deal.supplierId },
+          update: { balance: { increment: deal.price } },
+          create: { userId: deal.supplierId, balance: deal.price },
+        });
+        await tx.walletTransaction.create({
+          data: {
+            walletId: supplierWallet.id,
+            type: 'ESCROW_RELEASE',
+            amount: deal.price,
+            description: `Payment released for: ${deal.rfq.title}`,
+            reference: deal.id,
+          },
+        });
+      });
+
+      return NextResponse.json({
+        success: true,
+        message: `Deal complete! ₹${deal.price.toLocaleString('en-IN')} released to supplier.`,
+        newStatus: 'COMPLETED',
+      });
     }
 
     return NextResponse.json({ success: false, error: 'Unknown action' }, { status: 400 });

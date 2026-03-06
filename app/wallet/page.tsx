@@ -79,9 +79,32 @@ export default function WalletPage() {
         return;
       }
 
-      // Step 2: Open Razorpay checkout
+      // Step 2: Test mode — skip Razorpay popup, verify directly
+      if (orderData.testMode) {
+        const verifyRes = await fetch('/api/payment/verify', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            razorpay_order_id: orderData.orderId,
+            amount,
+          }),
+        });
+        const verifyData = await verifyRes.json();
+        if (verifyData.success) {
+          setSuccess(`₹${amount.toLocaleString('en-IN')} added (test mode — Razorpay keys not configured)`);
+          setDepositAmount('');
+          fetchWalletData();
+        } else {
+          setError(verifyData.error || 'Failed to add funds');
+        }
+        setProcessing(false);
+        return;
+      }
+
+      // Step 2: Live mode — open Razorpay checkout
       if (!window.Razorpay) {
-        setError('Payment gateway loading. Please try again.');
+        setError('Payment gateway loading. Please try again in a moment.');
         setProcessing(false);
         return;
       }
@@ -94,17 +117,17 @@ export default function WalletPage() {
         description: 'Wallet Top-up',
         order_id: orderData.orderId,
         handler: async function (response: any) {
-          // Step 3: Verify payment
+          // Step 3: Verify payment via dedicated verify endpoint
           try {
-            const verifyRes = await fetch('/api/payment/create-order', {
-              method: 'PUT',
+            const verifyRes = await fetch('/api/payment/verify', {
+              method: 'POST',
               credentials: 'include',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_signature: response.razorpay_signature,
-                amount: orderData.amount,
+                amount,
               }),
             });
 

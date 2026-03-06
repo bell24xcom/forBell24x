@@ -9,7 +9,7 @@ interface Deal {
   rfqTitle: string;
   otherParty: string;
   amount: number;
-  status: 'QUOTE_ACCEPTED' | 'PAYMENT_PENDING' | 'PAID' | 'SHIPPING' | 'DELIVERED' | 'COMPLETED';
+  status: 'QUOTE_ACCEPTED' | 'PAYMENT_PENDING' | 'ESCROW_LOCKED' | 'PAID' | 'SHIPPING' | 'DELIVERED' | 'COMPLETED';
   timeline: string;
   createdAt: string;
   role: 'buyer' | 'supplier';
@@ -59,7 +59,8 @@ export default function DealsPage() {
         showToast(data.message, 'success');
         const statusMap: Record<string, Deal['status']> = {
           ACTIVE: 'QUOTE_ACCEPTED', PAYMENT_PENDING: 'PAYMENT_PENDING',
-          PAID: 'PAID', SHIPPING: 'SHIPPING', DELIVERED: 'DELIVERED', COMPLETED: 'COMPLETED',
+          ESCROW_LOCKED: 'ESCROW_LOCKED', PAID: 'PAID',
+          SHIPPING: 'SHIPPING', DELIVERED: 'DELIVERED', COMPLETED: 'COMPLETED',
         };
         setDeals(prev => prev.map(d =>
           d.id === dealId ? { ...d, status: statusMap[data.newStatus] || d.status } : d
@@ -77,13 +78,14 @@ export default function DealsPage() {
   const getStatusStep = (status: string) => {
     const steps = [
       { key: 'QUOTE_ACCEPTED', label: 'Quote Accepted', icon: CheckCircle },
-      { key: 'PAYMENT_PENDING', label: 'Payment Pending', icon: Clock },
-      { key: 'PAID', label: 'Payment Done', icon: IndianRupee },
+      { key: 'ESCROW_LOCKED', label: 'Escrow Locked', icon: Wallet },
       { key: 'SHIPPING', label: 'Shipping', icon: Truck },
       { key: 'DELIVERED', label: 'Delivered', icon: Package },
       { key: 'COMPLETED', label: 'Completed', icon: CheckCircle },
     ];
-    const currentIndex = steps.findIndex(s => s.key === status);
+    // Map PAYMENT_PENDING/ACTIVE to QUOTE_ACCEPTED for display
+    const displayStatus = (status === 'PAYMENT_PENDING' || status === 'ACTIVE') ? 'QUOTE_ACCEPTED' : status;
+    const currentIndex = steps.findIndex(s => s.key === displayStatus);
     return { steps, currentIndex };
   };
 
@@ -91,12 +93,26 @@ export default function DealsPage() {
     switch (status) {
       case 'QUOTE_ACCEPTED': return 'bg-blue-900/40 text-blue-300';
       case 'PAYMENT_PENDING': return 'bg-yellow-900/40 text-yellow-300';
+      case 'ESCROW_LOCKED': return 'bg-amber-900/40 text-amber-300';
       case 'PAID': return 'bg-green-900/40 text-green-300';
       case 'SHIPPING': return 'bg-purple-900/40 text-purple-300';
       case 'DELIVERED': return 'bg-teal-900/40 text-teal-300';
       case 'COMPLETED': return 'bg-green-900/40 text-green-300';
       default: return 'bg-slate-700 text-slate-300';
     }
+  };
+
+  const getStatusLabel = (status: string) => {
+    const labels: Record<string, string> = {
+      QUOTE_ACCEPTED: 'Quote Accepted',
+      PAYMENT_PENDING: 'Payment Pending',
+      ESCROW_LOCKED: 'In Escrow',
+      PAID: 'Payment Done',
+      SHIPPING: 'Shipping',
+      DELIVERED: 'Delivered',
+      COMPLETED: 'Completed',
+    };
+    return labels[status] || status;
   };
 
   const getActionButton = (deal: Deal) => {
@@ -112,8 +128,15 @@ export default function DealsPage() {
             className="flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg transition-colors disabled:opacity-50 min-h-[44px]"
           >
             {isLoading('pay_wallet') ? <Loader2 className="w-4 h-4 animate-spin" /> : <Wallet className="w-4 h-4" />}
-            Pay ₹{amount.toLocaleString('en-IN')} from Wallet
+            Lock ₹{amount.toLocaleString('en-IN')} in Escrow
           </button>
+        );
+      }
+      if (status === 'ESCROW_LOCKED') {
+        return (
+          <span className="text-sm text-amber-400 flex items-center gap-2">
+            <Wallet className="w-4 h-4" /> ₹{amount.toLocaleString('en-IN')} held in escrow — waiting for supplier to ship
+          </span>
         );
       }
       if (status === 'SHIPPING') {
@@ -143,7 +166,7 @@ export default function DealsPage() {
     }
 
     if (role === 'supplier') {
-      if (status === 'PAID') {
+      if (status === 'ESCROW_LOCKED' || status === 'PAID') {
         return (
           <button
             onClick={() => handleAction(id, 'mark_shipped')}
@@ -158,7 +181,7 @@ export default function DealsPage() {
       if (status === 'QUOTE_ACCEPTED' || status === 'PAYMENT_PENDING') {
         return (
           <span className="text-sm text-yellow-400 flex items-center gap-2">
-            <Clock className="w-4 h-4" /> Waiting for buyer payment
+            <Clock className="w-4 h-4" /> Waiting for buyer to lock payment
           </span>
         );
       }
@@ -255,7 +278,7 @@ export default function DealsPage() {
                       ₹{deal.amount.toLocaleString('en-IN')}
                     </p>
                     <span className={`inline-block px-3 py-1 rounded-full text-sm mt-2 ${getStatusColor(deal.status)}`}>
-                      {steps[currentIndex]?.label || deal.status}
+                      {getStatusLabel(deal.status)}
                     </span>
                   </div>
                 </div>

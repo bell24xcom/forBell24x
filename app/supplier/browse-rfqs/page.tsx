@@ -226,7 +226,7 @@ export default function BrowseRFQsPage() {
                       setQuoteModal(rfq);
                       setSubmitError('');
                     }}
-                    className="w-full px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-center rounded-lg font-medium transition-colors"
+                    className="w-full px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-center rounded-lg font-medium transition-colors min-h-[44px]"
                   >
                     Submit Quote →
                   </button>
@@ -318,14 +318,14 @@ export default function BrowseRFQsPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="flex-1 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
+                  className="flex-1 px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 min-h-[44px]"
                 >
                   {submitting ? 'Submitting...' : 'Submit Quote'}
                 </button>
                 <button
                   type="button"
                   onClick={() => setQuoteModal(null)}
-                  className="px-4 py-2.5 border border-slate-600 text-slate-300 hover:text-white rounded-lg transition-colors"
+                  className="px-4 py-3 border border-slate-600 text-slate-300 hover:text-white rounded-lg transition-colors min-h-[44px]"
                 >
                   Cancel
                 </button>
