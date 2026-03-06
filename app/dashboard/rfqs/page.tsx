@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ChevronRight, Plus, FileText, AlertCircle, RefreshCw } from 'lucide-react';
+import WhatsAppShare from '@/components/ui/WhatsAppShare';
 
 type RFQStatus = 'ACTIVE' | 'QUOTED' | 'COMPLETED' | 'EXPIRED' | 'CANCELLED' | 'DRAFT';
 
@@ -180,7 +181,7 @@ export default function MyRFQsPage() {
             <table className="min-w-full divide-y divide-gray-100">
               <thead className="bg-slate-900">
                 <tr>
-                  {['Title', 'Category', 'Status', 'Quotes', 'Budget', 'Created'].map(h => (
+                  {['Title', 'Category', 'Status', 'Quotes', 'Budget', 'Created', 'Share'].map(h => (
                     <th
                       key={h}
                       className="px-6 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider"
@@ -259,6 +260,15 @@ export default function MyRFQsPage() {
                       <span className="text-sm text-slate-400 whitespace-nowrap">
                         {formatDate(rfq.createdAt)}
                       </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <WhatsAppShare
+                        rfqTitle={rfq.title}
+                        rfqId={rfq.id}
+                        category={rfq.category}
+                        budget={rfq.maxBudget ?? undefined}
+                        size="sm"
+                      />
                     </td>
                   </tr>
                 ))}

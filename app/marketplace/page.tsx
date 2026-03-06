@@ -4,6 +4,7 @@ import { Suspense, useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Search, Filter, Clock, MapPin, Tag } from 'lucide-react';
 import Link from 'next/link';
+import WhatsAppShare from '@/components/ui/WhatsAppShare';
 
 interface RFQ {
   id: string;
@@ -234,6 +235,16 @@ function MarketplaceContent() {
                         </div>
                         <div className="mt-3 text-xs bg-indigo-700 text-white px-3 py-1 rounded-lg">
                           Submit Quote →
+                        </div>
+                        <div className="mt-2">
+                          <WhatsAppShare
+                            rfqTitle={rfq.title}
+                            rfqId={rfq.id}
+                            category={rfq.category}
+                            budget={rfq.minBudget ?? undefined}
+                            location={rfq.location}
+                            size="sm"
+                          />
                         </div>
                       </div>
                     </div>
