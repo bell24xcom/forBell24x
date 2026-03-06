@@ -29,7 +29,7 @@ export default function SupplierPage() {
     <>
       <Header />
       <div className="min-h-screen bg-slate-900">
-        <section className="bg-white py-12">
+        <section className="bg-slate-800/50 py-12">
           <div className="container mx-auto px-4">
             <h1 className="text-4xl font-bold text-white mb-4">Suppliers</h1>
             <p className="text-lg text-slate-300 mb-8">
@@ -43,17 +43,17 @@ export default function SupplierPage() {
             {loading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {[...Array(6)].map((_, i) => (
-                  <div key={i} className="bg-white rounded-lg shadow-md p-6 animate-pulse">
-                    <div className="h-4 bg-gray-200 rounded mb-4"></div>
-                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                  <div key={i} className="bg-slate-800/50 border border-slate-700 rounded-lg p-6 animate-pulse">
+                    <div className="h-4 bg-slate-700 rounded mb-4"></div>
+                    <div className="h-4 bg-slate-700 rounded mb-2"></div>
+                    <div className="h-4 bg-slate-700 rounded w-3/4"></div>
                   </div>
                 ))}
               </div>
             ) : suppliers.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {suppliers.map((supplier) => (
-                  <div key={supplier.id} className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6">
+                  <div key={supplier.id} className="bg-slate-800/50 border border-slate-700 rounded-lg hover:border-blue-500 transition-colors p-6">
                     <div className="flex items-start justify-between mb-4">
                       <div>
                         <h3 className="text-xl font-semibold text-white">{supplier.company}</h3>

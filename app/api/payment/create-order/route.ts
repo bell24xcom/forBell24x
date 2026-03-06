@@ -1,123 +1,120 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Razorpay from 'razorpay';
+import crypto from 'crypto';
+import { authenticate } from '@/lib/jwt';
+import { prisma } from '@/lib/prisma';
+
+export const dynamic = 'force-dynamic';
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID!,
   key_secret: process.env.RAZORPAY_KEY_SECRET!,
 });
 
+// Create a Razorpay order for wallet top-up
 export async function POST(request: NextRequest) {
   try {
-    const { amount, currency = 'INR', description, customerName, customerEmail, customerPhone } = await request.json();
-
-    // Validate required fields
-    if (!amount || amount <= 0) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid amount' },
-        { status: 400 }
-      );
+    const user = await authenticate(request);
+    if (!user) {
+      return NextResponse.json({ success: false, error: 'Authentication required' }, { status: 401 });
     }
 
-    if (!customerName || !customerEmail) {
-      return NextResponse.json(
-        { success: false, error: 'Customer name and email are required' },
-        { status: 400 }
-      );
+    const { amount, currency = 'INR' } = await request.json();
+
+    if (!amount || amount < 1) {
+      return NextResponse.json({ success: false, error: 'Minimum amount is ₹1' }, { status: 400 });
     }
 
-    // Create Razorpay order
+    if (amount > 500000) {
+      return NextResponse.json({ success: false, error: 'Maximum amount is ₹5,00,000' }, { status: 400 });
+    }
+
     const order = await razorpay.orders.create({
-      amount: amount * 100, // Convert to paise
+      amount: Math.round(amount * 100), // Convert to paise
       currency,
-      receipt: `receipt_${Date.now()}`,
+      receipt: `wallet_${user.userId}_${Date.now()}`,
       notes: {
-        description: description || 'Bell24h Payment',
-        customer_name: customerName,
-        customer_email: customerEmail,
-        customer_phone: customerPhone || '',
-        platform: 'Bell24h B2B Marketplace'
-      }
+        userId: user.userId,
+        type: 'WALLET_DEPOSIT',
+        platform: 'Bell24h',
+      },
     });
-
-    console.log('✅ Razorpay order created:', order.id);
 
     return NextResponse.json({
       success: true,
-      data: {
-        id: order.id,
-        amount: order.amount,
-        currency: order.currency,
-        description: description || 'Bell24h Payment',
-        customer: {
-          name: customerName,
-          email: customerEmail,
-          phone: customerPhone
-        }
-      }
+      orderId: order.id,
+      amount: order.amount,
+      currency: order.currency,
+      key: process.env.RAZORPAY_KEY_ID,
     });
-
   } catch (error) {
-    console.error('❌ Razorpay order creation failed:', error);
-    
+    console.error('Razorpay create-order error:', error);
     return NextResponse.json(
-      { 
-        success: false, 
-        error: 'Failed to create payment order',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      },
+      { success: false, error: 'Failed to create payment order' },
       { status: 500 }
     );
   }
 }
 
-// Handle payment verification
+// Verify payment and credit wallet
 export async function PUT(request: NextRequest) {
   try {
-    const { orderId, paymentId, signature } = await request.json();
-
-    if (!orderId || !paymentId || !signature) {
-      return NextResponse.json(
-        { success: false, error: 'Missing payment verification data' },
-        { status: 400 }
-      );
+    const user = await authenticate(request);
+    if (!user) {
+      return NextResponse.json({ success: false, error: 'Authentication required' }, { status: 401 });
     }
 
-    // Verify payment signature
-    const crypto = require('crypto');
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, amount } = await request.json();
+
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+      return NextResponse.json({ success: false, error: 'Missing payment verification data' }, { status: 400 });
+    }
+
+    // Verify signature
+    const body = `${razorpay_order_id}|${razorpay_payment_id}`;
     const expectedSignature = crypto
       .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET!)
-      .update(`${orderId}|${paymentId}`)
+      .update(body)
       .digest('hex');
 
-    if (expectedSignature !== signature) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid payment signature' },
-        { status: 400 }
-      );
+    if (expectedSignature !== razorpay_signature) {
+      return NextResponse.json({ success: false, error: 'Payment verification failed' }, { status: 400 });
     }
 
-    // Payment verified successfully
-    console.log('✅ Payment verified:', paymentId);
+    // Credit wallet
+    const depositAmount = amount / 100; // Convert from paise to rupees
+
+    let wallet = await prisma.wallet.findUnique({ where: { userId: user.userId } });
+    if (!wallet) {
+      wallet = await prisma.wallet.create({ data: { userId: user.userId, balance: 0 } });
+    }
+
+    // Create transaction and update balance atomically
+    await prisma.$transaction([
+      prisma.walletTransaction.create({
+        data: {
+          walletId: wallet.id,
+          type: 'CREDIT',
+          amount: depositAmount,
+          description: `Razorpay deposit`,
+          reference: razorpay_payment_id,
+        },
+      }),
+      prisma.wallet.update({
+        where: { id: wallet.id },
+        data: { balance: { increment: depositAmount } },
+      }),
+    ]);
 
     return NextResponse.json({
       success: true,
-      data: {
-        paymentId,
-        orderId,
-        status: 'verified',
-        verifiedAt: new Date().toISOString()
-      }
+      message: `₹${depositAmount.toLocaleString('en-IN')} added to wallet`,
+      paymentId: razorpay_payment_id,
     });
-
   } catch (error) {
-    console.error('❌ Payment verification failed:', error);
-    
+    console.error('Payment verification error:', error);
     return NextResponse.json(
-      { 
-        success: false, 
-        error: 'Payment verification failed',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      },
+      { success: false, error: 'Payment verification failed' },
       { status: 500 }
     );
   }
