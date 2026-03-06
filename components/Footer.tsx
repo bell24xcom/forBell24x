@@ -72,10 +72,10 @@ export default function Footer() {
         <div className="max-w-6xl mx-auto px-4 py-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
             <p className="text-slate-600 text-xs">
-              &copy; {new Date().getFullYear()} BELL Technology Pvt. Ltd. All rights reserved. Made in India.
+              &copy; {new Date().getFullYear()} Bell24h. Operated by Digitex Studio. All rights reserved. Made in India 🇮🇳
             </p>
             <p className="text-slate-600 text-xs">
-              CIN: U00000MH2024PTC000000
+              GSTIN: 27AAAPP9753F2ZF | <a href="mailto:bell24h.helpline@gmail.com" className="hover:text-slate-400 transition-colors">bell24h.helpline@gmail.com</a>
             </p>
           </div>
         </div>

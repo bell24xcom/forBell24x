@@ -65,7 +65,7 @@ export default function Home() {
               "@type": "ContactPoint",
               "telephone": "+91-9876543210",
               "contactType": "customer service",
-              "email": "support@bell24h.com"
+              "email": "bell24h.helpline@gmail.com"
             },
             "address": {
               "@type": "PostalAddress",

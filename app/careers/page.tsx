@@ -63,8 +63,8 @@ export default function CareersPage() {
               <h2 className="text-2xl font-semibold text-white mb-4">📧 Get In Touch</h2>
               <p className="leading-relaxed">
                 Interested in joining our team? Send your resume and portfolio to:{' '}
-                <a href="mailto:careers@bell24h.com" className="text-blue-400 hover:text-blue-300 font-medium">
-                  careers@bell24h.com
+                <a href="mailto:digitex.studio@gmail.com" className="text-blue-400 hover:text-blue-300 font-medium">
+                  digitex.studio@gmail.com
                 </a>
               </p>
               <p className="text-slate-400 mt-3 text-sm">

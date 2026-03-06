@@ -42,7 +42,7 @@ export default function RefundPolicyPage() {
                 <strong className="text-white">Refund Applicability:</strong> Refunds are NOT available for premium RFQ features once the feature has been activated and your RFQ has received visibility.
               </p>
               <p className="mb-4">
-                <strong className="text-white">Exception:</strong> If a technical error prevents the feature from functioning as advertised (e.g., Featured RFQ not displayed), contact support@bell24h.com within 48 hours for a full refund.
+                <strong className="text-white">Exception:</strong> If a technical error prevents the feature from functioning as advertised (e.g., Featured RFQ not displayed), contact bell24h.helpline@gmail.com within 48 hours for a full refund.
               </p>
             </section>
 
@@ -72,7 +72,7 @@ export default function RefundPolicyPage() {
                 <li>Request must be made within 7 calendar days of purchase</li>
                 <li>Applies only to NEW subscriptions (not renewals)</li>
                 <li>You must not have used more than 50% of plan features (e.g., if your plan includes 100 credits, you must have at least 50 remaining)</li>
-                <li>Contact support@bell24h.com with your transaction ID and reason for refund</li>
+                <li>Contact bell24h.helpline@gmail.com with your transaction ID and reason for refund</li>
               </ul>
               <p className="mt-4">
                 <strong className="text-white">After 7 Days:</strong> Refunds are NOT available. You may cancel your subscription at any time to prevent future renewals, but no refund will be issued for the current billing period.
@@ -94,7 +94,7 @@ export default function RefundPolicyPage() {
                 <strong className="text-white">Exceptions:</strong>
               </p>
               <ul className="list-disc list-inside space-y-2 ml-4">
-                <li><strong className="text-white">Duplicate Purchase:</strong> If you are charged twice for the same credit purchase due to a payment gateway error, contact support@bell24h.com within 7 days with transaction proof for a refund.</li>
+                <li><strong className="text-white">Duplicate Purchase:</strong> If you are charged twice for the same credit purchase due to a payment gateway error, contact bell24h.helpline@gmail.com within 7 days with transaction proof for a refund.</li>
                 <li><strong className="text-white">Unused Credits:</strong> Credits are valid for 12 months from purchase date. Expired credits cannot be refunded or reactivated.</li>
               </ul>
             </section>
@@ -140,7 +140,7 @@ export default function RefundPolicyPage() {
                 <strong className="text-white">Refund Applicability:</strong> Platform fees are NON-REFUNDABLE once a deal is marked as "Completed" or "In Progress."
               </p>
               <p className="mb-4">
-                <strong className="text-white">Exception:</strong> If you were charged a platform fee in error (e.g., fee applied to a cancelled deal), contact support@bell24h.com with proof for investigation and potential refund.
+                <strong className="text-white">Exception:</strong> If you were charged a platform fee in error (e.g., fee applied to a cancelled deal), contact bell24h.helpline@gmail.com with proof for investigation and potential refund.
               </p>
             </section>
 
@@ -158,7 +158,7 @@ export default function RefundPolicyPage() {
                 To request a refund for eligible services:
               </p>
               <ol className="list-decimal list-inside space-y-3 ml-4">
-                <li><strong className="text-white">Contact Support:</strong> Email support@bell24h.com with the subject "Refund Request"</li>
+                <li><strong className="text-white">Contact Support:</strong> Email bell24h.helpline@gmail.com with the subject "Refund Request"</li>
                 <li>
                   <strong className="text-white">Provide Details:</strong>
                   <ul className="list-disc list-inside space-y-1 ml-6 mt-2">
@@ -186,7 +186,7 @@ export default function RefundPolicyPage() {
                 <li><strong className="text-white">Wallet (Paytm, PhonePe, etc.):</strong> 3-5 business days</li>
               </ul>
               <p className="mt-4">
-                If you do not receive your refund within the stated timeline, contact your bank/payment provider first, then reach out to support@bell24h.com with proof of non-receipt.
+                If you do not receive your refund within the stated timeline, contact your bank/payment provider first, then reach out to bell24h.helpline@gmail.com with proof of non-receipt.
               </p>
             </section>
 
@@ -206,7 +206,7 @@ export default function RefundPolicyPage() {
               <h3 className="text-xl font-semibold text-white mb-3 mt-6">10.3 Technical Issues</h3>
               <p className="mb-4">
                 If Bell24h experiences a platform outage or technical issue that prevents you from using paid services for more than 24 consecutive hours, you may request a pro-rated refund or credit extension.
-                Contact support@bell24h.com with the date and time of the outage.
+                Contact bell24h.helpline@gmail.com with the date and time of the outage.
               </p>
             </section>
 
@@ -225,9 +225,9 @@ export default function RefundPolicyPage() {
               </p>
               <div className="bg-slate-900 rounded-lg p-6 space-y-2">
                 <p><strong className="text-white">Company Name:</strong> DIGITEX STUDIO (Bell24h)</p>
-                <p><strong className="text-white">Email:</strong> support@bell24h.com</p>
+                <p><strong className="text-white">Email:</strong> bell24h.helpline@gmail.com</p>
                 <p><strong className="text-white">Phone:</strong> +91-9004962871</p>
-                <p><strong className="text-white">Address:</strong> Mumbai, Maharashtra, India</p>
+                <p><strong className="text-white">Address:</strong> Digitex Studio, Lodha Upper Thane, Sarang, Bhiwandi, Thane – 421302, Maharashtra, India</p>
                 <p><strong className="text-white">Business Hours:</strong> Monday-Saturday, 10:00 AM - 7:00 PM IST</p>
               </div>
             </section>
