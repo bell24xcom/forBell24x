@@ -6,6 +6,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticate } from '@/lib/jwt';
 import { prisma } from '@/lib/prisma';
+import { resendService } from '@/lib/resend';
+import { quoteAcceptedEmail } from '@/lib/emailTemplates';
 
 export const dynamic = 'force-dynamic';
 
@@ -161,6 +163,22 @@ export async function PUT(request: NextRequest) {
 
         return { accepted, deal: { ...deal, status: dealStatus } };
       });
+
+      // Fire-and-forget: notify supplier via email
+      try {
+        const supplier = await prisma.user.findUnique({
+          where: { id: quote.supplierId! },
+          select: { email: true, name: true },
+        });
+        if (supplier?.email) {
+          const template = quoteAcceptedEmail(
+            supplier.name || 'Supplier',
+            quote.rfq?.title || 'your RFQ',
+            Number(quote.price),
+          );
+          resendService.sendEmail({ to: supplier.email, ...template }).catch(console.error);
+        }
+      } catch { /* email failure must never block the response */ }
 
       const escrowLocked = result.deal.status === 'ESCROW_LOCKED';
       return NextResponse.json({

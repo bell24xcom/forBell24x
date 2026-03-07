@@ -229,8 +229,30 @@ export default function DashboardPage() {
 
   const hasNoActivity = stats.totalRFQs === 0 && stats.totalQuotesReceived === 0;
 
+  // Check if supplier needs onboarding (no company set)
+  const needsOnboarding = mode === 'supplier' && user && !(user as any).company;
+
   return (
     <div className="space-y-6">
+      {/* Onboarding Banner — supplier mode, no company set */}
+      {needsOnboarding && (
+        <div className="bg-indigo-900/30 border border-indigo-700/60 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <span className="text-2xl">🚀</span>
+            <div>
+              <p className="text-white font-semibold text-sm">Complete your supplier profile</p>
+              <p className="text-indigo-300 text-xs mt-0.5">Add your company details, categories, and GST to start receiving RFQs from buyers.</p>
+            </div>
+          </div>
+          <a
+            href="/supplier/onboarding"
+            className="shrink-0 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors min-h-[44px] flex items-center justify-center"
+          >
+            Set Up Profile →
+          </a>
+        </div>
+      )}
+
       {/* Welcome Section */}
       <div className="bg-gray-900 border border-gray-700 rounded-lg shadow-sm p-6">
         <div className="flex items-center justify-between">
