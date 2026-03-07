@@ -281,7 +281,9 @@ export default function WalletPage() {
         <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold">Transaction History</h2>
-            <span className="text-sm text-slate-400">Last 50 transactions</span>
+            <a href="/wallet/ledger" className="text-indigo-400 hover:text-indigo-300 text-sm transition-colors">
+              View Full Ledger →
+            </a>
           </div>
 
           {isLoading ? (

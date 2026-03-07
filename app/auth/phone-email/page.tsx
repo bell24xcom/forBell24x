@@ -65,7 +65,20 @@ export default function PhoneEmailAuth() {
         return;
       }
       localStorage.setItem('bell24h_user', JSON.stringify(loginData.user));
-      router.push('/dashboard');
+      // Claim flow: if ?claim=xxx param present, transfer unclaimed profile
+      const claimId = new URLSearchParams(window.location.search).get('claim');
+      if (claimId) {
+        try {
+          await fetch('/api/auth/claim', {
+            method: 'POST', credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ claimId }),
+          });
+        } catch { /* non-blocking */ }
+        router.push('/supplier/onboarding?claimed=1');
+      } else {
+        router.push('/dashboard');
+      }
     } catch {
       setError('Network error. Please check your connection.');
       setLoading(false);
@@ -170,7 +183,20 @@ export default function PhoneEmailAuth() {
       }
 
       localStorage.setItem('bell24h_user', JSON.stringify(data.user));
-      router.push('/dashboard');
+      // Claim flow
+      const claimId = new URLSearchParams(window.location.search).get('claim');
+      if (claimId) {
+        try {
+          await fetch('/api/auth/claim', {
+            method: 'POST', credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ claimId }),
+          });
+        } catch { /* non-blocking */ }
+        router.push('/supplier/onboarding?claimed=1');
+      } else {
+        router.push('/dashboard');
+      }
     } catch {
       setError('Network error. Please check your connection.');
     } finally {
