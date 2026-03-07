@@ -1,6 +1,14 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { Upload, AlertTriangle } from 'lucide-react';
+
+interface FeatureFlag {
+  key: string;
+  label: string;
+  description: string | null;
+  enabled: boolean;
+}
 
 interface PlanFeature {
   label: string; monthlyPriceINR: number;
@@ -10,6 +18,8 @@ interface PlanFeature {
   analyticsAccess: boolean; apiAccess: boolean;
 }
 interface ControlData {
+  flags: FeatureFlag[];
+  unclaimedProfiles: number;
   plans: Record<string, PlanFeature>;
   planStats: Record<string, { count: number; avgTrustScore: number }>;
   kyc: { gstProvided: number; udyamProvided: number; bothProvided: number; verified: number };
@@ -59,11 +69,58 @@ export default function ControlPanelPage() {
   const [loading, setLoading] = useState(true);
   const [error,   setError]   = useState('');
 
+  // Feature flags
+  const [togglingFlag, setTogglingFlag] = useState<string | null>(null);
+
+  // Supplier import
+  const [importJson,    setImportJson]    = useState('');
+  const [importing,     setImporting]     = useState(false);
+  const [importResult,  setImportResult]  = useState('');
+
   // Quick plan assignment
   const [assignPhone, setAssignPhone] = useState('');
   const [assignPlan,  setAssignPlan]  = useState('PRO');
   const [assigning,   setAssigning]   = useState(false);
   const [assignMsg,   setAssignMsg]   = useState('');
+
+  const toggleFlag = async (key: string, currentEnabled: boolean) => {
+    setTogglingFlag(key);
+    try {
+      const res  = await fetch('/api/admin/control-panel', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key, enabled: !currentEnabled }),
+      });
+      const json = await res.json();
+      if (json.success && data) {
+        setData({
+          ...data,
+          flags: data.flags.map(f => f.key === key ? { ...f, enabled: !currentEnabled } : f),
+        });
+      }
+    } catch { /* silent */ }
+    finally { setTogglingFlag(null); }
+  };
+
+  const handleImport = async () => {
+    setImporting(true);
+    setImportResult('');
+    try {
+      const suppliers = JSON.parse(importJson);
+      const res  = await fetch('/api/admin/import-suppliers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ suppliers }),
+      });
+      const json = await res.json();
+      setImportResult(json.message || (json.error ? `Error: ${json.error}` : 'Done'));
+      if (json.success) { setImportJson(''); fetchData(); }
+    } catch (e) {
+      setImportResult(`JSON parse error: ${e instanceof Error ? e.message : 'Invalid JSON'}`);
+    } finally {
+      setImporting(false);
+    }
+  };
 
   const fetchData = useCallback(async () => {
     setLoading(true); setError('');
@@ -126,6 +183,80 @@ export default function ControlPanelPage() {
       <div>
         <h1 className="text-xl font-bold text-white">Control Panel</h1>
         <p className="text-slate-400 text-sm">Plan features, KYC stats, and trust distribution</p>
+      </div>
+
+      {/* Feature Flags */}
+      <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl overflow-hidden">
+        <div className="px-5 py-4 border-b border-slate-700">
+          <h2 className="text-white font-semibold">Feature Flags</h2>
+          <p className="text-slate-400 text-xs mt-0.5">Toggle platform features on/off in real-time</p>
+        </div>
+        <div className="divide-y divide-slate-700/40">
+          {(data.flags || []).map(flag => (
+            <div key={flag.key} className={`flex items-center justify-between px-5 py-3 ${flag.key === 'maintenance_mode' && flag.enabled ? 'bg-amber-900/10' : ''}`}>
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-white">{flag.label}</span>
+                  {flag.key === 'maintenance_mode' && flag.enabled && (
+                    <span className="text-xs bg-amber-900/40 text-amber-300 border border-amber-700/50 px-2 py-0.5 rounded-full flex items-center gap-1">
+                      <AlertTriangle className="w-3 h-3" /> Active
+                    </span>
+                  )}
+                </div>
+                {flag.description && (
+                  <p className="text-xs text-slate-500 mt-0.5">{flag.description}</p>
+                )}
+              </div>
+              <button
+                onClick={() => toggleFlag(flag.key, flag.enabled)}
+                disabled={togglingFlag === flag.key}
+                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors duration-200 focus:outline-none ml-4 ${
+                  flag.enabled ? 'bg-indigo-600' : 'bg-slate-600'
+                } ${togglingFlag === flag.key ? 'opacity-50' : ''}`}
+              >
+                <span className={`inline-block h-5 w-5 rounded-full bg-white shadow transform transition-transform duration-200 mt-0.5 ${
+                  flag.enabled ? 'translate-x-5' : 'translate-x-0.5'
+                }`} />
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Import Unclaimed Supplier Profiles */}
+      <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-5">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <h2 className="text-white font-semibold text-sm flex items-center gap-2">
+              <Upload className="w-4 h-4 text-indigo-400" />
+              Import Unclaimed Supplier Profiles
+            </h2>
+            <p className="text-slate-400 text-xs mt-0.5">
+              {data.unclaimedProfiles} unclaimed profiles in database · Max 500 per import
+            </p>
+          </div>
+        </div>
+        <textarea
+          value={importJson}
+          onChange={e => setImportJson(e.target.value)}
+          placeholder={`Paste JSON array of suppliers:\n[\n  { "company": "Patel Steel", "category": "Steel & Metals", "city": "Mumbai", "state": "Maharashtra", "gstNumber": "27AAPFU0939F1ZV" },\n  ...\n]`}
+          rows={5}
+          className="w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-600 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+        />
+        <div className="flex items-center gap-3 mt-3">
+          <button
+            onClick={handleImport}
+            disabled={importing || !importJson.trim()}
+            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 text-white text-sm font-medium rounded-lg transition-colors"
+          >
+            {importing ? 'Importing…' : 'Import Suppliers'}
+          </button>
+          {importResult && (
+            <p className={`text-sm ${importResult.startsWith('Error') ? 'text-red-400' : 'text-green-400'}`}>
+              {importResult}
+            </p>
+          )}
+        </div>
       </div>
 
       {/* Plan Feature Matrix */}

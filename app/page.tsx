@@ -69,14 +69,28 @@ function HeroSection() {
       <div className="max-w-6xl mx-auto px-4">
         {/* Headline */}
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4 text-center">
-          Post RFQs in{' '}
-          <span className="text-blue-400">3 Different Ways</span>
+          Post an RFQ in{' '}
+          <span className="text-blue-400">30 Seconds.</span>{' '}
+          Get Quotes from Verified Suppliers.
         </h1>
 
         {/* Subheadline */}
-        <p className="text-lg text-slate-300 max-w-2xl mx-auto mb-10 text-center">
-          Choose Voice, Video, or Text. AI-powered matching across 450+ categories.
+        <p className="text-lg text-slate-300 max-w-2xl mx-auto mb-6 text-center">
+          India's AI-powered B2B procurement platform. Voice, Video, or Text — your choice.
         </p>
+
+        {/* Primary CTA links */}
+        <div className="flex flex-wrap gap-3 justify-center mb-10">
+          <a href="/voice-rfq" className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors min-h-[44px]">
+            🎤 Post Voice RFQ
+          </a>
+          <a href="/rfq/create" className="inline-flex items-center gap-2 px-6 py-3 bg-slate-700 hover:bg-slate-600 border border-slate-600 text-white font-semibold rounded-xl transition-colors min-h-[44px]">
+            📝 Post Text RFQ
+          </a>
+          <a href="/marketplace" className="inline-flex items-center gap-2 px-6 py-3 bg-slate-700 hover:bg-slate-600 border border-slate-600 text-white font-semibold rounded-xl transition-colors min-h-[44px]">
+            🔍 Browse RFQs
+          </a>
+        </div>
 
         {/* 3-Tab Switcher */}
         <div className="max-w-5xl mx-auto mb-8">
