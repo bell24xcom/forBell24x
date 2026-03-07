@@ -1,411 +1,293 @@
 'use client';
 
-import { AlertTriangle, CheckCircle, Clock, Database, Eye, Key, Lock, Shield, Users } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { AlertTriangle, CheckCircle, Clock, Database, RefreshCw, Shield, Trash2, XCircle } from 'lucide-react';
 
-interface SecurityEvent {
+interface ErrorLog {
   id: string;
-  type: 'login' | 'failed_login' | 'permission_change' | 'data_access' | 'system_change';
-  user: string;
-  description: string;
-  timestamp: string;
-  ip: string;
-  status: 'success' | 'warning' | 'error';
+  route: string;
+  method: string;
+  message: string;
+  stack?: string;
+  userId?: string;
+  severity: string;
+  createdAt: string;
 }
 
-interface UserSession {
-  id: string;
-  user: string;
-  ip: string;
-  location: string;
-  loginTime: string;
-  lastActivity: string;
-  status: 'active' | 'idle' | 'expired';
+interface LogData {
+  logs: ErrorLog[];
+  pagination: { page: number; limit: number; total: number; pages: number };
+  summary: { critical: number; error: number; warn: number };
 }
+
+const SEVERITY_COLORS: Record<string, string> = {
+  critical: 'bg-red-900/50 text-red-300 border border-red-700',
+  error:    'bg-orange-900/50 text-orange-300 border border-orange-700',
+  warn:     'bg-amber-900/50 text-amber-300 border border-amber-700',
+  info:     'bg-blue-900/50 text-blue-300 border border-blue-700',
+};
+
+const SEVERITY_ICONS: Record<string, React.ReactNode> = {
+  critical: <XCircle className="w-4 h-4 text-red-400" />,
+  error:    <AlertTriangle className="w-4 h-4 text-orange-400" />,
+  warn:     <AlertTriangle className="w-4 h-4 text-amber-400" />,
+  info:     <CheckCircle className="w-4 h-4 text-blue-400" />,
+};
 
 export default function SecurityPage() {
-  const [activeTab, setActiveTab] = useState('overview');
-  const [securityEvents, setSecurityEvents] = useState<SecurityEvent[]>([]);
-  const [userSessions, setUserSessions] = useState<UserSession[]>([]);
+  const [tab,       setTab]       = useState<'logs' | 'compliance'>('logs');
+  const [data,      setData]      = useState<LogData | null>(null);
+  const [loading,   setLoading]   = useState(true);
+  const [error,     setError]     = useState('');
+  const [severity,  setSeverity]  = useState('');
+  const [page,      setPage]      = useState(1);
+  const [deleting,  setDeleting]  = useState<string | null>(null);
+  const [expanded,  setExpanded]  = useState<string | null>(null);
 
-  const mockSecurityEvents: SecurityEvent[] = [
-    {
-      id: '1',
-      type: 'login',
-      user: 'admin@bell24h.com',
-      description: 'Successful login from admin panel',
-      timestamp: '2024-08-30 15:30:00',
-      ip: '192.168.1.100',
-      status: 'success'
-    },
-    {
-      id: '2',
-      type: 'failed_login',
-      user: 'unknown@example.com',
-      description: 'Failed login attempt with invalid credentials',
-      timestamp: '2024-08-30 15:25:00',
-      ip: '192.168.1.101',
-      status: 'error'
-    },
-    {
-      id: '3',
-      type: 'permission_change',
-      user: 'admin@bell24h.com',
-      description: 'User role updated for supplier@example.com',
-      timestamp: '2024-08-30 14:45:00',
-      ip: '192.168.1.100',
-      status: 'success'
-    },
-    {
-      id: '4',
-      type: 'data_access',
-      user: 'supplier@example.com',
-      description: 'Accessed sensitive customer data',
-      timestamp: '2024-08-30 14:30:00',
-      ip: '192.168.1.102',
-      status: 'warning'
+  const fetchLogs = useCallback(async () => {
+    setLoading(true);
+    setError('');
+    const params = new URLSearchParams({ page: String(page), limit: '30' });
+    if (severity) params.set('severity', severity);
+    try {
+      const res  = await fetch(`/api/admin/errors?${params}`);
+      const json = await res.json();
+      setData(json);
+    } catch {
+      setError('Failed to load error logs');
+    } finally {
+      setLoading(false);
     }
-  ];
+  }, [page, severity]);
 
-  const mockUserSessions: UserSession[] = [
-    {
-      id: '1',
-      user: 'admin@bell24h.com',
-      ip: '192.168.1.100',
-      location: 'Mumbai, India',
-      loginTime: '2024-08-30 15:30:00',
-      lastActivity: '2024-08-30 16:45:00',
-      status: 'active'
-    },
-    {
-      id: '2',
-      user: 'supplier@example.com',
-      ip: '192.168.1.102',
-      location: 'Delhi, India',
-      loginTime: '2024-08-30 14:30:00',
-      lastActivity: '2024-08-30 16:30:00',
-      status: 'idle'
-    },
-    {
-      id: '3',
-      user: 'buyer@example.com',
-      ip: '192.168.1.103',
-      location: 'Bangalore, India',
-      loginTime: '2024-08-30 13:15:00',
-      lastActivity: '2024-08-30 15:00:00',
-      status: 'expired'
-    }
-  ];
+  useEffect(() => { fetchLogs(); }, [fetchLogs]);
 
-  const securityMetrics = [
-    {
-      name: 'Active Sessions',
-      value: '1,247',
-      icon: Users,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-100'
-    },
-    {
-      name: 'Failed Logins (24h)',
-      value: '23',
-      icon: AlertTriangle,
-      color: 'text-red-600',
-      bgColor: 'bg-red-100'
-    },
-    {
-      name: 'Security Score',
-      value: '98%',
-      icon: Shield,
-      color: 'text-green-600',
-      bgColor: 'bg-green-100'
-    },
-    {
-      name: 'Data Breaches',
-      value: '0',
-      icon: Database,
-      color: 'text-green-600',
-      bgColor: 'bg-green-100'
-    }
-  ];
-
-  const getEventIcon = (type: string) => {
-    switch (type) {
-      case 'login':
-        return <CheckCircle className="h-4 w-4 text-green-600" />;
-      case 'failed_login':
-        return <AlertTriangle className="h-4 w-4 text-red-600" />;
-      case 'permission_change':
-        return <Key className="h-4 w-4 text-blue-600" />;
-      case 'data_access':
-        return <Eye className="h-4 w-4 text-yellow-600" />;
-      case 'system_change':
-        return <Database className="h-4 w-4 text-purple-600" />;
-      default:
-        return <Clock className="h-4 w-4 text-slate-300" />;
+  const deleteLog = async (id: string) => {
+    setDeleting(id);
+    try {
+      await fetch(`/api/admin/errors?id=${id}`, { method: 'DELETE' });
+      setData(prev => prev ? {
+        ...prev,
+        logs: prev.logs.filter(l => l.id !== id),
+        pagination: { ...prev.pagination, total: prev.pagination.total - 1 },
+      } : prev);
+    } finally {
+      setDeleting(null);
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'success':
-        return 'text-green-600 bg-green-100';
-      case 'warning':
-        return 'text-yellow-600 bg-yellow-100';
-      case 'error':
-        return 'text-red-600 bg-red-100';
-      default:
-        return 'text-slate-300 bg-neutral-100';
-    }
-  };
-
-  const getSessionStatusColor = (status: string) => {
-    switch (status) {
-      case 'active':
-        return 'text-green-600 bg-green-100';
-      case 'idle':
-        return 'text-yellow-600 bg-yellow-100';
-      case 'expired':
-        return 'text-red-600 bg-red-100';
-      default:
-        return 'text-slate-300 bg-neutral-100';
-    }
+  const clearOld = async () => {
+    if (!confirm('Clear all error logs older than 30 days?')) return;
+    await fetch('/api/admin/errors', { method: 'DELETE' });
+    fetchLogs();
   };
 
   return (
-    <div className="page-container">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-neutral-900">Security & Compliance</h1>
-          <p className="mt-2 text-slate-300">Monitor security events, user access, and compliance status</p>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-bold text-white">Security & Error Logs</h1>
+          <p className="text-slate-400 text-sm">Platform error monitoring and compliance status</p>
         </div>
+        <button
+          onClick={fetchLogs}
+          disabled={loading}
+          className="flex items-center gap-2 px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-300 hover:bg-slate-700 text-sm transition-colors"
+        >
+          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+          Refresh
+        </button>
+      </div>
 
-        {/* Tab Navigation */}
-        <div className="border-b border-neutral-200 mb-8">
-          <nav className="flex space-x-8">
-            {[
-              { id: 'overview', name: 'Overview', icon: Shield },
-              { id: 'events', name: 'Security Events', icon: AlertTriangle },
-              { id: 'sessions', name: 'Active Sessions', icon: Users },
-              { id: 'compliance', name: 'Compliance', icon: Lock }
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${activeTab === tab.id
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-slate-400 hover:text-slate-400 hover:border-neutral-300'
-                  }`}
-              >
-                <tab.icon className="w-5 h-5" />
-                <span>{tab.name}</span>
-              </button>
-            ))}
-          </nav>
+      {/* Summary cards */}
+      {data && (
+        <div className="grid grid-cols-3 gap-4">
+          {[
+            { label: 'Critical', value: data.summary.critical, color: 'text-red-400',    bg: 'bg-red-900/20 border-red-700/40' },
+            { label: 'Errors',   value: data.summary.error,    color: 'text-orange-400', bg: 'bg-orange-900/20 border-orange-700/40' },
+            { label: 'Warnings', value: data.summary.warn,     color: 'text-amber-400',  bg: 'bg-amber-900/20 border-amber-700/40' },
+          ].map(({ label, value, color, bg }) => (
+            <div key={label} className={`border rounded-xl px-4 py-3 ${bg}`}>
+              <p className={`text-2xl font-bold ${color}`}>{value}</p>
+              <p className="text-slate-400 text-xs mt-0.5">{label}</p>
+            </div>
+          ))}
         </div>
+      )}
 
-        {/* Overview Tab */}
-        {activeTab === 'overview' && (
-          <div className="space-y-8">
-            {/* Security Metrics */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {securityMetrics.map((metric, index) => (
-                <div key={index} className="bg-white rounded-lg shadow p-6">
-                  <div className="flex items-center">
-                    <div className={`p-2 ${metric.bgColor} rounded-lg`}>
-                      <metric.icon className={`h-6 w-6 ${metric.color}`} />
-                    </div>
-                    <div className="ml-4">
-                      <p className="text-sm font-medium text-slate-300">{metric.name}</p>
-                      <p className="text-2xl font-bold text-neutral-900">{metric.value}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+      {/* Tabs */}
+      <div className="flex gap-1 bg-slate-800/60 rounded-xl p-1 w-fit border border-slate-700/50">
+        {(['logs', 'compliance'] as const).map(t => (
+          <button
+            key={t}
+            onClick={() => setTab(t)}
+            className={`px-4 py-2 rounded-lg text-sm font-medium capitalize transition-colors ${
+              tab === t ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            {t === 'logs' ? 'Error Logs' : 'Compliance'}
+          </button>
+        ))}
+      </div>
 
-            {/* Security Status */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-medium text-neutral-900 mb-4">Security Status</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h4 className="text-sm font-medium text-slate-300 mb-2">Authentication</h4>
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-neutral-900">2FA Enabled</span>
-                      <CheckCircle className="h-4 w-4 text-green-600" />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-neutral-900">Password Policy</span>
-                      <CheckCircle className="h-4 w-4 text-green-600" />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-neutral-900">Session Timeout</span>
-                      <CheckCircle className="h-4 w-4 text-green-600" />
-                    </div>
-                  </div>
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium text-slate-300 mb-2">Data Protection</h4>
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-neutral-900">Data Encryption</span>
-                      <CheckCircle className="h-4 w-4 text-green-600" />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-neutral-900">Backup Encryption</span>
-                      <CheckCircle className="h-4 w-4 text-green-600" />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-neutral-900">GDPR Compliance</span>
-                      <CheckCircle className="h-4 w-4 text-green-600" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+      {/* Logs Tab */}
+      {tab === 'logs' && (
+        <div className="space-y-4">
+          {/* Filters */}
+          <div className="flex flex-wrap gap-3 items-center">
+            <select
+              value={severity}
+              onChange={e => { setSeverity(e.target.value); setPage(1); }}
+              className="px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-slate-300 focus:outline-none"
+            >
+              <option value="">All severities</option>
+              <option value="critical">Critical</option>
+              <option value="error">Error</option>
+              <option value="warn">Warning</option>
+              <option value="info">Info</option>
+            </select>
+            <button
+              onClick={clearOld}
+              className="flex items-center gap-1.5 px-3 py-2 bg-red-900/30 border border-red-700/50 text-red-300 rounded-lg text-sm hover:bg-red-900/50 transition-colors"
+            >
+              <Trash2 className="w-4 h-4" />
+              Clear old logs (&gt;30d)
+            </button>
+            {data && (
+              <span className="text-slate-500 text-sm ml-auto">{data.pagination.total} logs total</span>
+            )}
           </div>
-        )}
 
-        {/* Security Events Tab */}
-        {activeTab === 'events' && (
-          <div className="space-y-6">
-            <div className="bg-white rounded-lg shadow overflow-hidden">
-              <div className="px-6 py-4 border-b border-neutral-200">
-                <h3 className="text-lg font-medium text-neutral-900">Recent Security Events</h3>
+          {error && (
+            <div className="bg-red-900/30 border border-red-700/50 text-red-300 px-4 py-3 rounded-xl text-sm">{error}</div>
+          )}
+
+          {/* Table */}
+          <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl overflow-hidden">
+            {loading ? (
+              <div className="py-12 flex justify-center">
+                <div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
               </div>
-              <div className="divide-y divide-gray-200">
-                {mockSecurityEvents.map((event) => (
-                  <div key={event.id} className="px-6 py-4 flex items-center justify-between">
-                    <div className="flex items-center">
-                      {getEventIcon(event.type)}
-                      <div className="ml-4">
-                        <p className="text-sm font-medium text-neutral-900">{event.description}</p>
-                        <p className="text-sm text-slate-400">
-                          {event.user} • {event.ip} • {event.timestamp}
-                        </p>
+            ) : !data || data.logs.length === 0 ? (
+              <div className="py-12 text-center">
+                <Shield className="w-10 h-10 text-green-400 mx-auto mb-3" />
+                <p className="text-white font-medium">No error logs found</p>
+                <p className="text-slate-400 text-sm mt-1">The system is running cleanly</p>
+              </div>
+            ) : (
+              <div className="divide-y divide-slate-700/30">
+                {data.logs.map(log => (
+                  <div key={log.id} className="px-5 py-3 hover:bg-slate-700/20 transition-colors">
+                    <div className="flex items-start gap-3">
+                      <div className="shrink-0 mt-0.5">{SEVERITY_ICONS[log.severity] ?? SEVERITY_ICONS.info}</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${SEVERITY_COLORS[log.severity] ?? SEVERITY_COLORS.info}`}>
+                            {log.severity}
+                          </span>
+                          <code className="text-xs text-slate-400 bg-slate-900/50 px-2 py-0.5 rounded">
+                            {log.method} {log.route}
+                          </code>
+                          <span className="text-xs text-slate-500 flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            {new Date(log.createdAt).toLocaleString('en-IN')}
+                          </span>
+                        </div>
+                        <p className="text-sm text-slate-200 mt-1 truncate">{log.message}</p>
+                        {log.stack && (
+                          <button
+                            onClick={() => setExpanded(expanded === log.id ? null : log.id)}
+                            className="text-xs text-indigo-400 hover:text-indigo-300 mt-1 transition-colors"
+                          >
+                            {expanded === log.id ? 'Hide stack trace' : 'Show stack trace'}
+                          </button>
+                        )}
+                        {expanded === log.id && log.stack && (
+                          <pre className="mt-2 text-xs bg-slate-900/70 text-slate-300 p-3 rounded-lg overflow-x-auto max-h-32 font-mono">
+                            {log.stack}
+                          </pre>
+                        )}
                       </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(event.status)}`}>
-                        {event.status}
-                      </span>
+                      <button
+                        onClick={() => deleteLog(log.id)}
+                        disabled={deleting === log.id}
+                        className="shrink-0 p-1.5 text-slate-600 hover:text-red-400 transition-colors rounded"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
                   </div>
                 ))}
               </div>
-            </div>
+            )}
           </div>
-        )}
 
-        {/* Active Sessions Tab */}
-        {activeTab === 'sessions' && (
-          <div className="space-y-6">
-            <div className="bg-white rounded-lg shadow overflow-hidden">
-              <div className="px-6 py-4 border-b border-neutral-200">
-                <h3 className="text-lg font-medium text-neutral-900">Active User Sessions</h3>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-neutral-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">User</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">IP Address</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Location</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Login Time</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Last Activity</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Status</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {mockUserSessions.map((session) => (
-                      <tr key={session.id} className="hover:bg-neutral-50">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-neutral-900">
-                          {session.user}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">
-                          {session.ip}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">
-                          {session.location}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">
-                          {session.loginTime}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">
-                          {session.lastActivity}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getSessionStatusColor(session.status)}`}>
-                            {session.status}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <button className="text-red-600 hover:text-red-900">
-                            Revoke
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+          {/* Pagination */}
+          {data && data.pagination.pages > 1 && (
+            <div className="flex items-center justify-between text-sm text-slate-400">
+              <span>Page {data.pagination.page} of {data.pagination.pages}</span>
+              <div className="flex gap-2">
+                <button disabled={page <= 1} onClick={() => setPage(p => p - 1)}
+                  className="px-3 py-1.5 bg-slate-800 rounded-lg disabled:opacity-40 hover:bg-slate-700 transition-colors">
+                  ← Prev
+                </button>
+                <button disabled={page >= data.pagination.pages} onClick={() => setPage(p => p + 1)}
+                  className="px-3 py-1.5 bg-slate-800 rounded-lg disabled:opacity-40 hover:bg-slate-700 transition-colors">
+                  Next →
+                </button>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
+      )}
 
-        {/* Compliance Tab */}
-        {activeTab === 'compliance' && (
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-lg font-medium text-neutral-900 mb-4">GDPR Compliance</h3>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-slate-300">Data Processing Consent</span>
-                    <CheckCircle className="h-5 w-5 text-green-600" />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-slate-300">Right to Erasure</span>
-                    <CheckCircle className="h-5 w-5 text-green-600" />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-slate-300">Data Portability</span>
-                    <CheckCircle className="h-5 w-5 text-green-600" />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-slate-300">Privacy Policy</span>
-                    <CheckCircle className="h-5 w-5 text-green-600" />
-                  </div>
+      {/* Compliance Tab */}
+      {tab === 'compliance' && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-5">
+            <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
+              <Database className="w-4 h-4 text-indigo-400" /> Data Protection
+            </h3>
+            <div className="space-y-3">
+              {[
+                'JWT authentication with HttpOnly cookies',
+                'Bcrypt password hashing (12 rounds)',
+                'Admin routes protected with admin-token',
+                'Database encryption at rest (Neon)',
+                'HTTPS enforced (TLS 1.3)',
+                'No PII in public supplier API responses',
+              ].map(item => (
+                <div key={item} className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-400 shrink-0" />
+                  <span className="text-sm text-slate-300">{item}</span>
                 </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-lg font-medium text-neutral-900 mb-4">Security Standards</h3>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-slate-300">ISO 27001</span>
-                    <CheckCircle className="h-5 w-5 text-green-600" />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-slate-300">SOC 2 Type II</span>
-                    <CheckCircle className="h-5 w-5 text-green-600" />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-slate-300">PCI DSS</span>
-                    <CheckCircle className="h-5 w-5 text-green-600" />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-slate-300">OWASP Top 10</span>
-                    <CheckCircle className="h-5 w-5 text-green-600" />
-                  </div>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
-        )}
-      </div>
+
+          <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-5">
+            <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
+              <Shield className="w-4 h-4 text-green-400" /> Application Security
+            </h3>
+            <div className="space-y-3">
+              {[
+                'SQL injection prevention (Prisma ORM)',
+                'XSS protection (React JSX escaping)',
+                'CSRF-safe (SameSite cookie attribute)',
+                'Input validation on all API routes',
+                'Rate limiting via Vercel Edge',
+                'Error logs retained for 30 days',
+              ].map(item => (
+                <div key={item} className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-400 shrink-0" />
+                  <span className="text-sm text-slate-300">{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

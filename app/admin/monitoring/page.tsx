@@ -1,302 +1,344 @@
 'use client';
 
-import { Activity, AlertTriangle, CheckCircle, Clock, Cpu, Database, HardDrive, Monitor, Server } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
+import { Activity, AlertTriangle, CheckCircle, Clock, Database, FileText, RefreshCw, TrendingUp, Users, Zap } from 'lucide-react';
 
-interface SystemMetric {
-  name: string;
-  value: string;
-  status: 'healthy' | 'warning' | 'critical';
-  trend: 'up' | 'down' | 'stable';
-  icon: any;
+interface MonitoringData {
+  systemHealth: number;
+  metrics: {
+    users: { total: number; active: number; newToday: number; newThisWeek: number };
+    rfqs: { total: number; active: number; today: number; thisWeek: number; accepted: number; completed: number; cancelled: number };
+    quotes: { total: number; today: number; accepted: number; conversionRate: string };
+    transactions: { total: number; completed: number; completedVolume: number; successRate: string };
+  };
+  recentActivity: {
+    rfqs: Array<{ id: string; title: string; status: string; category: string; buyer: string; minutesAgo: number }>;
+    quotes: Array<{ id: string; rfqTitle: string; price: number; status: string; supplier: string; minutesAgo: number }>;
+  };
+  alerts: Array<{ type: string; message: string; timestamp: string }>;
+  lastUpdated: string;
 }
 
-interface Alert {
-  id: string;
-  type: 'error' | 'warning' | 'info';
-  message: string;
-  timestamp: string;
-  resolved: boolean;
+const STATUS_COLORS: Record<string, string> = {
+  ACTIVE:    'bg-green-900/40 text-green-300',
+  QUOTED:    'bg-blue-900/40 text-blue-300',
+  COMPLETED: 'bg-slate-700 text-slate-300',
+  CANCELLED: 'bg-red-900/40 text-red-300',
+  ACCEPTED:  'bg-indigo-900/40 text-indigo-300',
+  PENDING:   'bg-amber-900/40 text-amber-300',
+};
+
+function timeAgo(min: number) {
+  if (min < 1)  return 'just now';
+  if (min < 60) return `${min}m ago`;
+  return `${Math.floor(min / 60)}h ago`;
 }
 
 export default function SystemMonitoringPage() {
-  const [activeTab, setActiveTab] = useState('overview');
-  const [alerts, setAlerts] = useState<Alert[]>([]);
+  const [data,     setData]     = useState<MonitoringData | null>(null);
+  const [loading,  setLoading]  = useState(true);
+  const [error,    setError]    = useState('');
+  const [tab,      setTab]      = useState<'overview' | 'activity' | 'alerts'>('overview');
 
-  const systemMetrics: SystemMetric[] = [
-    {
-      name: 'CPU Usage',
-      value: '45%',
-      status: 'healthy',
-      trend: 'stable',
-      icon: Cpu
-    },
-    {
-      name: 'Memory Usage',
-      value: '2.1GB / 8GB',
-      status: 'healthy',
-      trend: 'stable',
-      icon: HardDrive
-    },
-    {
-      name: 'Database Connections',
-      value: '12/100',
-      status: 'healthy',
-      trend: 'stable',
-      icon: Database
-    },
-    {
-      name: 'API Response Time',
-      value: '142ms',
-      status: 'healthy',
-      trend: 'down',
-      icon: Activity
-    },
-    {
-      name: 'Disk Usage',
-      value: '65%',
-      status: 'warning',
-      trend: 'up',
-      icon: HardDrive
-    },
-    {
-      name: 'Uptime',
-      value: '99.8%',
-      status: 'healthy',
-      trend: 'stable',
-      icon: Server
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const res  = await fetch('/api/admin/monitoring');
+      const json = await res.json();
+      if (json.success) setData(json);
+      else setError(json.error || 'Failed to load monitoring data');
+    } catch {
+      setError('Network error — check your connection');
+    } finally {
+      setLoading(false);
     }
-  ];
-
-  const mockAlerts: Alert[] = [
-    {
-      id: '1',
-      type: 'warning',
-      message: 'Disk usage is approaching 70% threshold',
-      timestamp: '2024-08-30 14:30:00',
-      resolved: false
-    },
-    {
-      id: '2',
-      type: 'info',
-      message: 'Scheduled maintenance completed successfully',
-      timestamp: '2024-08-30 12:00:00',
-      resolved: true
-    },
-    {
-      id: '3',
-      type: 'error',
-      message: 'Database connection timeout occurred',
-      timestamp: '2024-08-30 10:15:00',
-      resolved: true
-    }
-  ];
-
-  useEffect(() => {
-    setAlerts(mockAlerts);
   }, []);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'healthy':
-        return 'text-green-600 bg-green-100';
-      case 'warning':
-        return 'text-yellow-600 bg-yellow-100';
-      case 'critical':
-        return 'text-red-600 bg-red-100';
-      default:
-        return 'text-slate-300 bg-neutral-100';
-    }
-  };
+  useEffect(() => {
+    fetchData();
+    const id = setInterval(fetchData, 60_000);
+    return () => clearInterval(id);
+  }, [fetchData]);
 
-  const getAlertIcon = (type: string) => {
-    switch (type) {
-      case 'error':
-        return <AlertTriangle className="h-4 w-4 text-red-600" />;
-      case 'warning':
-        return <AlertTriangle className="h-4 w-4 text-yellow-600" />;
-      case 'info':
-        return <CheckCircle className="h-4 w-4 text-blue-600" />;
-      default:
-        return <Clock className="h-4 w-4 text-slate-300" />;
-    }
-  };
+  const health = data?.systemHealth ?? 0;
+  const healthColor = health >= 80 ? 'text-green-400' : health >= 60 ? 'text-amber-400' : 'text-red-400';
+  const healthRing  = health >= 80 ? '#4ade80' : health >= 60 ? '#fbbf24' : '#f87171';
 
   return (
-    <div className="page-container">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-neutral-900">System Monitoring</h1>
-          <p className="mt-2 text-slate-300">Real-time system health and performance monitoring</p>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-bold text-white">System Monitoring</h1>
+          <p className="text-slate-400 text-sm">
+            {data?.lastUpdated
+              ? `Last updated ${new Date(data.lastUpdated).toLocaleTimeString('en-IN')}`
+              : 'Real-time platform health'}
+          </p>
         </div>
+        <button
+          onClick={fetchData}
+          disabled={loading}
+          className="flex items-center gap-2 px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-300 hover:bg-slate-700 text-sm transition-colors disabled:opacity-50"
+        >
+          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+          Refresh
+        </button>
+      </div>
 
-        {/* Tab Navigation */}
-        <div className="border-b border-neutral-200 mb-8">
-          <nav className="flex space-x-8">
-            {[
-              { id: 'overview', name: 'Overview', icon: Monitor },
-              { id: 'alerts', name: 'Alerts', icon: AlertTriangle },
-              { id: 'performance', name: 'Performance', icon: Activity }
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${activeTab === tab.id
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-slate-400 hover:text-slate-400 hover:border-neutral-300'
-                  }`}
-              >
-                <tab.icon className="w-5 h-5" />
-                <span>{tab.name}</span>
-              </button>
-            ))}
-          </nav>
+      {/* Error */}
+      {error && (
+        <div className="bg-red-900/30 border border-red-700/50 rounded-xl px-4 py-3 text-red-300 text-sm">
+          {error}
         </div>
+      )}
 
-        {/* Overview Tab */}
-        {activeTab === 'overview' && (
-          <div className="space-y-8">
-            {/* System Metrics */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {systemMetrics.map((metric, index) => (
-                <div key={index} className="bg-white rounded-lg shadow p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <div className="p-2 bg-neutral-100 rounded-lg">
-                        <metric.icon className={`h-6 w-6 ${metric.color}`} />
-                      </div>
-                      <div className="ml-4">
-                        <p className="text-sm font-medium text-slate-300">{metric.name}</p>
-                        <p className="text-2xl font-bold text-neutral-900">{metric.value}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(metric.status)}`}>
-                        {metric.status}
-                      </span>
-                    </div>
+      {/* Tabs */}
+      <div className="flex gap-1 bg-slate-800/60 rounded-xl p-1 w-fit border border-slate-700/50">
+        {(['overview', 'activity', 'alerts'] as const).map(t => (
+          <button
+            key={t}
+            onClick={() => setTab(t)}
+            className={`px-4 py-2 rounded-lg text-sm font-medium capitalize transition-colors ${
+              tab === t ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            {t}
+            {t === 'alerts' && data?.alerts.length ? (
+              <span className="ml-1.5 text-xs bg-amber-600 text-white px-1.5 py-0.5 rounded-full">
+                {data.alerts.length}
+              </span>
+            ) : null}
+          </button>
+        ))}
+      </div>
+
+      {/* Overview Tab */}
+      {tab === 'overview' && (
+        <div className="space-y-6">
+          {/* Health + Key Metrics */}
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+            {/* Health Score */}
+            <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-6 flex flex-col items-center justify-center lg:col-span-1">
+              <svg viewBox="0 0 36 36" className="w-24 h-24 -rotate-90">
+                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  fill="none" stroke="#1e293b" strokeWidth="3" />
+                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  fill="none" stroke={healthRing} strokeWidth="3"
+                  strokeDasharray={`${health}, 100`} strokeLinecap="round" />
+              </svg>
+              <p className={`text-3xl font-bold mt-2 ${healthColor}`}>{health.toFixed(1)}%</p>
+              <p className="text-slate-400 text-xs mt-1">System Health</p>
+            </div>
+
+            {/* Metric Cards */}
+            <div className="lg:col-span-3 grid grid-cols-2 sm:grid-cols-3 gap-4">
+              {[
+                { icon: Users,    label: 'Total Users',    value: data?.metrics.users.total ?? '—',      sub: `+${data?.metrics.users.newToday ?? 0} today`, color: 'text-indigo-400' },
+                { icon: Activity, label: 'Active Users',   value: data?.metrics.users.active ?? '—',     sub: `+${data?.metrics.users.newThisWeek ?? 0} this week`, color: 'text-green-400' },
+                { icon: FileText, label: 'Active RFQs',    value: data?.metrics.rfqs.active ?? '—',      sub: `${data?.metrics.rfqs.today ?? 0} posted today`, color: 'text-blue-400' },
+                { icon: TrendingUp, label: 'Total Quotes', value: data?.metrics.quotes.total ?? '—',     sub: `${data?.metrics.quotes.conversionRate ?? '—'}% conversion`, color: 'text-cyan-400' },
+                { icon: Database, label: 'Transactions',   value: data?.metrics.transactions.total ?? '—', sub: `${data?.metrics.transactions.successRate ?? '—'}% success`, color: 'text-amber-400' },
+                { icon: Zap,      label: 'Volume (₹)',     value: data ? `₹${(data.metrics.transactions.completedVolume / 100).toLocaleString('en-IN', { maximumFractionDigits: 0 })}` : '—', sub: 'completed escrow', color: 'text-rose-400' },
+              ].map(({ icon: Icon, label, value, sub, color }) => (
+                <div key={label} className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Icon className={`w-4 h-4 ${color}`} />
+                    <span className="text-slate-400 text-xs">{label}</span>
                   </div>
+                  <p className={`text-2xl font-bold ${color}`}>{typeof value === 'number' ? value.toLocaleString('en-IN') : value}</p>
+                  <p className="text-slate-500 text-xs mt-1">{sub}</p>
                 </div>
               ))}
             </div>
+          </div>
 
-            {/* System Status */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-medium text-neutral-900 mb-4">System Status</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h4 className="text-sm font-medium text-slate-300 mb-2">Services</h4>
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-neutral-900">API Server</span>
-                      <div className="flex items-center">
-                        <CheckCircle className="h-4 w-4 text-green-600 mr-2" />
-                        <span className="text-sm text-green-600">Running</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-neutral-900">Database</span>
-                      <div className="flex items-center">
-                        <CheckCircle className="h-4 w-4 text-green-600 mr-2" />
-                        <span className="text-sm text-green-600">Connected</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-neutral-900">Cache</span>
-                      <div className="flex items-center">
-                        <CheckCircle className="h-4 w-4 text-green-600 mr-2" />
-                        <span className="text-sm text-green-600">Active</span>
-                      </div>
-                    </div>
-                  </div>
+          {/* Services Status */}
+          <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-5">
+            <h3 className="text-sm font-semibold text-white mb-4">Service Status</h3>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {[
+                { name: 'API Server',  ok: true },
+                { name: 'Database',    ok: !!data },
+                { name: 'Auth Service', ok: true },
+                { name: 'Notifications', ok: true },
+              ].map(({ name, ok }) => (
+                <div key={name} className="flex items-center gap-2 px-3 py-2 bg-slate-900/50 rounded-lg border border-slate-700/30">
+                  {ok
+                    ? <CheckCircle className="w-4 h-4 text-green-400 shrink-0" />
+                    : <AlertTriangle className="w-4 h-4 text-red-400 shrink-0" />}
+                  <span className="text-sm text-slate-300">{name}</span>
                 </div>
-                <div>
-                  <h4 className="text-sm font-medium text-slate-300 mb-2">Recent Activity</h4>
-                  <div className="space-y-2">
-                    <div className="text-sm text-neutral-900">Last backup: 2 hours ago</div>
-                    <div className="text-sm text-neutral-900">Active users: 1,247</div>
-                    <div className="text-sm text-neutral-900">API calls today: 45,678</div>
+              ))}
+            </div>
+          </div>
+
+          {/* RFQ & Quote funnel */}
+          {data && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-5">
+                <h3 className="text-sm font-semibold text-white mb-4">RFQ Breakdown</h3>
+                <div className="space-y-3">
+                  {[
+                    { label: 'Active',    value: data.metrics.rfqs.active,    color: 'bg-green-500' },
+                    { label: 'Accepted',  value: data.metrics.rfqs.accepted,  color: 'bg-indigo-500' },
+                    { label: 'Completed', value: data.metrics.rfqs.completed, color: 'bg-slate-500' },
+                    { label: 'Cancelled', value: data.metrics.rfqs.cancelled, color: 'bg-red-500' },
+                  ].map(({ label, value, color }) => {
+                    const pct = data.metrics.rfqs.total > 0 ? Math.round((value / data.metrics.rfqs.total) * 100) : 0;
+                    return (
+                      <div key={label}>
+                        <div className="flex justify-between text-xs mb-1">
+                          <span className="text-slate-400">{label}</span>
+                          <span className="text-white font-medium">{value.toLocaleString()} ({pct}%)</span>
+                        </div>
+                        <div className="h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                          <div className={`h-full ${color} rounded-full`} style={{ width: `${pct}%` }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-5">
+                <h3 className="text-sm font-semibold text-white mb-4">Transaction Health</h3>
+                <div className="space-y-3">
+                  {[
+                    { label: 'Total',     value: data.metrics.transactions.total,     color: 'bg-blue-500' },
+                    { label: 'Completed', value: data.metrics.transactions.completed, color: 'bg-green-500' },
+                  ].map(({ label, value, color }) => {
+                    const pct = data.metrics.transactions.total > 0 ? Math.round((value / data.metrics.transactions.total) * 100) : 0;
+                    return (
+                      <div key={label}>
+                        <div className="flex justify-between text-xs mb-1">
+                          <span className="text-slate-400">{label}</span>
+                          <span className="text-white font-medium">{value.toLocaleString()} ({pct}%)</span>
+                        </div>
+                        <div className="h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                          <div className={`h-full ${color} rounded-full`} style={{ width: `${pct}%` }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                  <div className="pt-2 border-t border-slate-700">
+                    <p className="text-xs text-slate-400">Completed volume</p>
+                    <p className="text-lg font-bold text-green-400 mt-1">
+                      ₹{(data.metrics.transactions.completedVolume / 100).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
+      )}
 
-        {/* Alerts Tab */}
-        {activeTab === 'alerts' && (
-          <div className="space-y-6">
-            <div className="bg-white rounded-lg shadow overflow-hidden">
-              <div className="px-6 py-4 border-b border-neutral-200">
-                <h3 className="text-lg font-medium text-neutral-900">System Alerts</h3>
-              </div>
-              <div className="divide-y divide-gray-200">
-                {alerts.map((alert) => (
-                  <div key={alert.id} className="px-6 py-4 flex items-center justify-between">
-                    <div className="flex items-center">
-                      {getAlertIcon(alert.type)}
-                      <div className="ml-4">
-                        <p className="text-sm font-medium text-neutral-900">{alert.message}</p>
-                        <p className="text-sm text-slate-400">{alert.timestamp}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${alert.resolved ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                        }`}>
-                        {alert.resolved ? 'Resolved' : 'Active'}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Performance Tab */}
-        {activeTab === 'performance' && (
-          <div className="space-y-6">
+      {/* Activity Tab */}
+      {tab === 'activity' && (
+        <div className="space-y-4">
+          {loading && <div className="text-center text-slate-400 py-8">Loading activity…</div>}
+          {data && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-lg font-medium text-neutral-900 mb-4">Response Times</h3>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-300">API Endpoints</span>
-                    <span className="text-sm font-medium text-neutral-900">142ms</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-300">Database Queries</span>
-                    <span className="text-sm font-medium text-neutral-900">23ms</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-300">Static Assets</span>
-                    <span className="text-sm font-medium text-neutral-900">45ms</span>
-                  </div>
+              {/* Recent RFQs */}
+              <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl overflow-hidden">
+                <div className="px-5 py-4 border-b border-slate-700/50">
+                  <h3 className="text-sm font-semibold text-white">Recent RFQs (24h)</h3>
+                </div>
+                <div className="divide-y divide-slate-700/30">
+                  {data.recentActivity.rfqs.length === 0 ? (
+                    <div className="px-5 py-8 text-center text-slate-500 text-sm">No RFQs in last 24h</div>
+                  ) : data.recentActivity.rfqs.map(rfq => (
+                    <div key={rfq.id} className="px-5 py-3 hover:bg-slate-700/20 transition-colors">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="text-sm text-white font-medium truncate">{rfq.title}</p>
+                          <p className="text-xs text-slate-400 mt-0.5">{rfq.buyer} · {rfq.category}</p>
+                        </div>
+                        <div className="flex flex-col items-end gap-1 shrink-0">
+                          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_COLORS[rfq.status] ?? 'bg-slate-700 text-slate-300'}`}>
+                            {rfq.status}
+                          </span>
+                          <span className="text-xs text-slate-500">{timeAgo(rfq.minutesAgo)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-lg font-medium text-neutral-900 mb-4">Throughput</h3>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-300">Requests/min</span>
-                    <span className="text-sm font-medium text-neutral-900">1,247</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-300">Active Sessions</span>
-                    <span className="text-sm font-medium text-neutral-900">847</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-300">Error Rate</span>
-                    <span className="text-sm font-medium text-neutral-900">0.02%</span>
-                  </div>
+              {/* Recent Quotes */}
+              <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl overflow-hidden">
+                <div className="px-5 py-4 border-b border-slate-700/50">
+                  <h3 className="text-sm font-semibold text-white">Recent Quotes (24h)</h3>
+                </div>
+                <div className="divide-y divide-slate-700/30">
+                  {data.recentActivity.quotes.length === 0 ? (
+                    <div className="px-5 py-8 text-center text-slate-500 text-sm">No quotes in last 24h</div>
+                  ) : data.recentActivity.quotes.map(q => (
+                    <div key={q.id} className="px-5 py-3 hover:bg-slate-700/20 transition-colors">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="text-sm text-white font-medium truncate">{q.rfqTitle}</p>
+                          <p className="text-xs text-slate-400 mt-0.5">{q.supplier}</p>
+                        </div>
+                        <div className="flex flex-col items-end gap-1 shrink-0">
+                          <span className="text-sm font-semibold text-indigo-300">₹{Number(q.price).toLocaleString('en-IN')}</span>
+                          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_COLORS[q.status] ?? 'bg-slate-700 text-slate-300'}`}>
+                            {q.status}
+                          </span>
+                          <span className="text-xs text-slate-500">{timeAgo(q.minutesAgo)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
+          )}
+        </div>
+      )}
+
+      {/* Alerts Tab */}
+      {tab === 'alerts' && (
+        <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl overflow-hidden">
+          <div className="px-5 py-4 border-b border-slate-700/50">
+            <h3 className="text-sm font-semibold text-white">System Alerts</h3>
           </div>
-        )}
-      </div>
+          {!data || data.alerts.length === 0 ? (
+            <div className="px-5 py-12 text-center">
+              <CheckCircle className="w-10 h-10 text-green-400 mx-auto mb-3" />
+              <p className="text-white font-medium">All systems healthy</p>
+              <p className="text-slate-400 text-sm mt-1">No active alerts detected</p>
+            </div>
+          ) : (
+            <div className="divide-y divide-slate-700/30">
+              {data.alerts.map((alert, i) => (
+                <div key={i} className="px-5 py-4 flex items-start gap-3">
+                  {alert.type === 'error'   && <AlertTriangle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />}
+                  {alert.type === 'warning' && <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />}
+                  {alert.type === 'info'    && <CheckCircle   className="w-5 h-5 text-blue-400 shrink-0 mt-0.5" />}
+                  <div>
+                    <p className="text-sm text-white">{alert.message}</p>
+                    <p className="text-xs text-slate-500 mt-1 flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      {new Date(alert.timestamp).toLocaleString('en-IN')}
+                    </p>
+                  </div>
+                  <span className={`ml-auto text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${
+                    alert.type === 'error'   ? 'bg-red-900/40 text-red-300' :
+                    alert.type === 'warning' ? 'bg-amber-900/40 text-amber-300' :
+                    'bg-blue-900/40 text-blue-300'
+                  }`}>
+                    {alert.type}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
