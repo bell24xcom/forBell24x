@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Download, CheckSquare, Square } from 'lucide-react';
+import { Download, CheckSquare, Square, Eye, X } from 'lucide-react';
 
 interface User {
   id: string; name: string | null; email: string | null; phone: string | null;
@@ -43,8 +43,9 @@ export default function CRMPage() {
   const [planF,    setPlanF]    = useState('');
   const [loading,  setLoading]  = useState(true);
   const [error,    setError]    = useState('');
-  const [saving,   setSaving]   = useState<string | null>(null); // userId being updated
-  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [saving,     setSaving]     = useState<string | null>(null); // userId being updated
+  const [selected,   setSelected]   = useState<Set<string>>(new Set());
+  const [drawerUser, setDrawerUser] = useState<User | null>(null);
 
   const limit = 25;
 
@@ -263,7 +264,10 @@ export default function CRMPage() {
 
                   {/* Actions */}
                   <td className="px-4 py-3">
-                    <div className="flex gap-2 items-center">
+                    <div className="flex gap-2 items-center flex-wrap">
+                      <button onClick={() => setDrawerUser(u)} className="text-indigo-400 hover:text-indigo-300 transition-colors" title="View details">
+                        <Eye className="w-4 h-4" />
+                      </button>
                       <button
                         disabled={saving === u.id}
                         onClick={() => applyAction(u.id, u.isActive ? 'deactivate' : 'activate')}
@@ -288,6 +292,98 @@ export default function CRMPage() {
           </table>
         </div>
       </div>
+
+      {/* User Detail Drawer */}
+      {drawerUser && (
+        <div className="fixed inset-0 z-50 flex">
+          <div className="flex-1 bg-black/40" onClick={() => setDrawerUser(null)} />
+          <div className="w-full max-w-[420px] bg-slate-900 border-l border-slate-700 overflow-y-auto flex flex-col shadow-2xl">
+            {/* Header */}
+            <div className="p-5 border-b border-slate-700 sticky top-0 bg-slate-900 z-10 flex items-start justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-indigo-900/50 border border-indigo-700/50 flex items-center justify-center text-indigo-300 font-bold text-lg">
+                  {(drawerUser.name || '?')[0].toUpperCase()}
+                </div>
+                <div>
+                  <p className="text-white font-bold">{drawerUser.name || '—'}</p>
+                  <p className="text-slate-400 text-xs">{drawerUser.phone || drawerUser.email || '—'}</p>
+                  <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${drawerUser.isActive ? 'bg-green-900/30 text-green-400 border border-green-700/50' : 'bg-red-900/30 text-red-400 border border-red-700/50'}`}>
+                    {drawerUser.isActive ? 'Active' : 'Inactive'}
+                  </span>
+                </div>
+              </div>
+              <button onClick={() => setDrawerUser(null)} className="text-slate-400 hover:text-white transition-colors ml-3"><X className="w-5 h-5" /></button>
+            </div>
+
+            <div className="p-5 space-y-5 flex-1">
+              {/* Account */}
+              <div>
+                <p className="text-slate-500 text-xs uppercase tracking-wider mb-2">Account</p>
+                <div className="bg-slate-800/60 rounded-lg p-4 space-y-2 text-sm">
+                  <div className="flex justify-between"><span className="text-slate-400">Role</span><span className="text-white">{drawerUser.role}</span></div>
+                  <div className="flex justify-between"><span className="text-slate-400">Plan</span><PlanBadge plan={drawerUser.plan} /></div>
+                  <div className="flex justify-between"><span className="text-slate-400">Joined</span><span className="text-white">{new Date(drawerUser.createdAt).toLocaleDateString('en-IN')}</span></div>
+                  <div className="flex justify-between"><span className="text-slate-400">Location</span><span className="text-white">{drawerUser.location || '—'}</span></div>
+                  <div className="flex justify-between"><span className="text-slate-400">Trust Score</span><TrustBadge score={drawerUser.trustScore} /></div>
+                  {drawerUser.gstNumber && <div className="flex justify-between"><span className="text-slate-400">GST</span><span className="text-green-400 text-xs">{drawerUser.gstNumber}</span></div>}
+                  {drawerUser.udyamNumber && <div className="flex justify-between"><span className="text-slate-400">Udyam</span><span className="text-green-400 text-xs">{drawerUser.udyamNumber}</span></div>}
+                  <div className="flex justify-between"><span className="text-slate-400">KYC Verified</span><span className={drawerUser.isVerified ? 'text-green-400' : 'text-slate-500'}>{drawerUser.isVerified ? '✓ Verified' : 'Not verified'}</span></div>
+                </div>
+              </div>
+
+              {/* Stats */}
+              <div>
+                <p className="text-slate-500 text-xs uppercase tracking-wider mb-2">Activity</p>
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="bg-slate-800/60 rounded-lg p-3 text-center">
+                    <p className="text-white font-bold text-lg">{drawerUser._count.rfqs}</p>
+                    <p className="text-slate-400 text-xs">RFQs</p>
+                  </div>
+                  <div className="bg-slate-800/60 rounded-lg p-3 text-center">
+                    <p className="text-white font-bold text-lg">{drawerUser._count.quotes}</p>
+                    <p className="text-slate-400 text-xs">Quotes</p>
+                  </div>
+                  <div className="bg-slate-800/60 rounded-lg p-3 text-center">
+                    <p className="text-white font-bold text-lg">{drawerUser.wallet ? `₹${(drawerUser.wallet.balance / 100).toFixed(0)}` : '₹0'}</p>
+                    <p className="text-slate-400 text-xs">Wallet</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Quick Actions */}
+              <div>
+                <p className="text-slate-500 text-xs uppercase tracking-wider mb-2">Quick Actions</p>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <select
+                      defaultValue={drawerUser.plan}
+                      onChange={e => { applyAction(drawerUser.id, 'setPlan', e.target.value); setDrawerUser(prev => prev ? { ...prev, plan: e.target.value } : prev); }}
+                      className="flex-1 px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-slate-300 focus:outline-none min-h-[44px]"
+                    >
+                      {['FREE', 'PRO', 'ENTERPRISE'].map(p => <option key={p} value={p}>{p}</option>)}
+                    </select>
+                    <span className="text-slate-500 text-xs">Plan</span>
+                  </div>
+                  <button
+                    onClick={() => { applyAction(drawerUser.id, drawerUser.isActive ? 'deactivate' : 'activate'); setDrawerUser(prev => prev ? { ...prev, isActive: !prev.isActive } : prev); }}
+                    disabled={saving === drawerUser.id}
+                    className={`w-full px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 min-h-[44px] ${drawerUser.isActive ? 'bg-red-900/30 text-red-300 border border-red-700/50 hover:bg-red-900/50' : 'bg-green-900/30 text-green-300 border border-green-700/50 hover:bg-green-900/50'}`}>
+                    {saving === drawerUser.id ? '…' : drawerUser.isActive ? 'Deactivate User' : 'Activate User'}
+                  </button>
+                  {!drawerUser.isVerified && (
+                    <button
+                      onClick={() => { applyAction(drawerUser.id, 'setVerified', 'true'); setDrawerUser(prev => prev ? { ...prev, isVerified: true } : prev); }}
+                      disabled={saving === drawerUser.id}
+                      className="w-full px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 min-h-[44px]">
+                      {saving === drawerUser.id ? '…' : 'Verify KYC'}
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Pagination */}
       {pages > 1 && (
