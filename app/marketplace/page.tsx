@@ -131,7 +131,7 @@ function MarketplaceContent() {
       <div className="max-w-6xl mx-auto px-6 py-8 flex gap-8">
         {/* Sidebar filters */}
         <aside className="w-56 flex-shrink-0 hidden md:block">
-          <div className="bg-slate-800 rounded-xl p-4 sticky top-6">
+          <div className="bg-slate-800 rounded-xl p-4 sticky top-20">
             <div className="flex items-center gap-2 mb-4 text-sm font-semibold text-slate-300">
               <Filter className="w-4 h-4" /> Categories
             </div>
