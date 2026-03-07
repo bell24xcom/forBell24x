@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { Download, CheckSquare, Square } from 'lucide-react';
 
 interface User {
   id: string; name: string | null; email: string | null; phone: string | null;
@@ -43,8 +44,34 @@ export default function CRMPage() {
   const [loading,  setLoading]  = useState(true);
   const [error,    setError]    = useState('');
   const [saving,   setSaving]   = useState<string | null>(null); // userId being updated
+  const [selected, setSelected] = useState<Set<string>>(new Set());
 
   const limit = 25;
+
+  const toggleSelect = (id: string) =>
+    setSelected(prev => { const s = new Set(prev); s.has(id) ? s.delete(id) : s.add(id); return s; });
+
+  const toggleAll = () =>
+    setSelected(prev => prev.size === users.length ? new Set() : new Set(users.map(u => u.id)));
+
+  const exportCSV = () => {
+    const rows = users.filter(u => selected.size === 0 || selected.has(u.id));
+    const headers = ['Name', 'Email', 'Phone', 'Company', 'Role', 'Plan', 'Trust Score', 'GST', 'RFQs', 'Wallet (₹)', 'Status', 'Joined'];
+    const csv = [
+      headers.join(','),
+      ...rows.map(u => [
+        u.name ?? '', u.email ?? '', u.phone ?? '', u.company ?? '',
+        u.role, u.plan, u.trustScore, u.gstNumber ?? '',
+        u._count.rfqs,
+        u.wallet ? (u.wallet.balance / 100).toFixed(0) : '0',
+        u.isActive ? 'Active' : 'Inactive',
+        new Date(u.createdAt).toLocaleDateString('en-IN'),
+      ].map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')),
+    ].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = `crm-users-${new Date().toISOString().slice(0, 10)}.csv`; a.click();
+  };
 
   const fetchUsers = useCallback(async () => {
     setLoading(true);
@@ -94,9 +121,18 @@ export default function CRMPage() {
   return (
     <div className="space-y-5">
       {/* Header */}
-      <div>
-        <h1 className="text-xl font-bold text-white">CRM — User Management</h1>
-        <p className="text-slate-400 text-sm">{total.toLocaleString()} total users</p>
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <h1 className="text-xl font-bold text-white">CRM — User Management</h1>
+          <p className="text-slate-400 text-sm">{total.toLocaleString()} total users{selected.size > 0 ? ` · ${selected.size} selected` : ''}</p>
+        </div>
+        <button
+          onClick={exportCSV}
+          className="flex items-center gap-2 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm rounded-lg transition-colors"
+        >
+          <Download className="w-4 h-4" />
+          Export {selected.size > 0 ? `${selected.size} selected` : 'all'} CSV
+        </button>
       </div>
 
       {/* Filters */}
@@ -128,6 +164,13 @@ export default function CRMPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-slate-700 text-left">
+                <th className="px-4 py-3">
+                  <button onClick={toggleAll} className="text-slate-400 hover:text-white">
+                    {selected.size === users.length && users.length > 0
+                      ? <CheckSquare className="w-4 h-4 text-indigo-400" />
+                      : <Square className="w-4 h-4" />}
+                  </button>
+                </th>
                 {['User', 'Role', 'Plan', 'Trust', 'GST', 'Udyam', 'RFQs', 'Wallet', 'Joined', 'Status', 'Actions'].map(h => (
                   <th key={h} className="px-4 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider whitespace-nowrap">{h}</th>
                 ))}
@@ -135,13 +178,21 @@ export default function CRMPage() {
             </thead>
             <tbody className="divide-y divide-slate-700/50">
               {loading ? (
-                <tr><td colSpan={11} className="px-4 py-8 text-center text-slate-500">
+                <tr><td colSpan={12} className="px-4 py-8 text-center text-slate-500">
                   <div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto" />
                 </td></tr>
               ) : users.length === 0 ? (
-                <tr><td colSpan={11} className="px-4 py-8 text-center text-slate-500">No users found</td></tr>
+                <tr><td colSpan={12} className="px-4 py-8 text-center text-slate-500">No users found</td></tr>
               ) : users.map(u => (
-                <tr key={u.id} className={`hover:bg-slate-700/30 transition-colors ${!u.isActive ? 'opacity-50' : ''}`}>
+                <tr key={u.id} className={`hover:bg-slate-700/30 transition-colors ${!u.isActive ? 'opacity-50' : ''} ${selected.has(u.id) ? 'bg-indigo-900/10' : ''}`}>
+                  {/* Checkbox */}
+                  <td className="px-4 py-3">
+                    <button onClick={() => toggleSelect(u.id)} className="text-slate-400 hover:text-indigo-400">
+                      {selected.has(u.id)
+                        ? <CheckSquare className="w-4 h-4 text-indigo-400" />
+                        : <Square className="w-4 h-4" />}
+                    </button>
+                  </td>
                   {/* User */}
                   <td className="px-4 py-3">
                     <div className="font-medium text-white">{u.name || '—'}</div>
