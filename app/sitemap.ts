@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://bell24h.com'
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bell24h.com'
 
   const pages: Array<{ route: string; freq: MetadataRoute.Sitemap[number]['changeFrequency']; priority: number }> = [
     { route: '',              freq: 'daily',   priority: 1.0 },
