@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Database, Trash2, Zap, CheckCircle, AlertTriangle } from 'lucide-react';
 
-interface Counts { seeded: number; real: number }
+interface Counts { seeded: number; real: number; availableToSeed: number }
 
 export default function SeedRFQsPage() {
   const [counts,  setCounts]  = useState<Counts | null>(null);
@@ -15,7 +15,7 @@ export default function SeedRFQsPage() {
     try {
       const res  = await fetch('/api/admin/seed-rfqs', { credentials: 'include' });
       const data = await res.json();
-      if (data.success) setCounts({ seeded: data.seeded, real: data.real });
+      if (data.success) setCounts({ seeded: data.seeded, real: data.real, availableToSeed: data.availableToSeed });
     } catch { /* ignore */ }
     finally { setLoading(false); }
   };
@@ -36,9 +36,9 @@ export default function SeedRFQsPage() {
       const data = await res.json();
       if (data.success) {
         if (action === 'seed_all') {
-          setResult({ ok: true, message: `✓ Created ${data.created} RFQs across 20 categories. Total seeded: ${data.seeded}.` });
+          setResult({ ok: true, message: `✓ Created ${data.created} RFQs across all 50 categories + subcategories. Total seeded: ${data.seeded}.` });
         } else {
-          setResult({ ok: true, message: `✓ Cleared ${data.cleared} seeded RFQs.` });
+          setResult({ ok: true, message: `✓ Cleared ${data.cleared} seeded RFQs. Marketplace reset.` });
         }
         await fetchCounts();
       } else {
@@ -51,6 +51,8 @@ export default function SeedRFQsPage() {
     }
   };
 
+  const available = counts?.availableToSeed ?? 325;
+
   return (
     <div className="space-y-6 max-w-2xl">
       <div>
@@ -58,13 +60,13 @@ export default function SeedRFQsPage() {
           <Database className="w-5 h-5 text-indigo-400" /> RFQ Seeding Tool
         </h1>
         <p className="text-slate-400 text-sm mt-1">
-          Populate the marketplace with sample RFQs so suppliers see active listings immediately.
+          Populate all 50 categories + subcategories (~450 slots) so every supplier sees active listings immediately.
           Seeded RFQs are excluded from email notifications.
         </p>
       </div>
 
       {/* Current counts */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-3 gap-4">
         <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-5 text-center">
           <p className="text-3xl font-bold text-indigo-400">{loading ? '…' : (counts?.seeded ?? 0)}</p>
           <p className="text-slate-400 text-sm mt-1">Seeded RFQs</p>
@@ -72,6 +74,10 @@ export default function SeedRFQsPage() {
         <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-5 text-center">
           <p className="text-3xl font-bold text-green-400">{loading ? '…' : (counts?.real ?? 0)}</p>
           <p className="text-slate-400 text-sm mt-1">Real RFQs</p>
+        </div>
+        <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-5 text-center">
+          <p className="text-3xl font-bold text-amber-400">{loading ? '…' : available}</p>
+          <p className="text-slate-400 text-sm mt-1">Available to Seed</p>
         </div>
       </div>
 
@@ -97,7 +103,7 @@ export default function SeedRFQsPage() {
           className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-semibold rounded-xl transition-colors min-h-[44px]"
         >
           <Zap className="w-5 h-5" />
-          {busy ? 'Working…' : 'Seed 40 RFQs (20 categories × 2)'}
+          {busy ? 'Seeding… (may take 5–10s)' : `Seed ~${available} RFQs — All 50 Categories + Subcategories`}
         </button>
 
         <button
@@ -106,19 +112,23 @@ export default function SeedRFQsPage() {
           className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-red-900/30 hover:bg-red-900/50 disabled:opacity-40 text-red-400 font-semibold rounded-xl border border-red-800/50 transition-colors min-h-[44px]"
         >
           <Trash2 className="w-5 h-5" />
-          Clear All Seeded RFQs
+          Clear All Seeded RFQs ({counts?.seeded ?? 0})
         </button>
       </div>
 
-      {/* Info box */}
-      <div className="bg-slate-800/40 border border-slate-700/40 rounded-xl p-5 text-sm text-slate-400 space-y-2">
-        <p className="text-slate-300 font-medium">How it works</p>
-        <ul className="space-y-1.5 list-disc list-inside">
-          <li>Creates 2 RFQs per category (40 total across 20 categories)</li>
-          <li>Random cities, budgets, urgency, and timelines</li>
-          <li>All marked <code className="text-indigo-300 text-xs">isSeeded: true</code> — no email notifications sent</li>
+      {/* Coverage breakdown */}
+      <div className="bg-slate-800/40 border border-slate-700/40 rounded-xl p-5 text-sm text-slate-400 space-y-3">
+        <p className="text-slate-300 font-medium">Coverage breakdown</p>
+        <div className="grid grid-cols-2 gap-x-6 gap-y-1.5 text-xs">
+          <span>50 parent categories × 1 RFQ</span><span className="text-slate-300">= 50</span>
+          <span>~275 subcategories × 1 RFQ</span><span className="text-slate-300">≈ 275</span>
+          <span className="text-white font-semibold">Total</span><span className="text-indigo-400 font-bold">≈ 325</span>
+        </div>
+        <ul className="space-y-1.5 list-disc list-inside mt-2">
+          <li>All seeded RFQs marked <code className="text-indigo-300 text-xs">isSeeded: true</code> — no email noise</li>
+          <li>Random cities from 65 Indian cities, realistic budgets (₹10K–₹20L)</li>
           <li>Expires in 30 days — re-seed when needed</li>
-          <li>Safe to run multiple times — use Clear first to reset</li>
+          <li>Safe to clear and re-seed anytime</li>
         </ul>
       </div>
     </div>
