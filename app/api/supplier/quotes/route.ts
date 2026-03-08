@@ -131,23 +131,25 @@ export async function POST(request: NextRequest) {
       data: { status: 'QUOTED' },
     }).catch(() => {}); // Ignore if already updated
 
-    // Fire-and-forget: notify buyer via email
-    try {
-      const [supplier, buyer] = await Promise.all([
-        prisma.user.findUnique({ where: { id: user.userId }, select: { name: true, company: true } }),
-        prisma.user.findUnique({ where: { id: rfq.createdBy }, select: { email: true, name: true } }),
-      ]);
-      if (buyer?.email) {
-        const template = quoteReceivedEmail(
-          buyer.name || 'Buyer',
-          rfq.title,
-          supplier?.name || '',
-          supplier?.company || '',
-          parseFloat(String(price)),
-        );
-        resendService.sendEmail({ to: buyer.email, ...template }).catch(console.error);
-      }
-    } catch { /* email failure must never block the response */ }
+    // Fire-and-forget: notify buyer via email (skip for seeded/demo RFQs)
+    if (!rfq.isSeeded) {
+      try {
+        const [supplier, buyer] = await Promise.all([
+          prisma.user.findUnique({ where: { id: user.userId }, select: { name: true, company: true } }),
+          prisma.user.findUnique({ where: { id: rfq.createdBy! }, select: { email: true, name: true } }),
+        ]);
+        if (buyer?.email) {
+          const template = quoteReceivedEmail(
+            buyer.name || 'Buyer',
+            rfq.title,
+            supplier?.name || '',
+            supplier?.company || '',
+            parseFloat(String(price)),
+          );
+          resendService.sendEmail({ to: buyer.email, ...template }).catch(console.error);
+        }
+      } catch { /* email failure must never block the response */ }
+    }
 
     return NextResponse.json({
       success: true,
