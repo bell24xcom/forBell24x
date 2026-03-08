@@ -64,6 +64,11 @@ export async function GET(request: NextRequest) {
       prisma.rFQ.count({ where: { status: 'ACTIVE', expiresAt: { lte: threeDays, gt: now } } }),
     ]);
 
+    const [seededRfqs, realRfqs] = await Promise.all([
+      prisma.rFQ.count({ where: { isSeeded: true } }),
+      prisma.rFQ.count({ where: { isSeeded: false } }),
+    ]);
+
     const volumeResult = await prisma.transaction.aggregate({
       _sum: { amount: true },
       where: { status: 'COMPLETED' },
@@ -109,7 +114,7 @@ export async function GET(request: NextRequest) {
       stats: {
         range,
         users:        { total: totalUsers, buyers, suppliers, newToday, newThisWeek },
-        rfqs:         { total: totalRFQs, active: activeRFQs, completed: completedRFQs, cancelled: cancelledRFQs },
+        rfqs:         { total: totalRFQs, active: activeRFQs, completed: completedRFQs, cancelled: cancelledRFQs, seeded: seededRfqs, real: realRfqs },
         quotes:       { total: totalQuotes, accepted: acceptedQuotes, pending: pendingQuotes },
         transactions: { total: totalTx, completed: completedTx, completedVolume },
         funnel: {

@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 
 interface Stats {
   users:        { total: number; buyers: number; suppliers: number; newToday: number; newThisWeek: number };
-  rfqs:         { total: number; active: number; completed: number; cancelled: number };
+  rfqs:         { total: number; active: number; completed: number; cancelled: number; seeded?: number; real?: number };
   quotes:       { total: number; accepted: number; pending: number };
   transactions: { total: number; completed: number; completedVolume: number };
   funnel:       { rfqsCreated: number; quotesSubmitted: number; quotesAccepted: number; dealsCompleted: number; conversionRate: string };
@@ -158,6 +158,13 @@ export default function AdminDashboard() {
           <StatCard label="Quotes Sent"    value={stats.quotes.total}      />
           <StatCard label="Quotes Accepted" value={stats.quotes.accepted} color="green" />
         </div>
+        {(stats.rfqs.seeded !== undefined) && (
+          <div className="mt-2 flex gap-4 text-xs text-slate-500">
+            <span>Real RFQs: <span className="text-green-400 font-semibold">{stats.rfqs.real ?? 0}</span></span>
+            <span>Seeded: <span className="text-slate-400 font-semibold">{stats.rfqs.seeded}</span></span>
+            <a href="/admin/seed-rfqs" className="text-indigo-400 hover:text-indigo-300 underline">Manage seeds →</a>
+          </div>
+        )}
       </div>
 
       {/* Revenue */}
@@ -228,6 +235,7 @@ export default function AdminDashboard() {
           { href: '/admin/control-panel', label: 'Control Panel',  desc: 'Features & plans'    },
           { href: '/admin/rfqs',          label: 'View RFQs',      desc: 'All requests'        },
           { href: '/admin/import',        label: 'Import Suppliers', desc: 'CSV bulk upload'   },
+          { href: '/admin/seed-rfqs',     label: 'Seed RFQs',      desc: 'Populate marketplace' },
         ].map(link => (
           <a key={link.href} href={link.href}
             className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-4 hover:border-indigo-500/50 hover:bg-slate-800 transition-all group">
