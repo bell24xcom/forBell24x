@@ -63,7 +63,7 @@ const pricingTiers: PricingTier[] = [
     currency: '₹',
     period: 'month',
     features: [
-      'Up to 5 RFQs per month',
+      'Up to 2 RFQs per month',
       'Basic supplier matching',
       'Email support',
       'Mobile app access',
@@ -79,7 +79,7 @@ const pricingTiers: PricingTier[] = [
     color: 'gray',
     buttonText: 'Get Started Free',
     buttonVariant: 'outline',
-    maxRFQs: 5,
+    maxRFQs: 2,
     maxSuppliers: 50,
     aiFeatures: false,
     prioritySupport: false,
@@ -246,13 +246,21 @@ export default function PricingPage() {
     setPaymentError(null);
 
     if (tier.price === 0) {
-      router.push('/auth/register');
+      router.push('/auth/phone-email?redirect=/pricing');
       return;
     }
     if (tier.id === 'enterprise') {
       router.push('/contact');
       return;
     }
+
+    // Check auth before opening Razorpay
+    const stored = typeof window !== 'undefined' ? localStorage.getItem('bell24h_user') : null;
+    if (!stored) {
+      router.push('/auth/phone-email?redirect=/pricing');
+      return;
+    }
+
     await initiateRazorpayCheckout(tier);
   };
 
@@ -260,10 +268,11 @@ export default function PricingPage() {
     setCheckoutLoading(true);
     try {
       const amount = billingPeriod === 'yearly' ? getDiscountedPrice(tier) : tier.price;
-      const userData = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('userData') || '{}') : {};
+      const userData = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('bell24h_user') || '{}') : {};
 
       const res = await fetch('/api/payment/create-order', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           amount,
@@ -282,12 +291,12 @@ export default function PricingPage() {
       if (!loaded) throw new Error('Razorpay checkout could not be loaded. Please try again.');
 
       const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-        amount: data.data.amount,
-        currency: data.data.currency,
+        key: data.key,
+        amount: data.amount,
+        currency: data.currency,
         name: 'Bell24h',
         description: `${tier.name} Plan`,
-        order_id: data.data.id,
+        order_id: data.orderId,
         prefill: {
           name: userData.name || '',
           email: userData.email || '',
@@ -297,11 +306,12 @@ export default function PricingPage() {
         handler: async (response: any) => {
           const verifyRes = await fetch('/api/payment/create-order', {
             method: 'PUT',
+            credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              orderId: response.razorpay_order_id,
-              paymentId: response.razorpay_payment_id,
-              signature: response.razorpay_signature,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
             }),
           });
           const verifyData = await verifyRes.json();
@@ -424,10 +434,10 @@ export default function PricingPage() {
                   )}
                 </div>
                 
-                {tier.originalPrice && (
+                {tier.originalPrice && billingPeriod === 'yearly' && getSavings(tier) > 0 && (
                   <div className="flex items-center justify-center space-x-2 mb-4">
                     <span className="text-lg text-slate-400 line-through">
-                      {tier.currency}{tier.originalPrice.toLocaleString()}
+                      {tier.currency}{(tier.originalPrice * 12).toLocaleString()}
                     </span>
                     <span className="bg-red-100 text-red-800 text-sm font-medium px-2 py-1 rounded">
                       Save {tier.currency}{getSavings(tier).toLocaleString()}
