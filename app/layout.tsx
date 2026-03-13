@@ -4,24 +4,30 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import LaunchBanner from '@/components/LaunchBanner'
 import ClientProviders from '@/components/ClientProviders'
+import SchemaMarkup from '@/components/SEO/SchemaMarkup'
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.bell24h.com'),
-  title: "Bell24H - India's #1 B2B Supplier Marketplace | Voice, Video & Text RFQs",
-  description: 'Connect with 10,000+ verified suppliers across 450+ categories. Post RFQs via voice, video, or text. AI-powered matching for Indian businesses.',
-  keywords: 'B2B marketplace, suppliers India, RFQ, voice RFQ, video RFQ, AI matching, procurement, verified suppliers, 450 categories',
-  authors: [{ name: 'BELL Technology Pvt. Ltd.' }],
+  title: {
+    default: 'Bell24h — B2B Marketplace | Voice & Video RFQs',
+    template: '%s | Bell24h',
+  },
+  description: "India's #1 B2B supplier marketplace. Post RFQs via voice, video, or text. AI-powered matching across 450+ categories.",
+  keywords: ['B2B marketplace India', 'voice RFQ', 'video RFQ', 'supplier marketplace', 'procurement platform', 'AI supplier matching', 'verified suppliers India', 'B2B procurement'],
+  authors: [{ name: 'Digitex Studio' }],
+  formatDetection: { email: false, telephone: false },
+  alternates: { canonical: '/' },
   openGraph: {
-    title: "Bell24H - India's #1 B2B Supplier Marketplace",
-    description: 'Connect with 10,000+ verified suppliers. Post RFQs via voice, video, or text.',
+    title: "Bell24h — India's B2B Marketplace",
+    description: "Post RFQs via voice, video, or text. AI-powered matching across 450+ categories.",
     url: 'https://www.bell24h.com',
-    siteName: 'Bell24H',
+    siteName: 'Bell24h',
     images: [
       {
         url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'Bell24H - B2B Supplier Marketplace',
+        alt: 'Bell24h - B2B Supplier Marketplace',
       },
     ],
     locale: 'en_IN',
@@ -29,8 +35,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: "Bell24H - India's #1 B2B Supplier Marketplace",
-    description: 'Connect with 10,000+ verified suppliers. Post RFQs via voice, video, or text.',
+    title: "Bell24h — India's B2B Marketplace",
+    description: "Post RFQs via voice, video, or text. AI-powered matching across 450+ categories.",
     images: ['/og-image.jpg'],
   },
   robots: {
@@ -44,6 +50,10 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
+  icons: {
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+  },
 }
 
 export default function RootLayout({
@@ -54,6 +64,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body className="font-sans bg-[#0F172A] text-white antialiased">
+        <SchemaMarkup />
         <ClientProviders>
           {process.env.NEXT_PUBLIC_LAUNCH_MODE === 'true' && <LaunchBanner />}
           <Header />

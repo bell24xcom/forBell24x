@@ -1,0 +1,46 @@
+# Bell24h — AI-Powered B2B Procurement Platform
+
+## About
+Bell24h is India's AI-powered B2B marketplace connecting buyers and suppliers across 450+ categories.
+Built by Digitex Studio, Thane, Maharashtra, India.
+Website: https://www.bell24h.com
+
+## Key Features
+- Voice RFQ: Record procurement requests via microphone (Groq Whisper transcription)
+- Video RFQ: Submit video-based RFQs with AI analysis
+- Text RFQ: Traditional text-based Request for Quotation
+- AI Supplier Matching: NVIDIA-powered matching across 450+ categories
+- Escrow Payments: Secure buyer-held escrow via Bell24h Wallet
+- Trust Scores: Algorithmic 0–100 trust rating for all suppliers
+- GST Auto-fill: Automatic GST number validation and business details fetch
+- HSN Code Lookup: AI-powered HSN/SAC code suggestions
+
+## Categories (50 parent categories)
+Agriculture, Apparel & Fashion, Automobile, Building & Construction,
+Chemicals, Computer Hardware & Software, Electrical & Electronics,
+Food & Beverages, Furniture & Decor, Healthcare & Pharma,
+Industrial Machinery, Jewellery, Leather Products, Lighting,
+Metals & Alloys, Mining & Minerals, Office Supplies, Packaging,
+Paper & Printing, Plastics & Polymers, Rubber Products,
+Safety & Security, Sports & Fitness, Textiles, Tools & Hardware,
+Toys & Games, Transport & Logistics, Wood & Timber, and more.
+
+## How It Works
+1. Buyer posts an RFQ (voice, video, or text)
+2. AI matches with verified suppliers in the category
+3. Suppliers submit competitive quotes
+4. Buyer accepts best quote — deal is created
+5. Escrow locks payment until delivery confirmed
+6. Payment released to supplier on confirmation
+
+## Pricing Plans
+- Free (Starter): 2 RFQs/month, basic features
+- Pro: Unlimited RFQs, priority matching, AI features
+- Enterprise: Custom, dedicated support, API access
+
+## Contact
+Email: bell24h.helpline@gmail.com
+Phone: +91-9004962871
+Company: Digitex Studio
+GSTIN: 27AAAPP9753F2ZF
+Address: Thane, Maharashtra, India — 400601
