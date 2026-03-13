@@ -60,14 +60,28 @@ export default function Header() {
     router.push('/dashboard');
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+    } catch { /* continue with client cleanup */ }
+
+    // Clear all client-side auth state
     localStorage.removeItem('bell24h_user');
-    // Clear auth cookie
-    fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }).catch(() => {});
-    document.cookie = 'auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    localStorage.removeItem('user');
+    sessionStorage.clear();
+
+    // Aggressively clear cookie across all domain variants (fixes mobile Chrome)
+    const exp = 'expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    document.cookie = `auth-token=; ${exp}`;
+    document.cookie = `auth-token=; ${exp} domain=bell24h.com;`;
+    document.cookie = `auth-token=; ${exp} domain=.bell24h.com;`;
+    document.cookie = `auth-token=; ${exp} domain=www.bell24h.com;`;
+
     setIsLoggedIn(false);
     setUser(null);
-    router.push('/');
+
+    // Hard redirect (not router.push) forces full reload on mobile
+    window.location.href = '/';
   };
 
   const handleSearch = (e: React.FormEvent) => {

@@ -5,14 +5,16 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 
 const NAV = [
-  { href: '/admin',                label: 'Dashboard',      icon: '▤' },
-  { href: '/admin/crm',            label: 'CRM / Users',    icon: '👥' },
-  { href: '/admin/control-panel',  label: 'Control Panel',  icon: '⚙️' },
-  { href: '/admin/rfqs',           label: 'RFQs',           icon: '📋' },
-  { href: '/admin/analytics',      label: 'Analytics',      icon: '📊' },
-  { href: '/admin/leads',          label: 'Leads',          icon: '🎯' },
-  { href: '/admin/monitoring',     label: 'Monitoring',     icon: '🔍' },
-  { href: '/admin/security',       label: 'Security',       icon: '🔒' },
+  { href: '/admin',                label: 'Dashboard',        icon: '▤' },
+  { href: '/admin/crm',            label: 'CRM / Users',      icon: '👥' },
+  { href: '/admin/control-panel',  label: 'Control Panel',    icon: '⚙️' },
+  { href: '/admin/rfqs',           label: 'RFQs',             icon: '📋' },
+  { href: '/admin/analytics',      label: 'Analytics',        icon: '📊' },
+  { href: '/admin/leads',          label: 'Leads',            icon: '🎯' },
+  { href: '/admin/monitoring',     label: 'Monitoring',       icon: '🔍' },
+  { href: '/admin/security',       label: 'Security',         icon: '🔒' },
+  { href: '/admin/import',         label: 'Import Suppliers', icon: '📥' },
+  { href: '/admin/seed-rfqs',      label: 'Seed RFQs',        icon: '🌱' },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
