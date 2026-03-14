@@ -7,11 +7,14 @@ import { prisma } from '@/lib/prisma';
 import type { NextRequest } from 'next/server';
 
 // In production, JWT_SECRET must be set explicitly — never use the fallback.
+// NOTE: We do NOT throw at module load time (would cause routes to hang/500).
+// Instead, functions will use a non-functional placeholder that causes 401s.
 const JWT_SECRET = (() => {
   const s = process.env.JWT_SECRET;
   if (!s || s === 'bell24h_jwt_secret_change_in_production') {
     if (process.env.NODE_ENV === 'production') {
-      throw new Error('[JWT] JWT_SECRET env var is not set. Set it in Vercel → Settings → Environment Variables.');
+      console.error('[JWT] CRITICAL: JWT_SECRET env var is not set. Set it in Vercel → Settings → Environment Variables.');
+      return '__MISSING_JWT_SECRET__';
     }
     return 'dev_only_jwt_secret_not_for_production';
   }
@@ -22,7 +25,8 @@ const JWT_REFRESH_SECRET = (() => {
   const s = process.env.JWT_REFRESH_SECRET;
   if (!s || s === 'bell24h_refresh_secret_change_in_production') {
     if (process.env.NODE_ENV === 'production') {
-      throw new Error('[JWT] JWT_REFRESH_SECRET env var is not set. Set it in Vercel → Settings → Environment Variables.');
+      console.error('[JWT] CRITICAL: JWT_REFRESH_SECRET env var is not set. Set it in Vercel → Settings → Environment Variables.');
+      return '__MISSING_JWT_REFRESH_SECRET__';
     }
     return 'dev_only_refresh_secret_not_for_production';
   }

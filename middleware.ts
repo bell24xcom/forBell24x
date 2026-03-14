@@ -112,6 +112,8 @@ function handleAPIRoute(request: NextRequest, response: NextResponse): NextRespo
 }
 
 // Handle admin routes
+// Page-level auth is handled client-side in app/admin/layout.tsx.
+// Middleware only guards /api/admin/* API routes.
 function handleAdminRoute(request: NextRequest, response: NextResponse): NextResponse {
   response.headers.set('X-Frame-Options', 'DENY');
   response.headers.set('X-Content-Type-Options', 'nosniff');
@@ -119,27 +121,16 @@ function handleAdminRoute(request: NextRequest, response: NextResponse): NextRes
 
   const { pathname } = request.nextUrl;
 
-  // Allow login page and the login API through without a token
-  if (pathname === '/admin/login' || pathname.startsWith('/api/admin/login')) {
-    return response;
-  }
-
-  // Accept admin-token (separate admin login) OR auth-token (main app phone OTP login)
-  // Role verification (ADMIN check) is done inside each /api/admin/* handler via requireAdmin()
-  const adminToken = request.cookies.get('admin-token')?.value;
-  const authToken  = request.cookies.get('auth-token')?.value;
-  if (!adminToken && !authToken) {
-    // For page routes: redirect to login
-    if (!pathname.startsWith('/api/')) {
-      const loginUrl = new URL('/admin/login', request.url);
-      loginUrl.searchParams.set('redirect', pathname);
-      return NextResponse.redirect(loginUrl);
+  // Only protect API routes here — page routes are protected client-side
+  if (pathname.startsWith('/api/admin/') && !pathname.startsWith('/api/admin/login')) {
+    const adminToken = request.cookies.get('admin-token')?.value;
+    const authToken  = request.cookies.get('auth-token')?.value;
+    if (!adminToken && !authToken) {
+      return new NextResponse(JSON.stringify({ success: false, message: 'Admin authentication required' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
-    // For API routes: return 401 (requireAdmin() in the route handles this too)
-    return new NextResponse(JSON.stringify({ success: false, message: 'Admin authentication required' }), {
-      status: 401,
-      headers: { 'Content-Type': 'application/json' },
-    });
   }
 
   // Full JWT + role verification is done inside each /api/admin/* handler via requireAdmin().

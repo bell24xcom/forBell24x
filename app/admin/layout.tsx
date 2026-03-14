@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 
 const NAV = [
   { href: '/admin',                label: 'Dashboard',        icon: '▤' },
@@ -19,13 +19,55 @@ const NAV = [
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname  = usePathname();
-  const router    = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [authChecked, setAuthChecked] = useState(false);
+  const [adminUser, setAdminUser] = useState<string | null>(null);
 
-  const handleLogout = async () => {
-    await fetch('/api/admin/login', { method: 'DELETE' });
-    router.push('/admin/login');
+  // Client-side admin auth check — no middleware redirects needed
+  useEffect(() => {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000); // 5s timeout
+
+    fetch('/api/auth/me', { credentials: 'include', signal: controller.signal })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        clearTimeout(timeout);
+        if (data?.success && data?.user && (data.user.role === 'ADMIN' || data.user.role === 'SUPER_ADMIN')) {
+          setAdminUser(data.user.name || data.user.phone || 'Admin');
+          setAuthChecked(true);
+        } else {
+          // Not an admin — redirect to login
+          window.location.href = `/auth/phone-email?redirect=${encodeURIComponent(window.location.pathname)}`;
+        }
+      })
+      .catch(() => {
+        clearTimeout(timeout);
+        // Network error or timeout — redirect to login
+        window.location.href = `/auth/phone-email?redirect=${encodeURIComponent(window.location.pathname)}`;
+      });
+
+    return () => { clearTimeout(timeout); controller.abort(); };
+  }, []);
+
+  const handleLogout = () => {
+    // Clear auth-token cookie for all domain variants
+    const domains = ['', 'bell24h.com', 'www.bell24h.com', window.location.hostname];
+    domains.forEach(domain => {
+      const d = domain ? `; domain=${domain}` : '';
+      document.cookie = `auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT${d}`;
+      document.cookie = `admin-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT${d}`;
+    });
+    window.location.href = '/auth/phone-email';
   };
+
+  // Show loading spinner while checking auth
+  if (!authChecked) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+        <div className="text-slate-400 text-sm">Checking admin access...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-950 flex">
@@ -78,7 +120,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             {NAV.find(n => n.href === pathname || (n.href !== '/admin' && pathname.startsWith(n.href)))?.label ?? 'Admin'}
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-xs text-slate-500 bg-slate-800 px-2 py-1 rounded">ADMIN</span>
+            <span className="text-xs text-slate-500 bg-slate-800 px-2 py-1 rounded">{adminUser ?? 'ADMIN'}</span>
             <button
               onClick={handleLogout}
               className="text-xs text-slate-400 hover:text-red-400 transition-colors"
