@@ -39,20 +39,18 @@ export default function ContactPage() {
     setSubmitStatus('');
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      setSubmitStatus('success');
-      setFormData({
-        name: '',
-        email: '',
-        company: '',
-        phone: '',
-        subject: '',
-        message: '',
-        inquiryType: 'general'
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
       });
-    } catch (error) {
+      if (res.ok) {
+        setSubmitStatus('success');
+        setFormData({ name: '', email: '', company: '', phone: '', subject: '', message: '', inquiryType: 'general' });
+      } else {
+        setSubmitStatus('error');
+      }
+    } catch {
       setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);
