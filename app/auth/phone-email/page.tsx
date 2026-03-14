@@ -1,8 +1,7 @@
 "use client"
 import { CheckCircle, Phone, Shield } from 'lucide-react';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Script from 'next/script';
-import { useRouter } from 'next/navigation';
 
 declare global {
   interface Window {
@@ -26,7 +25,19 @@ export default function PhoneEmailAuth() {
   const [sentViaWidget, setSentViaWidget] = useState(false);
   const phoneRef = useRef('');
   const loginCalledRef = useRef(false); // prevent double-firing
-  const router = useRouter();
+
+  // If already authenticated, redirect immediately (handles back-button to login page)
+  useEffect(() => {
+    fetch('/api/auth/me', { credentials: 'include' })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data?.success && data?.user) {
+          const redirectTo = new URLSearchParams(window.location.search).get('redirect') || '/dashboard';
+          window.location.href = redirectTo;
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // Normalize phone: strip +91, spaces, dashes
   const normalizePhone = (raw: string): string => {
@@ -76,9 +87,9 @@ export default function PhoneEmailAuth() {
             body: JSON.stringify({ claimId }),
           });
         } catch { /* non-blocking */ }
-        router.push('/supplier/onboarding?claimed=1');
+        window.location.href = '/supplier/onboarding?claimed=1';
       } else {
-        router.push(params.get('redirect') || '/dashboard');
+        window.location.href = params.get('redirect') || '/dashboard';
       }
     } catch {
       setError('Network error. Please check your connection.');
@@ -195,9 +206,9 @@ export default function PhoneEmailAuth() {
             body: JSON.stringify({ claimId }),
           });
         } catch { /* non-blocking */ }
-        router.push('/supplier/onboarding?claimed=1');
+        window.location.href = '/supplier/onboarding?claimed=1';
       } else {
-        router.push(params.get('redirect') || '/dashboard');
+        window.location.href = params.get('redirect') || '/dashboard';
       }
     } catch {
       setError('Network error. Please check your connection.');
