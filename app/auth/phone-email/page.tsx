@@ -14,16 +14,25 @@ declare global {
 const WIDGET_ID  = process.env.NEXT_PUBLIC_MSG91_WIDGET_ID;
 const TOKEN_AUTH = process.env.NEXT_PUBLIC_MSG91_TOKEN_AUTH;
 
+// Compute safe redirect destination — never use a value without a leading slash
+function safeRedirect(user?: { role?: string }): string {
+  const raw = new URLSearchParams(window.location.search).get('redirect');
+  if (raw && raw.startsWith('/')) return raw;
+  if (user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN') return '/admin';
+  return '/dashboard';
+}
+
 export default function PhoneEmailAuth() {
-  const [step, setStep] = useState('phone'); // 'phone' or 'otp'
-  const [phone, setPhone] = useState('');
-  const [otp, setOtp] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [demoOTP, setDemoOTP] = useState('');
+  const [step, setStep]               = useState('phone'); // 'phone' or 'otp'
+  const [phone, setPhone]             = useState('');
+  const [otp, setOtp]                 = useState('');
+  const [loading, setLoading]         = useState(false);
+  const [error, setError]             = useState('');
+  const [demoOTP, setDemoOTP]         = useState('');
   const [widgetReady, setWidgetReady] = useState(false);
   const [sentViaWidget, setSentViaWidget] = useState(false);
-  const phoneRef = useRef('');
+  const [redirecting, setRedirecting] = useState(false); // prevents form flash during navigation
+  const phoneRef       = useRef('');
   const loginCalledRef = useRef(false); // prevent double-firing
 
   // If already authenticated, redirect immediately (handles back-button to login page)
@@ -32,8 +41,8 @@ export default function PhoneEmailAuth() {
       .then(r => r.ok ? r.json() : null)
       .then(data => {
         if (data?.success && data?.user) {
-          const raw = new URLSearchParams(window.location.search).get('redirect');
-          window.location.href = (raw && raw.startsWith('/')) ? raw : '/dashboard';
+          setRedirecting(true);
+          window.location.href = safeRedirect(data.user);
         }
       })
       .catch(() => {});
@@ -77,8 +86,7 @@ export default function PhoneEmailAuth() {
       }
       localStorage.setItem('bell24h_user', JSON.stringify(loginData.user));
       // Claim flow: if ?claim=xxx param present, transfer unclaimed profile
-      const params  = new URLSearchParams(window.location.search);
-      const claimId = params.get('claim');
+      const claimId = new URLSearchParams(window.location.search).get('claim');
       if (claimId) {
         try {
           await fetch('/api/auth/claim', {
@@ -87,10 +95,11 @@ export default function PhoneEmailAuth() {
             body: JSON.stringify({ claimId }),
           });
         } catch { /* non-blocking */ }
+        setRedirecting(true);
         window.location.href = '/supplier/onboarding?claimed=1';
       } else {
-        const raw = params.get('redirect');
-        window.location.href = (raw && raw.startsWith('/')) ? raw : '/dashboard';
+        setRedirecting(true);
+        window.location.href = safeRedirect(loginData.user);
       }
     } catch {
       setError('Network error. Please check your connection.');
@@ -197,8 +206,7 @@ export default function PhoneEmailAuth() {
 
       localStorage.setItem('bell24h_user', JSON.stringify(data.user));
       // Claim flow
-      const params  = new URLSearchParams(window.location.search);
-      const claimId = params.get('claim');
+      const claimId = new URLSearchParams(window.location.search).get('claim');
       if (claimId) {
         try {
           await fetch('/api/auth/claim', {
@@ -207,16 +215,18 @@ export default function PhoneEmailAuth() {
             body: JSON.stringify({ claimId }),
           });
         } catch { /* non-blocking */ }
+        setRedirecting(true);
         window.location.href = '/supplier/onboarding?claimed=1';
       } else {
-        const raw = params.get('redirect');
-        window.location.href = (raw && raw.startsWith('/')) ? raw : '/dashboard';
+        setRedirecting(true);
+        window.location.href = safeRedirect(data.user);
       }
     } catch {
       setError('Network error. Please check your connection.');
-    } finally {
       setLoading(false);
     }
+    // NOTE: no 'finally' here — setLoading is managed explicitly so redirecting
+    // state isn't overwritten by a finally block during navigation
   };
 
   const resendOTP = () => {
@@ -224,6 +234,18 @@ export default function PhoneEmailAuth() {
     setDemoOTP('');
     sendOTP();
   };
+
+  // Show redirect spinner — prevents login form from flashing during navigation
+  if (redirecting) {
+    return (
+      <div className="min-h-screen bg-[#0F172A] flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-10 h-10 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-white text-sm">Logging you in...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
