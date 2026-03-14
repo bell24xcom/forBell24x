@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useAuth } from '@/app/contexts/AuthContext';
 
 const NAV = [
   { href: '/admin',                label: 'Dashboard',        icon: '▤' },
@@ -19,35 +20,24 @@ const NAV = [
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname  = usePathname();
+  const { user, loading: authLoading } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [authChecked, setAuthChecked] = useState(false);
-  const [adminUser, setAdminUser] = useState<string | null>(null);
 
-  // Client-side admin auth check — no middleware redirects needed
+  // Auth check using existing context (reads localStorage, no extra API call)
   useEffect(() => {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 5000); // 5s timeout
+    if (authLoading) return; // Wait for AuthContext to finish reading localStorage
 
-    fetch('/api/auth/me', { credentials: 'include', signal: controller.signal })
-      .then(r => r.ok ? r.json() : null)
-      .then(data => {
-        clearTimeout(timeout);
-        if (data?.success && data?.user && (data.user.role === 'ADMIN' || data.user.role === 'SUPER_ADMIN')) {
-          setAdminUser(data.user.name || data.user.phone || 'Admin');
-          setAuthChecked(true);
-        } else {
-          // Not an admin — redirect to login
-          window.location.href = `/auth/phone-email?redirect=${encodeURIComponent(window.location.pathname)}`;
-        }
-      })
-      .catch(() => {
-        clearTimeout(timeout);
-        // Network error or timeout — redirect to login
-        window.location.href = `/auth/phone-email?redirect=${encodeURIComponent(window.location.pathname)}`;
-      });
-
-    return () => { clearTimeout(timeout); controller.abort(); };
-  }, []);
+    if (user && (user.role === 'ADMIN' || user.role === 'SUPER_ADMIN')) {
+      setAuthChecked(true);
+    } else if (user) {
+      // Logged in but not admin
+      window.location.href = '/dashboard';
+    } else {
+      // Not logged in
+      window.location.href = `/auth/phone-email?redirect=${encodeURIComponent(window.location.pathname)}`;
+    }
+  }, [user, authLoading]);
 
   const handleLogout = () => {
     // Clear auth-token cookie for all domain variants
@@ -120,7 +110,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             {NAV.find(n => n.href === pathname || (n.href !== '/admin' && pathname.startsWith(n.href)))?.label ?? 'Admin'}
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-xs text-slate-500 bg-slate-800 px-2 py-1 rounded">{adminUser ?? 'ADMIN'}</span>
+            <span className="text-xs text-slate-500 bg-slate-800 px-2 py-1 rounded">{user?.name || user?.phone || 'ADMIN'}</span>
             <button
               onClick={handleLogout}
               className="text-xs text-slate-400 hover:text-red-400 transition-colors"
