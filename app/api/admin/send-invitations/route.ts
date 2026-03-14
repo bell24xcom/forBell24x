@@ -10,13 +10,24 @@ export async function POST(req: NextRequest) {
   if (isErrorResponse(auth)) return auth;
 
   try {
+    // Optional: target specific supplier IDs (from CRM invite button)
+    const body = await req.json().catch(() => ({}));
+    const supplierIds: string[] = Array.isArray(body.supplierIds) ? body.supplierIds : [];
+
+    const where: Record<string, unknown> = {
+      isClaimed: false,
+      isActive: true,
+    };
+    if (supplierIds.length > 0) {
+      where.id = { in: supplierIds };
+    } else {
+      // Bulk send: only those with email
+      where.email = { not: null };
+    }
+
     // Fetch unclaimed suppliers with email who haven't been invited recently
     const unclaimedWithEmail = await prisma.user.findMany({
-      where: {
-        isClaimed: false,
-        email: { not: null },
-        isActive: true,
-      },
+      where,
       select: {
         id: true,
         name: true,

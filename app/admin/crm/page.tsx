@@ -1,13 +1,13 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Download, CheckSquare, Square, Eye, X } from 'lucide-react';
+import { Download, CheckSquare, Square, Eye, X, Mail } from 'lucide-react';
 
 interface User {
   id: string; name: string | null; email: string | null; phone: string | null;
   company: string | null; role: string; plan: string; isActive: boolean; isVerified: boolean;
   gstNumber: string | null; udyamNumber: string | null; trustScore: number;
-  location: string | null; lastLoginAt: string | null; createdAt: string;
+  location: string | null; lastLoginAt: string | null; createdAt: string; isClaimed: boolean;
   _count: { rfqs: number; quotes: number };
   wallet?: { balance: number } | null;
 }
@@ -46,6 +46,8 @@ export default function CRMPage() {
   const [saving,     setSaving]     = useState<string | null>(null); // userId being updated
   const [selected,   setSelected]   = useState<Set<string>>(new Set());
   const [drawerUser, setDrawerUser] = useState<User | null>(null);
+  const [inviting,   setInviting]   = useState<string | null>(null);
+  const [inviteToast, setInviteToast] = useState('');
 
   const limit = 25;
 
@@ -117,6 +119,28 @@ export default function CRMPage() {
     }
   };
 
+  const sendInvitation = async (user: User) => {
+    setInviting(user.id);
+    try {
+      const res = await fetch('/api/admin/send-invitations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ supplierIds: [user.id] }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setInviteToast(`Invitation sent to ${user.phone || user.email || user.name || 'supplier'}`);
+        setTimeout(() => setInviteToast(''), 4000);
+      } else {
+        alert(data.error || 'Failed to send invitation');
+      }
+    } catch {
+      alert('Network error sending invitation');
+    } finally {
+      setInviting(null);
+    }
+  };
+
   const pages = Math.ceil(total / limit);
 
   return (
@@ -156,6 +180,13 @@ export default function CRMPage() {
         </button>
       </div>
 
+      {/* Invite Toast */}
+      {inviteToast && (
+        <div className="bg-emerald-900/30 border border-emerald-700 text-emerald-300 px-4 py-3 rounded-lg text-sm flex items-center gap-2">
+          <Mail className="w-4 h-4" /> {inviteToast}
+        </div>
+      )}
+
       {/* Error */}
       {error && <div className="bg-red-900/30 border border-red-500/40 text-red-300 px-4 py-3 rounded-lg text-sm">{error}</div>}
 
@@ -172,7 +203,7 @@ export default function CRMPage() {
                       : <Square className="w-4 h-4" />}
                   </button>
                 </th>
-                {['User', 'Role', 'Plan', 'Trust', 'GST', 'Udyam', 'RFQs', 'Wallet', 'Joined', 'Status', 'Actions'].map(h => (
+                {['User', 'Role', 'Plan', 'Trust', 'GST', 'Udyam', 'RFQs', 'Wallet', 'Joined', 'Claim', 'Status', 'Actions'].map(h => (
                   <th key={h} className="px-4 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider whitespace-nowrap">{h}</th>
                 ))}
               </tr>
@@ -183,7 +214,7 @@ export default function CRMPage() {
                   <div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto" />
                 </td></tr>
               ) : users.length === 0 ? (
-                <tr><td colSpan={12} className="px-4 py-8 text-center text-slate-500">No users found</td></tr>
+                <tr><td colSpan={13} className="px-4 py-8 text-center text-slate-500">No users found</td></tr>
               ) : users.map(u => (
                 <tr key={u.id} className={`hover:bg-slate-700/30 transition-colors ${!u.isActive ? 'opacity-50' : ''} ${selected.has(u.id) ? 'bg-indigo-900/10' : ''}`}>
                   {/* Checkbox */}
@@ -255,6 +286,13 @@ export default function CRMPage() {
                     {new Date(u.createdAt).toLocaleDateString('en-IN')}
                   </td>
 
+                  {/* Claim Status */}
+                  <td className="px-4 py-3">
+                    <span className={`text-xs px-2 py-0.5 rounded-full font-semibold border ${u.isClaimed ? 'bg-green-900/30 text-green-400 border-green-700/50' : 'bg-slate-800 text-slate-400 border-slate-700'}`}>
+                      {u.isClaimed ? 'Claimed' : 'Unclaimed'}
+                    </span>
+                  </td>
+
                   {/* Status */}
                   <td className="px-4 py-3">
                     <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${u.isActive ? 'bg-green-900/30 text-green-400 border border-green-700/50' : 'bg-red-900/30 text-red-400 border border-red-700/50'}`}>
@@ -268,6 +306,17 @@ export default function CRMPage() {
                       <button onClick={() => setDrawerUser(u)} className="text-indigo-400 hover:text-indigo-300 transition-colors" title="View details">
                         <Eye className="w-4 h-4" />
                       </button>
+                      {!u.isClaimed && (
+                        <button
+                          disabled={inviting === u.id}
+                          onClick={() => sendInvitation(u)}
+                          className="text-xs px-2 py-1 rounded bg-amber-900/30 text-amber-400 hover:bg-amber-900/60 border border-amber-700/50 transition-colors flex items-center gap-1"
+                          title="Send claim invitation"
+                        >
+                          <Mail className="w-3 h-3" />
+                          {inviting === u.id ? '…' : 'Invite'}
+                        </button>
+                      )}
                       <button
                         disabled={saving === u.id}
                         onClick={() => applyAction(u.id, u.isActive ? 'deactivate' : 'activate')}
@@ -328,6 +377,7 @@ export default function CRMPage() {
                   {drawerUser.gstNumber && <div className="flex justify-between"><span className="text-slate-400">GST</span><span className="text-green-400 text-xs">{drawerUser.gstNumber}</span></div>}
                   {drawerUser.udyamNumber && <div className="flex justify-between"><span className="text-slate-400">Udyam</span><span className="text-green-400 text-xs">{drawerUser.udyamNumber}</span></div>}
                   <div className="flex justify-between"><span className="text-slate-400">KYC Verified</span><span className={drawerUser.isVerified ? 'text-green-400' : 'text-slate-500'}>{drawerUser.isVerified ? '✓ Verified' : 'Not verified'}</span></div>
+                  <div className="flex justify-between"><span className="text-slate-400">Claim Status</span><span className={drawerUser.isClaimed ? 'text-green-400' : 'text-amber-400'}>{drawerUser.isClaimed ? '✓ Claimed' : 'Unclaimed'}</span></div>
                 </div>
               </div>
 
@@ -376,6 +426,15 @@ export default function CRMPage() {
                       disabled={saving === drawerUser.id}
                       className="w-full px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 min-h-[44px]">
                       {saving === drawerUser.id ? '…' : 'Verify KYC'}
+                    </button>
+                  )}
+                  {!drawerUser.isClaimed && (
+                    <button
+                      onClick={() => sendInvitation(drawerUser)}
+                      disabled={inviting === drawerUser.id}
+                      className="w-full px-4 py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 min-h-[44px] flex items-center justify-center gap-2">
+                      <Mail className="w-4 h-4" />
+                      {inviting === drawerUser.id ? 'Sending…' : 'Send Claim Invitation'}
                     </button>
                   )}
                 </div>
