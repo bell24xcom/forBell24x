@@ -26,6 +26,8 @@ export default function BrowseRFQsPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const [showAllCategories, setShowAllCategories] = useState(false);
+  const [supplierCategories, setSupplierCategories] = useState<string[]>([]);
   const [quoteModal, setQuoteModal] = useState<RFQ | null>(null);
   const [quoteForm, setQuoteForm] = useState({ price: '', deliveryDays: '', notes: '', terms: '' });
   const [submitting, setSubmitting] = useState(false);
@@ -34,14 +36,24 @@ export default function BrowseRFQsPage() {
   const [quotedRfqs, setQuotedRfqs] = useState<Set<string>>(new Set());
 
   useEffect(() => {
+    const user = JSON.parse(localStorage.getItem('bell24h_user') || '{}');
+    const cats: string[] = user.preferences?.categories || user.categories || [];
+    setSupplierCategories(cats);
+  }, []);
+
+  useEffect(() => {
     fetchRFQs();
     const interval = setInterval(fetchRFQs, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [showAllCategories, supplierCategories]);
 
   const fetchRFQs = async () => {
     try {
-      const response = await fetch('/api/marketplace/rfqs?status=active', { credentials: 'include' });
+      const params = new URLSearchParams({ status: 'active' });
+      if (!showAllCategories && supplierCategories.length > 0) {
+        params.set('categories', supplierCategories.join(','));
+      }
+      const response = await fetch(`/api/marketplace/rfqs?${params}`, { credentials: 'include' });
       if (response.ok) {
         const data = await response.json();
         setRfqs(data.rfqs || []);
@@ -131,9 +143,23 @@ export default function BrowseRFQsPage() {
             <h1 className="text-3xl font-bold text-white mb-2">Browse Active RFQs</h1>
             <p className="text-slate-400">Find RFQs matching your business and submit competitive quotes</p>
           </div>
-          <div className="flex items-center gap-2 px-3 py-2 bg-green-900/20 border border-green-800 rounded-lg">
-            <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-            <span className="text-green-400 text-xs font-medium">Live — refreshes every 30s</span>
+          <div className="flex items-center gap-3 flex-wrap">
+            {supplierCategories.length > 0 && (
+              <button
+                onClick={() => setShowAllCategories(prev => !prev)}
+                className={`px-3 py-2 text-xs font-medium rounded-lg border transition-colors min-h-[44px] ${
+                  showAllCategories
+                    ? 'bg-indigo-900/40 border-indigo-700 text-indigo-300'
+                    : 'bg-slate-800/50 border-slate-700 text-slate-300 hover:border-slate-500'
+                }`}
+              >
+                {showAllCategories ? 'Showing All Categories' : `My Categories (${supplierCategories.length})`}
+              </button>
+            )}
+            <div className="flex items-center gap-2 px-3 py-2 bg-green-900/20 border border-green-800 rounded-lg">
+              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+              <span className="text-green-400 text-xs font-medium">Live — refreshes every 30s</span>
+            </div>
           </div>
         </div>
 

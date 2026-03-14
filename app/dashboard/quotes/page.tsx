@@ -20,6 +20,7 @@ interface QuoteItem {
   id: string;
   rfqTitle: string;
   rfqCategory: string;
+  supplierId: string;
   supplierName: string;
   supplierCompany: string;
   price: number;
@@ -303,7 +304,17 @@ export default function MyQuotesPage() {
                     </td>
                     <td className="px-6 py-4">
                       <p className="text-sm font-medium text-white">{quote.supplierName}</p>
-                      <p className="text-xs text-slate-400 mt-0.5">{quote.supplierCompany}</p>
+                      {quote.supplierCompany && (
+                        <p className="text-xs text-slate-400 mt-0.5">{quote.supplierCompany}</p>
+                      )}
+                      {quote.supplierId && (
+                        <Link
+                          href={`/supplier/${quote.supplierId}`}
+                          className="text-xs text-indigo-400 hover:text-indigo-300 mt-0.5 inline-block"
+                        >
+                          View Profile →
+                        </Link>
+                      )}
                     </td>
                     <td className="px-6 py-4">
                       <span className="text-sm font-semibold text-white">{formatPrice(quote.price)}</span>

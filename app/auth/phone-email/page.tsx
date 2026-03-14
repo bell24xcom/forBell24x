@@ -16,6 +16,11 @@ const TOKEN_AUTH = process.env.NEXT_PUBLIC_MSG91_TOKEN_AUTH;
 
 // Compute safe redirect destination — never use a value without a leading slash
 function safeRedirect(user?: { role?: string }): string {
+  const returnUrl = localStorage.getItem('bell24h_returnUrl');
+  if (returnUrl) {
+    localStorage.removeItem('bell24h_returnUrl');
+    return returnUrl;
+  }
   const raw = new URLSearchParams(window.location.search).get('redirect');
   if (raw && raw.startsWith('/')) return raw;
   if (user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN') return '/admin';

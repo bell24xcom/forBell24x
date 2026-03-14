@@ -48,6 +48,7 @@ export async function GET(request: NextRequest) {
         id: q.id,
         rfqTitle: q.rfq.title,
         rfqCategory: q.rfq.category,
+        supplierId: q.supplierId,
         supplierName: q.supplier.name,
         supplierCompany: q.supplier.company,
         supplierTrustScore: q.supplier.trustScore,

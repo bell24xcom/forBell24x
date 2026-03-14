@@ -97,7 +97,8 @@ export default function RFQDetailPage() {
 
   const handleQuote = () => {
     if (!isLoggedIn) {
-      router.push(`/auth/login?next=${encodeURIComponent(pathname)}`);
+      localStorage.setItem('bell24h_returnUrl', window.location.href);
+      router.push(`/auth/phone-email?redirect=${encodeURIComponent(pathname)}`);
     } else {
       setShowQuoteForm(true);
     }
@@ -148,7 +149,7 @@ export default function RFQDetailPage() {
             {/* RFQ Header */}
             <div className="mb-6">
               <h1 className="text-2xl font-bold mb-2">{rfq.title}</h1>
-              <div className="flex items-center gap-4 text-sm text-slate-300">
+              <div className="flex items-center gap-4 text-sm text-slate-500">
                 <span>RFQ #{rfq.id}</span>
                 <span>Posted {new Date(rfq.createdAt).toLocaleDateString()}</span>
                 <span>Views: {rfq.views}</span>
@@ -194,20 +195,30 @@ export default function RFQDetailPage() {
             {/* Buyer Info */}
             <div className="bg-slate-50 rounded-lg p-4">
               <h3 className="font-medium mb-2">Buyer Information</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <p className="text-slate-500">Name</p>
-                  <p className="text-slate-900 font-medium">{rfq.user.name}</p>
+              {!rfq.user?.name && !rfq.user?.company ? (
+                <p className="text-slate-500 text-sm">Posted by Bell24h Marketplace</p>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {rfq.user?.name && (
+                    <div>
+                      <p className="text-slate-500 text-sm">Name</p>
+                      <p className="text-slate-900 font-medium">{rfq.user.name}</p>
+                    </div>
+                  )}
+                  {rfq.user?.company && (
+                    <div>
+                      <p className="text-slate-500 text-sm">Company</p>
+                      <p className="text-slate-900 font-medium">{rfq.user.company}</p>
+                    </div>
+                  )}
+                  {rfq.user?.location && (
+                    <div>
+                      <p className="text-slate-500 text-sm">Location</p>
+                      <p className="text-slate-900">{rfq.user.location}</p>
+                    </div>
+                  )}
                 </div>
-                <div>
-                  <p className="text-slate-500">Company</p>
-                  <p className="text-slate-900 font-medium">{rfq.user.company}</p>
-                </div>
-                <div>
-                  <p className="text-slate-500">Location</p>
-                  <p className="text-slate-900">{rfq.user.location}</p>
-                </div>
-              </div>
+              )}
             </div>
           </div>
 
