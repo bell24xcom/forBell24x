@@ -22,6 +22,7 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category');
+    const categoriesParam = searchParams.get('categories');
     const location = searchParams.get('location');
     const search = searchParams.get('search');
     const minBudget = searchParams.get('minBudget');
@@ -36,7 +37,12 @@ export async function GET(request: NextRequest) {
       isPublic: true,
     };
 
-    if (category) {
+    if (categoriesParam) {
+      const cats = categoriesParam.split(',').filter(Boolean);
+      if (cats.length > 0) {
+        where.category = { in: cats };
+      }
+    } else if (category) {
       where.category = { contains: category, mode: 'insensitive' };
     }
 
