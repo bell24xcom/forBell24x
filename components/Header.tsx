@@ -21,33 +21,32 @@ export default function Header() {
     };
 
     const checkAuth = () => {
-      const userData = localStorage.getItem('bell24h_user');
-      if (userData) {
+      const stored = localStorage.getItem('bell24h_user');
+      if (stored) {
         try {
-          setUser(JSON.parse(userData));
-          setIsLoggedIn(true);
-        } catch {
-          setIsLoggedIn(false);
-        }
+          const u = JSON.parse(stored);
+          if (u && u.id) { setUser(u); setIsLoggedIn(true); }
+        } catch {}
       }
-      // Only call API if localStorage had no data (avoids duplicate Neon DB queries)
-      if (!userData) {
-        fetch('/api/auth/me', { credentials: 'include' })
-          .then(r => r.ok ? r.json() : null)
-          .then(data => {
-            if (data?.user) {
-              setUser(data.user);
-              setIsLoggedIn(true);
-              localStorage.setItem('bell24h_user', JSON.stringify(data.user));
-            }
-          })
-          .catch(() => {});
+    };
+
+    // Listen for login/logout events from other tabs or the login page
+    const onStorage = () => {
+      const s = localStorage.getItem('bell24h_user');
+      if (s) {
+        try { const u = JSON.parse(s); if (u?.id) { setUser(u); setIsLoggedIn(true); } } catch {}
+      } else {
+        setUser(null); setIsLoggedIn(false);
       }
     };
 
     checkAuth();
+    window.addEventListener('storage', onStorage);
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('storage', onStorage);
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
   const handleLogin = () => {
