@@ -32,8 +32,8 @@ export default function PhoneEmailAuth() {
       .then(r => r.ok ? r.json() : null)
       .then(data => {
         if (data?.success && data?.user) {
-          const redirectTo = new URLSearchParams(window.location.search).get('redirect') || '/dashboard';
-          window.location.href = redirectTo;
+          const raw = new URLSearchParams(window.location.search).get('redirect');
+          window.location.href = (raw && raw.startsWith('/')) ? raw : '/dashboard';
         }
       })
       .catch(() => {});
@@ -89,7 +89,8 @@ export default function PhoneEmailAuth() {
         } catch { /* non-blocking */ }
         window.location.href = '/supplier/onboarding?claimed=1';
       } else {
-        window.location.href = params.get('redirect') || '/dashboard';
+        const raw = params.get('redirect');
+        window.location.href = (raw && raw.startsWith('/')) ? raw : '/dashboard';
       }
     } catch {
       setError('Network error. Please check your connection.');
@@ -208,7 +209,8 @@ export default function PhoneEmailAuth() {
         } catch { /* non-blocking */ }
         window.location.href = '/supplier/onboarding?claimed=1';
       } else {
-        window.location.href = params.get('redirect') || '/dashboard';
+        const raw = params.get('redirect');
+        window.location.href = (raw && raw.startsWith('/')) ? raw : '/dashboard';
       }
     } catch {
       setError('Network error. Please check your connection.');
