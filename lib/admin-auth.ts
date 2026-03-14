@@ -15,9 +15,10 @@ export interface AdminPayload extends TokenPayload {
  * Returns the decoded payload or throws a NextResponse (which the caller returns).
  */
 export function requireAdmin(request: NextRequest): AdminPayload | NextResponse {
+  // Accept admin-token (dedicated admin session) OR auth-token (main app session with ADMIN role)
   const token = extractToken(
     request.headers.get('authorization'),
-    request.cookies.get('admin-token')?.value
+    request.cookies.get('admin-token')?.value ?? request.cookies.get('auth-token')?.value
   );
 
   if (!token) {

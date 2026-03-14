@@ -124,9 +124,11 @@ function handleAdminRoute(request: NextRequest, response: NextResponse): NextRes
     return response;
   }
 
-  // Check admin-token cookie (set by POST /api/admin/login)
+  // Accept admin-token (separate admin login) OR auth-token (main app phone OTP login)
+  // Role verification (ADMIN check) is done inside each /api/admin/* handler via requireAdmin()
   const adminToken = request.cookies.get('admin-token')?.value;
-  if (!adminToken) {
+  const authToken  = request.cookies.get('auth-token')?.value;
+  if (!adminToken && !authToken) {
     // For page routes: redirect to login
     if (!pathname.startsWith('/api/')) {
       const loginUrl = new URL('/admin/login', request.url);
