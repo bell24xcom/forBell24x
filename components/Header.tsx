@@ -30,17 +30,19 @@ export default function Header() {
           setIsLoggedIn(false);
         }
       }
-      // Also verify with API (cookie-based auth)
-      fetch('/api/auth/me', { credentials: 'include' })
-        .then(r => r.ok ? r.json() : null)
-        .then(data => {
-          if (data?.user) {
-            setUser(data.user);
-            setIsLoggedIn(true);
-            localStorage.setItem('bell24h_user', JSON.stringify(data.user));
-          }
-        })
-        .catch(() => {});
+      // Only call API if localStorage had no data (avoids duplicate Neon DB queries)
+      if (!userData) {
+        fetch('/api/auth/me', { credentials: 'include' })
+          .then(r => r.ok ? r.json() : null)
+          .then(data => {
+            if (data?.user) {
+              setUser(data.user);
+              setIsLoggedIn(true);
+              localStorage.setItem('bell24h_user', JSON.stringify(data.user));
+            }
+          })
+          .catch(() => {});
+      }
     };
 
     checkAuth();
