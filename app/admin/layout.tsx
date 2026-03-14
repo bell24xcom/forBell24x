@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useAuth } from '@/app/contexts/AuthContext';
 
 const NAV = [
   { href: '/admin',                label: 'Dashboard',        icon: '▤' },
@@ -20,24 +19,66 @@ const NAV = [
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname  = usePathname();
-  const { user, loading: authLoading } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [authChecked, setAuthChecked] = useState(false);
+  const [adminName, setAdminName]     = useState('');
 
-  // Auth check using existing context (reads localStorage, no extra API call)
   useEffect(() => {
-    if (authLoading) return; // Wait for AuthContext to finish reading localStorage
+    let cancelled = false;
 
-    if (user && (user.role === 'ADMIN' || user.role === 'SUPER_ADMIN')) {
-      setAuthChecked(true);
-    } else if (user) {
-      // Logged in but not admin
-      window.location.href = '/dashboard';
-    } else {
-      // Not logged in
-      window.location.href = `/auth/phone-email?redirect=${encodeURIComponent(window.location.pathname)}`;
-    }
-  }, [user, authLoading]);
+    const checkAdmin = async (attempt = 1) => {
+      // 1. Try localStorage first (instant, no DB call)
+      try {
+        const stored = localStorage.getItem('bell24h_user');
+        if (stored) {
+          const u = JSON.parse(stored);
+          if (u?.role === 'ADMIN' || u?.role === 'SUPER_ADMIN') {
+            if (!cancelled) { setAdminName(u.name || u.phone || ''); setAuthChecked(true); }
+            return;
+          }
+          if (u?.role) {
+            if (!cancelled) window.location.href = '/dashboard';
+            return;
+          }
+        }
+      } catch {}
+
+      // 2. localStorage empty/no role — verify via cookie
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 4000);
+        const res = await fetch('/api/auth/me', { credentials: 'include', signal: controller.signal });
+        clearTimeout(timeout);
+
+        if (!res.ok) {
+          if (!cancelled) window.location.href = '/auth/phone-email?redirect=/admin';
+          return;
+        }
+        const data = await res.json();
+        if (data?.success && data?.user) {
+          localStorage.setItem('bell24h_user', JSON.stringify(data.user));
+          if (data.user.role === 'ADMIN' || data.user.role === 'SUPER_ADMIN') {
+            if (!cancelled) { setAdminName(data.user.name || data.user.phone || ''); setAuthChecked(true); }
+          } else {
+            if (!cancelled) window.location.href = '/dashboard';
+          }
+        } else {
+          if (!cancelled) window.location.href = '/auth/phone-email?redirect=/admin';
+        }
+      } catch {
+        // Timeout or network error — retry once (handles Neon cold start)
+        if (attempt < 2) {
+          await new Promise(r => setTimeout(r, 2000));
+          if (!cancelled) checkAdmin(2);
+          return;
+        }
+        if (!cancelled) window.location.href = '/auth/phone-email?redirect=/admin';
+      }
+    };
+
+    checkAdmin();
+    return () => { cancelled = true; };
+  }, []);
 
   const handleLogout = () => {
     // Clear auth-token cookie for all domain variants
@@ -110,7 +151,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             {NAV.find(n => n.href === pathname || (n.href !== '/admin' && pathname.startsWith(n.href)))?.label ?? 'Admin'}
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-xs text-slate-500 bg-slate-800 px-2 py-1 rounded">{user?.name || user?.phone || 'ADMIN'}</span>
+            <span className="text-xs text-slate-500 bg-slate-800 px-2 py-1 rounded">{adminName || 'ADMIN'}</span>
             <button
               onClick={handleLogout}
               className="text-xs text-slate-400 hover:text-red-400 transition-colors"
