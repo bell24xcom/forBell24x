@@ -214,39 +214,47 @@ export default function WalletPage() {
     setAddingFunds(true);
     setAddFundsError(null);
     try {
-      const amount = 100000; // ₹1,000 default – in paise for Razorpay
+      const amountRupees = 1000; // ₹1,000 default — API expects rupees, not paise
 
       const res = await fetch('/api/payment/create-order', {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          amount,
-          currency: 'INR',
-          description: 'Wallet top-up — Bell24h',
-          customerName: 'Bell24h User',
-          customerEmail: '',
-          customerPhone: '',
-        }),
+        body: JSON.stringify({ amount: amountRupees, currency: 'INR' }),
       });
       const data = await res.json();
       if (!data.success) throw new Error(data.error ?? 'Failed to create payment order');
+
+      // Test mode — Razorpay not yet configured
+      if (data.testMode) {
+        setAddFundsError('Payment gateway not configured yet. Add RAZORPAY_KEY_ID to Vercel env to enable live payments.');
+        return;
+      }
 
       const loaded = await loadRazorpayScript();
       if (!loaded) throw new Error('Razorpay could not be loaded. Check your internet connection.');
 
       const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-        amount: data.data.amount,
-        currency: data.data.currency,
+        key: data.key,
+        amount: data.amount,
+        currency: data.currency,
         name: 'Bell24h',
         description: 'Wallet Top-up',
-        order_id: data.data.id,
+        order_id: data.orderId,
         theme: { color: '#2563EB' },
-        handler: () => {
-          // On success, refresh stats and transactions
-          fetchStats();
-          fetchTransactions();
+        handler: (response: { razorpay_payment_id: string; razorpay_order_id: string; razorpay_signature: string }) => {
+          // Verify payment and credit wallet
+          fetch('/api/payment/create-order', {
+            method: 'PUT',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_signature: response.razorpay_signature,
+              amount: data.amount,
+            }),
+          }).then(() => { fetchStats(); fetchTransactions(); });
         },
       };
       const rzp = new window.Razorpay(options);

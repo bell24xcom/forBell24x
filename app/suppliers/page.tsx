@@ -166,14 +166,22 @@ export default function SuppliersPage() {
                         <p className="text-sm text-gray-300">
                           <span className="font-medium">Location:</span> {supplier.location}
                         </p>
-                        <p className="text-sm text-gray-300">
-                          <span className="font-medium">Category:</span> {supplier.category}
-                        </p>
+                        {(supplier.categories?.length > 0 || supplier.category) && (
+                          <p className="text-sm text-gray-300">
+                            <span className="font-medium">Category:</span>{' '}
+                            {supplier.categories?.length > 0
+                              ? supplier.categories.slice(0, 2).join(', ')
+                              : supplier.category}
+                          </p>
+                        )}
                       </div>
                       
-                      <button className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                      <a
+                        href={`/supplier/${supplier.id}`}
+                        className="block w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors text-center font-medium min-h-[44px] flex items-center justify-center"
+                      >
                         View Profile
-                      </button>
+                      </a>
                     </div>
                   ))}
                 </div>

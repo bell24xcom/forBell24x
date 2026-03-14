@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
           id: true, name: true, email: true, phone: true, company: true,
           role: true, plan: true, isActive: true, isVerified: true,
           gstNumber: true, udyamNumber: true, trustScore: true,
-          location: true, lastLoginAt: true, createdAt: true,
+          location: true, lastLoginAt: true, createdAt: true, isClaimed: true,
           _count: { select: { rfqs: true, quotes: true } },
           wallet:  { select: { balance: true } },
         },
