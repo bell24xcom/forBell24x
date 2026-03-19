@@ -41,16 +41,25 @@ export default function PhoneEmailAuth() {
   const loginCalledRef = useRef(false); // prevent double-firing
 
   // If already authenticated, redirect immediately (handles back-button to login page)
+  // Use polling to handle cookie propagation delay from verify step
   useEffect(() => {
-    fetch('/api/auth/me', { credentials: 'include' })
-      .then(r => r.ok ? r.json() : null)
-      .then(data => {
-        if (data?.success && data?.user) {
-          setRedirecting(true);
-          window.location.href = safeRedirect(data.user);
-        }
-      })
-      .catch(() => {});
+    let attempts = 0;
+    const checkAuth = () => {
+      fetch('/api/auth/me', { credentials: 'include' })
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+          if (data?.success && data?.user) {
+            setRedirecting(true);
+            window.location.href = safeRedirect(data.user);
+          } else if (attempts < 3) {
+            // Retry up to 3 times with 500ms delay to handle cookie propagation
+            attempts++;
+            setTimeout(checkAuth, 500);
+          }
+        })
+        .catch(() => {});
+    };
+    checkAuth();
   }, []);
 
   // Normalize phone: strip +91, spaces, dashes
