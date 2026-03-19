@@ -4,6 +4,7 @@ import { verifyToken } from '@/lib/jwt';
 import { onRFQCreated, checkDailyLimit } from '@/lib/orchestration';
 import { sanitizeString, sanitizeText, safePositiveFloat } from '@/lib/sanitize';
 import { storeRFQ, extractRFQMeta } from '@/lib/memory-engine';
+import { agentZero } from '@/lib/agents/agent-zero';
 
 export const dynamic = 'force-dynamic';
 
@@ -133,6 +134,10 @@ export async function POST(request: NextRequest) {
       { id: rfq.id, title: rfq.title, category: rfq.category, location: rfq.location },
       { id: userId, name: buyer?.name ?? null, email: buyer?.email ?? null }
     ).catch(err => console.error('[Orchestration] onRFQCreated error:', err));
+
+    // ── Agent Zero: fire-and-forget outreach decision (never blocks response) ──
+    agentZero({ ...rfq, isSeeded: false })
+      .catch(err => console.error('[AgentZero] error:', err));
 
     return NextResponse.json({
       success: true,
