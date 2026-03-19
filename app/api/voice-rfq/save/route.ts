@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyToken } from '@/lib/jwt';
+import { storeRFQ, extractRFQMeta } from '@/lib/memory-engine';
 
 // Save voice-generated RFQ to database
 export async function POST(request: NextRequest) {
@@ -56,9 +57,26 @@ export async function POST(request: NextRequest) {
         urgency: rfqData.timeline === 'urgent' ? 'URGENT' : 'NORMAL',
         status: 'OPEN',
         createdBy: payload.userId,
-        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
       },
     });
+
+    // ── Elephant Memory: store in episodic memory ──
+    try {
+      const meta = extractRFQMeta({
+        id: savedRFQ.id,
+        title: savedRFQ.title,
+        category: savedRFQ.category,
+        description: savedRFQ.description,
+        quantity: savedRFQ.quantity,
+        location: null,
+        maxBudget: savedRFQ.maxBudget,
+        minBudget: savedRFQ.minBudget,
+      });
+      await storeRFQ(meta);
+    } catch (memErr) {
+      console.error('[Memory] storeRFQ error:', memErr);
+    }
 
     return NextResponse.json({
       success: true,

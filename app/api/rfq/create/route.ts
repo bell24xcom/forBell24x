@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { verifyToken } from '@/lib/jwt';
 import { onRFQCreated, checkDailyLimit } from '@/lib/orchestration';
 import { sanitizeString, sanitizeText, safePositiveFloat } from '@/lib/sanitize';
+import { storeRFQ, extractRFQMeta } from '@/lib/memory-engine';
 
 export const dynamic = 'force-dynamic';
 
@@ -103,6 +104,24 @@ export async function POST(request: NextRequest) {
         createdBy: userId,
       },
     });
+
+    // ── Elephant Memory: store in episodic memory (fire-and-forget) ──
+    try {
+      const meta = extractRFQMeta({
+        id: rfq.id,
+        title: rfq.title,
+        category: rfq.category,
+        description: rfq.description,
+        quantity: rfq.quantity,
+        location: rfq.location,
+        maxBudget: rfq.maxBudget,
+        minBudget: rfq.minBudget,
+      });
+      await storeRFQ(meta);
+    } catch (memErr) {
+      // Non-critical: never block RFQ creation if memory fails
+      console.error('[Memory] storeRFQ error:', memErr);
+    }
 
     // Fire orchestration in background — never blocks the response
     const buyer = await prisma.user.findUnique({

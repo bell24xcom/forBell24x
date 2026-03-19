@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useSession } from '@/app/contexts/AuthContext';
 import { Video, Mic, FileText, MapPin, Clock, DollarSign, Package, AlertTriangle, CheckCircle } from 'lucide-react';
+import { storeInteraction } from '@/lib/memory-engine';
 
 const URGENCY_CONFIG = {
   LOW:      { bg: 'bg-blue-100',    text: 'text-blue-800',  border: 'border-blue-200',  label: 'Low Priority' },
@@ -50,8 +51,13 @@ export default function RFQDetailPage() {
     try {
       const response = await fetch(`/api/rfq/${pathname.split('/').pop()}`, { credentials: 'include' });
       const data = await response.json();
-      if (data.success) setRFQ(data.rfq);
-      else setError(data.error || 'RFQ not found');
+      if (data.success) {
+        setRFQ(data.rfq);
+        // ── Elephant Memory: log view interaction ──
+        storeInteraction({ rfqId: data.rfq.id, actionType: 'view', source: 'marketplace' }).catch(() => {});
+      } else {
+        setError(data.error || 'RFQ not found');
+      }
     } catch {
       setError('Failed to load RFQ');
     }

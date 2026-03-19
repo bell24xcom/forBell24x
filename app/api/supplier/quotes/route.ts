@@ -3,6 +3,7 @@ import { authenticate } from '@/lib/jwt';
 import { prisma } from '@/lib/prisma';
 import { resendService } from '@/lib/resend';
 import { quoteReceivedEmail } from '@/lib/emailTemplates';
+import { storeQuote } from '@/lib/memory-engine';
 
 export const dynamic = 'force-dynamic';
 
@@ -124,6 +125,15 @@ export async function POST(request: NextRequest) {
         status: 'PENDING',
       },
     });
+
+    // ── Elephant Memory: store quote in episodic memory ──
+    storeQuote({
+      rfqId,
+      supplierId: user.userId,
+      price: parseFloat(String(price)),
+      quantity: quantity || rfq.quantity || '1',
+      status: 'PENDING',
+    }).catch(err => console.error('[Memory] storeQuote error:', err));
 
     // Update RFQ status to QUOTED if it was ACTIVE
     await prisma.rFQ.update({
