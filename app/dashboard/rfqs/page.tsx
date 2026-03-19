@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ChevronRight, Plus, FileText, AlertCircle, RefreshCw } from 'lucide-react';
+import { ChevronRight, Plus, FileText, AlertCircle, RefreshCw, Video, Mic, Zap } from 'lucide-react';
 import WhatsAppShare from '@/components/ui/WhatsAppShare';
 
 type RFQStatus = 'ACTIVE' | 'QUOTED' | 'COMPLETED' | 'EXPIRED' | 'CANCELLED' | 'DRAFT';
@@ -14,6 +14,7 @@ interface RFQItem {
   category: string;
   status: RFQStatus;
   urgency: string;
+  type?: 'voice' | 'video' | 'text';
   quantity: number;
   unit: string;
   minBudget: number | null;
@@ -41,6 +42,13 @@ function StatusBadge({ status }: { status: RFQStatus }) {
       {config.label}
     </span>
   );
+}
+
+function RFQTypeIcon({ type, className }: { type?: string; className?: string }) {
+  const cls = className ?? 'w-4 h-4';
+  if (type === 'video') return <Video className={`${cls} text-purple-400 flex-shrink-0`} />;
+  if (type === 'voice') return <Mic className={`${cls} text-blue-400 flex-shrink-0`} />;
+  return <Zap className={`${cls} text-amber-400 flex-shrink-0`} />;
 }
 
 function formatBudget(min: number | null, max: number | null): string {
@@ -229,16 +237,17 @@ export default function MyRFQsPage() {
                 {!loading && !error && rfqs.map(rfq => (
                   <tr key={rfq.id} className="hover:bg-slate-800 transition-colors">
                     <td className="px-6 py-4">
-                      <div className="max-w-xs">
-                        <p className="text-sm font-medium text-white truncate">
+                      <div className="flex items-center gap-2.5 max-w-xs">
+                        <RFQTypeIcon type={rfq.type} className="w-4 h-4" />
+                        <p className="text-sm font-semibold text-white truncate">
                           {rfq.title?.toLowerCase().includes('not specified') ? `Voice RFQ #${rfq.id.slice(-6)}` : rfq.title}
                         </p>
-                        {rfq.quantity != null && !String(rfq.quantity).toLowerCase().includes('not specified') && (
-                          <p className="text-xs text-slate-400 mt-0.5">
-                            {rfq.quantity} {rfq.unit}
-                          </p>
-                        )}
                       </div>
+                      {rfq.quantity != null && !String(rfq.quantity).toLowerCase().includes('not specified') && (
+                        <p className="text-xs text-slate-500 mt-0.5 ml-6.5">
+                          {rfq.quantity} {rfq.unit}
+                        </p>
+                      )}
                     </td>
                     <td className="px-6 py-4">
                       <span className="text-sm text-slate-300">{rfq.category}</span>
