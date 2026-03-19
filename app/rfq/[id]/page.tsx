@@ -8,6 +8,7 @@ export default function RFQDetailPage() {
   const [rfq, setRFQ] = useState<any>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
   const [showQuoteForm, setShowQuoteForm] = useState(false);
   const [quoteData, setQuoteData] = useState({
     price: '',
@@ -22,11 +23,14 @@ export default function RFQDetailPage() {
   const { user } = useSession();
 
   useEffect(() => {
-    if (!user) {
-      setIsLoggedIn(false);
-    } else {
-      setIsLoggedIn(true);
-    }
+    // Check cookie-based auth via /api/auth/me (not just localStorage)
+    fetch('/api/auth/me', { credentials: 'include' })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        setIsLoggedIn(!!(data?.success && data?.user));
+      })
+      .catch(() => setIsLoggedIn(false))
+      .finally(() => setAuthChecked(true));
   }, [user]);
 
   useEffect(() => {
