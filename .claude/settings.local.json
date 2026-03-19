@@ -35,7 +35,24 @@
       "Bash(python -m json.tool:*)",
       "Bash(netstat:*)",
       "Bash(taskkill:*)",
-      "Bash(tee:*)"
+      "Bash(tee:*)",
+      "Bash(claude install:*)",
+      "Bash(npm run build:*)",
+      "Bash(wc:*)",
+      "WebSearch",
+      "WebFetch(domain:www.globallinker.com)",
+      "WebFetch(domain:yesbank.globallinker.com)",
+      "WebFetch(domain:seller.globallinker.com)",
+      "Bash(npx prisma db push:*)",
+      "Bash(npx next build:*)",
+      "Bash(npx prisma:*)",
+      "Bash(sed:*)",
+      "Bash(npm install:*)",
+      "Bash(test:*)"
     ]
-  }
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "insforge"
+  ]
 }
