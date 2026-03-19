@@ -31,6 +31,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import UserDashboardLayout from '@/components/dashboard/UserDashboardLayout';
+import { LiveTicker } from '@/components/dashboard/LiveTicker';
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
@@ -223,6 +224,8 @@ export default function DashboardPage() {
   return (
     <UserDashboardLayout session={session}>
       <div className="p-6 space-y-6 bg-[#0a0b10] min-h-screen text-gray-100">
+        <LiveTicker />
+
         {/* Header */}
         <div className="flex justify-between items-center">
           <div>
