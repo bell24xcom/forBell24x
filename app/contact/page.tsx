@@ -57,6 +57,9 @@ export default function ContactPage() {
     }
   };
 
+  const [email_helpline, setEmail_helpline] = useState('bell24h.helpline@gmail.com');
+  const [email_digitex, setEmail_digitex] = useState('digitex.studio@gmail.com');
+
   const contactInfo = [
     {
       icon: '📍',
@@ -71,7 +74,12 @@ export default function ContactPage() {
     {
       icon: '✉️',
       title: 'Email',
-      details: ['bell24h.helpline@gmail.com (Helpline)', 'digitex.studio@gmail.com (Business)']
+      details: [
+        <a key="h" href={`mailto:${email_helpline}`} className="hover:text-blue-400 transition-colors">{email_helpline}</a>,
+        <span key="s" className="text-slate-500"> (Helpline)</span>,
+        <a key="d" href={`mailto:${email_digitex}`} className="hover:text-blue-400 transition-colors">{email_digitex}</a>,
+        <span key="s2" className="text-slate-500"> (Business)</span>,
+      ]
     },
     {
       icon: '🏢',
@@ -259,9 +267,12 @@ export default function ContactPage() {
                         <div>
                           <h3 className="text-lg font-semibold text-white mb-2">{info.title}</h3>
                           <div className="space-y-1">
-                            {info.details.map((detail, idx) => (
-                              <p key={idx} className="text-slate-400">{detail}</p>
-                            ))}
+                            {info.title === 'Email'
+                              ? info.details
+                              : info.details.map((detail, idx) => (
+                                  <p key={idx} className="text-slate-400">{detail}</p>
+                                ))
+                            }
                           </div>
                         </div>
                       </div>
