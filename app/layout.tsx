@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import ConditionalHeader from '@/components/ConditionalHeader'
 import LaunchBanner from '@/components/LaunchBanner'
 import ClientProviders from '@/components/ClientProviders'
 import SchemaMarkup from '@/components/SEO/SchemaMarkup'
@@ -69,7 +70,7 @@ export default function RootLayout({
         <Analytics />
         <ClientProviders>
           {process.env.NEXT_PUBLIC_LAUNCH_MODE === 'true' && <LaunchBanner />}
-          <Header />
+          <ConditionalHeader />
           <main className="min-h-screen">
             {children}
           </main>
