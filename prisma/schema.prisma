@@ -381,6 +381,86 @@ enum LeadStatus {
   CLOSED_LOST
 }
 
+// ─── ELEPHANT MEMORY ENGINE ───────────────────────────────────────────────────
+
+// Stores structured metadata for every RFQ for fast retrieval
+model RfqMemory {
+  id          String   @id @default(cuid())
+  rfqId      String   @unique @map("rfq_id")
+  title      String
+  category   String
+  product    String?
+  intent     String?
+  priceRange String?  @map("price_range")
+  quantity   String?
+  location   String?
+  metadata   Json?
+  embedding  String?  // vector embedding stored as base64 string (Chroma-compatible)
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@map("rfq_memory")
+}
+
+// Tracks every user interaction with the platform
+model InteractionMemory {
+  id          String    @id @default(cuid())
+  rfqId      String?   @map("rfq_id")
+  userId     String?   @map("user_id")
+  sessionId  String?   @map("session_id")
+  actionType String    @map("action_type") // view | click | quote | bookmark | share
+  source     String?   // marketplace | dashboard | whatsapp | email
+  metadata   Json?
+  createdAt  DateTime  @default(now()) @map("created_at")
+
+  @@map("interaction_memory")
+}
+
+// Stores every supplier quote for conversion analysis
+model QuoteMemory {
+  id          String      @id @default(cuid())
+  rfqId      String      @map("rfq_id")
+  supplierId  String      @map("supplier_id")
+  price      Float
+  quantity   String
+  status     QuoteMemoryStatus @default(PENDING)
+  metadata   Json?
+  createdAt  DateTime    @default(now()) @map("created_at")
+
+  @@map("quote_memory")
+}
+
+enum QuoteMemoryStatus {
+  PENDING
+  WON
+  LOST
+  EXPIRED
+}
+
+// Aggregated market intelligence per category
+model MarketInsight {
+  id            String   @id @default(cuid())
+  category      String   @unique
+  avgPrice      Float?   @map("avg_price")
+  minPrice      Float?   @map("min_price")
+  maxPrice      Float?   @map("max_price")
+  successRate   Float?   @default(0) @map("success_rate")
+  avgTimeline   String?  @map("avg_timeline")
+  demandTrend   DemandTrend @default(STABLE)
+  rfqCount      Int      @default(0) @map("rfq_count")
+  quoteCount    Int      @default(0) @map("quote_count")
+  conversionRate Float?  @default(0) @map("conversion_rate")
+  lastUpdated   DateTime @default(now()) @map("last_updated")
+  metadata      Json?
+
+  @@map("market_insights")
+}
+
+enum DemandTrend {
+  RISING
+  STABLE
+  DECLINING
+}
+
 enum NotificationType {
   INFO
   SUCCESS
