@@ -58,6 +58,12 @@ class ResendService {
         }
       }
 
+      // GLOBAL SAFETY SWITCH
+      if (process.env.AGENT_MODE === 'test') {
+        console.log(`[SMOKE-TEST] Messenger: BLOCKED-TEST-MODE - Email to ${recipients.join(', ')} suppressed.`);
+        return { success: true, message: 'Email suppressed in test mode' };
+      }
+
       const result = await this.resend.emails.send({
         from: from || this.config.fromEmail,
         to: recipients,

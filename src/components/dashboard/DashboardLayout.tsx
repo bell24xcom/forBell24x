@@ -22,6 +22,7 @@ import {
   MessageSquare,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { GuestBanner } from '@/components/dashboard/GuestBanner';
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -207,6 +208,7 @@ export default function DashboardLayout({ children, userType }: DashboardLayoutP
 
         {/* Main Content */}
         <main className="flex-1 p-6">
+          <GuestBanner />
           {children}
         </main>
       </div>
