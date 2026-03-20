@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
       limit,
     });
   } catch (error) {
-    console.error('Error fetching supplier quotes:', error);
+    console.error('[supplier/quotes GET]', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -174,7 +174,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error creating supplier quote:', error);
+    console.error('[supplier/quotes POST]', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

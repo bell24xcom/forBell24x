@@ -135,7 +135,7 @@ export default function BrowseRFQsPage() {
   return (
     <DashboardLayout>
       <div className="max-w-7xl">
-        <button onClick={() => router.back()} className="flex items-center gap-2 text-gray-400 hover:text-white mb-6 text-sm transition-colors cursor-pointer">
+        <button onClick={() => router.back()} className="flex items-center gap-2 text-gray-400 hover:text-white mb-6 text-sm transition-colors cursor-pointer min-h-[44px]">
           ← Back
         </button>
         <div className="mb-6 flex items-start justify-between flex-wrap gap-3">

@@ -275,9 +275,9 @@ export default function DashboardPage() {
       <div className="flex gap-2">
         <button
           onClick={() => setMode('buyer')}
-          className={`px-6 py-2 rounded-lg font-medium transition-colors ${
+          className={`px-6 py-2 rounded-lg font-medium transition-all active:scale-95 min-h-[44px] ${
             mode === 'buyer'
-              ? 'bg-blue-600 text-white'
+              ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
               : 'bg-gray-800 text-gray-400 hover:text-white'
           }`}
         >
@@ -285,9 +285,9 @@ export default function DashboardPage() {
         </button>
         <button
           onClick={() => setMode('supplier')}
-          className={`px-6 py-2 rounded-lg font-medium transition-colors ${
+          className={`px-6 py-2 rounded-lg font-medium transition-all active:scale-95 min-h-[44px] ${
             mode === 'supplier'
-              ? 'bg-emerald-600 text-white'
+              ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/20'
               : 'bg-gray-800 text-gray-400 hover:text-white'
           }`}
         >
@@ -310,13 +310,13 @@ export default function DashboardPage() {
                   Post your first RFQ in 30 seconds using voice, video, or text. Get quotes from verified suppliers across India.
                 </p>
                 <div className="flex items-center justify-center gap-4 flex-wrap">
-                  <button onClick={() => router.push('/voice-rfq')} className="flex items-center gap-2 bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
+                  <button onClick={() => router.push('/voice-rfq')} className="flex items-center gap-2 bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 active:scale-95 transition-all min-h-[44px]">
                     <Mic className="w-5 h-5" /> Voice RFQ
                   </button>
-                  <button onClick={() => router.push('/video-rfq')} className="flex items-center gap-2 bg-white/10 text-white border-2 border-white px-6 py-3 rounded-lg font-semibold hover:bg-white/20 transition-colors">
+                  <button onClick={() => router.push('/video-rfq')} className="flex items-center gap-2 bg-white/10 text-white border-2 border-white px-6 py-3 rounded-lg font-semibold hover:bg-white/20 active:scale-95 transition-all min-h-[44px]">
                     <Video className="w-5 h-5" /> Video RFQ
                   </button>
-                  <button onClick={() => router.push('/rfq/create')} className="flex items-center gap-2 bg-white/10 text-white border-2 border-white px-6 py-3 rounded-lg font-semibold hover:bg-white/20 transition-colors">
+                  <button onClick={() => router.push('/rfq/create')} className="flex items-center gap-2 bg-white/10 text-white border-2 border-white px-6 py-3 rounded-lg font-semibold hover:bg-white/20 active:scale-95 transition-all min-h-[44px]">
                     <FileText className="w-5 h-5" /> Text RFQ
                   </button>
                 </div>
@@ -502,7 +502,7 @@ export default function DashboardPage() {
               <h2 className="text-2xl font-bold text-white">Supplier Dashboard</h2>
               <p className="text-gray-400 mt-1">Find RFQs, submit quotes, grow your business</p>
             </div>
-            <Link href="/supplier/browse-rfqs" className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors">
+            <Link href="/supplier/browse-rfqs" className="bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-semibold px-6 py-3 rounded-lg transition-all shadow-lg shadow-emerald-600/20 min-h-[44px] flex items-center">
               Browse New RFQs
             </Link>
           </div>

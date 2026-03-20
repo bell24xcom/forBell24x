@@ -272,7 +272,7 @@ export default function VoiceRFQPage() {
   return (
     <div className="min-h-screen bg-[#0F172A] py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <button onClick={() => router.back()} className="flex items-center gap-2 text-gray-400 hover:text-white mb-6 text-sm transition-colors cursor-pointer">
+        <button onClick={() => router.back()} className="flex items-center gap-2 text-gray-400 hover:text-white mb-6 text-sm transition-colors cursor-pointer min-h-[44px]">
           ← Back
         </button>
         {/* Header Section */}
@@ -298,18 +298,18 @@ export default function VoiceRFQPage() {
 
             <div className="page-header">
               {!isRecording ? (
-                <button 
+                <button
                   onClick={startRecording}
                   disabled={isProcessing}
-                  className="bg-red-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-red-700 transition-colors flex items-center mx-auto disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="bg-red-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-red-700 active:scale-95 transition-all shadow-lg shadow-red-600/30 flex items-center mx-auto disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none min-h-[52px]"
                 >
                   <span className="mr-2">🎤</span>
                   {isProcessing ? 'Processing...' : 'Start Recording'}
                 </button>
               ) : (
-                <button 
+                <button
                   onClick={stopRecording}
-                  className="bg-gray-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-gray-700 transition-colors flex items-center mx-auto animate-pulse"
+                  className="bg-gray-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-gray-700 active:scale-95 transition-all flex items-center mx-auto animate-pulse min-h-[52px]"
                 >
                   <span className="mr-2">⏹️</span>
                   Stop Recording
@@ -322,73 +322,73 @@ export default function VoiceRFQPage() {
 
             {/* Transcript Display */}
             {transcript && (
-              <div className="bg-blue-50 p-4 rounded-lg mb-6">
-                <h4 className="font-semibold text-blue-900 mb-2">Voice Transcript:</h4>
-                <p className="text-blue-800">{transcript}</p>
+              <div className="bg-blue-900/20 border border-blue-700/50 p-4 rounded-lg mb-6">
+                <h4 className="font-semibold text-blue-300 mb-2">Voice Transcript:</h4>
+                <p className="text-blue-200">{transcript}</p>
               </div>
             )}
 
             {/* Error Display */}
             {error && (
-              <div className="bg-red-50 p-4 rounded-lg mb-6">
-                <h4 className="font-semibold text-red-900 mb-2">Error:</h4>
-                <p className="text-red-800">{error}</p>
+              <div className="bg-red-900/40 border border-red-700 p-4 rounded-lg mb-6">
+                <h4 className="font-semibold text-red-300 mb-2">Error:</h4>
+                <p className="text-red-200">{error}</p>
               </div>
             )}
 
             {/* Debug: Show if RFQ data exists */}
             {transcript && !generatedRFQ && (
-              <div className="bg-yellow-50 p-4 rounded-lg mb-6 border-2 border-yellow-500">
-                <p className="text-yellow-900 text-base">⏳ Extracting RFQ data... (If this stays, data extraction failed)</p>
+              <div className="bg-yellow-900/20 border border-yellow-700/50 p-4 rounded-lg mb-6">
+                <p className="text-yellow-300 text-base">⏳ Extracting RFQ data... (If this stays, data extraction failed)</p>
               </div>
             )}
 
             {/* Generated RFQ Display */}
             {generatedRFQ && (
-              <div className="bg-green-50 p-6 rounded-lg mb-6 border-2 border-green-500">
-                <h4 className="font-semibold text-green-900 mb-4 text-xl">✅ Generated RFQ:</h4>
-                <div className="space-y-3 text-gray-900">
+              <div className="bg-slate-800 border border-emerald-700/50 p-6 rounded-xl mb-6">
+                <h4 className="font-semibold text-emerald-400 mb-4 text-xl">✅ Generated RFQ:</h4>
+                <div className="space-y-3">
                   <div className="text-base">
-                    <strong className="text-gray-900">Title:</strong> <span className="text-gray-800">{generatedRFQ.title || 'N/A'}</span>
+                    <strong className="text-slate-300">Title:</strong> <span className="text-white">{generatedRFQ.title || 'N/A'}</span>
                   </div>
                   <div className="text-base">
-                    <strong className="text-gray-900">Category:</strong> <span className="text-gray-800">{generatedRFQ.category || 'N/A'}</span>
+                    <strong className="text-slate-300">Category:</strong> <span className="text-white">{generatedRFQ.category || 'N/A'}</span>
                   </div>
                   <div className="text-base">
-                    <strong className="text-gray-900">Description:</strong> <span className="text-gray-800">{generatedRFQ.description || 'N/A'}</span>
+                    <strong className="text-slate-300">Description:</strong> <span className="text-white">{generatedRFQ.description || 'N/A'}</span>
                   </div>
                   <div className="text-base">
-                    <strong className="text-gray-900">Quantity:</strong> <span className="text-gray-800">{generatedRFQ.quantity || 'N/A'}</span>
+                    <strong className="text-slate-300">Quantity:</strong> <span className="text-white">{generatedRFQ.quantity || 'N/A'}</span>
                   </div>
                   <div className="text-base">
-                    <strong className="text-gray-900">Timeline:</strong> <span className="text-gray-800">{generatedRFQ.timeline || 'N/A'}</span>
+                    <strong className="text-slate-300">Timeline:</strong> <span className="text-white">{generatedRFQ.timeline || 'N/A'}</span>
                   </div>
                   <div className="text-base">
-                    <strong className="text-gray-900">Budget:</strong> <span className="text-gray-800">{generatedRFQ.budget || 'N/A'}</span>
+                    <strong className="text-slate-300">Budget:</strong> <span className="text-white">{generatedRFQ.budget || 'N/A'}</span>
                   </div>
                   <div className="text-base">
-                    <strong className="text-gray-900">Specifications:</strong>
+                    <strong className="text-slate-300">Specifications:</strong>
                     {generatedRFQ.specifications && generatedRFQ.specifications.length > 0 ? (
-                      <ul className="list-disc list-inside ml-4 text-gray-800">
+                      <ul className="list-disc list-inside ml-4 text-white">
                         {generatedRFQ.specifications.map((spec, index) => (
                           <li key={index}>{spec}</li>
                         ))}
                       </ul>
                     ) : (
-                      <span className="text-gray-800"> N/A</span>
+                      <span className="text-slate-400"> N/A</span>
                     )}
                   </div>
                 </div>
                 <div className="flex gap-4 mt-6">
-                  <button 
+                  <button
                     onClick={saveRFQ}
-                    className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors"
+                    className="bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 active:scale-95 transition-all shadow-lg shadow-emerald-600/20 font-semibold min-h-[44px]"
                   >
                     Save RFQ
                   </button>
-                  <button 
+                  <button
                     onClick={discardRFQ}
-                    className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+                    className="bg-slate-700 text-white px-6 py-3 rounded-lg hover:bg-slate-600 active:scale-95 transition-all font-semibold min-h-[44px]"
                   >
                     Discard
                   </button>

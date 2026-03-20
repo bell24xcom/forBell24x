@@ -98,7 +98,7 @@ export async function GET(request: NextRequest) {
       recentActivity: activity,
     });
   } catch (error) {
-    console.error('Dashboard stats error:', error);
+    console.error('[dashboard/stats]', error);
     return NextResponse.json({ success: false, error: 'Failed to load stats' }, { status: 500 });
   }
 }
