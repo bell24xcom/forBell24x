@@ -23,7 +23,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Missing required fields' }, { status: 400 });
     }
 
-    const isTestMode = razorpay_order_id.startsWith('order_test_');
+    const isTestMode =
+      razorpay_order_id.startsWith('order_test_') &&
+      process.env.NODE_ENV !== 'production';
 
     if (!isTestMode) {
       // Verify Razorpay signature
@@ -47,24 +49,30 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Credit wallet atomically
-    const wallet = await prisma.wallet.upsert({
-      where: { userId: user.userId },
-      update: { balance: { increment: amount } },
-      create: { userId: user.userId, balance: amount },
-    });
+    // Ensure wallet exists before transaction block
+    let wallet = await prisma.wallet.findUnique({ where: { userId: user.userId } });
+    if (!wallet) {
+      wallet = await prisma.wallet.create({ data: { userId: user.userId, balance: 0 } });
+    }
 
-    await prisma.walletTransaction.create({
-      data: {
-        walletId: wallet.id,
-        type: 'CREDIT',
-        amount,
-        description: isTestMode
-          ? `Test deposit of ₹${amount.toLocaleString('en-IN')}`
-          : `Razorpay deposit of ₹${amount.toLocaleString('en-IN')}`,
-        reference: razorpay_payment_id || razorpay_order_id,
-      },
-    });
+    // Credit wallet + log transaction atomically — both succeed or both fail
+    await prisma.$transaction([
+      prisma.wallet.update({
+        where: { id: wallet.id },
+        data: { balance: { increment: amount } },
+      }),
+      prisma.walletTransaction.create({
+        data: {
+          walletId: wallet.id,
+          type: 'CREDIT',
+          amount,
+          description: isTestMode
+            ? `Test deposit of ₹${amount.toLocaleString('en-IN')}`
+            : `Razorpay deposit of ₹${amount.toLocaleString('en-IN')}`,
+          reference: razorpay_payment_id || razorpay_order_id,
+        },
+      }),
+    ]);
 
     // Re-fetch updated balance
     const updated = await prisma.wallet.findUnique({ where: { userId: user.userId } });

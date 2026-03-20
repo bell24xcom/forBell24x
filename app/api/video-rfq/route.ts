@@ -6,15 +6,17 @@ import { agentZero } from '@/lib/agents/agent-zero';
 import { verifyToken } from '@/lib/jwt';
 
 // Helper function to extract numeric budget from string
+// Handles formats: "₹2.5L", "₹50,000", "100000", "2L - 5L"
 function extractBudgetNumber(budgetStr: string): number {
   if (!budgetStr || budgetStr === 'To be discussed' || budgetStr === 'Not specified') {
     return 0;
   }
-  const numMatch = budgetStr.match(/[\d,]+/);
-  if (numMatch) {
-    return parseInt(numMatch[0].replace(/,/g, ''));
-  }
-  return 0;
+  // Match first number with optional lakhs suffix
+  const match = budgetStr.match(/([\d.,]+)\s*(L|lakh|lakhs)?/i);
+  if (!match) return 0;
+  const num = parseFloat(match[1].replace(/,/g, ''));
+  const multiplier = match[2] ? 100000 : 1;
+  return isNaN(num) ? 0 : Math.round(num * multiplier);
 }
 
 // Real AI-powered video RFQ processing via NVIDIA MiniMax M2.1
