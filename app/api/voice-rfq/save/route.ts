@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyToken } from '@/lib/jwt';
 import { storeRFQ, extractRFQMeta } from '@/lib/memory-engine';
+import { agentZero } from '@/lib/agents/agent-zero';
 
 // Save voice-generated RFQ to database
 export async function POST(request: NextRequest) {
@@ -77,6 +78,19 @@ export async function POST(request: NextRequest) {
     } catch (memErr) {
       console.error('[Memory] storeRFQ error:', memErr);
     }
+
+    // Trigger Agent Zero (fire-and-forget)
+    agentZero({
+      id: savedRFQ.id,
+      title: savedRFQ.title,
+      category: savedRFQ.category,
+      location: null,
+      maxBudget: savedRFQ.maxBudget,
+      quantity: savedRFQ.quantity,
+      timeline: savedRFQ.timeline,
+      urgency: savedRFQ.urgency as string,
+      isSeeded: false,
+    }).catch((e: unknown) => console.error('[VoiceRFQ] agentZero error:', e));
 
     return NextResponse.json({
       success: true,

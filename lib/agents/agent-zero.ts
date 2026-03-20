@@ -120,6 +120,7 @@ export async function agentZero(rfq: {
   };
 
   // Step 1: Memory check
+  console.log(`[SMOKE-TEST] Memory: checking insights for "${ctx.category}"`);
   const [insights, similar] = await Promise.all([
     getMarketInsights(ctx.category).catch(e => { errors.push(`Insights error: ${e}`); return null; }),
     getSimilarRFQs(ctx.category, 5).catch(e => { errors.push(`SimilarRFQ error: ${e}`); return []; }),
@@ -134,6 +135,7 @@ export async function agentZero(rfq: {
   // Step 3: Decide strategy
   const { strategy, reason } = await decideStrategy(ctx);
   console.log(`[AgentZero] RFQ ${rfq.id} → strategy=${strategy}, reason=${reason}`);
+  console.log(`[SMOKE-TEST] Strategy: ${strategy} for RFQ ${rfq.id}`);
 
   if (strategy === 'skip') {
     return {

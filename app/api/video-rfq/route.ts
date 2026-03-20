@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { aiClient } from '@/lib/ai-client';
+import { prisma } from '@/lib/prisma';
+import { storeRFQ, extractRFQMeta } from '@/lib/memory-engine';
+import { agentZero } from '@/lib/agents/agent-zero';
+import { verifyToken } from '@/lib/jwt';
 
 // Helper function to extract numeric budget from string
 function extractBudgetNumber(budgetStr: string): number {
@@ -31,6 +35,13 @@ export async function POST(request: NextRequest) {
     const videoBytes = await videoFile.arrayBuffer();
     const videoBuffer = Buffer.from(videoBytes);
 
+    // Optional auth — video RFQ can be submitted by logged-in or guest users
+    const token =
+      request.cookies.get('auth-token')?.value ||
+      request.headers.get('authorization')?.replace('Bearer ', '');
+    const authPayload = token ? verifyToken(token) : null;
+    const userId = authPayload?.userId ?? null;
+
     // Try NVIDIA MiniMax AI first, fall back to basic analysis
     let processedRFQ;
     try {
@@ -40,8 +51,60 @@ export async function POST(request: NextRequest) {
       processedRFQ = processVideoWithBasicAnalysis(videoFile.name, additionalContext);
     }
 
+    // Map AI urgency string to Prisma RFQUrgency enum
+    const urgencyMap: Record<string, 'LOW' | 'NORMAL' | 'HIGH' | 'URGENT'> = {
+      low: 'LOW', medium: 'NORMAL', high: 'HIGH', urgent: 'URGENT',
+    };
+    const urgency = urgencyMap[processedRFQ.urgency?.toLowerCase()] ?? 'NORMAL';
+
+    // Save Video RFQ to database
+    let savedRFQId: string | null = null;
+    try {
+      const savedRFQ = await prisma.rFQ.create({
+        data: {
+          title: processedRFQ.title,
+          description: processedRFQ.description,
+          category: processedRFQ.category,
+          quantity: processedRFQ.quantity || 'To be discussed',
+          unit: processedRFQ.unit || 'units',
+          maxBudget: extractBudgetNumber(processedRFQ.budget) || null,
+          location: processedRFQ.location !== 'Not specified' ? processedRFQ.location : null,
+          timeline: processedRFQ.timeline,
+          urgency,
+          type: 'VIDEO',
+          status: 'OPEN',
+          isSeeded: false,
+          createdBy: userId,
+          expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        },
+      });
+
+      savedRFQId = savedRFQ.id;
+      console.log('[VideoRFQ] Saved to DB:', savedRFQ.id);
+
+      // Memory + Agent (fire-and-forget — don't block response)
+      const meta = extractRFQMeta({
+        id: savedRFQ.id,
+        title: savedRFQ.title,
+        category: savedRFQ.category,
+        description: savedRFQ.description,
+        quantity: savedRFQ.quantity,
+        location: savedRFQ.location,
+        maxBudget: savedRFQ.maxBudget,
+        minBudget: null,
+      });
+      storeRFQ(meta).catch((e: unknown) => console.error('[VideoRFQ] storeRFQ error:', e));
+      agentZero({ ...savedRFQ, urgency: savedRFQ.urgency as string }).catch(
+        (e: unknown) => console.error('[VideoRFQ] agentZero error:', e)
+      );
+    } catch (dbErr) {
+      console.error('[VideoRFQ] DB save failed:', dbErr);
+      // Non-fatal: user still gets extracted data
+    }
+
     return NextResponse.json({
       success: true,
+      rfqId: savedRFQId,
       transcription: processedRFQ.description,
       extractedInfo: {
         title: processedRFQ.title,

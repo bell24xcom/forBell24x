@@ -89,6 +89,16 @@ export async function sendOutreach(
   rfq: { id: string; title: string; category: string; quantity: string; maxBudget?: number | null; timeline?: string; urgency: string },
   suppliers: OutreachTarget[]
 ): Promise<MessageResult[]> {
+  // SAFETY GATE — block all external communication unless AGENT_MODE=live
+  if (process.env.AGENT_MODE !== 'live') {
+    console.log('[SMOKE-TEST] Messenger: BLOCKED-TEST-MODE — No external outreach triggered.');
+    return suppliers.map(s => ({
+      supplierId: s.id,
+      sent: false,
+      error: 'blocked_test_mode',
+    }));
+  }
+
   const results: MessageResult[] = [];
 
   for (const supplier of suppliers) {
