@@ -461,6 +461,27 @@ enum DemandTrend {
   DECLINING
 }
 
+// Scraped / imported leads from external sources
+model ExternalLead {
+  id          String   @id @default(cuid())
+  source      String   // linkedin | tradeindia | reddit | manual | csv | whatsapp
+  rawText     String   @map("raw_text")      // original unstructured text
+  name        String?
+  company     String?
+  phone       String?
+  email       String?
+  location    String?
+  category    String?  // AI-classified
+  requirement String?  // cleaned requirement text
+  budgetHint  String?  @map("budget_hint")
+  status      String   @default("new") // new | converted | rejected | duplicate
+  rfqId       String?  @map("rfq_id")  // set after conversion
+  createdAt   DateTime @default(now()) @map("created_at")
+  processedAt DateTime? @map("processed_at")
+
+  @@map("external_leads")
+}
+
 // Aggregated user behavior per category — updated by daily cron
 model UserBehaviorMemory {
   id                   String   @id @default(cuid())
