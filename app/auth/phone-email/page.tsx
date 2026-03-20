@@ -343,7 +343,7 @@ export default function PhoneEmailAuth() {
                       value={phone}
                       onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
                       placeholder="9876543210"
-                      className="flex-1 rounded-r-lg border border-neutral-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="flex-1 rounded-r-lg border border-neutral-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                     />
                   </div>
                 </div>
@@ -351,7 +351,7 @@ export default function PhoneEmailAuth() {
                 <button
                   onClick={sendOTP}
                   disabled={loading || phone.length !== 10}
-                  className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
+                  className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 active:scale-95 disabled:bg-gray-400 transition-all shadow-lg shadow-blue-600/20 disabled:shadow-none min-h-[48px]"
                 >
                   {loading ? 'Sending...' : 'Send OTP'}
                 </button>
@@ -370,7 +370,7 @@ export default function PhoneEmailAuth() {
                     value={otp}
                     onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
                     placeholder="000000"
-                    className="w-full text-center text-2xl tracking-widest border border-neutral-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full text-center text-2xl tracking-widest border border-neutral-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                     maxLength={6}
                     autoFocus
                   />
@@ -379,7 +379,7 @@ export default function PhoneEmailAuth() {
                 <button
                   onClick={verifyOTP}
                   disabled={loading || otp.length !== 6}
-                  className="w-full bg-green-600 text-white py-3 rounded-lg font-medium hover:bg-green-700 disabled:bg-gray-400 transition-colors"
+                  className="w-full bg-green-600 text-white py-3 rounded-lg font-medium hover:bg-green-700 active:scale-95 disabled:bg-gray-400 transition-all shadow-lg shadow-green-600/20 disabled:shadow-none min-h-[48px]"
                 >
                   {loading ? 'Verifying...' : 'Verify OTP'}
                 </button>
@@ -387,14 +387,14 @@ export default function PhoneEmailAuth() {
                 <div className="flex justify-between">
                   <button
                     onClick={() => { setStep('phone'); setOtp(''); setDemoOTP(''); setError(''); }}
-                    className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                    className="text-blue-600 hover:text-blue-700 text-sm font-medium min-h-[44px] inline-flex items-center"
                   >
                     Change Number
                   </button>
                   <button
                     onClick={resendOTP}
                     disabled={loading}
-                    className="text-blue-600 hover:text-blue-700 text-sm font-medium disabled:text-gray-400"
+                    className="text-blue-600 hover:text-blue-700 text-sm font-medium disabled:text-gray-400 min-h-[44px] inline-flex items-center"
                   >
                     Resend OTP
                   </button>
