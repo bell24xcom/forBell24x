@@ -12,6 +12,10 @@
     {
       "path": "/api/cron/analyze-behavior",
       "schedule": "0 2 * * *"
+    },
+    {
+      "path": "/api/cron/demand-loop",
+      "schedule": "0 8 * * *"
     }
   ],
   "env": {
