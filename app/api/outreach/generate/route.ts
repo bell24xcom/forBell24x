@@ -96,12 +96,12 @@ export async function GET(request: NextRequest) {
           name: s.name ?? 'Unknown',
           company: s.company ?? 'Unknown',
           phone: s.phone,
-          email: s.email,
+          emailAddress: s.email,
           location: s.location,
           trustScore: s.trustScore,
           whatsapp,
           waLink,
-          email: email,
+          emailDraft: email,
         };
       });
 
