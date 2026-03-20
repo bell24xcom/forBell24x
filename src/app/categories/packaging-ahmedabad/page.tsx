@@ -1,12 +1,30 @@
 'use client';
 
 import Link from 'next/link';
-import { FileText, Building2, MapPin, Shield, Star, CheckCircle, ShoppingCart } from 'lucide-react';
+import { useState } from 'react';
+import { FileText, Building2, MapPin, Shield, Star, CheckCircle, ShoppingCart, Mic, Video, X } from 'lucide-react';
+import { VideoRFQ } from '@/components/rfq/VideoRFQ';
+import { GuestRFQManager } from '@/lib/rfq/GuestRFQManager';
 
 const Page = () => {
+  const [showVideoModal, setShowVideoModal] = useState(false);
   const category = "Packaging";
   const city = "Ahmedabad";
   const cityLocal = "Ahmedabad";
+
+  const handleVideoComplete = (blob: Blob, metadata: any) => {
+    // Save to guest storage for "Try Without Login" flow
+    GuestRFQManager.saveGuestRFQ({
+      type: 'video',
+      category,
+      city,
+      data: {
+        blobSize: blob.size,
+        metadata
+      }
+    });
+    // In a real flow, we'd also trigger an upload to Cloudinary here
+  };
 
   const h1 = `${category} Suppliers & Manufacturers in ${city} | Bell24h`;
   const metaDescription = `Find top ${category} suppliers and manufacturers in ${city}. Connect with verified businesses for bulk export and domestic needs on Bell24h. Post your RFQ today!`;
@@ -72,12 +90,32 @@ const Page = () => {
                 <h3 className="text-lg font-semibold text-white mb-2 flex items-center gap-2">
                   <Video className="w-5 h-5 text-purple-400" /> Video RFQs
                 </h3>
-                <p className="text-slate-300 leading-relaxed text-sm">
+                <p className="text-slate-300 leading-relaxed text-sm mb-4">
                   Showcase intricate {category} product specifications or quality standards visually. Video RFQs provide unparalleled clarity, reducing miscommunication and speeding up the sourcing process for export-ready goods.
                 </p>
+                <button 
+                  onClick={() => setShowVideoModal(true)}
+                  className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg transition text-sm flex items-center justify-center gap-2"
+                >
+                  <Video className="w-4 h-4" /> Try Video RFQ
+                </button>
               </div>
             </div>
           </section>
+
+          {/* Video RFQ Modal */}
+          {showVideoModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+              <div className="w-full max-w-2xl animate-in fade-in zoom-in duration-300">
+                <VideoRFQ 
+                  category={category} 
+                  city={city} 
+                  onCancel={() => setShowVideoModal(false)}
+                  onComplete={handleVideoComplete}
+                />
+              </div>
+            </div>
+          )}
 
           {/* CTA Button */}
           <section className="text-center">
