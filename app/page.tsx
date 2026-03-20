@@ -587,17 +587,28 @@ function FinalCTASection() {
 }
 
 /* ---- LIVE ACTIVITY TICKER ---- */
+const FALLBACK_ACTIVITIES = [
+  '🔴 LIVE: Steel supplier Mumbai quoted ₹2.4L',
+  '📦 Textile RFQ from Surat — suppliers matching',
+  '✅ Deal closed: Auto Parts Pune ₹85,000',
+  '🎤 Voice RFQ: Chemicals Gujarat — AI processed',
+  '📹 Video RFQ: Steel Rods Maharashtra — Specs extracted',
+  '🔴 LIVE: New RFQ posted: Electronics Delhi',
+];
+
 function LiveActivityTicker() {
-  const activities = [
-    '🔴 LIVE: Steel supplier Mumbai quoted ₹2.4L • 2 min ago',
-    '📦 Textile RFQ from Surat — 3 suppliers matched',
-    '✅ Deal closed: Auto Parts Pune ₹85,000',
-    '🎤 Voice RFQ: Chemicals Gujarat — AI processed in 4s',
-    '🔴 LIVE: New supplier registered: Electronics Delhi',
-    '📹 Video RFQ: Steel Rods Maharashtra — Specs extracted',
-    '💰 Payment released: Packaging Mumbai ₹1.2L',
-    '🔴 LIVE: 5 quotes received for Textile Machinery Surat',
-  ];
+  const [activities, setActivities] = useState<string[]>(FALLBACK_ACTIVITIES);
+
+  useEffect(() => {
+    fetch('/api/activity')
+      .then(r => r.json())
+      .then(d => {
+        if (d.success && d.activities?.length > 0) {
+          setActivities(d.activities.map((a: { text: string; ago: string }) => `${a.text} • ${a.ago}`));
+        }
+      })
+      .catch(() => {}); // fall back to static on error
+  }, []);
 
   return (
     <div className="border-y border-slate-800 bg-slate-900 py-4 overflow-hidden">
@@ -616,13 +627,11 @@ function LiveActivityTicker() {
 
       <div className="ticker-wrapper relative">
         <div className="ticker-content flex gap-12 whitespace-nowrap">
-          {/* First set */}
           {activities.map((activity, idx) => (
             <span key={`first-${idx}`} className="text-slate-300 text-sm font-medium">
               {activity}
             </span>
           ))}
-          {/* Duplicate set for seamless loop */}
           {activities.map((activity, idx) => (
             <span key={`second-${idx}`} className="text-slate-300 text-sm font-medium">
               {activity}

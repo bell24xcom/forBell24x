@@ -461,6 +461,21 @@ enum DemandTrend {
   DECLINING
 }
 
+// User feedback — captures supplier/buyer experience
+model Feedback {
+  id        String   @id @default(cuid())
+  userId    String?  @map("user_id")
+  rfqId     String?  @map("rfq_id")
+  role      String?  // buyer | supplier
+  type      String   // suggestion | bug | praise | friction
+  rating    Int?     // 1–5
+  message   String
+  page      String?  // which page feedback was submitted from
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("feedback")
+}
+
 enum NotificationType {
   INFO
   SUCCESS
