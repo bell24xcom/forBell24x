@@ -12,6 +12,7 @@
  */
 
 import { getMarketInsights, getSimilarRFQs } from '../memory-engine';
+import { getBehaviorInsight } from '../behavior-engine';
 import { searchKnowledge } from '../knowledge-base';
 import { findSuppliers } from './scout';
 import { sendOutreach } from './messenger';
@@ -49,11 +50,19 @@ export interface AgentResult {
 export async function decideStrategy(ctx: AgentContext): Promise<{ strategy: OutreachStrategy; reason: string }> {
   // Skip seeded RFQs handled at entry point
 
-  const insights = await getMarketInsights(ctx.category);
+  const [insights, behavior] = await Promise.all([
+    getMarketInsights(ctx.category),
+    getBehaviorInsight(ctx.category).catch(() => null),
+  ]);
 
   // Low budget → skip outreach
   if (!ctx.maxBudget || ctx.maxBudget < 10000) {
     return { strategy: 'skip', reason: `Budget ${ctx.maxBudget ?? 0} below 10000 threshold` };
+  }
+
+  // High drop-off at rfq_viewed → users aren't engaging with this category
+  if (behavior && behavior.dropRate > 0.8 && behavior.sessionCount > 5) {
+    return { strategy: 'skip', reason: `High drop-off (${(behavior.dropRate * 100).toFixed(0)}%) at "${behavior.avgDropStage}" — suppressing outreach` };
   }
 
   if (!insights) {
@@ -64,16 +73,22 @@ export async function decideStrategy(ctx: AgentContext): Promise<{ strategy: Out
   const { demandTrend, conversionRate } = insights;
 
   if (demandTrend === 'RISING') {
-    return { strategy: 'aggressive', reason: `Demand trending RISING — maximize outreach` };
+    // If behavior confirms good engagement, be aggressive
+    const behaviorBoost = behavior && behavior.conversionRate > 0.3;
+    return {
+      strategy: behaviorBoost ? 'aggressive' : 'quality_focus',
+      reason: `Demand RISING${behaviorBoost ? ' + good user engagement' : ''} — targeted outreach`,
+    };
   }
 
   if (demandTrend === 'DECLINING') {
-    return { strategy: 'skip', reason: `Demand trending DECLINING — suppress outreach` };
+    return { strategy: 'skip', reason: `Demand DECLINING — suppress outreach` };
   }
 
-  // STABLE
-  if (conversionRate !== undefined && conversionRate > 0.6) {
-    return { strategy: 'quality_focus', reason: `High conversion ${(conversionRate * 100).toFixed(0)}% — focus on quality suppliers` };
+  // STABLE — use behavior conversion rate to decide
+  const effectiveConversion = behavior?.conversionRate ?? conversionRate ?? 0;
+  if (effectiveConversion > 0.4) {
+    return { strategy: 'quality_focus', reason: `Conversion ${(effectiveConversion * 100).toFixed(0)}% — focus on quality suppliers` };
   }
 
   return { strategy: 'volume_push', reason: `Normal market — volume outreach` };
