@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyToken } from '@/lib/jwt';
+import { checkDailyLimit } from '@/lib/orchestration';
 import { storeRFQ, extractRFQMeta } from '@/lib/memory-engine';
 import { agentZero } from '@/lib/agents/agent-zero';
 
@@ -27,6 +28,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Rate limit: max 10 RFQs per buyer per day (shared limit with text RFQ)
+    const limitCheck = await checkDailyLimit(payload.userId, 'rfq', 10);
+    if (!limitCheck.allowed) {
+      return NextResponse.json(
+        { success: false, error: `Daily RFQ limit reached (${limitCheck.count}/${limitCheck.limit}). Try again tomorrow.` },
+        { status: 429 }
+      );
+    }
+
     const rfqData = await request.json();
 
     if (!rfqData || !rfqData.title) {
@@ -39,10 +49,16 @@ export async function POST(request: NextRequest) {
     // Keep quantity as string (Prisma schema is String type)
     const quantity = rfqData.quantity || '1 units';
 
-    // Parse budget from string like "₹2.5L - ₹3.5L" -> numbers
-    const budgetMatch = rfqData.budget?.match(/₹([\d.]+)L?\s*-?\s*₹?([\d.]+)?L?/);
-    const minBudget = budgetMatch ? parseFloat(budgetMatch[1]) * (budgetMatch[1].includes('L') ? 100000 : 1) : null;
-    const maxBudget = budgetMatch && budgetMatch[2] ? parseFloat(budgetMatch[2]) * 100000 : null;
+    // Parse budget from strings like "₹2.5L - ₹3.5L" or "₹50,000" -> numbers
+    const budgetStr = rfqData.budget || '';
+    const budgetMatch = budgetStr.match(/₹([\d.,]+)(L)?\s*-?\s*₹?([\d.,]+)?(L)?/);
+    const parseAmount = (num: string | undefined, hasL: string | undefined) => {
+      if (!num) return null;
+      const n = parseFloat(num.replace(/,/g, ''));
+      return isNaN(n) ? null : n * (hasL ? 100000 : 1);
+    };
+    const minBudget = budgetMatch ? parseAmount(budgetMatch[1], budgetMatch[2]) : null;
+    const maxBudget = budgetMatch ? parseAmount(budgetMatch[3], budgetMatch[4]) : null;
 
     // Save to database with status OPEN
     const savedRFQ = await prisma.rFQ.create({
