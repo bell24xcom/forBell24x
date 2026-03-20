@@ -1,0 +1,252 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { MessageCircle, Mail, RefreshCw, ExternalLink, Users, FileText, TrendingUp, Copy, CheckCheck } from 'lucide-react';
+
+interface SupplierMessage {
+  supplierId: string;
+  name: string;
+  company: string;
+  phone: string | null;
+  emailAddress: string | null;
+  location: string | null;
+  trustScore: number;
+  whatsapp: string;
+  waLink: string | null;
+  emailDraft: { subject: string; body: string };
+}
+
+interface OutreachGroup {
+  category: string;
+  rfqCount: number;
+  featuredRFQ: { id: string; title: string; link: string };
+  suppliers: SupplierMessage[];
+}
+
+interface DashboardStats {
+  activity: { rfqsToday: number; quotesThisWeek: number; activeSuppliers: number; totalRFQs: number };
+  leads: { total: number; pending: number; converted: number; conversionRate: string };
+}
+
+export default function OperatorDashboard() {
+  const [category, setCategory] = useState('');
+  const [outreach, setOutreach] = useState<OutreachGroup[]>([]);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [copied, setCopied] = useState<string | null>(null);
+  const [funnelData, setFunnelData] = useState<any>(null);
+
+  useEffect(() => {
+    loadStats();
+    loadFunnel();
+  }, []);
+
+  async function loadStats() {
+    const res = await fetch('/api/demand/dashboard').catch(() => null);
+    if (res?.ok) setStats(await res.json());
+  }
+
+  async function loadFunnel() {
+    const res = await fetch('/api/analytics/funnel?days=7').catch(() => null);
+    if (res?.ok) setFunnelData(await res.json());
+  }
+
+  async function generateOutreach() {
+    setLoading(true);
+    try {
+      const url = category
+        ? `/api/outreach/generate?category=${encodeURIComponent(category)}`
+        : '/api/outreach/generate';
+      const res = await fetch(url);
+      const data = await res.json();
+      if (data.success) {
+        setOutreach(data.outreach ?? []);
+      } else {
+        alert(data.message || data.error || 'No data returned');
+      }
+    } catch (e) {
+      alert('Failed to load outreach data');
+    }
+    setLoading(false);
+  }
+
+  function copyText(text: string, id: string) {
+    navigator.clipboard.writeText(text);
+    setCopied(id);
+    setTimeout(() => setCopied(null), 2000);
+  }
+
+  const CATEGORIES = [
+    '', 'Textiles', 'Packaging & Paper', 'Industrial Machinery', 'Automobile',
+    'Electronics & Electrical', 'Chemical', 'Food Products & Beverage',
+    'Agriculture', 'Apparel & Fashion', 'Tools & Equipment',
+  ];
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-white p-4 md:p-6">
+      <div className="max-w-5xl mx-auto space-y-6">
+
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-white">Operator Dashboard</h1>
+            <p className="text-slate-400 text-sm mt-1">Manual activation — send outreach, track pipeline</p>
+          </div>
+          <button
+            onClick={() => { loadStats(); loadFunnel(); }}
+            className="p-2 text-slate-400 hover:text-white transition-colors"
+            title="Refresh"
+          >
+            <RefreshCw className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Stats Row */}
+        {stats && (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {[
+              { label: 'RFQs Today', value: stats.activity.rfqsToday, icon: FileText },
+              { label: 'Active Suppliers', value: stats.activity.activeSuppliers, icon: Users },
+              { label: 'Quotes This Week', value: stats.activity.quotesThisWeek, icon: TrendingUp },
+              { label: 'Leads Pipeline', value: `${stats.leads.converted}/${stats.leads.total}`, icon: TrendingUp },
+            ].map(s => (
+              <div key={s.label} className="bg-slate-900 border border-slate-800 rounded-lg p-4">
+                <div className="text-2xl font-bold text-blue-400">{s.value}</div>
+                <div className="text-slate-400 text-xs mt-1">{s.label}</div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Funnel */}
+        {funnelData?.rates && (
+          <div className="bg-slate-900 border border-slate-800 rounded-lg p-4">
+            <h2 className="text-sm font-semibold text-slate-300 mb-3">7-Day Funnel</h2>
+            <div className="flex gap-6 flex-wrap">
+              {[
+                { label: 'RFQs Created', value: funnelData.funnel.rfqsCreated },
+                { label: 'Viewed', value: funnelData.funnel.rfqsViewed, rate: funnelData.rates.viewRate },
+                { label: 'Quoted', value: funnelData.funnel.rfqsQuoted, rate: funnelData.rates.quoteRate },
+                { label: 'Deals', value: funnelData.funnel.dealsAccepted, rate: funnelData.rates.dealRate },
+              ].map((s, i) => (
+                <div key={i} className="text-center">
+                  <div className="text-xl font-bold text-white">{s.value}</div>
+                  <div className="text-xs text-slate-400">{s.label}</div>
+                  {s.rate && <div className="text-xs text-blue-400">{s.rate}</div>}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Outreach Generator */}
+        <div className="bg-slate-900 border border-slate-800 rounded-lg p-5">
+          <h2 className="text-lg font-semibold mb-4">Generate Outreach Messages</h2>
+          <div className="flex gap-3 flex-wrap">
+            <select
+              value={category}
+              onChange={e => setCategory(e.target.value)}
+              className="bg-slate-800 border border-slate-700 text-white rounded-lg px-3 py-2 text-sm flex-1 min-w-[180px]"
+            >
+              {CATEGORIES.map(c => (
+                <option key={c} value={c}>{c || 'All Categories'}</option>
+              ))}
+            </select>
+            <button
+              onClick={generateOutreach}
+              disabled={loading}
+              className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-semibold px-5 py-2 rounded-lg text-sm transition-colors flex items-center gap-2"
+            >
+              {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Users className="w-4 h-4" />}
+              {loading ? 'Loading...' : 'Generate Messages'}
+            </button>
+          </div>
+        </div>
+
+        {/* Outreach Results */}
+        {outreach.length === 0 && !loading && (
+          <div className="text-slate-500 text-sm text-center py-8">
+            Click "Generate Messages" to load suppliers and ready-to-send WhatsApp messages.
+          </div>
+        )}
+
+        {outreach.map(group => (
+          <div key={group.category} className="bg-slate-900 border border-slate-800 rounded-lg p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-semibold text-white">{group.category}</h3>
+                <p className="text-sm text-slate-400">
+                  {group.rfqCount} live RFQ{group.rfqCount !== 1 ? 's' : ''} —{' '}
+                  <a href={group.featuredRFQ.link} target="_blank" rel="noreferrer" className="text-blue-400 hover:underline">
+                    {group.featuredRFQ.title.slice(0, 50)}
+                  </a>
+                </p>
+              </div>
+              <a
+                href={group.featuredRFQ.link}
+                target="_blank"
+                rel="noreferrer"
+                className="text-slate-400 hover:text-white"
+              >
+                <ExternalLink className="w-4 h-4" />
+              </a>
+            </div>
+
+            {group.suppliers.length === 0 ? (
+              <p className="text-slate-500 text-sm">No suppliers with contact info found for this category.</p>
+            ) : (
+              <div className="space-y-3">
+                {group.suppliers.map(s => (
+                  <div key={s.supplierId} className="bg-slate-800 rounded-lg p-4 space-y-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <p className="font-medium text-white text-sm">{s.company}</p>
+                        <p className="text-slate-400 text-xs">{s.name} {s.location ? `· ${s.location}` : ''} · Trust: {s.trustScore}</p>
+                      </div>
+                      <div className="flex gap-2 shrink-0">
+                        {s.waLink && (
+                          <a
+                            href={s.waLink}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="bg-green-600 hover:bg-green-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors"
+                          >
+                            <MessageCircle className="w-3.5 h-3.5" />
+                            WhatsApp
+                          </a>
+                        )}
+                        {s.emailAddress && (
+                          <a
+                            href={`mailto:${s.emailAddress}?subject=${encodeURIComponent(s.emailDraft.subject)}&body=${encodeURIComponent(s.emailDraft.body)}`}
+                            className="bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors"
+                          >
+                            <Mail className="w-3.5 h-3.5" />
+                            Email
+                          </a>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* WhatsApp message preview */}
+                    <div className="bg-slate-900 rounded p-3 text-xs text-slate-300 font-mono whitespace-pre-wrap leading-relaxed">
+                      {s.whatsapp}
+                    </div>
+                    <button
+                      onClick={() => copyText(s.whatsapp, s.supplierId)}
+                      className="text-xs text-slate-400 hover:text-white flex items-center gap-1 transition-colors"
+                    >
+                      {copied === s.supplierId
+                        ? <><CheckCheck className="w-3.5 h-3.5 text-green-400" /> Copied!</>
+                        : <><Copy className="w-3.5 h-3.5" /> Copy message</>
+                      }
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}

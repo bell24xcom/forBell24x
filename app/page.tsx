@@ -69,14 +69,30 @@ function HeroSection() {
       <div className="max-w-6xl mx-auto px-4">
         {/* Headline */}
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4 text-center">
-          Post RFQs in{' '}
-          <span className="text-blue-400">3 Different Ways</span>
+          Find Verified Suppliers{' '}
+          <span className="text-blue-400">in 24 Hours</span>
         </h1>
 
         {/* Subheadline */}
-        <p className="text-lg text-slate-300 max-w-2xl mx-auto mb-10 text-center">
-          Choose Voice, Video, or Text. AI-powered matching across 450+ categories.
+        <p className="text-lg text-slate-300 max-w-2xl mx-auto mb-6 text-center">
+          Post your requirement by voice, video, or text. AI matches you with verified Indian suppliers — free during beta.
         </p>
+
+        {/* Primary CTA */}
+        <div className="flex flex-col sm:flex-row gap-3 justify-center mb-8">
+          <a
+            href="/rfq/create"
+            className="inline-flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-bold px-8 py-4 rounded-xl text-lg transition-all duration-200 shadow-lg shadow-blue-500/25"
+          >
+            Post Your Requirement — Free
+          </a>
+          <a
+            href="/supplier/browse-rfqs"
+            className="inline-flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-white font-semibold px-8 py-4 rounded-xl text-lg transition-all duration-200 border border-slate-700"
+          >
+            Browse Open RFQs
+          </a>
+        </div>
 
         {/* 3-Tab Switcher */}
         <div className="max-w-5xl mx-auto mb-8">
@@ -566,20 +582,20 @@ function FinalCTASection() {
     <section className="py-16 border-t border-slate-800">
       <div className="max-w-3xl mx-auto px-4 text-center">
         <h2 className="text-2xl lg:text-3xl font-bold text-white mb-4">
-          Ready to Transform Your Procurement?
+          Post Your Requirement. Get Supplier Quotes in 24 Hours.
         </h2>
         <p className="text-slate-300 mb-8">
-          Join thousands of businesses already using Bell24H to find verified suppliers faster.
+          No spam. No brokers. Direct connection to verified Indian suppliers — free during beta.
         </p>
         <Link
           href="/rfq/create"
           className="inline-flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold px-8 py-3.5 rounded-lg text-lg transition-all duration-200 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40"
         >
-          Post Your First RFQ Free
+          Post Your Requirement Free
           <ArrowRight className="w-5 h-5" />
         </Link>
         <p className="text-slate-500 text-sm mt-4">
-          No credit card required &middot; Free during beta &middot; Cancel anytime
+          No credit card &middot; Free during beta &middot; Voice, Video, or Text
         </p>
       </div>
     </section>
