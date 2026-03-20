@@ -461,6 +461,21 @@ enum DemandTrend {
   DECLINING
 }
 
+// Aggregated user behavior per category — updated by daily cron
+model UserBehaviorMemory {
+  id                   String   @id @default(cuid())
+  category             String   @unique
+  sessionCount         Int      @default(0) @map("session_count")
+  avgDropStage         String?  @map("avg_drop_stage")  // e.g. rfq_viewed | quote_started
+  dropRate             Float?   @default(0) @map("drop_rate")
+  avgTimeToQuoteHours  Float?   @map("avg_time_to_quote_hours")
+  conversionRate       Float?   @default(0) @map("conversion_rate")
+  topFailures          Json?    @map("top_failures")    // { stage: count }
+  lastAnalyzed         DateTime @default(now()) @map("last_analyzed")
+
+  @@map("user_behavior_memory")
+}
+
 // User feedback — captures supplier/buyer experience
 model Feedback {
   id        String   @id @default(cuid())
