@@ -57,15 +57,16 @@ export async function findSuppliers(ctx: {
   });
   winningQuotes.forEach(q => memorySupplierIds.add(q.supplierId));
 
-  // DB search: claimed suppliers in category
+  // DB search: claimed suppliers; prefer memory-matched suppliers if available
+  const hasMemorySuppliers = memorySupplierIds.size > 0;
   const dbSuppliers = await prisma.user.findMany({
     where: {
       role: 'SUPPLIER',
       isClaimed: true,
       isActive: true,
-      // Note: category is on RFQs, not users — would need product/industry mapping
-      // For now, return all claimed suppliers in location
       ...(location && location !== 'Pan India' ? { location } : {}),
+      // If we have category-proven suppliers from memory, prefer them
+      ...(hasMemorySuppliers ? { id: { in: [...memorySupplierIds] } } : {}),
     },
     select: {
       id: true,
@@ -79,8 +80,29 @@ export async function findSuppliers(ctx: {
     take: 50,
   });
 
+  // Fallback: if no memory-matched suppliers found, fetch all active suppliers
+  const allSuppliers = dbSuppliers.length > 0 ? dbSuppliers : await prisma.user.findMany({
+    where: {
+      role: 'SUPPLIER',
+      isClaimed: true,
+      isActive: true,
+      ...(location && location !== 'Pan India' ? { location } : {}),
+    },
+    select: {
+      id: true,
+      name: true,
+      company: true,
+      phone: true,
+      email: true,
+      location: true,
+      trustScore: true,
+    },
+    orderBy: { trustScore: 'desc' },
+    take: 30,
+  });
+
   // Score and rank
-  const scored = dbSuppliers.map(s => {
+  const scored = allSuppliers.map(s => {
     const memoryBoost = memorySupplierIds.has(s.id) ? 15 : 0;
     const trustBoost = Math.min((s.trustScore ?? 0) / 10, 10); // max +10
     const score = (s.trustScore ?? 0) + memoryBoost + trustBoost;
