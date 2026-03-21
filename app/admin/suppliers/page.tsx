@@ -1,284 +1,223 @@
 'use client';
 
-import { Building, CheckCircle, Clock, Edit, Eye, Plus, Search, Trash2, XCircle } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { Search, RefreshCw, Building, Phone, Star } from 'lucide-react';
 
 interface Supplier {
-  id: string;
-  name: string;
-  email: string;
-  category: string;
-  location: string;
-  status: 'verified' | 'pending' | 'rejected';
-  rating: number;
-  orders: number;
-  revenue: string;
-  joinedDate: string;
+  id: string; name: string; company: string | null; phone: string | null;
+  email: string | null; trustScore: number; isActive: boolean; isClaimed: boolean;
+  plan: string; categories: string[]; quoteCount: number; dealCount: number;
+  joinedAt: string;
 }
 
-export default function SuppliersManagementPage() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('all');
-  const [statusFilter, setStatusFilter] = useState('all');
+interface SuppliersResponse {
+  suppliers: Supplier[];
+  pagination: { page: number; limit: number; total: number; pages: number };
+  stats: { total: number; active: number; withPhone: number; highTrust: number };
+}
 
-  const mockSuppliers: Supplier[] = [
-    {
-      id: '1',
-      name: 'TechCorp Industries',
-      email: 'admin@techcorp.com',
-      category: 'Electronics',
-      location: 'Mumbai',
-      status: 'verified',
-      rating: 4.8,
-      orders: 2340,
-      revenue: '₹2.4Cr',
-      joinedDate: '2024-01-15'
-    },
-    {
-      id: '2',
-      name: 'MetalWorks Ltd',
-      email: 'contact@metalworks.com',
-      category: 'Manufacturing',
-      location: 'Delhi',
-      status: 'verified',
-      rating: 4.7,
-      orders: 1890,
-      revenue: '₹1.8Cr',
-      joinedDate: '2024-02-20'
-    },
-    {
-      id: '3',
-      name: 'ElectroTech Solutions',
-      email: 'info@electrotech.com',
-      category: 'Electronics',
-      location: 'Bangalore',
-      status: 'pending',
-      rating: 0,
-      orders: 0,
-      revenue: '₹0',
-      joinedDate: '2024-08-25'
-    },
-    {
-      id: '4',
-      name: 'TextileCorp India',
-      email: 'sales@textilecorp.com',
-      category: 'Textiles',
-      location: 'Chennai',
-      status: 'verified',
-      rating: 4.6,
-      orders: 1560,
-      revenue: '₹1.2Cr',
-      joinedDate: '2024-03-10'
+const PLAN_COLOR: Record<string, string> = {
+  FREE:       'bg-slate-700 text-slate-300',
+  PRO:        'bg-indigo-800 text-indigo-200',
+  ENTERPRISE: 'bg-amber-800 text-amber-200',
+};
+
+export default function SuppliersPage() {
+  const [data,     setData]     = useState<SuppliersResponse | null>(null);
+  const [loading,  setLoading]  = useState(true);
+  const [error,    setError]    = useState('');
+  const [page,     setPage]     = useState(1);
+  const [search,   setSearch]   = useState('');
+  const [query,    setQuery]    = useState('');   // debounced search
+
+  const fetchData = useCallback(async () => {
+    setLoading(true); setError('');
+    try {
+      const params = new URLSearchParams({ page: String(page), search: query });
+      const res  = await fetch(`/api/admin/suppliers?${params}`);
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || 'Failed');
+      setData(json);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to load');
+    } finally {
+      setLoading(false);
     }
-  ];
+  }, [page, query]);
 
-  const filteredSuppliers = mockSuppliers.filter(supplier => {
-    const matchesSearch = supplier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      supplier.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      supplier.category.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = categoryFilter === 'all' || supplier.category === categoryFilter;
-    const matchesStatus = statusFilter === 'all' || supplier.status === statusFilter;
+  useEffect(() => { fetchData(); }, [fetchData]);
 
-    return matchesSearch && matchesCategory && matchesStatus;
-  });
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'verified':
-        return <CheckCircle className="h-4 w-4 text-green-600" />;
-      case 'pending':
-        return <Clock className="h-4 w-4 text-yellow-600" />;
-      case 'rejected':
-        return <XCircle className="h-4 w-4 text-red-600" />;
-      default:
-        return <Clock className="h-4 w-4 text-slate-300" />;
-    }
-  };
+  function handleSearch(e: React.FormEvent) {
+    e.preventDefault();
+    setPage(1);
+    setQuery(search);
+  }
 
   return (
-    <div className="page-container">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-neutral-900">Supplier Management</h1>
-          <p className="mt-2 text-slate-300">Verify and manage supplier accounts and performance</p>
+    <div className="space-y-5">
+      {/* Header */}
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-xl font-bold text-white">Suppliers</h1>
+          <p className="text-slate-400 text-sm">
+            {data ? `${data.stats.total} total · ${data.stats.active} active · ${data.stats.withPhone} with phone · ${data.stats.highTrust} high-trust` : 'Loading…'}
+          </p>
         </div>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Building className="h-6 w-6 text-blue-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-slate-300">Total Suppliers</p>
-                <p className="text-2xl font-bold text-neutral-900">847</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <CheckCircle className="h-6 w-6 text-green-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-slate-300">Verified</p>
-                <p className="text-2xl font-bold text-neutral-900">789</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-yellow-100 rounded-lg">
-                <Clock className="h-6 w-6 text-yellow-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-slate-300">Pending</p>
-                <p className="text-2xl font-bold text-neutral-900">45</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-red-100 rounded-lg">
-                <XCircle className="h-6 w-6 text-red-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-slate-300">Rejected</p>
-                <p className="text-2xl font-bold text-neutral-900">13</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Controls */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search suppliers..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-            </div>
-
-            <select
-              value={categoryFilter}
-              onChange={(e) => setCategoryFilter(e.target.value)}
-              className="px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="all">All Categories</option>
-              <option value="Electronics">Electronics</option>
-              <option value="Manufacturing">Manufacturing</option>
-              <option value="Textiles">Textiles</option>
-              <option value="Chemicals">Chemicals</option>
-            </select>
-
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="all">All Status</option>
-              <option value="verified">Verified</option>
-              <option value="pending">Pending</option>
-              <option value="rejected">Rejected</option>
-            </select>
-
-            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2">
-              <Plus className="h-4 w-4" />
-              Add Supplier
-            </button>
-          </div>
-        </div>
-
-        {/* Suppliers Table */}
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <div className="px-6 py-4 border-b border-neutral-200">
-            <h3 className="text-lg font-medium text-neutral-900">Suppliers ({filteredSuppliers.length})</h3>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-neutral-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Supplier</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Category</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Location</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Rating</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Orders</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Revenue</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredSuppliers.map((supplier) => (
-                  <tr key={supplier.id} className="hover:bg-neutral-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div>
-                        <div className="text-sm font-medium text-neutral-900">{supplier.name}</div>
-                        <div className="text-sm text-slate-400">{supplier.email}</div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                        {supplier.category}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">
-                      {supplier.location}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        {getStatusIcon(supplier.status)}
-                        <span className={`ml-2 inline-flex px-2 py-1 text-xs font-semibold rounded-full ${supplier.status === 'verified' ? 'bg-green-100 text-green-800' :
-                            supplier.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                              'bg-red-100 text-red-800'
-                          }`}>
-                          {supplier.status}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <span className="text-sm font-medium text-neutral-900">{supplier.rating}</span>
-                        <span className="text-yellow-400 ml-1">★</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">
-                      {supplier.orders.toLocaleString()}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-neutral-900">
-                      {supplier.revenue}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button className="text-blue-600 hover:text-blue-900 mr-3">
-                        <Eye className="h-4 w-4" />
-                      </button>
-                      <button className="text-green-600 hover:text-green-900 mr-3">
-                        <Edit className="h-4 w-4" />
-                      </button>
-                      <button className="text-red-600 hover:text-red-900">
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <button onClick={fetchData} disabled={loading}
+          className="p-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-400 hover:text-white transition-colors">
+          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+        </button>
       </div>
+
+      {/* Stats */}
+      {data && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {[
+            { label: 'Total',      value: data.stats.total,     color: 'text-blue-400',    border: 'border-blue-500/20' },
+            { label: 'Active',     value: data.stats.active,    color: 'text-green-400',   border: 'border-green-500/20' },
+            { label: 'With Phone', value: data.stats.withPhone, color: 'text-cyan-400',    border: 'border-cyan-500/20' },
+            { label: 'High Trust', value: data.stats.highTrust, color: 'text-amber-400',   border: 'border-amber-500/20' },
+          ].map(s => (
+            <div key={s.label} className={`bg-slate-800/60 border ${s.border} rounded-xl p-4`}>
+              <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
+              <p className="text-slate-400 text-xs mt-0.5">{s.label}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Search */}
+      <form onSubmit={handleSearch} className="flex gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+          <input
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Search name, company, phone…"
+            className="w-full pl-9 pr-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white text-sm placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+          />
+        </div>
+        <button type="submit"
+          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg transition-colors">
+          Search
+        </button>
+      </form>
+
+      {error && <div className="bg-red-900/30 border border-red-700/50 text-red-300 px-4 py-3 rounded-xl text-sm">{error}</div>}
+
+      {loading && !data && (
+        <div className="py-16 flex justify-center">
+          <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+        </div>
+      )}
+
+      {/* Table */}
+      {data && (
+        <>
+          <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-slate-700/50">
+                    <th className="text-left text-xs text-slate-400 font-medium uppercase tracking-wide px-4 py-3">Supplier</th>
+                    <th className="text-left text-xs text-slate-400 font-medium uppercase tracking-wide px-4 py-3">Phone</th>
+                    <th className="text-left text-xs text-slate-400 font-medium uppercase tracking-wide px-4 py-3">Categories</th>
+                    <th className="text-left text-xs text-slate-400 font-medium uppercase tracking-wide px-4 py-3">Trust</th>
+                    <th className="text-left text-xs text-slate-400 font-medium uppercase tracking-wide px-4 py-3">Activity</th>
+                    <th className="text-left text-xs text-slate-400 font-medium uppercase tracking-wide px-4 py-3">Plan</th>
+                    <th className="text-left text-xs text-slate-400 font-medium uppercase tracking-wide px-4 py-3">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-700/30">
+                  {data.suppliers.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} className="text-center text-slate-500 py-12 text-sm">
+                        <Building className="w-8 h-8 mx-auto mb-2 text-slate-700" />
+                        No suppliers found
+                      </td>
+                    </tr>
+                  ) : data.suppliers.map(s => (
+                    <tr key={s.id} className="hover:bg-slate-700/20 transition-colors">
+                      <td className="px-4 py-3">
+                        <p className="text-white font-medium text-sm">{s.company ?? s.name}</p>
+                        {s.company && <p className="text-slate-500 text-xs">{s.name}</p>}
+                        <p className="text-slate-600 text-xs font-mono">{s.id.slice(0, 8)}…</p>
+                      </td>
+                      <td className="px-4 py-3">
+                        {s.phone ? (
+                          <span className="flex items-center gap-1 text-slate-300 text-xs">
+                            <Phone className="w-3 h-3 text-green-500" />{s.phone}
+                          </span>
+                        ) : (
+                          <span className="text-slate-600 text-xs">—</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex flex-wrap gap-1">
+                          {s.categories.length > 0
+                            ? s.categories.slice(0, 2).map(c => (
+                                <span key={c} className="text-[10px] bg-slate-700 text-slate-300 px-1.5 py-0.5 rounded">{c}</span>
+                              ))
+                            : <span className="text-slate-600 text-xs">—</span>
+                          }
+                          {s.categories.length > 2 && (
+                            <span className="text-[10px] text-slate-500">+{s.categories.length - 2}</span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className={`flex items-center gap-1 text-xs font-semibold ${
+                          s.trustScore >= 70 ? 'text-green-400' :
+                          s.trustScore >= 40 ? 'text-amber-400' : 'text-slate-500'
+                        }`}>
+                          <Star className="w-3 h-3" /> {s.trustScore}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-xs text-slate-400">
+                        <span className="text-white">{s.quoteCount}</span> quotes ·{' '}
+                        <span className="text-white">{s.dealCount}</span> deals
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className={`text-xs px-1.5 py-0.5 rounded font-semibold ${PLAN_COLOR[s.plan] ?? PLAN_COLOR.FREE}`}>
+                          {s.plan}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className={`text-xs px-1.5 py-0.5 rounded font-semibold ${
+                          s.isActive ? 'bg-green-900/50 text-green-400' : 'bg-red-900/50 text-red-400'
+                        }`}>
+                          {s.isActive ? 'Active' : 'Inactive'}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Pagination */}
+          {data.pagination.pages > 1 && (
+            <div className="flex items-center justify-between text-sm">
+              <p className="text-slate-500 text-xs">
+                Showing {(data.pagination.page - 1) * data.pagination.limit + 1}–
+                {Math.min(data.pagination.page * data.pagination.limit, data.pagination.total)} of {data.pagination.total}
+              </p>
+              <div className="flex gap-2">
+                <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
+                  className="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-slate-300 text-xs disabled:opacity-40 hover:bg-slate-700 transition-colors">
+                  Previous
+                </button>
+                <button onClick={() => setPage(p => Math.min(data.pagination.pages, p + 1))}
+                  disabled={page === data.pagination.pages}
+                  className="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-slate-300 text-xs disabled:opacity-40 hover:bg-slate-700 transition-colors">
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }
