@@ -149,7 +149,7 @@ export default function RFQDetailPage() {
         {/* Breadcrumb */}
         <nav className="mb-6 flex items-center gap-2 text-sm">
           <a href="/rfq" className="text-slate-400 hover:text-white transition-colors">Marketplace</a>
-          <span className="text-slate-600">/</span>
+          <span className="text-slate-300">/</span>
           <span className="text-slate-300 truncate max-w-[200px]">{rfq.title}</span>
         </nav>
 
@@ -224,7 +224,7 @@ export default function RFQDetailPage() {
                     {rfq.user?.location && (
                       <div>
                         <p className="text-slate-500 text-xs">Location</p>
-                        <p className="text-slate-700 font-medium">{rfq.user.location}</p>
+                        <p className="text-slate-400 font-medium">{rfq.user.location}</p>
                       </div>
                     )}
                   </div>
@@ -263,12 +263,12 @@ export default function RFQDetailPage() {
                   <h2 className="text-xl font-bold text-slate-900">Submit Your Quote</h2>
                   <button
                     onClick={() => setShowQuoteForm(false)}
-                    className="text-slate-400 hover:text-slate-600 text-2xl leading-none"
+                    className="text-slate-400 hover:text-slate-300 text-2xl leading-none"
                   >
                     ×
                   </button>
                 </div>
-                <p className="text-slate-500 text-sm mt-1">Quote for: <span className="font-medium text-slate-700">{rfq.title}</span></p>
+                <p className="text-slate-500 text-sm mt-1">Quote for: <span className="font-medium text-slate-400">{rfq.title}</span></p>
               </div>
 
               <div className="p-6 space-y-6">
@@ -277,7 +277,7 @@ export default function RFQDetailPage() {
                   <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Required Information</p>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                      <label className="block text-sm font-semibold text-slate-700 mb-1.5">Your Price (₹) *</label>
+                      <label className="block text-sm font-semibold text-slate-400 mb-1.5">Your Price (₹) *</label>
                       <input
                         type="number"
                         value={quoteData.price}
@@ -288,7 +288,7 @@ export default function RFQDetailPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold text-slate-700 mb-1.5">Quantity *</label>
+                      <label className="block text-sm font-semibold text-slate-400 mb-1.5">Quantity *</label>
                       <input
                         type="text"
                         value={quoteData.quantity}
@@ -299,7 +299,7 @@ export default function RFQDetailPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-semibold text-slate-700 mb-1.5">Delivery Timeline *</label>
+                      <label className="block text-sm font-semibold text-slate-400 mb-1.5">Delivery Timeline *</label>
                       <input
                         type="text"
                         value={quoteData.timeline}
@@ -315,7 +315,7 @@ export default function RFQDetailPage() {
                 {/* Description */}
                 <div>
                   <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Your Offer</p>
-                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">Description *</label>
+                  <label className="block text-sm font-semibold text-slate-400 mb-1.5">Description *</label>
                   <textarea
                     value={quoteData.description}
                     onChange={(e) => setQuoteData({ ...quoteData, description: e.target.value })}
@@ -329,7 +329,7 @@ export default function RFQDetailPage() {
                 {/* Terms */}
                 <div>
                   <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Terms & Conditions</p>
-                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">Terms</label>
+                  <label className="block text-sm font-semibold text-slate-400 mb-1.5">Terms</label>
                   <textarea
                     value={quoteData.terms}
                     onChange={(e) => setQuoteData({ ...quoteData, terms: e.target.value })}
@@ -351,7 +351,7 @@ export default function RFQDetailPage() {
                   <button
                     type="button"
                     onClick={() => setShowQuoteForm(false)}
-                    className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-4 py-3 rounded-xl transition-colors"
+                    className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-400 font-semibold px-4 py-3 rounded-xl transition-colors"
                   >
                     Cancel
                   </button>

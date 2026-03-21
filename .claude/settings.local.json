@@ -48,7 +48,16 @@
       "Bash(npx prisma:*)",
       "Bash(sed:*)",
       "Bash(npm install:*)",
-      "Bash(test:*)"
+      "Bash(test:*)",
+      "Bash(grep -n \"catch\\\\|console\" /c/Users/Sanika/Projects/bell24h/app/api/supplier/quotes/route.ts | head -10 2>/dev/null\ngrep -n \"catch\\\\|console\" /c/Users/Sanika/Projects/bell24h/app/api/dashboard/stats/route.ts | head -10 2>/dev/null)",
+      "Bash(grep -rn \"bg-blue-600\\\\|bg-blue-500\" /c/Users/Sanika/Projects/bell24h/app/voice-rfq/page.tsx 2>/dev/null | head -5\ngrep -rn \"bg-blue-600\\\\|bg-blue-500\" /c/Users/Sanika/Projects/bell24h/app/auth/phone-email/page.tsx 2>/dev/null | head -5)",
+      "Bash(npx vercel:*)",
+      "Bash(cat:*)",
+      "Bash(python3:*)",
+      "Bash(VERCEL_SCOPE=vvishaal-penharkarbell24s-projects npx vercel:*)",
+      "Bash(VERCEL_TOKEN=vca_6V8iGkLGVEFdoaoei8eDML1kcCULTskW6Ftjps6SXLpG7mbcvZ2O60RB npx vercel:*)",
+      "Bash(gh api:*)",
+      "Bash(do echo:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

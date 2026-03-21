@@ -290,7 +290,7 @@ export default function WalletPage() {
             <div className="text-center py-8 text-slate-400"><p>Loading transactions...</p></div>
           ) : transactions.length === 0 ? (
             <div className="text-center py-8 text-slate-400">
-              <Wallet className="w-12 h-12 mx-auto mb-3 text-slate-600" />
+              <Wallet className="w-12 h-12 mx-auto mb-3 text-slate-300" />
               <p>No transactions yet</p>
               <p className="text-sm mt-1">Add funds to get started</p>
             </div>
