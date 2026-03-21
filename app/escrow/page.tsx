@@ -175,7 +175,7 @@ export default function EscrowPage() {
               <p className="text-white font-semibold mb-2">No Escrow Transactions</p>
               <p className="text-gray-400 text-sm mb-4">Secure escrow payments will appear here once you complete a deal</p>
               <div className="bg-amber-900/20 border border-amber-700/30 rounded-lg p-4 max-w-md mx-auto">
-                <p className="text-amber-400 text-sm">Razorpay escrow integration coming soon</p>
+                <p className="text-amber-400 text-sm">Escrow coming soon. Payments currently handled directly.</p>
               </div>
             </div>
           ) : (
