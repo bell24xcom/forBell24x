@@ -7,7 +7,7 @@
   "crons": [
     {
       "path": "/api/cron/update-insights",
-      "schedule": "0 */6 * * *"
+      "schedule": "0 6 * * *"
     },
     {
       "path": "/api/cron/analyze-behavior",
