@@ -57,9 +57,9 @@ export default function EscrowPage() {
     try {
       const response = await fetch('/api/escrow', {
         method: 'PUT',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('auth-token')}`,
         },
         body: JSON.stringify({
           escrowId,
