@@ -1,18 +1,18 @@
 /**
  * Supplier Drip Engine
  * ───────────────────────────────────────────────────────
- * Sends timed follow-up WhatsApp nudges to new suppliers.
+ * Sends timed WhatsApp nudges to suppliers based on when they were
+ * first contacted (outreach_sent timestamp), NOT registration date.
  *
- * Drip schedule (days since User.createdAt):
- *   Day 3:  if profile incomplete (no company or GST) → complete your profile
- *   Day 7:  if no quote submitted yet → first RFQ is waiting
- *   Day 14: if no login in 14 days → re-engagement message
+ * Drip schedule (days since outreach_sent):
+ *   Day 3:  48–96h after outreach_sent, no profile_completed → complete profile
+ *   Day 7:  6–8 days after outreach_sent, no quote_submitted → browse RFQs
+ *   Day 14: 13–15 days after outreach_sent, no login in 14 days → re-engage
  *
- * Each drip is logged to InteractionMemory with action types:
+ * Action types in InteractionMemory:
  *   drip_day3_sent / drip_day7_sent / drip_day14_sent
  *
- * Skips if the drip was already sent (idempotent).
- * Only targets active, claimed suppliers with a phone number.
+ * Idempotent — skips if the drip was already sent.
  */
 
 import { prisma } from '@/lib/prisma';
@@ -25,62 +25,38 @@ export interface DripCandidate {
   name: string;
   company: string | null;
   phone: string;
+  category: string;
   dripType: DripType;
   message: string;
   waLink: string;
-  registeredAt: Date;
+  firstContactedAt: Date;
 }
 
 function buildDripMessage(
   supplier: { name: string | null; company: string | null },
+  category: string,
   type: DripType
 ): string {
   const name = supplier.name ?? supplier.company ?? 'there';
 
   if (type === 'day3') {
-    return `Hi ${name},
-
-Welcome to Bell24h! 👋
-
-Your supplier profile is almost ready. Complete it now to get matched with live buyer RFQs:
-
-✅ Add company name + GST number
-✅ Upload product categories
-✅ Add your location
-
-Complete your profile:
-https://www.bell24h.com/supplier/profile/edit
-
-Buyers search by company, category, and location — incomplete profiles miss 80% of matches.
-
-— Bell24h Team`;
+    return `Hi ${name}! Your Bell24h supplier profile is live but incomplete.
+Buyers are searching for ${category} suppliers right now.
+Complete your profile in 2 mins: https://bell24h.com/supplier/profile/edit
+- Bell24h Team`;
   }
 
   if (type === 'day7') {
-    return `Hi ${name},
-
-There are live buyer RFQs on Bell24h waiting for supplier quotes right now.
-
-You registered 7 days ago — haven't submitted a quote yet.
-
-Browse open RFQs and submit your first quote today:
-https://www.bell24h.com/supplier/browse-rfqs
-
-First quote = first deal.
-
-— Bell24h Team`;
+    return `Hi ${name}, good news! A buyer just posted an RFQ in ${category}.
+Your profile is matched but incomplete — you're missing quotes.
+Browse RFQs now: https://bell24h.com/supplier/browse-rfqs
+- Bell24h Team`;
   }
 
-  return `Hi ${name},
-
-We've missed you on Bell24h.
-
-New buyer RFQs are posted daily. Suppliers who respond within 24 hours win 3× more deals.
-
-Log back in and see what's waiting for you:
-https://www.bell24h.com/dashboard
-
-— Bell24h Team`;
+  return `Hi ${name}, we miss you on Bell24h!
+${category} buyers are active this week.
+Login to see new RFQs: https://bell24h.com/dashboard
+- Bell24h Team`;
 }
 
 function buildWaLink(phone: string, message: string): string {
@@ -92,42 +68,39 @@ function buildWaLink(phone: string, message: string): string {
 export async function getDripsDue(): Promise<DripCandidate[]> {
   const now = Date.now();
 
-  // Time windows (days since registration)
-  const day3Start  = new Date(now - 4 * 86400000);
-  const day3End    = new Date(now - 3 * 86400000);
-  const day7Start  = new Date(now - 8 * 86400000);
-  const day7End    = new Date(now - 7 * 86400000);
-  const day14Start = new Date(now - 15 * 86400000);
-  const day14End   = new Date(now - 14 * 86400000);
+  // Time windows relative to outreach_sent timestamp
+  const day3Start  = new Date(now - 96 * 3600000);   // 96h ago
+  const day3End    = new Date(now - 48 * 3600000);   // 48h ago
+  const day7Start  = new Date(now - 8  * 86400000);  // 8 days ago
+  const day7End    = new Date(now - 6  * 86400000);  // 6 days ago
+  const day14Start = new Date(now - 15 * 86400000);  // 15 days ago
+  const day14End   = new Date(now - 13 * 86400000);  // 13 days ago
 
-  // Fetch all suppliers registered in any of the 3 windows (single query)
-  const suppliers = await prisma.user.findMany({
+  // Fetch all initial outreach contacts within the combined window
+  const initialContacts = await prisma.interactionMemory.findMany({
     where: {
-      role: 'SUPPLIER',
-      isActive: true,
-      phone: { not: null },
-      createdAt: {
-        gte: day14Start,
-        lte: day3End,
-      },
+      actionType: 'outreach_sent',
+      createdAt: { gte: day14Start, lte: day3End },
+      userId: { not: null },
     },
-    select: {
-      id: true,
-      name: true,
-      company: true,
-      gstNumber: true,
-      phone: true,
-      lastLoginAt: true,
-      createdAt: true,
-    },
+    select: { userId: true, rfqId: true, createdAt: true, metadata: true },
+    orderBy: { createdAt: 'desc' },
   });
 
-  if (suppliers.length === 0) return [];
+  if (initialContacts.length === 0) return [];
 
-  const supplierIds = suppliers.map(s => s.id);
+  // Deduplicate by userId — keep most recent outreach_sent per supplier
+  const latestBySupplier = new Map<string, (typeof initialContacts)[0]>();
+  for (const c of initialContacts) {
+    if (!latestBySupplier.has(c.userId!)) {
+      latestBySupplier.set(c.userId!, c);
+    }
+  }
 
-  // Batch-fetch all drip history and quotes for these suppliers
-  const [dripHistory, quotes] = await Promise.all([
+  const supplierIds = [...latestBySupplier.keys()];
+
+  // Batch fetch: drip history, quotes, supplier profiles
+  const [dripHistory, quotes, suppliers] = await Promise.all([
     prisma.interactionMemory.findMany({
       where: {
         actionType: { in: ['drip_day3_sent', 'drip_day7_sent', 'drip_day14_sent'] },
@@ -140,43 +113,54 @@ export async function getDripsDue(): Promise<DripCandidate[]> {
       select: { supplierId: true },
       distinct: ['supplierId'],
     }),
+    prisma.user.findMany({
+      where: {
+        id: { in: supplierIds },
+        isActive: true,
+        phone: { not: null },
+      },
+      select: { id: true, name: true, company: true, phone: true, lastLoginAt: true, preferences: true },
+    }),
   ]);
 
   const dripSentSet = new Set(dripHistory.map(d => `${d.userId}:${d.actionType}`));
   const hasQuotedSet = new Set(quotes.map(q => q.supplierId));
+  const supplierMap = new Map(suppliers.map(s => [s.id, s]));
 
   const candidates: DripCandidate[] = [];
 
-  for (const s of suppliers) {
-    if (!s.phone) continue;
-    const phone = s.phone;
-    const createdMs = s.createdAt.getTime();
+  for (const [supplierId, contact] of latestBySupplier) {
+    const supplier = supplierMap.get(supplierId);
+    if (!supplier?.phone) continue;
 
-    const inDay3  = createdMs >= day3Start.getTime()  && createdMs <= day3End.getTime();
-    const inDay7  = createdMs >= day7Start.getTime()  && createdMs <= day7End.getTime();
-    const inDay14 = createdMs >= day14Start.getTime() && createdMs <= day14End.getTime();
+    const contactMs = contact.createdAt.getTime();
+    const isDay3  = contactMs >= day3Start.getTime()  && contactMs <= day3End.getTime();
+    const isDay7  = contactMs >= day7Start.getTime()  && contactMs <= day7End.getTime();
+    const isDay14 = contactMs >= day14Start.getTime() && contactMs <= day14End.getTime();
 
-    if (inDay3) {
-      if (dripSentSet.has(`${s.id}:drip_day3_sent`)) continue;
-      // Only send if profile is incomplete
-      const profileComplete = !!s.company && !!s.gstNumber;
-      if (profileComplete) continue;
-      const message = buildDripMessage(s, 'day3');
-      candidates.push({ supplierId: s.id, name: s.name ?? '', company: s.company, phone, dripType: 'day3', message, waLink: buildWaLink(phone, message), registeredAt: s.createdAt });
-    } else if (inDay7) {
-      if (dripSentSet.has(`${s.id}:drip_day7_sent`)) continue;
-      // Only send if no quotes yet
-      if (hasQuotedSet.has(s.id)) continue;
-      const message = buildDripMessage(s, 'day7');
-      candidates.push({ supplierId: s.id, name: s.name ?? '', company: s.company, phone, dripType: 'day7', message, waLink: buildWaLink(phone, message), registeredAt: s.createdAt });
-    } else if (inDay14) {
-      if (dripSentSet.has(`${s.id}:drip_day14_sent`)) continue;
-      // Only send if inactive for 14+ days
-      const lastLogin = s.lastLoginAt;
-      const inactiveSince = !lastLogin || (now - lastLogin.getTime()) > 14 * 86400000;
-      if (!inactiveSince) continue;
-      const message = buildDripMessage(s, 'day14');
-      candidates.push({ supplierId: s.id, name: s.name ?? '', company: s.company, phone, dripType: 'day14', message, waLink: buildWaLink(phone, message), registeredAt: s.createdAt });
+    // Extract category from outreach metadata or use generic fallback
+    const meta = contact.metadata as Record<string, unknown> | null;
+    const category = (meta?.category as string) || (meta?.rfqCategory as string) || 'your category';
+
+    if (isDay3) {
+      if (dripSentSet.has(`${supplierId}:drip_day3_sent`)) continue;
+      // Check if profile is complete (company + phone = claimed)
+      const profileComplete = !!supplier.company;
+      if (profileComplete) continue; // Skip if already complete
+      const message = buildDripMessage(supplier, category, 'day3');
+      candidates.push({ supplierId, name: supplier.name ?? '', company: supplier.company, phone: supplier.phone, category, dripType: 'day3', message, waLink: buildWaLink(supplier.phone, message), firstContactedAt: contact.createdAt });
+    } else if (isDay7) {
+      if (dripSentSet.has(`${supplierId}:drip_day7_sent`)) continue;
+      if (hasQuotedSet.has(supplierId)) continue; // Already quoted, skip
+      const message = buildDripMessage(supplier, category, 'day7');
+      candidates.push({ supplierId, name: supplier.name ?? '', company: supplier.company, phone: supplier.phone, category, dripType: 'day7', message, waLink: buildWaLink(supplier.phone, message), firstContactedAt: contact.createdAt });
+    } else if (isDay14) {
+      if (dripSentSet.has(`${supplierId}:drip_day14_sent`)) continue;
+      // Check if inactive for 14+ days
+      const lastLogin = supplier.lastLoginAt;
+      if (lastLogin && (now - lastLogin.getTime()) < 14 * 86400000) continue;
+      const message = buildDripMessage(supplier, category, 'day14');
+      candidates.push({ supplierId, name: supplier.name ?? '', company: supplier.company, phone: supplier.phone, category, dripType: 'day14', message, waLink: buildWaLink(supplier.phone, message), firstContactedAt: contact.createdAt });
     }
   }
 

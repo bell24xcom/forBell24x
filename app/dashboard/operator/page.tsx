@@ -43,6 +43,17 @@ interface FollowUp {
   waLink: string | null;
 }
 
+interface Drip {
+  supplierId: string;
+  name: string;
+  company: string | null;
+  phone: string;
+  category: string;
+  dripType: 'day3' | 'day7' | 'day14';
+  message: string;
+  waLink: string;
+}
+
 export default function OperatorDashboard() {
   const [category, setCategory] = useState('');
   const [outreach, setOutreach] = useState<OutreachGroup[]>([]);
@@ -51,11 +62,13 @@ export default function OperatorDashboard() {
   const [copied, setCopied] = useState<string | null>(null);
   const [funnelData, setFunnelData] = useState<any>(null);
   const [followUps, setFollowUps] = useState<FollowUp[]>([]);
+  const [drips, setDrips] = useState<Drip[]>([]);
 
   useEffect(() => {
     loadStats();
     loadFunnel();
     loadFollowUps();
+    loadDrips();
   }, []);
 
   async function loadStats() {
@@ -83,6 +96,23 @@ export default function OperatorDashboard() {
       body: JSON.stringify({ supplierId, rfqId, type }),
     }).catch(() => {});
     setFollowUps(prev => prev.filter(f => !(f.supplierId === supplierId && f.rfqId === rfqId)));
+  }
+
+  async function loadDrips() {
+    const res = await fetch('/api/outreach/drip').catch(() => null);
+    if (res?.ok) {
+      const data = await res.json();
+      setDrips(data.drips ?? []);
+    }
+  }
+
+  async function markDripSent(supplierId: string, dripType: string) {
+    await fetch('/api/outreach/drip', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ supplierId, dripType }),
+    }).catch(() => {});
+    setDrips(prev => prev.filter(d => d.supplierId !== supplierId));
   }
 
   async function generateOutreach() {
@@ -228,6 +258,71 @@ export default function OperatorDashboard() {
                     className="text-xs text-slate-400 hover:text-white flex items-center gap-1 transition-colors"
                   >
                     {copied === `fu-${f.supplierId}`
+                      ? <><CheckCheck className="w-3.5 h-3.5 text-green-400" /> Copied ✓</>
+                      : <><Copy className="w-3.5 h-3.5" /> Copy message</>
+                    }
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Onboarding Drips Due */}
+        {drips.length > 0 && (
+          <div className="bg-slate-900 border border-slate-800 rounded-lg p-5 space-y-4">
+            <div className="flex items-center gap-2">
+              <h2 className="text-lg font-semibold text-white">Onboarding Drips Due</h2>
+              <span className="bg-blue-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                {drips.length}
+              </span>
+              <span className="text-slate-500 text-xs ml-auto">
+                {drips.filter(d => d.dripType === 'day3').length} Day 3 ·{' '}
+                {drips.filter(d => d.dripType === 'day7').length} Day 7 ·{' '}
+                {drips.filter(d => d.dripType === 'day14').length} Day 14
+              </span>
+            </div>
+            <div className="space-y-3">
+              {drips.map(d => (
+                <div key={`${d.supplierId}-${d.dripType}`} className="bg-slate-800 rounded-lg p-4 space-y-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium text-white text-sm">{d.company ?? d.name}</p>
+                        <span className={`text-xs px-1.5 py-0.5 rounded font-semibold ${
+                          d.dripType === 'day3'
+                            ? 'bg-blue-900 text-blue-300'
+                            : d.dripType === 'day7'
+                            ? 'bg-amber-900 text-amber-300'
+                            : 'bg-red-900 text-red-300'
+                        }`}>
+                          {d.dripType === 'day3' ? 'Day 3 — Profile' : d.dripType === 'day7' ? 'Day 7 — Quote' : 'Day 14 — Re-engage'}
+                        </span>
+                      </div>
+                      <p className="text-slate-400 text-xs">{d.phone} · {d.category}</p>
+                    </div>
+                    <a
+                      href={d.waLink}
+                      target="_blank"
+                      rel="noreferrer"
+                      onClick={() => {
+                        logEvent({ type: 'whatsapp_click', meta: { supplierId: d.supplierId, company: d.company, drip: d.dripType } });
+                        markDripSent(d.supplierId, d.dripType);
+                      }}
+                      className="bg-green-600 hover:bg-green-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors shrink-0"
+                    >
+                      <MessageCircle className="w-3.5 h-3.5" />
+                      Send
+                    </a>
+                  </div>
+                  <div className="bg-slate-900 rounded p-3 text-xs text-slate-300 font-mono whitespace-pre-wrap leading-relaxed">
+                    {d.message}
+                  </div>
+                  <button
+                    onClick={() => copyText(d.message, `drip-${d.supplierId}`)}
+                    className="text-xs text-slate-400 hover:text-white flex items-center gap-1 transition-colors"
+                  >
+                    {copied === `drip-${d.supplierId}`
                       ? <><CheckCheck className="w-3.5 h-3.5 text-green-400" /> Copied ✓</>
                       : <><Copy className="w-3.5 h-3.5" /> Copy message</>
                     }
