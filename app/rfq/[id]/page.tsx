@@ -77,9 +77,9 @@ export default function RFQDetailPage() {
     try {
       const response = await fetch('/api/supplier/quotes', {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('auth-token')}`,
         },
         body: JSON.stringify({
           rfqId: rfq.id,
