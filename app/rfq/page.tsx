@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 
 interface RFQ {
   id: string;
@@ -87,8 +85,6 @@ export default function RFQPage() {
 
   return (
     <div className="min-h-screen bg-[#0F172A]">
-      <Header />
-
       {/* Hero */}
       <section className="bg-gradient-to-r from-blue-700 to-indigo-700 py-12">
         <div className="max-w-5xl mx-auto px-4 text-center">
@@ -216,8 +212,6 @@ export default function RFQPage() {
           </>
         )}
       </div>
-
-      <Footer />
     </div>
   );
 }
