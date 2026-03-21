@@ -9,6 +9,7 @@ type NavItem = { href: string; label: string; icon: string; group?: string };
 const NAV: NavItem[] = [
   // Core
   { href: '/admin',                  label: 'Dashboard',        icon: '▤',  group: 'Intelligence' },
+  { href: '/admin/kpi',              label: 'KPI',              icon: '📈' },
   { href: '/admin/analytics',        label: 'Analytics',        icon: '📊' },
   { href: '/admin/heatmap',          label: 'Heatmap',          icon: '🔥' },
   { href: '/admin/revenue',          label: 'Revenue',          icon: '💰' },

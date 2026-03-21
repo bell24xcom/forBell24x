@@ -1,421 +1,195 @@
 'use client';
 
-// Removed broken lucide-react import - using emojis instead
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { RefreshCw, Send, MessageCircle, Users, Zap, TrendingUp } from 'lucide-react';
 
-interface Campaign {
-  id: string;
-  name: string;
-  type: 'email' | 'social' | 'paid' | 'content';
-  status: 'active' | 'paused' | 'completed';
-  budget: string;
-  spent: string;
-  impressions: number;
-  clicks: number;
-  conversions: number;
-  ctr: number;
-  cpc: number;
-  roas: number;
-  startDate: string;
-  endDate: string;
+interface OutreachStats {
+  days: number;
+  outreachSent: number;
+  waClicks: number;
+  subscriptions: number;
+  followUp1: number;
+  followUp2: number;
+  drips: number;
+  waClickRate: number;
+  subRate: number;
+  totalActionsByType: { actionType: string; count: number }[];
+  dailyOutreach: { date: string; count: number }[];
 }
 
-interface Metric {
-  name: string;
-  value: string;
-  change: number;
-  trend: 'up' | 'down' | 'stable';
-  icon: any;
-  color: string;
-}
+const RANGES = [
+  { label: '7 Days',  value: 7  },
+  { label: '30 Days', value: 30 },
+  { label: '90 Days', value: 90 },
+];
 
 export default function LaunchMetricsPage() {
-  const [activeTab, setActiveTab] = useState('overview');
-  const [timeRange, setTimeRange] = useState('30d');
+  const [data,    setData]    = useState<OutreachStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error,   setError]   = useState('');
+  const [days,    setDays]    = useState(30);
 
-  const metrics: Metric[] = [
-    {
-      name: 'Total Campaigns',
-      value: '24',
-      change: 12.5,
-      trend: 'up',
-      icon: '🎯',
-      color: 'text-blue-600'
-    },
-    {
-      name: 'Total Spend',
-      value: '₹2.4L',
-      change: 8.3,
-      trend: 'up',
-      icon: '💰',
-      color: 'text-green-600'
-    },
-    {
-      name: 'Impressions',
-      value: '1.2M',
-      change: 15.7,
-      trend: 'up',
-      icon: '👁️',
-      color: 'text-purple-600'
-    },
-    {
-      name: 'Click-Through Rate',
-      value: '3.2%',
-      change: -2.1,
-      trend: 'down',
-      icon: '↗️',
-      color: 'text-orange-600'
-    },
-    {
-      name: 'Cost Per Click',
-      value: '₹12.50',
-      change: 5.4,
-      trend: 'up',
-      icon: '📊',
-      color: 'text-red-600'
-    },
-    {
-      name: 'Return on Ad Spend',
-      value: '4.2x',
-      change: 18.9,
-      trend: 'up',
-      icon: '📊',
-      color: 'text-indigo-600'
+  const fetchData = useCallback(async () => {
+    setLoading(true); setError('');
+    try {
+      const res  = await fetch(`/api/admin/outreach-stats?days=${days}`);
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || 'Failed');
+      setData(json);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to load');
+    } finally {
+      setLoading(false);
     }
-  ];
+  }, [days]);
 
-  const campaigns: Campaign[] = [
-    {
-      id: '1',
-      name: 'Q4 Product Launch',
-      type: 'paid',
-      status: 'active',
-      budget: '₹50,000',
-      spent: '₹32,500',
-      impressions: 125000,
-      clicks: 4200,
-      conversions: 156,
-      ctr: 3.36,
-      cpc: 7.74,
-      roas: 4.8,
-      startDate: '2024-08-01',
-      endDate: '2024-09-30'
-    },
-    {
-      id: '2',
-      name: 'Supplier Onboarding',
-      type: 'email',
-      status: 'active',
-      budget: '₹25,000',
-      spent: '₹18,200',
-      impressions: 85000,
-      clicks: 2100,
-      conversions: 89,
-      ctr: 2.47,
-      cpc: 8.67,
-      roas: 3.2,
-      startDate: '2024-08-15',
-      endDate: '2024-09-15'
-    },
-    {
-      id: '3',
-      name: 'Brand Awareness',
-      type: 'social',
-      status: 'paused',
-      budget: '₹75,000',
-      spent: '₹45,000',
-      impressions: 320000,
-      clicks: 8900,
-      conversions: 234,
-      ctr: 2.78,
-      cpc: 5.06,
-      roas: 2.8,
-      startDate: '2024-07-01',
-      endDate: '2024-08-31'
-    },
-    {
-      id: '4',
-      name: 'Content Marketing',
-      type: 'content',
-      status: 'completed',
-      budget: '₹30,000',
-      spent: '₹28,500',
-      impressions: 180000,
-      clicks: 5400,
-      conversions: 167,
-      ctr: 3.00,
-      cpc: 5.28,
-      roas: 5.1,
-      startDate: '2024-06-01',
-      endDate: '2024-07-31'
-    }
-  ];
+  useEffect(() => { fetchData(); }, [fetchData]);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active':
-        return 'text-green-600 bg-green-100';
-      case 'paused':
-        return 'text-yellow-600 bg-yellow-100';
-      case 'completed':
-        return 'text-blue-600 bg-blue-100';
-      default:
-        return 'text-slate-300 bg-neutral-100';
-    }
-  };
-
-  const getTypeIcon = (type: string) => {
-    switch (type) {
-      case 'email':
-        return <span className="text-lg">💬</span>;
-      case 'social':
-        return <span className="text-lg">🔗</span>;
-      case 'paid':
-        return <span className="text-lg">💰</span>;
-      case 'content':
-        return <span className="text-lg">📊</span>;
-      default:
-        return <span className="text-lg">📊</span>;
-    }
-  };
-
-  const getTrendIcon = (trend: string) => {
-    switch (trend) {
-      case 'up':
-        return <span className="text-green-600">↗️</span>;
-      case 'down':
-        return <span className="text-red-600">↘️</span>;
-      default:
-        return <span className="text-slate-300">📊</span>;
-    }
-  };
+  const trendMax = data ? Math.max(1, ...data.dailyOutreach.map(d => d.count)) : 1;
 
   return (
-    <div className="page-container">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-neutral-900">Launch Metrics</h1>
-          <p className="mt-2 text-slate-300">Track marketing campaign performance and launch metrics</p>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 className="text-xl font-bold text-white">Launch Metrics</h1>
+          <p className="text-slate-400 text-sm">Real outreach activity from InteractionMemory. Zero mock data.</p>
         </div>
-
-        {/* Tab Navigation */}
-        <div className="border-b border-neutral-200 mb-8">
-          <nav className="flex space-x-8">
-            {[
-              { id: 'overview', name: 'Overview', icon: '📊' },
-              { id: 'campaigns', name: 'Campaigns', icon: '🎯' },
-              { id: 'analytics', name: 'Analytics', icon: '📈' }
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${activeTab === tab.id
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-slate-400 hover:text-slate-400 hover:border-neutral-300'
-                  }`}
-              >
-                <span className="text-lg">{tab.icon}</span>
-                <span>{tab.name}</span>
+        <div className="flex items-center gap-2">
+          <div className="flex bg-slate-800 border border-slate-700 rounded-lg overflow-hidden">
+            {RANGES.map(r => (
+              <button key={r.value} onClick={() => setDays(r.value)}
+                className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+                  days === r.value ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'
+                }`}>
+                {r.label}
               </button>
             ))}
-          </nav>
+          </div>
+          <button onClick={fetchData} disabled={loading}
+            className="p-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-400 hover:text-white transition-colors">
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+          </button>
         </div>
-
-        {/* Time Range Selector */}
-        <div className="mb-6">
-          <select
-            value={timeRange}
-            onChange={(e) => setTimeRange(e.target.value)}
-            className="px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value="7d">Last 7 days</option>
-            <option value="30d">Last 30 days</option>
-            <option value="90d">Last 90 days</option>
-            <option value="1y">Last year</option>
-          </select>
-        </div>
-
-        {/* Overview Tab */}
-        {activeTab === 'overview' && (
-          <div className="space-y-8">
-            {/* Key Metrics */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {metrics.map((metric, index) => (
-                <div key={index} className="bg-white rounded-lg shadow p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <div className="p-2 bg-neutral-100 rounded-lg">
-                        <span className={`text-2xl ${metric.color}`}>{metric.icon}</span>
-                      </div>
-                      <div className="ml-4">
-                        <p className="text-sm font-medium text-slate-300">{metric.name}</p>
-                        <p className="text-2xl font-bold text-neutral-900">{metric.value}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      {getTrendIcon(metric.trend)}
-                      <span className={`text-sm font-medium ${metric.trend === 'up' ? 'text-green-600' :
-                          metric.trend === 'down' ? 'text-red-600' : 'text-slate-300'
-                        }`}>
-                        {metric.change > 0 ? '+' : ''}{metric.change}%
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Performance Chart Placeholder */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-medium text-neutral-900 mb-4">Performance Trends</h3>
-              <div className="h-64 bg-neutral-50 rounded-lg flex items-center justify-center">
-                <div className="text-center">
-                  <span className="text-5xl text-gray-400 mx-auto mb-4">📊</span>
-                  <p className="text-slate-400">Performance chart would be displayed here</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Campaigns Tab */}
-        {activeTab === 'campaigns' && (
-          <div className="space-y-6">
-            <div className="bg-white rounded-lg shadow overflow-hidden">
-              <div className="px-6 py-4 border-b border-neutral-200">
-                <h3 className="text-lg font-medium text-neutral-900">Marketing Campaigns</h3>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-neutral-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Campaign</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Type</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Status</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Budget</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Spent</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Impressions</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">CTR</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">ROAS</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {campaigns.map((campaign) => (
-                      <tr key={campaign.id} className="hover:bg-neutral-50">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div>
-                            <div className="text-sm font-medium text-neutral-900">{campaign.name}</div>
-                            <div className="text-sm text-slate-400">{campaign.startDate} - {campaign.endDate}</div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            {getTypeIcon(campaign.type)}
-                            <span className="ml-2 text-sm text-neutral-900 capitalize">{campaign.type}</span>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(campaign.status)}`}>
-                            {campaign.status}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-900">
-                          {campaign.budget}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-900">
-                          {campaign.spent}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">
-                          {campaign.impressions.toLocaleString()}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-900">
-                          {campaign.ctr}%
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-900">
-                          {campaign.roas}x
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Analytics Tab */}
-        {activeTab === 'analytics' && (
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-lg font-medium text-neutral-900 mb-4">Top Performing Campaigns</h3>
-                <div className="space-y-4">
-                  {campaigns.slice(0, 3).map((campaign, index) => (
-                    <div key={campaign.id} className="flex items-center justify-between">
-                      <div className="flex items-center">
-                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                          <span className="text-sm font-medium text-blue-600">{index + 1}</span>
-                        </div>
-                        <div className="ml-3">
-                          <p className="text-sm font-medium text-neutral-900">{campaign.name}</p>
-                          <p className="text-sm text-slate-400">{campaign.type}</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm font-medium text-neutral-900">{campaign.roas}x ROAS</p>
-                        <p className="text-sm text-slate-400">{campaign.ctr}% CTR</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-lg font-medium text-neutral-900 mb-4">Channel Performance</h3>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-slate-300">Paid Advertising</span>
-                    <div className="flex items-center space-x-2">
-                      <span className="text-sm font-medium text-neutral-900">4.2x ROAS</span>
-                      <div className="w-16 bg-neutral-200 rounded-full h-2">
-                        <div className="bg-blue-600 h-2 rounded-full" style={{ width: '85%' }}></div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-slate-300">Email Marketing</span>
-                    <div className="flex items-center space-x-2">
-                      <span className="text-sm font-medium text-neutral-900">3.2x ROAS</span>
-                      <div className="w-16 bg-neutral-200 rounded-full h-2">
-                        <div className="bg-green-600 h-2 rounded-full" style={{ width: '65%' }}></div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-slate-300">Social Media</span>
-                    <div className="flex items-center space-x-2">
-                      <span className="text-sm font-medium text-neutral-900">2.8x ROAS</span>
-                      <div className="w-16 bg-neutral-200 rounded-full h-2">
-                        <div className="bg-purple-600 h-2 rounded-full" style={{ width: '55%' }}></div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-slate-300">Content Marketing</span>
-                    <div className="flex items-center space-x-2">
-                      <span className="text-sm font-medium text-neutral-900">5.1x ROAS</span>
-                      <div className="w-16 bg-neutral-200 rounded-full h-2">
-                        <div className="bg-orange-600 h-2 rounded-full" style={{ width: '95%' }}></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
+
+      {error && <div className="bg-red-900/30 border border-red-700/50 text-red-300 px-4 py-3 rounded-xl text-sm">{error}</div>}
+
+      {loading && !data && (
+        <div className="py-20 flex justify-center">
+          <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+        </div>
+      )}
+
+      {data && (
+        <>
+          {/* KPI Cards */}
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {[
+              { label: 'Outreach Sent',    value: data.outreachSent,   icon: Send,          color: 'text-blue-400',    border: 'border-blue-500/20' },
+              { label: 'WA Clicks',        value: data.waClicks,       icon: MessageCircle, color: 'text-green-400',   border: 'border-green-500/20',
+                sub: `${data.waClickRate}% click rate` },
+              { label: 'Subscriptions',    value: data.subscriptions,  icon: Users,         color: 'text-emerald-400', border: 'border-emerald-500/20',
+                sub: `${data.subRate}% of outreach` },
+              { label: 'Follow-up Day 2',  value: data.followUp1,      icon: Zap,           color: 'text-indigo-400',  border: 'border-indigo-500/20' },
+              { label: 'Follow-up Day 5',  value: data.followUp2,      icon: Zap,           color: 'text-purple-400',  border: 'border-purple-500/20' },
+              { label: 'Drip Messages',    value: data.drips,          icon: TrendingUp,    color: 'text-orange-400',  border: 'border-orange-500/20' },
+            ].map(card => (
+              <div key={card.label} className={`bg-slate-800/60 border ${card.border} rounded-xl p-5`}>
+                <div className="flex items-center gap-2 mb-3">
+                  <card.icon className={`w-4 h-4 ${card.color}`} />
+                  <span className="text-slate-400 text-xs font-medium uppercase tracking-wide">{card.label}</span>
+                </div>
+                <p className={`text-2xl font-bold ${card.color}`}>{card.value}</p>
+                {'sub' in card && card.sub && <p className="text-slate-500 text-xs mt-0.5">{card.sub}</p>}
+              </div>
+            ))}
+          </div>
+
+          {/* Outreach Funnel */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-5">
+              <h3 className="text-sm font-semibold text-white mb-4">Outreach Funnel</h3>
+              {data.outreachSent === 0 ? (
+                <p className="text-slate-500 text-xs">No outreach activity in this period.</p>
+              ) : (
+                <div className="space-y-2">
+                  {[
+                    { step: 'Outreach Sent',  value: data.outreachSent,  color: 'bg-blue-500' },
+                    { step: 'WA Clicked',     value: data.waClicks,      color: 'bg-green-500' },
+                    { step: 'Subscribed',     value: data.subscriptions, color: 'bg-emerald-500' },
+                    { step: 'Follow-up D2',   value: data.followUp1,     color: 'bg-indigo-500' },
+                    { step: 'Follow-up D5',   value: data.followUp2,     color: 'bg-purple-500' },
+                    { step: 'Drips',          value: data.drips,         color: 'bg-orange-500' },
+                  ].map((step, i, arr) => {
+                    const pct = Math.max(2, Math.round((step.value / data.outreachSent) * 100));
+                    const convPct = i > 0 && arr[i - 1].value > 0
+                      ? ((step.value / arr[i - 1].value) * 100).toFixed(0) : null;
+                    return (
+                      <div key={step.step} className="flex items-center gap-3">
+                        <span className="text-slate-400 text-xs w-28 shrink-0">{step.step}</span>
+                        <div className="flex-1 h-7 bg-slate-700 rounded-lg overflow-hidden">
+                          <div className={`h-full ${step.color} rounded-lg flex items-center px-2 transition-all`}
+                            style={{ width: `${pct}%` }}>
+                            <span className="text-white text-xs font-semibold">{step.value}</span>
+                          </div>
+                        </div>
+                        {convPct !== null && (
+                          <span className="text-slate-500 text-xs w-10 text-right shrink-0">{convPct}%</span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Daily Outreach Trend */}
+            <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-5">
+              <h3 className="text-sm font-semibold text-white mb-4">Daily Outreach Trend</h3>
+              {data.dailyOutreach.length === 0 ? (
+                <p className="text-slate-500 text-xs">No data yet.</p>
+              ) : (
+                <div className="flex items-end gap-0.5 h-24">
+                  {data.dailyOutreach.map(d => {
+                    const h = Math.max(2, Math.round((d.count / trendMax) * 88));
+                    return (
+                      <div key={d.date} className="flex flex-col items-center gap-1 flex-1"
+                        title={`${d.date}: ${d.count}`}>
+                        <div className="w-full bg-blue-500 rounded-t" style={{ height: `${h}px` }} />
+                        {data.dailyOutreach.length <= 14 && (
+                          <span className="text-[8px] text-slate-600">{d.date.slice(8)}</span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Action Type Breakdown */}
+          {data.totalActionsByType.length > 0 && (
+            <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-5">
+              <h3 className="text-sm font-semibold text-white mb-4">All Action Types</h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                {data.totalActionsByType.map(a => (
+                  <div key={a.actionType} className="bg-slate-700/40 rounded-lg px-3 py-2">
+                    <p className="text-white text-sm font-semibold">{a.count}</p>
+                    <p className="text-slate-400 text-xs truncate">{a.actionType.replace(/_/g, ' ')}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="bg-slate-800/40 border border-slate-700/30 rounded-xl p-4 text-xs text-slate-500">
+            <strong className="text-slate-400">Data source:</strong> All numbers pulled live from InteractionMemory table.
+            Email campaign tracking is handled via Brevo webhooks (not yet wired).
+            Showing {days}-day window ending now.
+          </div>
+        </>
+      )}
     </div>
   );
 }

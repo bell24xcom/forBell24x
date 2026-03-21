@@ -50,7 +50,7 @@ export default function UsersPage() {
         page: currentPage.toString(),
         limit: '20'
       });
-      
+
       if (searchTerm) params.append('search', searchTerm);
       if (roleFilter) params.append('role', roleFilter);
 
@@ -58,7 +58,7 @@ export default function UsersPage() {
       if (!response.ok) {
         throw new Error('Failed to fetch users');
       }
-      
+
       const data = await response.json();
       setUsersData(data);
       setError(null);
@@ -94,7 +94,7 @@ export default function UsersPage() {
       });
 
       if (response.ok) {
-        fetchUsers(); // Refresh the list
+        fetchUsers();
       }
     } catch (err) {
       console.error('Error updating user:', err);
@@ -103,10 +103,10 @@ export default function UsersPage() {
 
   if (isLoading && !usersData) {
     return (
-      <div className="page-container flex items-center justify-center">
+      <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-          <p className="mt-4 text-slate-300">Loading users...</p>
+          <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="mt-4 text-slate-400 text-sm">Loading users...</p>
         </div>
       </div>
     );
@@ -114,14 +114,14 @@ export default function UsersPage() {
 
   if (error) {
     return (
-      <div className="page-container flex items-center justify-center">
+      <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <div className="text-red-500 text-6xl mb-4">⚠️</div>
-          <h2 className="text-2xl font-bold text-neutral-900 mb-2">Error Loading Users</h2>
-          <p className="feature-description">{error}</p>
+          <div className="text-red-400 text-5xl mb-4">⚠️</div>
+          <h2 className="text-xl font-bold text-white mb-2">Error Loading Users</h2>
+          <p className="text-slate-400 text-sm mb-4">{error}</p>
           <button
             onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-primary-700"
+            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-sm"
           >
             Retry
           </button>
@@ -131,240 +131,147 @@ export default function UsersPage() {
   }
 
   return (
-    <div className="page-container">
+    <div className="space-y-5">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div>
-              <h1 className="text-3xl font-bold text-neutral-900">User Management</h1>
-              <p className="text-slate-300 mt-1">Manage suppliers, buyers, and user roles</p>
-            </div>
-          </div>
-        </div>
+      <div>
+        <h1 className="text-xl font-bold text-white">User Management</h1>
+        <p className="text-slate-400 text-sm">Manage suppliers, buyers, and user roles</p>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Stats Cards */}
-        {usersData?.stats && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-slate-300">Total Users</p>
-                  <p className="text-3xl font-bold text-neutral-900">{usersData.stats.totalUsers.toLocaleString()}</p>
-                </div>
-                <div className="p-3 bg-blue-100 rounded-lg">
-                  <span className="text-2xl">👥</span>
-                </div>
-              </div>
+      {/* Stats Cards */}
+      {usersData?.stats && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {[
+            { label: 'Total Users',  value: usersData.stats.totalUsers,        color: 'text-blue-400',   border: 'border-blue-500/20' },
+            { label: 'Buyers',       value: usersData.stats.buyers,            color: 'text-green-400',  border: 'border-green-500/20' },
+            { label: 'Suppliers',    value: usersData.stats.suppliers,         color: 'text-purple-400', border: 'border-purple-500/20' },
+            { label: 'Active',       value: usersData.stats.activeUsers,       color: 'text-amber-400',  border: 'border-amber-500/20' },
+          ].map(s => (
+            <div key={s.label} className={`bg-slate-800/60 border ${s.border} rounded-xl p-4`}>
+              <p className={`text-2xl font-bold ${s.color}`}>{s.value.toLocaleString()}</p>
+              <p className="text-slate-400 text-xs mt-0.5">{s.label}</p>
             </div>
+          ))}
+        </div>
+      )}
 
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-slate-300">Buyers</p>
-                  <p className="text-3xl font-bold text-neutral-900">{usersData.stats.buyers.toLocaleString()}</p>
-                </div>
-                <div className="p-3 bg-green-100 rounded-lg">
-                  <span className="text-2xl">🛒</span>
-                </div>
-              </div>
-            </div>
+      {/* Search and Filters */}
+      <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3">
+        <input
+          type="text"
+          placeholder="Search users by name, email, or phone…"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="flex-1 px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white text-sm placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+        />
+        <select
+          value={roleFilter}
+          onChange={(e) => setRoleFilter(e.target.value)}
+          title="Filter users by role"
+          className="px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white text-sm focus:outline-none focus:border-indigo-500"
+        >
+          <option value="">All Roles</option>
+          <option value="BUYER">Buyers</option>
+          <option value="SUPPLIER">Suppliers</option>
+          <option value="ADMIN">Admins</option>
+        </select>
+        <button
+          type="submit"
+          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg transition-colors"
+        >
+          Search
+        </button>
+      </form>
 
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-slate-300">Suppliers</p>
-                  <p className="text-3xl font-bold text-neutral-900">{usersData.stats.suppliers.toLocaleString()}</p>
-                </div>
-                <div className="p-3 bg-purple-100 rounded-lg">
-                  <span className="text-2xl">🏢</span>
-                </div>
-              </div>
-            </div>
+      {/* Users Table */}
+      <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-slate-700/50">
+                <th className="text-left text-xs text-slate-400 font-medium uppercase tracking-wide px-4 py-3">User</th>
+                <th className="text-left text-xs text-slate-400 font-medium uppercase tracking-wide px-4 py-3">Role</th>
+                <th className="text-left text-xs text-slate-400 font-medium uppercase tracking-wide px-4 py-3">Activity</th>
+                <th className="text-left text-xs text-slate-400 font-medium uppercase tracking-wide px-4 py-3">Status</th>
+                <th className="text-left text-xs text-slate-400 font-medium uppercase tracking-wide px-4 py-3">Joined</th>
+                <th className="text-left text-xs text-slate-400 font-medium uppercase tracking-wide px-4 py-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-700/30">
+              {usersData?.users.map((user) => (
+                <tr key={user.id} className="hover:bg-slate-700/20 transition-colors">
+                  <td className="px-4 py-3">
+                    <p className="text-white font-medium text-sm">{user.name}</p>
+                    <p className="text-slate-500 text-xs">{user.email}</p>
+                    {user.phone && <p className="text-slate-500 text-xs">{user.phone}</p>}
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className={`inline-flex px-2 py-0.5 text-xs font-semibold rounded ${
+                      user.role === 'ADMIN'    ? 'bg-red-900/50 text-red-400' :
+                      user.role === 'SUPPLIER' ? 'bg-purple-900/50 text-purple-400' :
+                      'bg-green-900/50 text-green-400'
+                    }`}>
+                      {user.role}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-xs text-slate-400">
+                    <div>RFQs: <span className="text-white">{user._count.rfqs}</span></div>
+                    <div>Leads: <span className="text-white">{user._count.leads}</span></div>
+                    <div>Txns: <span className="text-white">{user._count.transactions}</span></div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className={`inline-flex px-2 py-0.5 text-xs font-semibold rounded ${
+                      user.isActive ? 'bg-green-900/50 text-green-400' : 'bg-red-900/50 text-red-400'
+                    }`}>
+                      {user.isActive ? 'Active' : 'Inactive'}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-xs text-slate-400">
+                    {new Date(user.createdAt).toLocaleDateString()}
+                  </td>
+                  <td className="px-4 py-3">
+                    <button
+                      onClick={() => toggleUserStatus(user.id, user.isActive)}
+                      className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+                        user.isActive
+                          ? 'bg-red-900/40 text-red-400 hover:bg-red-900/70'
+                          : 'bg-green-900/40 text-green-400 hover:bg-green-900/70'
+                      }`}
+                    >
+                      {user.isActive ? 'Deactivate' : 'Activate'}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-slate-300">Active Users</p>
-                  <p className="text-3xl font-bold text-neutral-900">{usersData.stats.activeUsers.toLocaleString()}</p>
-                </div>
-                <div className="p-3 bg-yellow-100 rounded-lg">
-                  <span className="text-2xl">✅</span>
-                </div>
-              </div>
+        {/* Pagination */}
+        {usersData?.pagination && usersData.pagination.pages > 1 && (
+          <div className="px-4 py-3 flex items-center justify-between border-t border-slate-700/50">
+            <p className="text-xs text-slate-500">
+              Showing {(currentPage - 1) * usersData.pagination.limit + 1}–
+              {Math.min(currentPage * usersData.pagination.limit, usersData.pagination.total)} of {usersData.pagination.total}
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                disabled={currentPage === 1}
+                className="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-slate-300 text-xs disabled:opacity-40 hover:bg-slate-700 transition-colors"
+              >
+                Previous
+              </button>
+              <button
+                onClick={() => setCurrentPage(Math.min(usersData.pagination.pages, currentPage + 1))}
+                disabled={currentPage === usersData.pagination.pages}
+                className="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-slate-300 text-xs disabled:opacity-40 hover:bg-slate-700 transition-colors"
+              >
+                Next
+              </button>
             </div>
           </div>
         )}
-
-        {/* Search and Filters */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-          <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1">
-              <input
-                type="text"
-                placeholder="Search users by name, email, or phone..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500"
-              />
-            </div>
-            <div>
-              <select
-                value={roleFilter}
-                onChange={(e) => setRoleFilter(e.target.value)}
-                className="px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500"
-                title="Filter users by role"
-              >
-                <option value="">All Roles</option>
-                <option value="BUYER">Buyers</option>
-                <option value="SUPPLIER">Suppliers</option>
-                <option value="ADMIN">Admins</option>
-              </select>
-            </div>
-            <button
-              type="submit"
-              className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-primary-700"
-            >
-              Search
-            </button>
-          </form>
-        </div>
-
-        {/* Users Table */}
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-neutral-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
-                    User
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
-                    Role
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
-                    Activity
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
-                    Joined
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {usersData?.users.map((user) => (
-                  <tr key={user.id} className="hover:bg-neutral-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div>
-                        <div className="text-sm font-medium text-neutral-900">{user.name}</div>
-                        <div className="text-sm text-slate-400">{user.email}</div>
-                        <div className="text-sm text-slate-400">{user.phone}</div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        user.role === 'ADMIN' ? 'bg-red-100 text-red-800' :
-                        user.role === 'SUPPLIER' ? 'bg-purple-100 text-purple-800' :
-                        'bg-green-100 text-green-800'
-                      }`}>
-                        {user.role}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">
-                      <div>RFQs: {user._count.rfqs}</div>
-                      <div>Leads: {user._count.leads}</div>
-                      <div>Transactions: {user._count.transactions}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        user.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                      }`}>
-                        {user.isActive ? 'Active' : 'Inactive'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">
-                      {new Date(user.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button
-                        onClick={() => toggleUserStatus(user.id, user.isActive)}
-                        className={`px-3 py-1 rounded text-xs ${
-                          user.isActive 
-                            ? 'bg-red-100 text-red-700 hover:bg-red-200' 
-                            : 'bg-green-100 text-green-700 hover:bg-green-200'
-                        }`}
-                      >
-                        {user.isActive ? 'Deactivate' : 'Activate'}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Pagination */}
-          {usersData?.pagination && (
-            <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-neutral-200 sm:px-6">
-              <div className="flex-1 flex justify-between sm:hidden">
-                <button
-                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                  disabled={currentPage === 1}
-                  className="relative inline-flex items-center px-4 py-2 border border-neutral-300 text-sm font-medium rounded-md text-slate-400 bg-white hover:bg-neutral-50 disabled:opacity-50"
-                >
-                  Previous
-                </button>
-                <button
-                  onClick={() => setCurrentPage(Math.min(usersData.pagination.pages, currentPage + 1))}
-                  disabled={currentPage === usersData.pagination.pages}
-                  className="ml-3 relative inline-flex items-center px-4 py-2 border border-neutral-300 text-sm font-medium rounded-md text-slate-400 bg-white hover:bg-neutral-50 disabled:opacity-50"
-                >
-                  Next
-                </button>
-              </div>
-              <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-sm text-slate-400">
-                    Showing{' '}
-                    <span className="font-medium">{(currentPage - 1) * usersData.pagination.limit + 1}</span>
-                    {' '}to{' '}
-                    <span className="font-medium">
-                      {Math.min(currentPage * usersData.pagination.limit, usersData.pagination.total)}
-                    </span>
-                    {' '}of{' '}
-                    <span className="font-medium">{usersData.pagination.total}</span>
-                    {' '}results
-                  </p>
-                </div>
-                <div>
-                  <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-                    <button
-                      onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                      disabled={currentPage === 1}
-                      className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-neutral-300 bg-white text-sm font-medium text-slate-400 hover:bg-neutral-50 disabled:opacity-50"
-                    >
-                      Previous
-                    </button>
-                    <button
-                      onClick={() => setCurrentPage(Math.min(usersData.pagination.pages, currentPage + 1))}
-                      disabled={currentPage === usersData.pagination.pages}
-                      className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-neutral-300 bg-white text-sm font-medium text-slate-400 hover:bg-neutral-50 disabled:opacity-50"
-                    >
-                      Next
-                    </button>
-                  </nav>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
       </div>
     </div>
   );
