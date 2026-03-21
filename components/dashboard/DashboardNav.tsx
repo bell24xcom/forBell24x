@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, FileText, MessageSquare, TrendingUp, Mail, Wallet, BarChart3, CreditCard, Building2, ShieldCheck } from 'lucide-react';
+import { LayoutDashboard, FileText, MessageSquare, TrendingUp, Mail, Wallet, BarChart3, CreditCard, Building2, ShieldCheck, List } from 'lucide-react';
 
 const navItems = [
   { label: 'Overview', href: '/dashboard', icon: LayoutDashboard },
@@ -11,6 +11,7 @@ const navItems = [
   { label: 'Analytics', href: '/dashboard/analytics', icon: TrendingUp },
   { label: 'Messages', href: '/dashboard/messages', icon: Mail },
   { label: 'Wallet', href: '/dashboard/wallet', icon: Wallet },
+  { label: 'Ledger', href: '/dashboard/wallet/ledger', icon: List },
   { label: 'Escrow', href: '/escrow', icon: ShieldCheck },
   { label: 'Reports', href: '/dashboard/reports', icon: BarChart3 },
   { label: 'Subscription', href: '/dashboard/subscription', icon: CreditCard },

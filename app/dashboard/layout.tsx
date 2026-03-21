@@ -7,7 +7,7 @@ import { useDashboardMode } from '@/contexts/DashboardContext';
 import {
   LayoutDashboard, PlusCircle, FileText, MessageSquare, Users2,
   Mail, Wallet, BarChart3, User, Bell, Settings, Search, Star,
-  Mic, Video, FileEdit, Building2, Package, CreditCard, Menu, X, Shield
+  Mic, Video, FileEdit, Building2, Package, CreditCard, Menu, X, Shield, List
 } from 'lucide-react';
 
 interface NavItem {
@@ -31,6 +31,7 @@ const buyerNavItems: NavItem[] = [
   { divider: true, label: 'TOOLS' },
   { icon: Mail, label: 'Messages', href: '/dashboard/messages' },
   { icon: Wallet, label: 'Wallet', href: '/dashboard/wallet' },
+  { icon: List, label: 'Ledger', href: '/dashboard/wallet/ledger' },
   { icon: Shield, label: 'Escrow', href: '/dashboard/escrow' },
   { icon: BarChart3, label: 'Analytics', href: '/dashboard/analytics' },
   { divider: true, label: 'ACCOUNT' },
@@ -52,6 +53,7 @@ const supplierNavItems: NavItem[] = [
   { divider: true, label: 'TOOLS' },
   { icon: Mail, label: 'Messages', href: '/dashboard/messages' },
   { icon: Wallet, label: 'Wallet & Earnings', href: '/dashboard/wallet' },
+  { icon: List, label: 'Ledger', href: '/dashboard/wallet/ledger' },
   { icon: Shield, label: 'Escrow', href: '/dashboard/escrow' },
   { icon: BarChart3, label: 'Performance', href: '/dashboard/analytics' },
   { divider: true, label: 'PROFILE' },
