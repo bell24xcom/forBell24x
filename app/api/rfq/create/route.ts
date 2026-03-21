@@ -5,6 +5,7 @@ import { onRFQCreated, checkDailyLimit } from '@/lib/orchestration';
 import { sanitizeString, sanitizeText, safePositiveFloat } from '@/lib/sanitize';
 import { storeRFQ, extractRFQMeta } from '@/lib/memory-engine';
 import { agentZero } from '@/lib/agents/agent-zero';
+import { logEvent } from '@/lib/log-event';
 
 export const dynamic = 'force-dynamic';
 
@@ -124,6 +125,9 @@ export async function POST(request: NextRequest) {
       console.error('[Memory] storeRFQ error:', memErr);
     }
 
+    // Log RFQ created event
+    logEvent({ type: 'rfq_created', meta: { rfqId: rfq.id, category: rfq.category, userId } });
+
     // Fire orchestration in background — never blocks the response
     const buyer = await prisma.user.findUnique({
       where: { id: userId },
@@ -155,11 +159,9 @@ export async function POST(request: NextRequest) {
       message: 'RFQ created successfully',
     });
   } catch (error) {
-    console.error('Error creating RFQ:', error);
-    const { errorLogger } = await import('@/lib/errorLogger');
-    errorLogger.critical(error, { route: '/api/rfq/create' });
+    console.error('[API_ERROR] /api/rfq/create', error instanceof Error ? error.message : error);
     return NextResponse.json(
-      { success: false, error: 'Failed to create RFQ' },
+      { success: false, error: 'Failed to create RFQ', retryable: true },
       { status: 500 }
     );
   }

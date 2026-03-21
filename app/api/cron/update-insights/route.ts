@@ -14,12 +14,12 @@ async function runCron(request: NextRequest) {
   }
 
   try {
-    console.log('[Cron] Starting market insights update...');
+    console.log('[CRON_START] /api/cron/update-insights');
     const result = await dailyInsightsCron();
-    console.log('[Cron] Market insights updated:', result);
+    console.log('[CRON_END] /api/cron/update-insights', JSON.stringify(result));
     return NextResponse.json({ success: true, ...result, timestamp: new Date().toISOString() });
   } catch (error) {
-    console.error('[Cron] update-insights failed:', error);
+    console.error('[API_ERROR] /api/cron/update-insights', error instanceof Error ? error.message : error);
     return NextResponse.json({ success: false, error: 'Cron failed' }, { status: 500 });
   }
 }

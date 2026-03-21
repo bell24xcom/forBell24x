@@ -13,12 +13,12 @@ async function run(request: NextRequest) {
   }
 
   try {
-    console.log('[Cron] Starting behavior analysis...');
+    console.log('[CRON_START] /api/cron/analyze-behavior');
     const result = await analyzeUserBehavior(30);
-    console.log('[Cron] Behavior analysis complete:', result);
+    console.log('[CRON_END] /api/cron/analyze-behavior', JSON.stringify(result));
     return NextResponse.json({ success: true, ...result, timestamp: new Date().toISOString() });
   } catch (error) {
-    console.error('[Cron] analyze-behavior failed:', error);
+    console.error('[API_ERROR] /api/cron/analyze-behavior', error instanceof Error ? error.message : error);
     return NextResponse.json({ success: false, error: 'Cron failed' }, { status: 500 });
   }
 }
