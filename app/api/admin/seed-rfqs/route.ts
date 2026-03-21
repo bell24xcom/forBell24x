@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin, isErrorResponse } from '@/lib/admin-auth';
-import { ALL_CATEGORIES } from '@/app/data/categories';
 
 export const dynamic = 'force-dynamic';
 
@@ -67,33 +66,60 @@ function fillTemplate(sub: string, city: string): string {
 }
 
 /**
- * Flatten ALL_CATEGORIES into a list of seed targets.
- * Each entry = { category: parentName, subcategory: subName }
- * We seed 1 RFQ per subcategory + 1 parent-level RFQ per parent category.
- * Total ≈ 325 RFQs covering all 450+ category slots.
+ * 40 curated realistic Indian B2B seed RFQs.
+ * 8 categories × 5 RFQs. Varied cities, budgets, urgencies.
  */
 function buildSeedTargets(): Array<{ title: string; category: string; priority: number }> {
-  const targets: Array<{ title: string; category: string; priority: number }> = [];
-
-  for (const cat of ALL_CATEGORIES) {
-    // 1 RFQ at parent category level
-    targets.push({
-      title: `${cat.name} — Bulk Procurement`,
-      category: cat.name,
-      priority: cat.trending ? 5 : 3,
-    });
-
-    // 1 RFQ per subcategory
-    for (const sub of cat.subcategories) {
-      targets.push({
-        title: `${sub} — Supplier Required`,
-        category: sub,
-        priority: 3,
-      });
-    }
-  }
-
-  return targets;
+  return [
+    // Textiles
+    { title: 'Cotton Fabric — Bulk Supply Required',           category: 'Textiles',     priority: 5 },
+    { title: 'Polyester Yarn — Export Quality Needed',         category: 'Textiles',     priority: 4 },
+    { title: 'Dyed Fabric Rolls — Wholesale Buyer',            category: 'Textiles',     priority: 4 },
+    { title: 'Ready-Made Garments — Private Label Production', category: 'Textiles',     priority: 5 },
+    { title: 'Technical Textiles for Industrial Use',          category: 'Textiles',     priority: 3 },
+    // Steel & Metals
+    { title: 'MS Steel Rods — Fe500 Construction Grade',       category: 'Steel',        priority: 5 },
+    { title: 'Stainless Steel Sheets — Food Grade 304',        category: 'Steel',        priority: 4 },
+    { title: 'Aluminium Extrusion Profiles — Bulk Order',      category: 'Metals',       priority: 4 },
+    { title: 'Hot Rolled Steel Coils — Bulk Requirement',      category: 'Steel',        priority: 5 },
+    { title: 'Copper Wire and Cables — Electrical Grade',      category: 'Metals',       priority: 3 },
+    // Packaging
+    { title: 'Corrugated Boxes — 5-Ply Export Quality',        category: 'Packaging',    priority: 5 },
+    { title: 'HDPE Woven Bags — Agricultural Grade',           category: 'Packaging',    priority: 4 },
+    { title: 'PET Bottles — Food Grade 500ml',                 category: 'Packaging',    priority: 4 },
+    { title: 'Flexible Laminate Pouches — FMCG Packaging',    category: 'Packaging',    priority: 5 },
+    { title: 'Kraft Paper — 200 GSM Industrial Grade',         category: 'Packaging',    priority: 3 },
+    // Electronics
+    { title: 'PCB Assembly — SMT Contract Manufacturing',      category: 'Electronics',  priority: 5 },
+    { title: 'LED Drivers — Bulk Component Sourcing',          category: 'Electronics',  priority: 4 },
+    { title: 'Industrial Sensors — Temperature and Pressure',  category: 'Electronics',  priority: 4 },
+    { title: 'Power Supply Units — 12V DC Industrial',         category: 'Electronics',  priority: 3 },
+    { title: 'Wire Harness Assembly — Automotive Grade',       category: 'Electronics',  priority: 5 },
+    // Machinery
+    { title: 'CNC Turning Machine — 500mm Bed Capacity',       category: 'Machinery',    priority: 4 },
+    { title: 'Industrial Air Compressor — 100 CFM',            category: 'Machinery',    priority: 5 },
+    { title: 'Hydraulic Press Machine — 50 Ton',               category: 'Machinery',    priority: 4 },
+    { title: 'Conveyor Belt System — Modular Design',          category: 'Machinery',    priority: 3 },
+    { title: 'Industrial Pumps — Centrifugal 3HP',             category: 'Machinery',    priority: 4 },
+    // Chemicals
+    { title: 'Caustic Soda Flakes — Industrial Grade Bulk',    category: 'Chemicals',    priority: 5 },
+    { title: 'Titanium Dioxide — Coating and Paint Grade',     category: 'Chemicals',    priority: 4 },
+    { title: 'Sodium Silicate — Liquid Form Industrial',       category: 'Chemicals',    priority: 3 },
+    { title: 'HDPE Granules — Virgin Grade Supplier',          category: 'Chemicals',    priority: 5 },
+    { title: 'Industrial Solvents — Bulk Drum Requirement',    category: 'Chemicals',    priority: 4 },
+    // Construction
+    { title: 'TMT Steel Bars — Fe550 Grade Urgent',            category: 'Construction', priority: 5 },
+    { title: 'AAC Blocks — Lightweight 600x200x200mm',         category: 'Construction', priority: 4 },
+    { title: 'Waterproofing Chemicals — Crystalline Type',     category: 'Construction', priority: 4 },
+    { title: 'CPVC Pipes — SDR 11 Pressure Class',             category: 'Construction', priority: 3 },
+    { title: 'Superplasticizer Admixture for Concrete',        category: 'Construction', priority: 4 },
+    // Agriculture
+    { title: 'Drip Irrigation System — 5 Acre Setup',          category: 'Agriculture',  priority: 4 },
+    { title: 'Agricultural Pesticides — WHO Class II',         category: 'Agriculture',  priority: 5 },
+    { title: 'Rotavator 7 Ft — Tractor Mounted',               category: 'Agriculture',  priority: 4 },
+    { title: 'Organic Fertilizers — NPK Granulated',           category: 'Agriculture',  priority: 5 },
+    { title: 'Cold Storage Equipment — Potato Grade',          category: 'Agriculture',  priority: 3 },
+  ];
 }
 
 export async function GET(request: NextRequest) {
