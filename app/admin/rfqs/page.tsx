@@ -243,7 +243,7 @@ export default function AdminRFQsPage() {
               <div>
                 <p className="text-slate-500 text-xs mb-2 uppercase tracking-wider">Quotes ({drawer._count.quotes})</p>
                 {drawer.quotes.length === 0 ? (
-                  <p className="text-slate-600 text-sm">No quotes yet</p>
+                  <p className="text-slate-300 text-sm">No quotes yet</p>
                 ) : (
                   <div className="space-y-2">
                     {drawer.quotes.map(q => (

@@ -212,7 +212,7 @@ export default function SecurityPage() {
                       <button
                         onClick={() => deleteLog(log.id)}
                         disabled={deleting === log.id}
-                        className="shrink-0 p-1.5 text-slate-600 hover:text-red-400 transition-colors rounded"
+                        className="shrink-0 p-1.5 text-slate-300 hover:text-red-400 transition-colors rounded"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>

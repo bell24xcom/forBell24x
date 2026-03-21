@@ -231,7 +231,7 @@ export default function DealsPage() {
         </div>
       ) : deals.length === 0 ? (
         <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-12 text-center">
-          <Users2 className="w-16 h-16 text-slate-600 mx-auto mb-4" />
+          <Users2 className="w-16 h-16 text-slate-300 mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-white mb-2">No Active Deals</h3>
           <p className="text-slate-400 mb-6">
             Your first deal starts when you accept a supplier's quote.

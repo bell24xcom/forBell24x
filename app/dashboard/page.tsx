@@ -459,7 +459,7 @@ export default function DashboardPage() {
             </div>
             {latestRfqs.length === 0 ? (
               <div className="text-center py-8">
-                <Search className="w-10 h-10 text-slate-600 mx-auto mb-3" />
+                <Search className="w-10 h-10 text-slate-300 mx-auto mb-3" />
                 <p className="text-slate-400 text-sm">No active RFQs yet — check back soon!</p>
               </div>
             ) : (
@@ -579,7 +579,7 @@ export default function DashboardPage() {
               </div>
               {latestRfqs.length === 0 ? (
                 <div className="text-center py-8">
-                  <Search className="w-10 h-10 text-gray-600 mx-auto mb-3" />
+                  <Search className="w-10 h-10 text-gray-300 mx-auto mb-3" />
                   <p className="text-gray-400 text-sm">New RFQs will appear here</p>
                 </div>
               ) : (
@@ -604,7 +604,7 @@ export default function DashboardPage() {
                 <Link href="/supplier/my-quotes" className="text-blue-400 text-sm hover:text-blue-300">View All &rarr;</Link>
               </div>
               <div className="text-center py-8">
-                <FileText className="w-10 h-10 text-gray-600 mx-auto mb-3" />
+                <FileText className="w-10 h-10 text-gray-300 mx-auto mb-3" />
                 <p className="text-gray-400 text-sm">Quotes you submit will appear here</p>
                 <Link href="/supplier/browse-rfqs" className="text-blue-400 text-sm mt-2 inline-block hover:text-blue-300">
                   Find RFQs to Quote &rarr;

@@ -349,7 +349,7 @@ export default function EditProfilePage() {
                       </div>
                       <span className="text-gray-500 text-xs w-10 text-right">{item.value}%</span>
                     </div>
-                    <p className="text-gray-600 text-xs ml-[7.5rem] mt-0.5">{item.tip}</p>
+                    <p className="text-gray-300 text-xs ml-[7.5rem] mt-0.5">{item.tip}</p>
                   </div>
                 ))}
               </div>
@@ -367,7 +367,7 @@ export default function EditProfilePage() {
               </Link>
             </div>
             <div className="text-center py-6">
-              <Package className="w-12 h-12 text-gray-600 mx-auto mb-3" />
+              <Package className="w-12 h-12 text-gray-300 mx-auto mb-3" />
               <p className="text-gray-400 text-sm">No products added yet</p>
               <Link href="/supplier/products/add" className="inline-flex items-center gap-1.5 mt-3 text-blue-400 text-sm hover:text-blue-300">
                 <Plus className="w-4 h-4" /> Add Your First Product

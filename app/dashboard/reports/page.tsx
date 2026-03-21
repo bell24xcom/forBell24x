@@ -252,7 +252,7 @@ export default function ReportsPage() {
                 onClick={() => setDateRange(opt.value)}
                 className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                   dateRange === opt.value
-                    ? 'bg-white text-white shadow-sm'
+                    ? 'bg-blue-600 text-white shadow-sm'
                     : 'text-gray-400 hover:text-gray-200'
                 }`}
               >

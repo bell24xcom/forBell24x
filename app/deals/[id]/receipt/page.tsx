@@ -166,7 +166,7 @@ export default function DealReceiptPage() {
           {/* Footer */}
           <div className="border-t border-slate-700 pt-6 text-center">
             <p className="text-slate-500 text-xs">This is a computer-generated receipt from Bell24h (Digitex Studio)</p>
-            <p className="text-slate-600 text-xs mt-1">GSTIN: 27AAPFU0939F1ZV · bell24h.com</p>
+            <p className="text-slate-300 text-xs mt-1">GSTIN: 27AAPFU0939F1ZV · bell24h.com</p>
           </div>
         </div>
       </div>

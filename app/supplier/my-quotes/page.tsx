@@ -147,7 +147,7 @@ export default function MyQuotesPage() {
           </div>
         ) : filteredQuotes.length === 0 ? (
           <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-12 text-center">
-            <FileText className="w-16 h-16 text-slate-600 mx-auto mb-4" />
+            <FileText className="w-16 h-16 text-slate-300 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-white mb-2">No Quotes Yet</h3>
             <p className="text-slate-400 mb-6">
               You haven't submitted any quotes yet. Browse RFQs to start quoting.

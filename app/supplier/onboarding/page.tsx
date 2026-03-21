@@ -446,7 +446,7 @@ export default function SupplierOnboardingPage() {
           </button>
         </div>
 
-        <p className="text-center text-xs text-slate-600 mt-4">
+        <p className="text-center text-xs text-slate-300 mt-4">
           <button
             type="button"
             onClick={() => router.push('/dashboard')}

@@ -67,7 +67,7 @@ export default function BlogPage() {
                   {post.category}
                 </span>
                 <span className="text-xs text-slate-500">{post.readTime}</span>
-                <span className="text-xs text-slate-600">
+                <span className="text-xs text-slate-300">
                   {new Date(post.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
                 </span>
               </div>
