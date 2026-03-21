@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
       },
       rates: {
         viewRate: `${toRate(rfqsWithViews, rfqsCreated)}%`,
-        quoteRate: `${toRate(rfqsWithQuotes, rfqsViewed)}%`,
+        quoteRate: `${toRate(rfqsWithQuotes, rfqsWithViews)}%`,
         dealRate: `${toRate(dealsAccepted, rfqsWithQuotes)}%`,
         overallConversion: `${toRate(dealsAccepted, rfqsCreated)}%`,
       },
