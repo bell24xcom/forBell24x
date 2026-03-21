@@ -4,17 +4,33 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-const NAV = [
-  { href: '/admin',                label: 'Dashboard',        icon: '▤' },
-  { href: '/admin/crm',            label: 'CRM / Users',      icon: '👥' },
-  { href: '/admin/control-panel',  label: 'Control Panel',    icon: '⚙️' },
-  { href: '/admin/rfqs',           label: 'RFQs',             icon: '📋' },
-  { href: '/admin/analytics',      label: 'Analytics',        icon: '📊' },
-  { href: '/admin/leads',          label: 'Leads',            icon: '🎯' },
-  { href: '/admin/monitoring',     label: 'Monitoring',       icon: '🔍' },
-  { href: '/admin/security',       label: 'Security',         icon: '🔒' },
-  { href: '/admin/import',         label: 'Import Suppliers', icon: '📥' },
-  { href: '/admin/seed-rfqs',      label: 'Seed RFQs',        icon: '🌱' },
+type NavItem = { href: string; label: string; icon: string; group?: string };
+
+const NAV: NavItem[] = [
+  // Core
+  { href: '/admin',                  label: 'Dashboard',        icon: '▤',  group: 'Intelligence' },
+  { href: '/admin/analytics',        label: 'Analytics',        icon: '📊' },
+  { href: '/admin/heatmap',          label: 'Heatmap',          icon: '🔥' },
+  { href: '/admin/revenue',          label: 'Revenue',          icon: '💰' },
+  // Users & Suppliers
+  { href: '/admin/crm',              label: 'CRM / Users',      icon: '👥', group: 'People' },
+  { href: '/admin/suppliers',        label: 'Suppliers',        icon: '🏭' },
+  { href: '/admin/leads',            label: 'Leads',            icon: '🎯' },
+  { href: '/admin/customers',        label: 'Customers',        icon: '🤝' },
+  // Operations
+  { href: '/admin/rfqs',             label: 'RFQs',             icon: '📋', group: 'Operations' },
+  { href: '/admin/outreach',         label: 'Outreach',         icon: '📣' },
+  { href: '/admin/control-panel',    label: 'Control Panel',    icon: '⚙️' },
+  { href: '/admin/feature-flags',    label: 'Feature Flags',    icon: '🚩' },
+  // System
+  { href: '/admin/n8n',              label: 'Automation',       icon: '⚡', group: 'System' },
+  { href: '/admin/monitoring',       label: 'Monitoring',       icon: '🔍' },
+  { href: '/admin/security',         label: 'Security',         icon: '🔒' },
+  { href: '/admin/errors',           label: 'Error Logs',       icon: '🐛' },
+  // Data
+  { href: '/admin/import',           label: 'Import Suppliers', icon: '📥', group: 'Data' },
+  { href: '/admin/seed-rfqs',        label: 'Seed RFQs',        icon: '🌱' },
+  { href: '/admin/launch-metrics',   label: 'Launch Metrics',   icon: '🚀' },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -112,22 +128,31 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 py-4 space-y-0.5 px-2 overflow-y-auto">
+        <nav className="flex-1 py-3 px-2 overflow-y-auto space-y-0.5">
           {NAV.map(item => {
             const isActive = pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href));
             return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
-                  isActive
-                    ? 'bg-indigo-600 text-white'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800'
-                }`}
-              >
-                <span className="text-base shrink-0">{item.icon}</span>
-                {sidebarOpen && <span className="truncate">{item.label}</span>}
-              </Link>
+              <div key={item.href}>
+                {item.group && sidebarOpen && (
+                  <p className="text-[10px] font-semibold text-slate-600 uppercase tracking-widest px-3 pt-3 pb-1">
+                    {item.group}
+                  </p>
+                )}
+                {item.group && !sidebarOpen && (
+                  <div className="my-1.5 mx-1 h-px bg-slate-700/50" />
+                )}
+                <Link
+                  href={item.href}
+                  className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
+                    isActive
+                      ? 'bg-indigo-600 text-white'
+                      : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                  }`}
+                >
+                  <span className="text-base shrink-0">{item.icon}</span>
+                  {sidebarOpen && <span className="truncate">{item.label}</span>}
+                </Link>
+              </div>
             );
           })}
         </nav>
@@ -148,7 +173,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {/* Top bar */}
         <header className="h-14 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-6 shrink-0">
           <div className="text-slate-300 text-sm font-medium">
-            {NAV.find(n => n.href === pathname || (n.href !== '/admin' && pathname.startsWith(n.href)))?.label ?? 'Admin'}
+            {NAV.find(n => pathname === n.href || (n.href !== '/admin' && pathname.startsWith(n.href)))?.label ?? 'Admin'}
           </div>
           <div className="flex items-center gap-4">
             <span className="text-xs text-slate-500 bg-slate-800 px-2 py-1 rounded">{adminName || 'ADMIN'}</span>
