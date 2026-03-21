@@ -3,18 +3,33 @@
 import { useState, useEffect, useCallback } from 'react';
 import { RefreshCw, Send, MessageCircle, Users, Zap, TrendingUp } from 'lucide-react';
 
-interface OutreachStats {
-  days: number;
+interface OutreachPeriod {
   outreachSent: number;
-  waClicks: number;
-  subscriptions: number;
   followUp1: number;
   followUp2: number;
-  drips: number;
-  waClickRate: number;
-  subRate: number;
-  totalActionsByType: { actionType: string; count: number }[];
-  dailyOutreach: { date: string; count: number }[];
+  drip3: number;
+  drip7: number;
+  drip14: number;
+  subscriptions: number;
+  waClicks: number;
+  uniqueSuppliersReached: number;
+  conversionRate: string;
+}
+
+interface RecentEvent {
+  actionType: string;
+  userId: string | null;
+  source: string | null;
+  metadata: unknown;
+  createdAt: string;
+}
+
+interface OutreachStats {
+  success: boolean;
+  days: number;
+  period: OutreachPeriod;
+  allTime: Omit<OutreachPeriod, 'uniqueSuppliersReached' | 'conversionRate' | 'waClicks'>;
+  recentEvents: RecentEvent[];
 }
 
 const RANGES = [
@@ -22,6 +37,13 @@ const RANGES = [
   { label: '30 Days', value: 30 },
   { label: '90 Days', value: 90 },
 ];
+
+function relTime(iso: string) {
+  const d = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
+  if (d < 60) return `${d}m ago`;
+  if (d < 1440) return `${Math.floor(d / 60)}h ago`;
+  return `${Math.floor(d / 1440)}d ago`;
+}
 
 export default function LaunchMetricsPage() {
   const [data,    setData]    = useState<OutreachStats | null>(null);
@@ -45,7 +67,8 @@ export default function LaunchMetricsPage() {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  const trendMax = data ? Math.max(1, ...data.dailyOutreach.map(d => d.count)) : 1;
+  const p = data?.period;
+  const drips = (p?.drip3 ?? 0) + (p?.drip7 ?? 0) + (p?.drip14 ?? 0);
 
   return (
     <div className="space-y-6">
@@ -81,19 +104,20 @@ export default function LaunchMetricsPage() {
         </div>
       )}
 
-      {data && (
+      {data && p && (
         <>
           {/* KPI Cards */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {[
-              { label: 'Outreach Sent',    value: data.outreachSent,   icon: Send,          color: 'text-blue-400',    border: 'border-blue-500/20' },
-              { label: 'WA Clicks',        value: data.waClicks,       icon: MessageCircle, color: 'text-green-400',   border: 'border-green-500/20',
-                sub: `${data.waClickRate}% click rate` },
-              { label: 'Subscriptions',    value: data.subscriptions,  icon: Users,         color: 'text-emerald-400', border: 'border-emerald-500/20',
-                sub: `${data.subRate}% of outreach` },
-              { label: 'Follow-up Day 2',  value: data.followUp1,      icon: Zap,           color: 'text-indigo-400',  border: 'border-indigo-500/20' },
-              { label: 'Follow-up Day 5',  value: data.followUp2,      icon: Zap,           color: 'text-purple-400',  border: 'border-purple-500/20' },
-              { label: 'Drip Messages',    value: data.drips,          icon: TrendingUp,    color: 'text-orange-400',  border: 'border-orange-500/20' },
+              { label: 'Outreach Sent',    value: p.outreachSent,           icon: Send,          color: 'text-blue-400',    border: 'border-blue-500/20' },
+              { label: 'WA Clicks',        value: p.waClicks,               icon: MessageCircle, color: 'text-green-400',   border: 'border-green-500/20',
+                sub: `${p.conversionRate}% conv rate` },
+              { label: 'Subscriptions',    value: p.subscriptions,          icon: Users,         color: 'text-emerald-400', border: 'border-emerald-500/20',
+                sub: `${p.uniqueSuppliersReached} unique suppliers` },
+              { label: 'Follow-up Day 2',  value: p.followUp1,              icon: Zap,           color: 'text-indigo-400',  border: 'border-indigo-500/20' },
+              { label: 'Follow-up Day 5',  value: p.followUp2,              icon: Zap,           color: 'text-purple-400',  border: 'border-purple-500/20' },
+              { label: 'Drip Messages',    value: drips,                    icon: TrendingUp,    color: 'text-orange-400',  border: 'border-orange-500/20',
+                sub: `D3:${p.drip3} D7:${p.drip7} D14:${p.drip14}` },
             ].map(card => (
               <div key={card.label} className={`bg-slate-800/60 border ${card.border} rounded-xl p-5`}>
                 <div className="flex items-center gap-2 mb-3">
@@ -106,23 +130,24 @@ export default function LaunchMetricsPage() {
             ))}
           </div>
 
-          {/* Outreach Funnel */}
+          {/* Funnel */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-5">
-              <h3 className="text-sm font-semibold text-white mb-4">Outreach Funnel</h3>
-              {data.outreachSent === 0 ? (
+              <h3 className="text-sm font-semibold text-white mb-4">Outreach Funnel (Period)</h3>
+              {p.outreachSent === 0 ? (
                 <p className="text-slate-500 text-xs">No outreach activity in this period.</p>
               ) : (
                 <div className="space-y-2">
                   {[
-                    { step: 'Outreach Sent',  value: data.outreachSent,  color: 'bg-blue-500' },
-                    { step: 'WA Clicked',     value: data.waClicks,      color: 'bg-green-500' },
-                    { step: 'Subscribed',     value: data.subscriptions, color: 'bg-emerald-500' },
-                    { step: 'Follow-up D2',   value: data.followUp1,     color: 'bg-indigo-500' },
-                    { step: 'Follow-up D5',   value: data.followUp2,     color: 'bg-purple-500' },
-                    { step: 'Drips',          value: data.drips,         color: 'bg-orange-500' },
+                    { step: 'Outreach Sent', value: p.outreachSent,   color: 'bg-blue-500' },
+                    { step: 'WA Clicked',    value: p.waClicks,       color: 'bg-green-500' },
+                    { step: 'Subscribed',    value: p.subscriptions,  color: 'bg-emerald-500' },
+                    { step: 'Follow-up D2',  value: p.followUp1,      color: 'bg-indigo-500' },
+                    { step: 'Follow-up D5',  value: p.followUp2,      color: 'bg-purple-500' },
+                    { step: 'Drip Total',    value: drips,            color: 'bg-orange-500' },
                   ].map((step, i, arr) => {
-                    const pct = Math.max(2, Math.round((step.value / data.outreachSent) * 100));
+                    const base = arr[0].value || 1;
+                    const pct  = Math.max(2, Math.round((step.value / base) * 100));
                     const convPct = i > 0 && arr[i - 1].value > 0
                       ? ((step.value / arr[i - 1].value) * 100).toFixed(0) : null;
                     return (
@@ -144,39 +169,37 @@ export default function LaunchMetricsPage() {
               )}
             </div>
 
-            {/* Daily Outreach Trend */}
+            {/* All-time totals */}
             <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-5">
-              <h3 className="text-sm font-semibold text-white mb-4">Daily Outreach Trend</h3>
-              {data.dailyOutreach.length === 0 ? (
-                <p className="text-slate-500 text-xs">No data yet.</p>
-              ) : (
-                <div className="flex items-end gap-0.5 h-24">
-                  {data.dailyOutreach.map(d => {
-                    const h = Math.max(2, Math.round((d.count / trendMax) * 88));
-                    return (
-                      <div key={d.date} className="flex flex-col items-center gap-1 flex-1"
-                        title={`${d.date}: ${d.count}`}>
-                        <div className="w-full bg-blue-500 rounded-t" style={{ height: `${h}px` }} />
-                        {data.dailyOutreach.length <= 14 && (
-                          <span className="text-[8px] text-slate-600">{d.date.slice(8)}</span>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+              <h3 className="text-sm font-semibold text-white mb-4">All-Time Totals</h3>
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { label: 'Outreach',     value: data.allTime.outreachSent },
+                  { label: 'Follow-up D2', value: data.allTime.followUp1 },
+                  { label: 'Follow-up D5', value: data.allTime.followUp2 },
+                  { label: 'Drip D3',      value: data.allTime.drip3 },
+                  { label: 'Drip D7',      value: data.allTime.drip7 },
+                  { label: 'Drip D14',     value: data.allTime.drip14 },
+                  { label: 'Subscribed',   value: data.allTime.subscriptions },
+                ].map(item => (
+                  <div key={item.label} className="bg-slate-700/40 rounded-lg px-3 py-2">
+                    <p className="text-white text-sm font-semibold">{item.value}</p>
+                    <p className="text-slate-400 text-xs">{item.label}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
-          {/* Action Type Breakdown */}
-          {data.totalActionsByType.length > 0 && (
+          {/* Recent Events */}
+          {data.recentEvents.length > 0 && (
             <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-5">
-              <h3 className="text-sm font-semibold text-white mb-4">All Action Types</h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                {data.totalActionsByType.map(a => (
-                  <div key={a.actionType} className="bg-slate-700/40 rounded-lg px-3 py-2">
-                    <p className="text-white text-sm font-semibold">{a.count}</p>
-                    <p className="text-slate-400 text-xs truncate">{a.actionType.replace(/_/g, ' ')}</p>
+              <h3 className="text-sm font-semibold text-white mb-4">Recent Events</h3>
+              <div className="space-y-1">
+                {data.recentEvents.slice(0, 15).map((e, i) => (
+                  <div key={i} className="flex items-center justify-between text-xs py-1 border-b border-slate-700/30 last:border-0">
+                    <span className="text-slate-300">{e.actionType.replace(/_/g, ' ')}</span>
+                    <span className="text-slate-500">{relTime(e.createdAt)}</span>
                   </div>
                 ))}
               </div>
@@ -185,7 +208,7 @@ export default function LaunchMetricsPage() {
 
           <div className="bg-slate-800/40 border border-slate-700/30 rounded-xl p-4 text-xs text-slate-500">
             <strong className="text-slate-400">Data source:</strong> All numbers pulled live from InteractionMemory table.
-            Email campaign tracking is handled via Brevo webhooks (not yet wired).
+            Email campaign tracking handled via Brevo webhooks (not yet wired).
             Showing {days}-day window ending now.
           </div>
         </>

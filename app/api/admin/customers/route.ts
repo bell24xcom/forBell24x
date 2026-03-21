@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
       } : {}),
     };
 
-    const [customers, total, rfqStats] = await Promise.all([
+    const [customers, total] = await Promise.all([
       prisma.user.findMany({
         where,
         select: {
@@ -62,14 +62,13 @@ export async function GET(req: NextRequest) {
         take:  limit,
       }),
       prisma.user.count({ where }),
-      prisma.rFQ.aggregate({
-        _count: { _all: true },
-        _avg:   {},
-      }),
     ]);
 
     // Total unique buyers (all-time)
-    const totalBuyers = await prisma.user.count({ where: { rfqs: { some: {} } } });
+    const [totalBuyers, totalRfqs] = await Promise.all([
+      prisma.user.count({ where: { rfqs: { some: {} } } }),
+      prisma.rFQ.count(),
+    ]);
     const activeBuyers = await prisma.user.count({
       where: {
         rfqs:     { some: {} },
@@ -103,7 +102,7 @@ export async function GET(req: NextRequest) {
       stats: {
         totalBuyers,
         activeBuyers,
-        totalRfqs: rfqStats._count._all,
+        totalRfqs,
       },
     });
   } catch (error) {
