@@ -27,6 +27,8 @@ model User {
   avatar               String?
   preferences          Json?
   plan                 UserPlan       @default(FREE)
+  planActivatedAt      DateTime?      @map("plan_activated_at")
+  planExpiresAt        DateTime?      @map("plan_expires_at")
   isClaimed            Boolean        @default(true)  @map("is_claimed")
   claimedAt            DateTime?      @map("claimed_at")
   importedFrom         String?        @map("imported_from")
