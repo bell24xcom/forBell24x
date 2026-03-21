@@ -21,6 +21,7 @@ export default function VideoRFQPage() {
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const previewRef = useRef<HTMLVideoElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -42,8 +43,15 @@ export default function VideoRFQPage() {
         const blob = new Blob(chunks, { type: 'video/webm' });
         setVideoBlob(blob);
         setVideoUrl(URL.createObjectURL(blob));
+        // Stop live preview stream
+        if (previewRef.current) previewRef.current.srcObject = null;
         stream.getTracks().forEach(track => track.stop());
       };
+
+      // Show live camera feed during recording
+      if (previewRef.current) {
+        previewRef.current.srcObject = stream;
+      }
 
       mediaRecorderRef.current.start();
       setIsRecording(true);
@@ -230,8 +238,25 @@ export default function VideoRFQPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {/* Video Preview */}
-                {videoUrl && (
+                {/* Live Camera Preview — shown during recording */}
+                {isRecording && (
+                  <div className="relative">
+                    <video
+                      ref={previewRef}
+                      autoPlay
+                      muted
+                      playsInline
+                      className="w-full h-64 bg-black rounded-lg object-cover"
+                    />
+                    <div className="absolute top-2 left-2 flex items-center gap-1.5 bg-red-600 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                      <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                      REC {formatTime(recordingTime)}
+                    </div>
+                  </div>
+                )}
+
+                {/* Recorded / Uploaded Video Playback */}
+                {videoUrl && !isRecording && (
                   <div className="relative">
                     <video
                       ref={videoRef}
