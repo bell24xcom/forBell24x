@@ -29,6 +29,20 @@ interface DashboardStats {
   leads: { total: number; pending: number; converted: number; conversionRate: string };
 }
 
+interface FollowUp {
+  supplierId: string;
+  rfqId: string;
+  followUpType: 'day2' | 'day5';
+  name: string;
+  company: string;
+  phone: string | null;
+  trustScore: number;
+  rfqTitle: string;
+  rfqCategory: string;
+  message: string;
+  waLink: string | null;
+}
+
 export default function OperatorDashboard() {
   const [category, setCategory] = useState('');
   const [outreach, setOutreach] = useState<OutreachGroup[]>([]);
@@ -36,10 +50,12 @@ export default function OperatorDashboard() {
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
   const [funnelData, setFunnelData] = useState<any>(null);
+  const [followUps, setFollowUps] = useState<FollowUp[]>([]);
 
   useEffect(() => {
     loadStats();
     loadFunnel();
+    loadFollowUps();
   }, []);
 
   async function loadStats() {
@@ -50,6 +66,23 @@ export default function OperatorDashboard() {
   async function loadFunnel() {
     const res = await fetch('/api/analytics/funnel?days=7').catch(() => null);
     if (res?.ok) setFunnelData(await res.json());
+  }
+
+  async function loadFollowUps() {
+    const res = await fetch('/api/outreach/follow-up').catch(() => null);
+    if (res?.ok) {
+      const data = await res.json();
+      setFollowUps(data.followUps ?? []);
+    }
+  }
+
+  async function markFollowUpSent(supplierId: string, rfqId: string, type: string) {
+    await fetch('/api/outreach/follow-up', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ supplierId, rfqId, type }),
+    }).catch(() => {});
+    setFollowUps(prev => prev.filter(f => !(f.supplierId === supplierId && f.rfqId === rfqId)));
   }
 
   async function generateOutreach() {
@@ -134,6 +167,71 @@ export default function OperatorDashboard() {
                   <div className="text-xl font-bold text-white">{s.value}</div>
                   <div className="text-xs text-slate-400">{s.label}</div>
                   {s.rate && <div className="text-xs text-blue-400">{s.rate}</div>}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Follow-ups Due */}
+        {followUps.length > 0 && (
+          <div className="bg-amber-950/40 border border-amber-700/50 rounded-lg p-5 space-y-4">
+            <div className="flex items-center gap-2">
+              <h2 className="text-lg font-semibold text-amber-300">Follow-ups Due</h2>
+              <span className="bg-amber-500 text-black text-xs font-bold px-2 py-0.5 rounded-full">
+                {followUps.length}
+              </span>
+              <span className="text-slate-500 text-xs ml-auto">
+                {followUps.filter(f => f.followUpType === 'day2').length} Day 2 ·{' '}
+                {followUps.filter(f => f.followUpType === 'day5').length} Day 5
+              </span>
+            </div>
+            <div className="space-y-3">
+              {followUps.map(f => (
+                <div key={`${f.supplierId}-${f.rfqId}`} className="bg-slate-800 rounded-lg p-4 space-y-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium text-white text-sm">{f.company}</p>
+                        <span className={`text-xs px-1.5 py-0.5 rounded font-semibold ${
+                          f.followUpType === 'day2'
+                            ? 'bg-blue-900 text-blue-300'
+                            : 'bg-red-900 text-red-300'
+                        }`}>
+                          {f.followUpType === 'day2' ? 'Day 2' : 'Day 5 — Final'}
+                        </span>
+                      </div>
+                      <p className="text-slate-400 text-xs">{f.name} · Trust: {f.trustScore} · {f.rfqCategory}</p>
+                      <p className="text-slate-500 text-xs mt-0.5">RFQ: {f.rfqTitle}</p>
+                    </div>
+                    {f.waLink && (
+                      <a
+                        href={f.waLink}
+                        target="_blank"
+                        rel="noreferrer"
+                        onClick={() => {
+                          logEvent({ type: 'whatsapp_click', meta: { supplierId: f.supplierId, company: f.company, followUp: f.followUpType } });
+                          markFollowUpSent(f.supplierId, f.rfqId, f.followUpType);
+                        }}
+                        className="bg-amber-500 hover:bg-amber-400 text-black text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors shrink-0"
+                      >
+                        <MessageCircle className="w-3.5 h-3.5" />
+                        Send
+                      </a>
+                    )}
+                  </div>
+                  <div className="bg-slate-900 rounded p-3 text-xs text-slate-300 font-mono whitespace-pre-wrap leading-relaxed">
+                    {f.message}
+                  </div>
+                  <button
+                    onClick={() => copyText(f.message, `fu-${f.supplierId}`)}
+                    className="text-xs text-slate-400 hover:text-white flex items-center gap-1 transition-colors"
+                  >
+                    {copied === `fu-${f.supplierId}`
+                      ? <><CheckCheck className="w-3.5 h-3.5 text-green-400" /> Copied ✓</>
+                      : <><Copy className="w-3.5 h-3.5" /> Copy message</>
+                    }
+                  </button>
                 </div>
               ))}
             </div>
