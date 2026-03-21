@@ -32,6 +32,8 @@ const NAV: NavItem[] = [
   { href: '/admin/import',           label: 'Import Suppliers', icon: '📥', group: 'Data' },
   { href: '/admin/seed-rfqs',        label: 'Seed RFQs',        icon: '🌱' },
   { href: '/admin/launch-metrics',   label: 'Launch Metrics',   icon: '🚀' },
+  { href: '/admin/email-health',     label: 'Email DNS',        icon: '📧' },
+  { href: '/admin/flow-test',        label: 'Flow Test',        icon: '🧪' },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
