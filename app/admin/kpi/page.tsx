@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { TrendingUp, TrendingDown, RefreshCw, IndianRupee, FileText, Users, Handshake, MessageCircle, Zap } from 'lucide-react';
+import { TrendingUp, TrendingDown, RefreshCw, IndianRupee, FileText, Users, Package, MessageCircle, Zap } from 'lucide-react';
 
 const RANGES = [
   { label: '7 Days',  value: 7  },
@@ -145,7 +145,7 @@ export default function KPIPage() {
             <KpiCard label="Quotes Posted"   value={data.period.quotesSubmitted}
               growth={data.growth.quotes}  icon={MessageCircle} color="text-cyan-400"  border="border-cyan-500/20" />
             <KpiCard label="Deals Created"   value={data.period.dealsCreated}
-              growth={data.growth.deals}   icon={Handshake}    color="text-purple-400" border="border-purple-500/20"
+              growth={data.growth.deals}   icon={Package}      color="text-purple-400" border="border-purple-500/20"
               sub={`${data.period.dealsCompleted} completed`} />
             <KpiCard label="Revenue"         value={fmt(data.period.revenue)}
               growth={data.growth.revenue} icon={IndianRupee}  color="text-amber-400"  border="border-amber-500/20" />

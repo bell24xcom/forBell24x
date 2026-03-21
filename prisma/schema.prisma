@@ -106,6 +106,7 @@ model RFQ {
   expiresAt      DateTime?
   isPublic       Boolean       @default(true)
   isSeeded       Boolean       @default(false) @map("is_seeded")
+  slug           String?       @unique
   location       String?
   maxBudget      Float?
   minBudget      Float?
