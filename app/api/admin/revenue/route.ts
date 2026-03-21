@@ -106,9 +106,9 @@ export async function GET(req: NextRequest) {
         reference:   t.reference,
         createdAt:   t.createdAt.toISOString(),
         user: {
-          name:    t.wallet.user?.name ?? null,
-          company: t.wallet.user?.company ?? null,
-          phone:   t.wallet.user?.phone ?? null,
+          name:    t.wallet?.user?.name    ?? null,
+          company: t.wallet?.user?.company ?? null,
+          phone:   t.wallet?.user?.phone   ?? null,
         },
       })),
       monthlyRevenue:     monthlyRevenue.map(r => ({

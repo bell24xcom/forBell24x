@@ -21,30 +21,15 @@ export async function GET(req: NextRequest) {
     const prev  = new Date(Date.now() - days * 2 * 86400000);
 
     const [
-      // Current period
-      rfqsCreated,
-      rfqsActive,
-      quotesSubmitted,
-      dealsCreated,
-      dealsCompleted,
+      rfqsCreated, rfqsActive,
+      quotesSubmitted, dealsCreated, dealsCompleted,
       revenue,
-      outreachSent,
-      waClicks,
-      subscriptions,
-      followUp1,
-      followUp2,
-      drips,
-      // Previous period for growth %
-      prevRfqs,
-      prevQuotes,
-      prevDeals,
-      prevRevenue,
-      // Category breakdown of RFQs (top 8)
+      outreachSent, waClicks, subscriptions,
+      followUp1, followUp2, drips,
+      prevRfqs, prevQuotes, prevDeals, prevRevenue,
       categoryBreakdown,
-      // Daily RFQ trend
       dailyRfqs,
     ] = await Promise.all([
-      // Period counts
       prisma.rFQ.count({ where: { createdAt: { gte: since } } }),
       prisma.rFQ.count({ where: { status: 'ACTIVE' } }),
       prisma.quote.count({ where: { createdAt: { gte: since } } }),
@@ -54,16 +39,13 @@ export async function GET(req: NextRequest) {
         where: { type: 'CREDIT', createdAt: { gte: since } },
         _sum: { amount: true },
       }),
-      prisma.interactionMemory.count({ where: { actionType: 'outreach_sent', createdAt: { gte: since } } }),
-      prisma.interactionMemory.count({ where: { actionType: 'whatsapp_click', createdAt: { gte: since } } }),
-      prisma.interactionMemory.count({ where: { actionType: 'subscription_activated', createdAt: { gte: since } } }),
-      prisma.interactionMemory.count({ where: { actionType: 'follow_up_1_sent', createdAt: { gte: since } } }),
-      prisma.interactionMemory.count({ where: { actionType: 'follow_up_2_sent', createdAt: { gte: since } } }),
+      prisma.interactionMemory.count({ where: { actionType: 'outreach_sent',          createdAt: { gte: since } } }),
+      prisma.interactionMemory.count({ where: { actionType: 'whatsapp_click',          createdAt: { gte: since } } }),
+      prisma.interactionMemory.count({ where: { actionType: 'subscription_activated',  createdAt: { gte: since } } }),
+      prisma.interactionMemory.count({ where: { actionType: 'follow_up_1_sent',        createdAt: { gte: since } } }),
+      prisma.interactionMemory.count({ where: { actionType: 'follow_up_2_sent',        createdAt: { gte: since } } }),
       prisma.interactionMemory.count({
-        where: {
-          actionType: { in: ['drip_day3_sent', 'drip_day7_sent', 'drip_day14_sent'] },
-          createdAt: { gte: since },
-        },
+        where: { actionType: { in: ['drip_day3_sent', 'drip_day7_sent', 'drip_day14_sent'] }, createdAt: { gte: since } },
       }),
       // Previous period
       prisma.rFQ.count({ where: { createdAt: { gte: prev, lt: since } } }),
@@ -73,22 +55,22 @@ export async function GET(req: NextRequest) {
         where: { type: 'CREDIT', createdAt: { gte: prev, lt: since } },
         _sum: { amount: true },
       }),
-      // Category breakdown
+      // Category breakdown — order by count desc, top 8
       prisma.rFQ.groupBy({
         by: ['category'],
-        where: { createdAt: { gte: since }, category: { not: null } },
+        where: { createdAt: { gte: since } },
         _count: { _all: true },
         orderBy: { _count: { category: 'desc' } },
         take: 8,
       }),
-      // Daily trend
-      prisma.$queryRaw<Array<{ date: string; count: number }>>(
+      // Daily RFQ trend — use Date param instead of make_interval
+      prisma.$queryRaw<Array<{ date: string; count: bigint }>>(
         Prisma.sql`
           SELECT
             TO_CHAR(created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD') AS date,
-            COUNT(*)::int AS count
+            COUNT(*) AS count
           FROM rfqs
-          WHERE created_at >= NOW() - make_interval(days => ${days})
+          WHERE created_at >= ${since}
           GROUP BY date ORDER BY date ASC
         `
       ),
@@ -100,48 +82,34 @@ export async function GET(req: NextRequest) {
     const growth = (cur: number, prev: number) =>
       prev > 0 ? +((((cur - prev) / prev) * 100).toFixed(1)) : 0;
 
-    // Conversion rates
-    const quoteRate   = rfqsCreated > 0 ? +((quotesSubmitted / rfqsCreated) * 100).toFixed(1) : 0;
+    const quoteRate   = rfqsCreated   > 0 ? +((quotesSubmitted / rfqsCreated)   * 100).toFixed(1) : 0;
     const dealRate    = quotesSubmitted > 0 ? +((dealsCreated / quotesSubmitted) * 100).toFixed(1) : 0;
-    const waClickRate = outreachSent > 0 ? +((waClicks / outreachSent) * 100).toFixed(1) : 0;
-    const subRate     = outreachSent > 0 ? +((subscriptions / outreachSent) * 100).toFixed(1) : 0;
+    const waClickRate = outreachSent  > 0 ? +((waClicks      / outreachSent)    * 100).toFixed(1) : 0;
+    const subRate     = outreachSent  > 0 ? +((subscriptions / outreachSent)    * 100).toFixed(1) : 0;
 
     return NextResponse.json({
       success: true,
       days,
       period: {
-        rfqsCreated,
-        rfqsActive,
-        quotesSubmitted,
-        dealsCreated,
-        dealsCompleted,
+        rfqsCreated, rfqsActive,
+        quotesSubmitted, dealsCreated, dealsCompleted,
         revenue: revenueAmt,
-        outreachSent,
-        waClicks,
-        subscriptions,
-        followUp1,
-        followUp2,
-        drips,
+        outreachSent, waClicks, subscriptions,
+        followUp1, followUp2, drips,
       },
       growth: {
-        rfqs:     growth(rfqsCreated, prevRfqs),
-        quotes:   growth(quotesSubmitted, prevQuotes),
-        deals:    growth(dealsCreated, prevDeals),
-        revenue:  growth(revenueAmt, prevRevenueAmt),
+        rfqs:    growth(rfqsCreated,    prevRfqs),
+        quotes:  growth(quotesSubmitted, prevQuotes),
+        deals:   growth(dealsCreated,   prevDeals),
+        revenue: growth(revenueAmt,     prevRevenueAmt),
       },
-      rates: {
-        quoteRate,      // % of RFQs that got a quote
-        dealRate,       // % of quotes that became deals
-        waClickRate,    // % of outreach that got WA click
-        subRate,        // % of outreach that subscribed
-      },
-      // Full funnel steps for visualisation
+      rates: { quoteRate, dealRate, waClickRate, subRate },
       funnel: [
-        { step: 'Outreach Sent',   value: outreachSent,    color: 'bg-blue-500' },
-        { step: 'WA Clicked',      value: waClicks,        color: 'bg-cyan-500' },
-        { step: 'Quotes Posted',   value: quotesSubmitted, color: 'bg-indigo-500' },
-        { step: 'Deals Created',   value: dealsCreated,    color: 'bg-purple-500' },
-        { step: 'Subscribed',      value: subscriptions,   color: 'bg-green-500' },
+        { step: 'Outreach Sent',  value: outreachSent,    color: 'bg-blue-500'   },
+        { step: 'WA Clicked',     value: waClicks,        color: 'bg-cyan-500'   },
+        { step: 'Quotes Posted',  value: quotesSubmitted, color: 'bg-indigo-500' },
+        { step: 'Deals Created',  value: dealsCreated,    color: 'bg-purple-500' },
+        { step: 'Subscribed',     value: subscriptions,   color: 'bg-green-500'  },
       ],
       categoryBreakdown: categoryBreakdown.map(c => ({
         category: c.category ?? 'Unknown',

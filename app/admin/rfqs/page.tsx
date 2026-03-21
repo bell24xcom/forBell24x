@@ -19,29 +19,37 @@ const fmt = (n: number | null) => n ? `₹${(n / 100000).toFixed(1)}L` : '—';
 const fmtDate = (d: string | null) => d ? new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
 
 export default function AdminRFQsPage() {
-  const [rfqs, setRfqs] = useState<RFQ[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [rfqs,       setRfqs]       = useState<RFQ[]>([]);
+  const [loading,    setLoading]    = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [search, setSearch] = useState('');
-  const [statusF, setStatusF] = useState('');
-  const [drawer, setDrawer] = useState<RFQ | null>(null);
+  const [search,     setSearch]     = useState('');
+  const [statusF,    setStatusF]    = useState('');
+  const [drawer,     setDrawer]     = useState<RFQ | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
-  const [confirm, setConfirm] = useState<string | null>(null); // rfqId to confirm close
+  const [confirm,    setConfirm]    = useState<string | null>(null);
+  const [page,       setPage]       = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const LIMIT = 50;
 
-  const fetchRFQs = async () => {
+  const fetchRFQs = async (pg = page) => {
     setRefreshing(true);
     try {
-      const p = new URLSearchParams({ limit: '50' });
+      const p = new URLSearchParams({ limit: String(LIMIT), page: String(pg) });
       if (statusF) p.set('status', statusF);
       if (search)  p.set('search', search);
       const res = await fetch(`/api/admin/rfqs?${p}`, { credentials: 'include' });
       const data = await res.json();
-      if (data.rfqs) setRfqs(data.rfqs);
+      if (data.rfqs) {
+        setRfqs(data.rfqs);
+        setTotalPages(data.pagination?.pages ?? 1);
+        setTotalCount(data.pagination?.total ?? data.rfqs.length);
+      }
     } catch (e) { console.error(e); }
     finally { setLoading(false); setRefreshing(false); }
   };
 
-  useEffect(() => { fetchRFQs(); }, [statusF]);
+  useEffect(() => { setPage(1); fetchRFQs(1); }, [statusF]);
 
   const patchRFQ = async (id: string, action: string, days?: number) => {
     setActionLoading(true);
@@ -79,13 +87,13 @@ export default function AdminRFQsPage() {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-xl font-bold text-white">RFQ Management</h1>
-          <p className="text-slate-400 text-sm">{filtered.length} RFQs</p>
+          <p className="text-slate-400 text-sm">{totalCount} total · page {page}/{totalPages}</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <button onClick={exportCSV} className="flex items-center gap-2 px-3 py-2 bg-slate-800 border border-slate-700 hover:border-indigo-500 text-slate-300 hover:text-white rounded-lg text-sm transition-colors min-h-[44px]">
             <Download className="w-4 h-4" /> Export CSV
           </button>
-          <button onClick={fetchRFQs} disabled={refreshing} className="flex items-center gap-2 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm transition-colors disabled:opacity-50 min-h-[44px]">
+          <button onClick={() => fetchRFQs(page)} disabled={refreshing} className="flex items-center gap-2 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm transition-colors disabled:opacity-50 min-h-[44px]">
             <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} /> Refresh
           </button>
         </div>
@@ -95,6 +103,7 @@ export default function AdminRFQsPage() {
       <div className="flex flex-wrap gap-3">
         <input type="text" placeholder="Search title, buyer, category…" value={search}
           onChange={e => setSearch(e.target.value)}
+          onKeyDown={e => { if (e.key === 'Enter') { setPage(1); fetchRFQs(1); } }}
           className="flex-1 min-w-[200px] px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 min-h-[44px]" />
         <select value={statusF} onChange={e => setStatusF(e.target.value)}
           className="px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-slate-300 focus:outline-none min-h-[44px]">
@@ -104,7 +113,7 @@ export default function AdminRFQsPage() {
           <option value="EXPIRED">Expired</option>
           <option value="CANCELLED">Cancelled</option>
         </select>
-        <button onClick={fetchRFQs} className="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm transition-colors min-h-[44px]">Search</button>
+        <button onClick={() => { setPage(1); fetchRFQs(1); }} className="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm transition-colors min-h-[44px]">Search</button>
       </div>
 
       {/* Table */}
@@ -170,6 +179,37 @@ export default function AdminRFQsPage() {
           </table>
         </div>
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between text-sm">
+          <p className="text-slate-500 text-xs">
+            Showing {(page - 1) * LIMIT + 1}–{Math.min(page * LIMIT, totalCount)} of {totalCount} RFQs
+          </p>
+          <div className="flex gap-2">
+            <button onClick={() => { const p = Math.max(1, page - 1); setPage(p); fetchRFQs(p); }}
+              disabled={page === 1}
+              className="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-slate-300 text-xs disabled:opacity-40 hover:bg-slate-700 transition-colors min-h-[36px]">
+              Previous
+            </button>
+            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+              const pg = page <= 3 ? i + 1 : page + i - 2;
+              if (pg < 1 || pg > totalPages) return null;
+              return (
+                <button key={pg} onClick={() => { setPage(pg); fetchRFQs(pg); }}
+                  className={`px-3 py-1.5 rounded-lg text-xs min-h-[36px] transition-colors ${pg === page ? 'bg-indigo-600 text-white' : 'bg-slate-800 border border-slate-700 text-slate-300 hover:bg-slate-700'}`}>
+                  {pg}
+                </button>
+              );
+            })}
+            <button onClick={() => { const p = Math.min(totalPages, page + 1); setPage(p); fetchRFQs(p); }}
+              disabled={page === totalPages}
+              className="px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-slate-300 text-xs disabled:opacity-40 hover:bg-slate-700 transition-colors min-h-[36px]">
+              Next
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Confirm Close Dialog */}
       {confirm && (
