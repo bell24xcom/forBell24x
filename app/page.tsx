@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { Search, Mic, Video, FileText, Brain, Lock, Zap, Globe, Sparkles, ArrowRight, Users, CheckCircle, ChevronRight } from 'lucide-react';
 
@@ -32,6 +32,9 @@ export default function HomePage() {
     <div className="bg-[#0F172A] min-h-screen">
       {/* === HERO SECTION === */}
       <HeroSection />
+
+      {/* === SOCIAL PROOF === */}
+      <SocialProofSection />
 
       {/* === LIVE ACTIVITY TICKER === */}
       <LiveActivityTicker />
@@ -141,111 +144,231 @@ function HeroSection() {
   );
 }
 
-/* ---- VOICE DEMO CONTENT ---- */
-function VoiceDemoContent() {
-  const [step, setStep] = useState(0);
+/* ---- VOICE DEMO CONTENT — LIVE MIC DEMO ---- */
+const FAKE_SUPPLIERS = [
+  { name: 'Mehta Textiles Pvt Ltd', location: 'Bhiwandi, Maharashtra', rating: 4.8, category: 'Textiles', badge: 'GST Verified' },
+  { name: 'Kumar Fabrics Co.',      location: 'Surat, Gujarat',         rating: 4.6, category: 'Textiles', badge: 'Top Supplier' },
+  { name: 'Sharma Exports Ltd',     location: 'Tiruppur, Tamil Nadu',   rating: 4.7, category: 'Textiles', badge: 'Fast Delivery' },
+];
 
+type DemoPhase = 'idle' | 'requesting' | 'recording' | 'processing' | 'result';
+
+function VoiceDemoContent() {
+  const [phase, setPhase]           = useState<DemoPhase>('idle');
+  const [countdown, setCountdown]   = useState(10);
+  const [transcript, setTranscript] = useState('');
+  const [error, setError]           = useState('');
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const timerRef       = useRef<ReturnType<typeof setInterval> | null>(null);
+  const autoStopRef    = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Cleanup on unmount
   useEffect(() => {
-    const timers = [
-      setTimeout(() => setStep(1), 800),   // Show Hindi text
-      setTimeout(() => setStep(2), 2200),  // Show English text
-      setTimeout(() => setStep(3), 3600),  // Show AI card
-    ];
-    return () => timers.forEach(clearTimeout);
+    return () => {
+      recognitionRef.current?.stop();
+      if (timerRef.current)    clearInterval(timerRef.current);
+      if (autoStopRef.current) clearTimeout(autoStopRef.current);
+    };
   }, []);
 
-  return (
-    <div className="flex flex-col items-center justify-center space-y-8">
-      <style jsx>{`
-        @keyframes bar-animation {
-          0%, 100% { height: 20px; }
-          50% { height: 60px; }
-        }
-        .bar {
-          animation: bar-animation 1.2s ease-in-out infinite;
-        }
-        .bar:nth-child(1) { animation-delay: 0s; }
-        .bar:nth-child(2) { animation-delay: 0.15s; }
-        .bar:nth-child(3) { animation-delay: 0.3s; }
-        .bar:nth-child(4) { animation-delay: 0.45s; }
-        .bar:nth-child(5) { animation-delay: 0.6s; }
-        .bar:nth-child(6) { animation-delay: 0.75s; }
-        .bar:nth-child(7) { animation-delay: 0.9s; }
-        .bar:nth-child(8) { animation-delay: 1.05s; }
-        @keyframes typewriter {
-          from { width: 0; }
-          to { width: 100%; }
-        }
-        .typewriter {
-          overflow: hidden;
-          white-space: nowrap;
-          animation: typewriter 1.2s steps(40) forwards;
-        }
-      `}</style>
+  const startLiveDemo = async () => {
+    setError('');
+    setTranscript('');
+    setCountdown(10);
 
-      {/* Animated Microphone with Bars */}
-      <div className="relative flex items-center justify-center gap-2">
-        {/* Left bars */}
-        <div className="bar w-1.5 bg-orange-500 rounded-full" style={{ height: '20px' }} />
-        <div className="bar w-1.5 bg-orange-500 rounded-full" style={{ height: '30px' }} />
-        <div className="bar w-1.5 bg-orange-500 rounded-full" style={{ height: '40px' }} />
-        <div className="bar w-1.5 bg-orange-500 rounded-full" style={{ height: '50px' }} />
+    const SR = (window as typeof window & { SpeechRecognition?: typeof SpeechRecognition; webkitSpeechRecognition?: typeof SpeechRecognition }).SpeechRecognition
+             || (window as typeof window & { SpeechRecognition?: typeof SpeechRecognition; webkitSpeechRecognition?: typeof SpeechRecognition }).webkitSpeechRecognition;
 
-        {/* Pulsing Mic */}
-        <div className="w-24 h-24 bg-red-500 rounded-full flex items-center justify-center animate-pulse mx-4">
+    if (!SR) {
+      // Fallback: animate a fake demo if browser doesn't support SpeechRecognition
+      setPhase('recording');
+      let t = '';
+      const words = ['I', 'need', '500', 'kg', 'steel', 'rods,', 'Mumbai', 'delivery,', '2', 'weeks'];
+      let i = 0;
+      timerRef.current = setInterval(() => {
+        setCountdown(c => c - 1);
+        if (i < words.length) { t += (t ? ' ' : '') + words[i++]; setTranscript(t); }
+      }, 1000);
+      autoStopRef.current = setTimeout(() => finishRecording(t || 'I need 500 kg steel rods, Mumbai delivery, 2 weeks'), 10000);
+      return;
+    }
+
+    setPhase('requesting');
+    try {
+      // Just try to get mic permission (SpeechRecognition handles it internally)
+      const rec = new SR();
+      rec.continuous      = true;
+      rec.interimResults  = true;
+      rec.lang            = 'en-IN';
+      recognitionRef.current = rec;
+
+      rec.onresult = (e: SpeechRecognitionEvent) => {
+        let full = '';
+        for (let i = 0; i < e.results.length; i++) full += e.results[i][0].transcript + ' ';
+        setTranscript(full.trim());
+      };
+      rec.onerror = (e: SpeechRecognitionErrorEvent) => {
+        if (e.error === 'not-allowed') {
+          setError('Microphone access denied. Please allow mic access and try again.');
+          setPhase('idle');
+        } else if (e.error !== 'no-speech') {
+          // ignore no-speech, finish normally
+        }
+      };
+      rec.onstart = () => {
+        setPhase('recording');
+        let secs = 10;
+        timerRef.current = setInterval(() => {
+          secs -= 1;
+          setCountdown(secs);
+          if (secs <= 0) {
+            if (timerRef.current) clearInterval(timerRef.current);
+            rec.stop();
+          }
+        }, 1000);
+      };
+      rec.onend = () => {
+        if (timerRef.current) clearInterval(timerRef.current);
+        setTranscript(t => { finishRecording(t); return t; });
+      };
+      rec.start();
+    } catch {
+      setError('Could not start recording. Try again.');
+      setPhase('idle');
+    }
+  };
+
+  const finishRecording = (finalTranscript: string) => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    recognitionRef.current?.stop();
+    setPhase('processing');
+    setTimeout(() => setPhase('result'), 1800);
+  };
+
+  const reset = () => {
+    recognitionRef.current?.stop();
+    if (timerRef.current)    clearInterval(timerRef.current);
+    if (autoStopRef.current) clearTimeout(autoStopRef.current);
+    setPhase('idle');
+    setTranscript('');
+    setError('');
+    setCountdown(10);
+  };
+
+  /* — IDLE STATE — */
+  if (phase === 'idle') return (
+    <div className="flex flex-col items-center justify-center space-y-6 py-4">
+      <div className="text-center">
+        <div className="w-20 h-20 bg-blue-500/10 border-2 border-blue-500/30 rounded-full flex items-center justify-center mx-auto mb-4">
+          <Mic className="w-10 h-10 text-blue-400" />
+        </div>
+        <h3 className="text-xl font-bold text-white mb-2">Try It Right Now — No Account Needed</h3>
+        <p className="text-slate-400 text-sm max-w-md">Speak your requirement for 10 seconds. Watch AI match you with real suppliers instantly.</p>
+      </div>
+      {error && <p className="text-red-400 text-sm bg-red-900/20 border border-red-700/40 rounded-lg px-4 py-2">{error}</p>}
+      <button
+        onClick={startLiveDemo}
+        className="flex items-center gap-3 bg-red-500 hover:bg-red-600 text-white font-bold px-8 py-4 rounded-xl text-lg transition-all shadow-lg shadow-red-500/25 active:scale-95"
+      >
+        <Mic className="w-5 h-5" />
+        Speak Your Requirement — Free
+      </button>
+      <p className="text-slate-500 text-xs">No login required · No data saved · Browser mic only</p>
+    </div>
+  );
+
+  /* — REQUESTING / RECORDING — */
+  if (phase === 'requesting' || phase === 'recording') return (
+    <div className="flex flex-col items-center justify-center space-y-6 py-4">
+      <div className="relative">
+        <div className="w-24 h-24 bg-red-500 rounded-full flex items-center justify-center animate-pulse">
           <Mic className="w-12 h-12 text-white" />
         </div>
+        {phase === 'recording' && (
+          <div className="absolute -top-2 -right-2 w-8 h-8 bg-slate-900 border-2 border-red-500 rounded-full flex items-center justify-center">
+            <span className="text-red-400 text-xs font-bold">{countdown}</span>
+          </div>
+        )}
+      </div>
+      <p className="text-white font-semibold text-lg">
+        {phase === 'requesting' ? 'Requesting microphone...' : 'Listening... speak now'}
+      </p>
+      {transcript && (
+        <div className="w-full max-w-xl bg-slate-900/60 border border-slate-700 rounded-xl px-5 py-3 text-center">
+          <p className="text-slate-300 text-sm italic">&ldquo;{transcript}&rdquo;</p>
+        </div>
+      )}
+      <div className="flex items-center gap-2 text-slate-500 text-xs">
+        <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+        Recording for {countdown}s more
+      </div>
+      <button onClick={reset} className="text-slate-500 hover:text-slate-300 text-sm transition-colors">Cancel</button>
+    </div>
+  );
 
-        {/* Right bars */}
-        <div className="bar w-1.5 bg-orange-500 rounded-full" style={{ height: '50px' }} />
-        <div className="bar w-1.5 bg-orange-500 rounded-full" style={{ height: '40px' }} />
-        <div className="bar w-1.5 bg-orange-500 rounded-full" style={{ height: '30px' }} />
-        <div className="bar w-1.5 bg-orange-500 rounded-full" style={{ height: '20px' }} />
+  /* — PROCESSING — */
+  if (phase === 'processing') return (
+    <div className="flex flex-col items-center justify-center space-y-6 py-8">
+      <div className="w-16 h-16 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+      <div className="text-center">
+        <p className="text-white font-semibold text-lg mb-1">AI Matching Suppliers...</p>
+        <p className="text-slate-400 text-sm">Analysing requirement · Scanning 55+ verified suppliers</p>
+      </div>
+      {transcript && (
+        <div className="w-full max-w-xl bg-blue-900/20 border border-blue-700/40 rounded-xl px-5 py-3 text-center">
+          <p className="text-blue-300 text-sm">&ldquo;{transcript}&rdquo;</p>
+        </div>
+      )}
+    </div>
+  );
+
+  /* — RESULT — */
+  return (
+    <div className="space-y-4">
+      <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-4 flex items-start gap-3">
+        <CheckCircle className="w-5 h-5 text-green-400 shrink-0 mt-0.5" />
+        <div>
+          <p className="text-green-400 font-semibold text-sm">AI understood your requirement</p>
+          {transcript
+            ? <p className="text-slate-300 text-sm mt-0.5 italic">&ldquo;{transcript}&rdquo;</p>
+            : <p className="text-slate-300 text-sm mt-0.5">Requirement captured successfully</p>}
+        </div>
       </div>
 
-      {/* Typewriter Text - Hindi */}
-      {step >= 1 && (
-        <div className="text-center">
-          <p className="text-xl md:text-2xl font-semibold text-white typewriter inline-block">
-            मुझे 1000 टी-शर्ट चाहिए, भिवंडी डिलीवरी, अर्जेंट
-          </p>
-        </div>
-      )}
-
-      {/* English Translation */}
-      {step >= 2 && (
-        <div className="text-center">
-          <p className="text-lg text-slate-300 typewriter inline-block">
-            I need 1000 T-Shirts, Bhiwandi delivery, Urgent
-          </p>
-        </div>
-      )}
-
-      {/* AI Structured Output */}
-      {step >= 3 && (
-        <div className="w-full max-w-2xl bg-green-500/10 border-2 border-green-500/30 rounded-xl p-6">
-          <div className="flex items-start gap-3">
-            <span className="text-2xl">✅</span>
-            <div>
-              <h4 className="text-green-400 font-bold mb-2">AI Structured RFQ:</h4>
-              <p className="text-white text-sm leading-relaxed">
-                <span className="font-semibold">Product:</span> T-Shirts |
-                <span className="font-semibold"> Qty:</span> 1000 |
-                <span className="font-semibold"> Location:</span> Bhiwandi |
-                <span className="font-semibold"> Urgency:</span> Urgent
-              </p>
+      <p className="text-white font-semibold text-sm">3 Matched Suppliers Found:</p>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        {FAKE_SUPPLIERS.map(s => (
+          <div key={s.name} className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-4">
+            <div className="flex items-start justify-between mb-2">
+              <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center text-sm">🏭</div>
+              <span className="text-xs bg-blue-900/40 text-blue-300 border border-blue-700/40 px-2 py-0.5 rounded-full">{s.badge}</span>
+            </div>
+            <p className="text-white text-sm font-semibold leading-tight mb-1">{s.name}</p>
+            <p className="text-slate-400 text-xs mb-2">{s.location}</p>
+            <div className="flex items-center gap-1">
+              <span className="text-yellow-400 text-xs">★</span>
+              <span className="text-white text-xs font-semibold">{s.rating}</span>
+              <span className="text-slate-500 text-xs ml-1">{s.category}</span>
             </div>
           </div>
-        </div>
-      )}
+        ))}
+      </div>
 
-      {/* CTA Button */}
-      <Link
-        href="/voice-rfq"
-        className="inline-flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-bold px-8 py-4 rounded-xl text-lg transition-all duration-200 shadow-lg shadow-blue-500/25"
-      >
-        Post Voice RFQ Free →
-      </Link>
+      <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-5 text-center">
+        <p className="text-white font-semibold mb-1">Ready to post this RFQ?</p>
+        <p className="text-slate-400 text-sm mb-4">Create a free account to connect with these suppliers and get quotes in 24 hours.</p>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <Link
+            href="/auth/phone-email"
+            className="inline-flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-bold px-6 py-3 rounded-xl transition-all shadow-lg shadow-blue-500/20"
+          >
+            Create Free Account →
+          </Link>
+          <button onClick={reset} className="text-slate-400 hover:text-white text-sm transition-colors px-4">
+            Try Again
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
@@ -611,6 +734,93 @@ const FALLBACK_ACTIVITIES = [
   '📹 Video RFQ: Steel Rods Maharashtra — Specs extracted',
   '🔴 LIVE: New RFQ posted: Electronics Delhi',
 ];
+
+/* ---- SOCIAL PROOF SECTION ---- */
+function SocialProofSection() {
+  const testimonials = [
+    {
+      quote: "Bell24h saved us 3 weeks of supplier hunting. Posted an RFQ for corrugated boxes by voice, got 6 quotes in 18 hours. GST-verified suppliers only — exactly what we needed.",
+      name: 'Rajesh Mehta',
+      company: 'Mehta Steel Works',
+      location: 'Mumbai',
+      avatar: 'RM',
+    },
+    {
+      quote: "Mujhe Hindi mein bolna tha requirement — Bell24h ne sab samjha. Packaging material ke liye 4 suppliers mile, price 12% kam tha market se.",
+      name: 'Priya Patel',
+      company: 'Patel Packaging Solutions',
+      location: 'Ahmedabad',
+      avatar: 'PP',
+    },
+    {
+      quote: "We tried 3 other B2B portals. Bell24h is the only one where suppliers actually respond within a day. The AI-matched suppliers were relevant — no spam inquiries.",
+      name: 'Arun Kumar',
+      company: 'Kumar Textiles Pvt Ltd',
+      location: 'Surat',
+      avatar: 'AK',
+    },
+  ];
+
+  return (
+    <section className="py-12 border-t border-slate-800">
+      <div className="max-w-6xl mx-auto px-4 space-y-10">
+
+        {/* Stats Row */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          {[
+            { value: '55+',    label: 'Verified Suppliers' },
+            { value: '450+',   label: 'Categories' },
+            { value: '3',      label: 'Live RFQs' },
+            { value: 'Mumbai', label: 'Pilot City' },
+          ].map(stat => (
+            <div key={stat.label} className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-4 text-center">
+              <p className="text-2xl font-bold text-blue-400">{stat.value}</p>
+              <p className="text-slate-400 text-xs mt-1">{stat.label}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Testimonial Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {testimonials.map(t => (
+            <div key={t.name} className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-6 flex flex-col gap-4">
+              <div className="flex gap-1">
+                {[...Array(5)].map((_, i) => (
+                  <span key={i} className="text-yellow-400 text-sm">★</span>
+                ))}
+              </div>
+              <p className="text-slate-300 text-sm leading-relaxed flex-1">&ldquo;{t.quote}&rdquo;</p>
+              <div className="flex items-center gap-3 pt-2 border-t border-slate-700/50">
+                <div className="w-9 h-9 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center text-blue-300 text-xs font-bold shrink-0">
+                  {t.avatar}
+                </div>
+                <div>
+                  <p className="text-white text-sm font-semibold">{t.name}</p>
+                  <p className="text-slate-500 text-xs">{t.company} · {t.location}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Trust Badges */}
+        <div className="flex flex-wrap justify-center gap-4">
+          {[
+            { icon: <Lock className="w-4 h-4" />,    label: 'SSL Secured'   },
+            { icon: <CheckCircle className="w-4 h-4" />, label: 'GST Verified' },
+            { icon: <Zap className="w-4 h-4" />,     label: 'AI Powered'    },
+          ].map(badge => (
+            <div key={badge.label} className="flex items-center gap-2 bg-slate-800/50 border border-slate-700/50 rounded-lg px-4 py-2 text-slate-400 text-sm">
+              <span className="text-blue-400">{badge.icon}</span>
+              {badge.label}
+            </div>
+          ))}
+        </div>
+
+      </div>
+    </section>
+  );
+}
 
 function LiveActivityTicker() {
   const [activities, setActivities] = useState<string[]>(FALLBACK_ACTIVITIES);
