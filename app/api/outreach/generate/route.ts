@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { logEvent } from '@/lib/log-event';
 
 export const dynamic = 'force-dynamic';
 
@@ -80,15 +81,20 @@ export async function GET(request: NextRequest) {
         const loc = topRFQ.location ? ` Location: ${topRFQ.location}.` : '';
         const link = `https://www.bell24h.com/rfq/${topRFQ.id}`;
 
-        const whatsapp = `Hi ${name}, we have a live RFQ for *${topRFQ.title}* (${category}).${budget}${loc} Quote directly here — no fees: ${link}`;
+        const city = (s.location || '').split(',')[0].trim() || 'India';
+        const productSummary = topRFQ.quantity
+          ? `${topRFQ.title} — Qty: ${topRFQ.quantity}${budget}${loc}`
+          : `${topRFQ.title}${budget}${loc}`;
+        const whatsapp = `Hi ${name},\n\nWe found your company *${s.company ?? name}* in *${category}* (${city}).\n\nA buyer is looking for:\n👉 ${productSummary}\n\nView requirement:\n${link}\n\n– Team Bell24h`;
 
         const email = {
           subject: `New RFQ Opportunity: ${topRFQ.title} — Bell24h`,
           body: `Hi ${name},\n\nA buyer on Bell24h is looking for ${topRFQ.title} in ${category}.\n\nQuantity: ${topRFQ.quantity || 'To be discussed'}${budget}${loc}\n\nYou can view full details and submit your quote here:\n${link}\n\nThis is free to quote during our beta phase.\n\n— Bell24h Team\nhttps://www.bell24h.com`,
         };
 
-        const waLink = s.phone
-          ? `https://wa.me/91${s.phone.replace(/\D/g, '')}?text=${encodeURIComponent(whatsapp)}`
+        const cleanPhone = s.phone ? s.phone.replace(/\D/g, '').replace(/^91/, '') : null;
+        const waLink = cleanPhone
+          ? `https://wa.me/91${cleanPhone}?text=${encodeURIComponent(whatsapp)}`
           : null;
 
         return {
@@ -112,6 +118,8 @@ export async function GET(request: NextRequest) {
         suppliers: messages,
       };
     });
+
+    logEvent({ type: 'outreach_generated', meta: { categories: categories.length, suppliers: suppliers.length, rfqs: liveRFQs.length } });
 
     return NextResponse.json({
       success: true,

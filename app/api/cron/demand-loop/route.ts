@@ -13,12 +13,12 @@ async function run(request: NextRequest) {
   }
 
   try {
-    console.log('[Cron] Starting daily demand loop...');
+    console.log('[CRON_START] /api/cron/demand-loop');
     const result = await runDailyDemandLoop();
-    console.log('[Cron] Demand loop complete:', result);
+    console.log('[CRON_END] /api/cron/demand-loop', JSON.stringify(result));
     return NextResponse.json({ success: true, ...result, timestamp: new Date().toISOString() });
   } catch (error) {
-    console.error('[Cron] demand-loop failed:', error);
+    console.error('[API_ERROR] /api/cron/demand-loop', error instanceof Error ? error.message : error);
     return NextResponse.json({ success: false, error: 'Cron failed' }, { status: 500 });
   }
 }

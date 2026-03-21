@@ -4,6 +4,7 @@ import { verifyToken } from '@/lib/jwt';
 import { checkDailyLimit } from '@/lib/orchestration';
 import { storeRFQ, extractRFQMeta } from '@/lib/memory-engine';
 import { agentZero } from '@/lib/agents/agent-zero';
+import { logEvent } from '@/lib/log-event';
 
 // Save voice-generated RFQ to database
 export async function POST(request: NextRequest) {
@@ -95,6 +96,8 @@ export async function POST(request: NextRequest) {
       console.error('[Memory] storeRFQ error:', memErr);
     }
 
+    logEvent({ type: 'rfq_created', meta: { rfqId: savedRFQ.id, category: savedRFQ.category, via: 'voice' } });
+
     // Trigger Agent Zero (fire-and-forget)
     agentZero({
       id: savedRFQ.id,
@@ -120,14 +123,14 @@ export async function POST(request: NextRequest) {
       message: 'RFQ saved successfully',
     });
   } catch (error: any) {
-    console.error('Error saving voice RFQ:', error);
+    console.error('[API_ERROR] /api/voice-rfq/save', error instanceof Error ? error.message : error);
     const errorMessage = error?.code === 'P2002'
       ? 'Duplicate RFQ entry'
       : error?.code === 'P2003'
       ? 'Invalid reference (user not found)'
       : error?.message || 'Failed to save RFQ';
     return NextResponse.json(
-      { success: false, error: errorMessage, code: error?.code },
+      { success: false, error: errorMessage, code: error?.code, retryable: true },
       { status: 500 }
     );
   }

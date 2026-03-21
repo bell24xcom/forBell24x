@@ -128,9 +128,9 @@ export async function POST(request: NextRequest) {
       timestamp: new Date().toISOString()
     });
   } catch (error) {
-    console.error('Error processing video RFQ:', error);
+    console.error('[API_ERROR] /api/video-rfq', error instanceof Error ? error.message : error);
     return NextResponse.json(
-      { success: false, error: 'Failed to process video input' },
+      { success: false, error: 'Failed to process video input', retryable: true },
       { status: 500 }
     );
   }

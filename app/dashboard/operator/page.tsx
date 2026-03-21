@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { MessageCircle, Mail, RefreshCw, ExternalLink, Users, FileText, TrendingUp, Copy, CheckCheck } from 'lucide-react';
+import { logEvent } from '@/lib/log-event';
 
 interface SupplierMessage {
   supplierId: string;
@@ -209,6 +210,7 @@ export default function OperatorDashboard() {
                             href={s.waLink}
                             target="_blank"
                             rel="noreferrer"
+                            onClick={() => logEvent({ type: 'whatsapp_click', meta: { supplierId: s.supplierId, company: s.company } })}
                             className="bg-green-600 hover:bg-green-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors"
                           >
                             <MessageCircle className="w-3.5 h-3.5" />
@@ -236,7 +238,7 @@ export default function OperatorDashboard() {
                       className="text-xs text-slate-400 hover:text-white flex items-center gap-1 transition-colors"
                     >
                       {copied === s.supplierId
-                        ? <><CheckCheck className="w-3.5 h-3.5 text-green-400" /> Copied!</>
+                        ? <><CheckCheck className="w-3.5 h-3.5 text-green-400" /> Copied ✓</>
                         : <><Copy className="w-3.5 h-3.5" /> Copy message</>
                       }
                     </button>
