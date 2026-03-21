@@ -1,5 +1,7 @@
 'use client';
 
+// Set NEXT_PUBLIC_GA_ID in Vercel Dashboard → Settings → Environment Variables
+// Value format: G-XXXXXXXXXX
 import Script from 'next/script';
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
