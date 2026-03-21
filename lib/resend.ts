@@ -60,6 +60,8 @@ class EmailService {
         return { success: false, message: 'Email send failed', error: JSON.stringify(err) };
       }
 
+      const toList = Array.isArray(to) ? to.join(', ') : to;
+      console.log('[Email] Sent to:', toList, '| Subject:', subject);
       return { success: true, message: 'Email sent successfully' };
     } catch (error) {
       console.error('[Email] Brevo error:', error);
