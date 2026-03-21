@@ -83,10 +83,21 @@ export async function POST(request: NextRequest) {
     };
     const urgency = urgencyMap[(rfqData.urgency || 'normal').toLowerCase()] ?? 'NORMAL';
 
+    // Generate a unique slug from title + short random suffix
+    const baseSlug = title
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .slice(0, 60);
+    const slug = `${baseSlug}-${Date.now().toString(36)}`;
+
     // Save to database
     const rfq = await prisma.rFQ.create({
       data: {
         title,
+        slug,
         description,
         category,
         quantity: sanitizeString(String(rfqData.quantity || '1'), 50),
@@ -146,15 +157,16 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       rfq: {
-        id: rfq.id,
-        title: rfq.title,
-        category: rfq.category,
-        status: rfq.status,
-        createdAt: rfq.createdAt.toISOString(),
-        expiresAt: rfq.expiresAt?.toISOString(),
-        priority: rfq.priority,
+        id:             rfq.id,
+        slug:           rfq.slug,
+        title:          rfq.title,
+        category:       rfq.category,
+        status:         rfq.status,
+        createdAt:      rfq.createdAt.toISOString(),
+        expiresAt:      rfq.expiresAt?.toISOString(),
+        priority:       rfq.priority,
         estimatedValue: rfq.estimatedValue,
-        tags: rfq.tags,
+        tags:           rfq.tags,
       },
       message: 'RFQ created successfully',
     });

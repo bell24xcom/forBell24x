@@ -42,6 +42,16 @@ function pick<T>(arr: readonly T[] | T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
+function toSlug(text: string, suffix: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .slice(0, 60) + '-' + suffix;
+}
+
 function rand(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -123,10 +133,11 @@ export async function POST(request: NextRequest) {
 
     const targets = buildSeedTargets();
 
-    const rfqsToCreate = targets.map(target => {
+    const rfqsToCreate = targets.map((target, i) => {
       const city = pick(CITIES);
       return {
         title:       target.title,
+        slug:        toSlug(target.title, String(i + 1)),
         description: fillTemplate(target.category, city),
         category:    target.category,
         quantity:    String(rand(50, 5000)),
