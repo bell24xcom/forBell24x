@@ -120,14 +120,21 @@ export async function authenticate(request: NextRequest): Promise<{ userId: stri
   const authCookie = request.cookies.get('auth-token')?.value;
   const token = extractToken(authHeader, authCookie);
 
-  if (!token) return null;
+  if (!token) {
+    console.error('[AUTH] No auth-token cookie and no Bearer header');
+    return null;
+  }
 
   try {
     const payload = verifyToken(token);
     const user = await prisma.user.findUnique({ where: { id: payload.userId } });
-    if (!user) return null;
+    if (!user) {
+      console.error('[AUTH] JWT valid but user not found in DB:', payload.userId);
+      return null;
+    }
     return { userId: user.id, phone: user.phone, role: user.role };
-  } catch {
+  } catch (err: any) {
+    console.error('[AUTH] JWT verify failed:', err?.message || err);
     return null;
   }
 }
