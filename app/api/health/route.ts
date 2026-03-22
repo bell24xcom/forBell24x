@@ -9,7 +9,8 @@ export async function GET(request: NextRequest) {
   const hasDatabase  = !!process.env.DATABASE_URL;
   const hasAuth      = !!process.env.NEXTAUTH_SECRET;
   const hasInsforge  = !!process.env.INSFORGE_API_KEY;
-  const hasRazorpay  = !!process.env.RAZORPAY_KEY_ID && !!process.env.RAZORPAY_KEY_SECRET;
+  const hasRazorpay        = !!process.env.RAZORPAY_KEY_ID && !!process.env.RAZORPAY_KEY_SECRET;
+  const hasRazorpayWebhook = !!process.env.RAZORPAY_WEBHOOK_SECRET;
 
   // Only attempt DB connection if DATABASE_URL is configured
   let dbStatus: { connected: boolean; latency?: number; error?: string; note?: string } = {
@@ -37,7 +38,7 @@ export async function GET(request: NextRequest) {
   return NextResponse.json(
     {
       status,
-      deployVersion: '8efe246',
+      deployVersion: 'cdc31e8',
       timestamp: new Date().toISOString(),
       uptime: Math.floor(uptime),
       website: 'online',
@@ -50,6 +51,7 @@ export async function GET(request: NextRequest) {
           auth: hasAuth,
           insforge: hasInsforge,
           razorpay: hasRazorpay,
+          razorpayWebhook: hasRazorpayWebhook,
         },
       },
       memory: {
