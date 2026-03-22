@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
   return NextResponse.json(
     {
       status,
-      deployVersion: '8acffaa',
+      deployVersion: '8efe246',
       timestamp: new Date().toISOString(),
       uptime: Math.floor(uptime),
       website: 'online',
