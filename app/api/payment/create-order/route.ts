@@ -26,8 +26,14 @@ export async function POST(request: NextRequest) {
     const keyId = process.env.RAZORPAY_KEY_ID;
     const keySecret = process.env.RAZORPAY_KEY_SECRET;
 
+    console.log("RAZORPAY KEY:", keyId ? `${keyId.slice(0, 8)}...` : "MISSING");
+
+    if (!keyId || !keySecret) {
+      return NextResponse.json({ success: false, error: 'Razorpay env missing' }, { status: 500 });
+    }
+
     // Test mode when keys aren't configured
-    if (!keyId || !keySecret || keyId.includes('placeholder') || keyId === '') {
+    if (keyId.includes('placeholder') || keyId === '') {
       return NextResponse.json({
         success: true,
         testMode: true,
@@ -57,11 +63,10 @@ export async function POST(request: NextRequest) {
       currency: order.currency,
       key: keyId,
     });
-  } catch (error) {
-    const msg = error instanceof Error ? error.message : 'Failed to create payment order';
-    console.error('Razorpay create-order error:', msg, error);
+  } catch (error: any) {
+    console.error('RAZORPAY FULL ERROR:', error);
     return NextResponse.json(
-      { success: false, error: msg },
+      { success: false, error: error?.message || 'Unknown error', details: error },
       { status: 500 }
     );
   }
