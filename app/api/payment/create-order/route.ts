@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
     const order = await razorpay.orders.create({
       amount: Math.round(amount * 100),
       currency,
-      receipt: `wallet_${user.userId}_${Date.now()}`,
+      receipt: `wal_${Date.now()}`,
       notes: { userId: user.userId, type: 'WALLET_DEPOSIT', platform: 'Bell24h' },
     });
 
