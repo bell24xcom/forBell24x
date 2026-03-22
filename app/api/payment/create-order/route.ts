@@ -9,6 +9,7 @@ export const dynamic = 'force-dynamic';
 export async function POST(request: NextRequest) {
   try {
     const user = await authenticate(request);
+    console.log("USER SESSION:", user ? `userId=${user.userId}` : "null — auth failed");
     if (!user) {
       return NextResponse.json({ success: false, error: 'Authentication required' }, { status: 401 });
     }
