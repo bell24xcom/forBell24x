@@ -72,17 +72,17 @@ export default function OperatorDashboard() {
   }, []);
 
   async function loadStats() {
-    const res = await fetch('/api/demand/dashboard').catch(() => null);
+    const res = await fetch('/api/demand/dashboard', { credentials: 'include' }).catch(() => null);
     if (res?.ok) setStats(await res.json());
   }
 
   async function loadFunnel() {
-    const res = await fetch('/api/analytics/funnel?days=7').catch(() => null);
+    const res = await fetch('/api/analytics/funnel?days=7', { credentials: 'include' }).catch(() => null);
     if (res?.ok) setFunnelData(await res.json());
   }
 
   async function loadFollowUps() {
-    const res = await fetch('/api/outreach/follow-up').catch(() => null);
+    const res = await fetch('/api/outreach/follow-up', { credentials: 'include' }).catch(() => null);
     if (res?.ok) {
       const data = await res.json();
       setFollowUps(data.followUps ?? []);
@@ -92,6 +92,7 @@ export default function OperatorDashboard() {
   async function markFollowUpSent(supplierId: string, rfqId: string, type: string) {
     await fetch('/api/outreach/follow-up', {
       method: 'POST',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ supplierId, rfqId, type }),
     }).catch(() => {});
@@ -99,7 +100,7 @@ export default function OperatorDashboard() {
   }
 
   async function loadDrips() {
-    const res = await fetch('/api/outreach/drip').catch(() => null);
+    const res = await fetch('/api/outreach/drip', { credentials: 'include' }).catch(() => null);
     if (res?.ok) {
       const data = await res.json();
       setDrips(data.drips ?? []);
@@ -109,6 +110,7 @@ export default function OperatorDashboard() {
   async function markDripSent(supplierId: string, dripType: string) {
     await fetch('/api/outreach/drip', {
       method: 'POST',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ supplierId, dripType }),
     }).catch(() => {});
@@ -121,7 +123,7 @@ export default function OperatorDashboard() {
       const url = category
         ? `/api/outreach/generate?category=${encodeURIComponent(category)}`
         : '/api/outreach/generate';
-      const res = await fetch(url);
+      const res = await fetch(url, { credentials: 'include' });
       const data = await res.json();
       if (data.success) {
         setOutreach(data.outreach ?? []);
