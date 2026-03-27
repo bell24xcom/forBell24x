@@ -58,7 +58,8 @@
       "Bash(VERCEL_TOKEN=vca_6V8iGkLGVEFdoaoei8eDML1kcCULTskW6Ftjps6SXLpG7mbcvZ2O60RB npx vercel:*)",
       "Bash(gh api:*)",
       "Bash(do echo:*)",
-      "Bash(do sed:*)"
+      "Bash(do sed:*)",
+      "Bash(rm:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
