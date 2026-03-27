@@ -1,47 +1,82 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
-import { AuthProvider } from "@/contexts/AuthContext";
-
-const inter = Inter({ subsets: ["latin"] });
+import type { Metadata } from 'next'
+import './globals.css'
+import Header from '@/components/Header'
+import Footer from '@/components/Footer'
+import ConditionalHeader from '@/components/ConditionalHeader'
+import LaunchBanner from '@/components/LaunchBanner'
+import ClientProviders from '@/components/ClientProviders'
+import SchemaMarkup from '@/components/SEO/SchemaMarkup'
+import Analytics from '@/components/SEO/Analytics'
 
 export const metadata: Metadata = {
-  title: "Bell24h - India's Fastest B2B Match-Making Engine",
-  description: "Post RFQ. Get 3 Verified Quotes in 24 Hours. Bell24h uses 200 live data signals to match you with pre-qualified Indian suppliers.",
-  keywords: "B2B marketplace, RFQ, suppliers, procurement, India, MSME, escrow, verified suppliers",
-  authors: [{ name: "Bell24h Team" }],
+  metadataBase: new URL('https://www.bell24h.com'),
+  title: {
+    default: 'Bell24h — B2B Marketplace | Voice & Video RFQs',
+    template: '%s | Bell24h',
+  },
+  description: "India's #1 B2B supplier marketplace. Post RFQs via voice, video, or text. AI-powered matching across 450+ categories.",
+  keywords: ['B2B marketplace India', 'voice RFQ', 'video RFQ', 'supplier marketplace', 'procurement platform', 'AI supplier matching', 'verified suppliers India', 'B2B procurement'],
+  authors: [{ name: 'Digitex Studio' }],
+  formatDetection: { email: false, telephone: false },
+  alternates: { canonical: '/' },
   openGraph: {
-    title: "Bell24h - India's Fastest B2B Match-Making Engine",
-    description: "Post RFQ. Get 3 Verified Quotes in 24 Hours. Trust-first, AI-powered B2B marketplace.",
-    type: "website",
-    locale: "en_IN",
+    title: "Bell24h — India's B2B Marketplace",
+    description: "Post RFQs via voice, video, or text. AI-powered matching across 450+ categories.",
+    url: 'https://www.bell24h.com',
+    siteName: 'Bell24h',
+    images: [
+      {
+        url: '/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Bell24h - B2B Supplier Marketplace',
+      },
+    ],
+    locale: 'en_IN',
+    type: 'website',
   },
   twitter: {
-    card: "summary_large_image",
-    title: "Bell24h - India's Fastest B2B Match-Making Engine",
-    description: "Post RFQ. Get 3 Verified Quotes in 24 Hours. Trust-first, AI-powered B2B marketplace.",
+    card: 'summary_large_image',
+    title: "Bell24h — India's B2B Marketplace",
+    description: "Post RFQs via voice, video, or text. AI-powered matching across 450+ categories.",
+    images: ['/og-image.jpg'],
   },
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
-  verification: {
-    google: "your-google-verification-code",
+  icons: {
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
   },
-};
+}
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: {
+  children: React.ReactNode
+}) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+    <html lang="en" className="scroll-smooth">
+      <body className="font-sans bg-[#0F172A] text-white antialiased">
+        <SchemaMarkup />
+        <Analytics />
+        <ClientProviders>
+          {process.env.NEXT_PUBLIC_LAUNCH_MODE === 'true' && <LaunchBanner />}
+          <ConditionalHeader />
+          <main className="min-h-screen">
+            {children}
+          </main>
+          <Footer />
+        </ClientProviders>
       </body>
     </html>
-  );
+  )
 }

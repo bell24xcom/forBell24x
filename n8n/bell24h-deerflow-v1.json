@@ -1,0 +1,184 @@
+{
+  "name": "DeerFlow RFQ Outreach Engine",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "rfq-created",
+        "options": {}
+      },
+      "name": "Webhook: RFQ Created",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [100, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{$env.SITE_URL}}/api/admin/suppliers/search",
+        "method": "POST",
+        "bodyParametersUi": {
+          "parameter": [
+            {
+              "name": "category",
+              "value": "={{$node[\"Webhook: RFQ Created\"].json[\"body\"][\"category\"]}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Fetch Candidate Suppliers",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [300, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{$env.SITE_URL}}/api/ai/decision",
+        "method": "POST",
+        "bodyParametersUi": {
+          "parameter": [
+            {
+              "name": "rfq",
+              "value": "={{$node[\"Webhook: RFQ Created\"].json[\"body\"]}}"
+            },
+            {
+              "name": "candidates",
+              "value": "={{$node[\"Fetch Candidate Suppliers\"].json[\"suppliers\"]}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Consult DeerFlow AI",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "outreach_plan",
+        "options": {}
+      },
+      "name": "Loop outreach_plan",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 1,
+      "position": [700, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://api.whatsapp.com/send",
+        "method": "GET",
+        "qs": [
+          {
+            "name": "phone",
+            "value": "={{$json[\"phone\"]}}"
+          },
+          {
+            "name": "text",
+            "value": "={{$json[\"message\"]}}"
+          }
+        ],
+        "options": {}
+      },
+      "name": "Send WhatsApp",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [900, 200]
+    },
+    {
+      "parameters": {
+        "url": "={{$env.INSFORGE_URL}}/rest/v1/outreach_logs",
+        "method": "POST",
+        "headersUi": {
+          "parameter": [
+            {
+              "name": "apikey",
+              "value": "={{$env.INSFORGE_API_KEY}}"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{$env.INSFORGE_API_KEY}}"
+            }
+          ]
+        },
+        "bodyParametersUi": {
+          "parameter": [
+            {
+              "name": "rfq_id",
+              "value": "={{$node[\"Webhook: RFQ Created\"].json[\"body\"][\"id\"]}}"
+            },
+            {
+              "name": "supplier_id",
+              "value": "={{$json[\"supplier_id\"]}}"
+            },
+            {
+              "name": "action_type",
+              "value": "whatsapp_sent"
+            },
+            {
+              "name": "status",
+              "value": "success"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Log to InsForge",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [1100, 300]
+    }
+  ],
+  "connections": {
+    "Webhook: RFQ Created": {
+      "main": [
+        [
+          {
+            "node": "Fetch Candidate Suppliers",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Candidate Suppliers": {
+      "main": [
+        [
+          {
+            "node": "Consult DeerFlow AI",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consult DeerFlow AI": {
+      "main": [
+        [
+          {
+            "node": "Loop outreach_plan",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop outreach_plan": {
+      "main": [
+        [
+          {
+            "node": "Send WhatsApp",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "Log to InsForge",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

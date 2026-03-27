@@ -60,3 +60,4 @@ export const getCategoryById = (id: string): Category | undefined => {
 export const getFeaturedCategories = (): Category[] => {
   return categories.filter(category => category.featured);
 };
+export const ALL_CATEGORIES = categories;

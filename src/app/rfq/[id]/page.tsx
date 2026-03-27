@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { useSession } from '@/app/contexts/AuthContext';
+import { useSession } from '@/src/app/contexts/AuthContext';
 import { Video, Mic, FileText, MapPin, Clock, DollarSign, Package, AlertTriangle, CheckCircle } from 'lucide-react';
 import { storeInteraction } from '@/lib/memory-engine';
 
@@ -53,8 +53,12 @@ export default function RFQDetailPage() {
       const data = await response.json();
       if (data.success) {
         setRFQ(data.rfq);
-        // ── Elephant Memory: log view interaction ──
-        storeInteraction({ rfqId: data.rfq.id, actionType: 'view', source: 'marketplace' }).catch(() => {});
+        // ── Elephant Memory: log view interaction (fire-and-forget) ──
+        storeInteraction({
+          rfqId: data.rfq.id,
+          actionType: 'view',
+          source: 'marketplace',
+        }).catch(() => {});
       } else {
         setError(data.error || 'RFQ not found');
       }
@@ -73,9 +77,9 @@ export default function RFQDetailPage() {
     try {
       const response = await fetch('/api/supplier/quotes', {
         method: 'POST',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('auth-token')}`,
         },
         body: JSON.stringify({
           rfqId: rfq.id,
@@ -139,20 +143,20 @@ export default function RFQDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0F172A] text-white pb-24 md:pb-0">
+    <div className="min-h-screen bg-[#0F172A] text-white">
       <div className="max-w-5xl mx-auto px-4 py-8">
 
         {/* Breadcrumb */}
         <nav className="mb-6 flex items-center gap-2 text-sm">
           <a href="/rfq" className="text-slate-400 hover:text-white transition-colors">Marketplace</a>
-          <span className="text-slate-600">/</span>
+          <span className="text-slate-300">/</span>
           <span className="text-slate-300 truncate max-w-[200px]">{rfq.title}</span>
         </nav>
 
         {/* Main Content */}
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
 
-          {/* Header */}
+          {/* RFQ Header */}
           <div className="bg-gradient-to-r from-slate-900 to-slate-800 px-6 py-5 border-b border-slate-700">
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0">
@@ -186,6 +190,7 @@ export default function RFQDetailPage() {
           {/* Details Grid */}
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Left: Category & Description */}
               <div className="space-y-5">
                 <div>
                   <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Category</p>
@@ -199,6 +204,7 @@ export default function RFQDetailPage() {
                 </div>
               </div>
 
+              {/* Right: Buyer Info */}
               <div className="bg-slate-50 rounded-xl p-5 border border-slate-100">
                 <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Buyer Information</p>
                 {rfq.user?.name || rfq.user?.company ? (
@@ -218,7 +224,7 @@ export default function RFQDetailPage() {
                     {rfq.user?.location && (
                       <div>
                         <p className="text-slate-500 text-xs">Location</p>
-                        <p className="text-slate-700 font-medium">{rfq.user.location}</p>
+                        <p className="text-slate-400 font-medium">{rfq.user.location}</p>
                       </div>
                     )}
                   </div>
@@ -232,24 +238,146 @@ export default function RFQDetailPage() {
             </div>
           </div>
 
-          {/* Desktop CTA */}
-          <div className="hidden md:block px-6 py-4 bg-slate-50 border-t border-slate-200 rounded-b-2xl">
+          {/* Sticky CTA Bar */}
+          <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 md:static fixed-bottom-bar md:border-t md:border-slate-200 md:rounded-b-2xl">
             <div className="flex items-center justify-between gap-4">
-              <div className="text-sm text-slate-500">
+              <div className="hidden md:block text-sm text-slate-500">
                 {isLoggedIn ? 'Ready to submit your quote' : 'Login to submit a quote'}
               </div>
               <button
                 onClick={handleQuote}
-                className="bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-semibold px-8 py-3 rounded-xl transition-all shadow-lg shadow-indigo-600/25 hover:shadow-indigo-600/40 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                className="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-semibold px-8 py-3 rounded-xl transition-all shadow-lg shadow-indigo-600/25 hover:shadow-indigo-600/40 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
               >
                 {isLoggedIn ? 'Submit Your Quote' : 'Login to Quote'}
               </button>
             </div>
           </div>
         </div>
+
+        {/* Quote Form Modal */}
+        {showQuoteForm && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto">
+              <div className="p-6 border-b border-slate-200 sticky top-0 bg-white rounded-t-2xl">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-bold text-slate-900">Submit Your Quote</h2>
+                  <button
+                    onClick={() => setShowQuoteForm(false)}
+                    className="text-slate-400 hover:text-slate-300 text-2xl leading-none"
+                  >
+                    ×
+                  </button>
+                </div>
+                <p className="text-slate-500 text-sm mt-1">Quote for: <span className="font-medium text-slate-400">{rfq.title}</span></p>
+              </div>
+
+              <div className="p-6 space-y-6">
+                {/* Required Fields */}
+                <div>
+                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Required Information</p>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-400 mb-1.5">Your Price (₹) *</label>
+                      <input
+                        type="number"
+                        value={quoteData.price}
+                        onChange={(e) => setQuoteData({ ...quoteData, price: e.target.value })}
+                        placeholder="50000"
+                        className="w-full px-4 py-2.5 bg-white border border-slate-300 text-slate-900 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all placeholder:text-slate-400"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-400 mb-1.5">Quantity *</label>
+                      <input
+                        type="text"
+                        value={quoteData.quantity}
+                        onChange={(e) => setQuoteData({ ...quoteData, quantity: e.target.value })}
+                        placeholder="500 units"
+                        className="w-full px-4 py-2.5 bg-white border border-slate-300 text-slate-900 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all placeholder:text-slate-400"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-400 mb-1.5">Delivery Timeline *</label>
+                      <input
+                        type="text"
+                        value={quoteData.timeline}
+                        onChange={(e) => setQuoteData({ ...quoteData, timeline: e.target.value })}
+                        placeholder="21 days"
+                        className="w-full px-4 py-2.5 bg-white border border-slate-300 text-slate-900 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all placeholder:text-slate-400"
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Description */}
+                <div>
+                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Your Offer</p>
+                  <label className="block text-sm font-semibold text-slate-400 mb-1.5">Description *</label>
+                  <textarea
+                    value={quoteData.description}
+                    onChange={(e) => setQuoteData({ ...quoteData, description: e.target.value })}
+                    placeholder="Describe your product specifications, material quality, certifications, and what makes your offer competitive..."
+                    rows={4}
+                    className="w-full px-4 py-3 bg-white border border-slate-300 text-slate-900 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all placeholder:text-slate-400 text-sm leading-relaxed"
+                    required
+                  />
+                </div>
+
+                {/* Terms */}
+                <div>
+                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Terms & Conditions</p>
+                  <label className="block text-sm font-semibold text-slate-400 mb-1.5">Terms</label>
+                  <textarea
+                    value={quoteData.terms}
+                    onChange={(e) => setQuoteData({ ...quoteData, terms: e.target.value })}
+                    placeholder="Payment terms (e.g., 50% advance, 50% on delivery), warranty details, delivery terms, GST inclusion status..."
+                    rows={3}
+                    className="w-full px-4 py-3 bg-white border border-slate-300 text-slate-900 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all placeholder:text-slate-400 text-sm leading-relaxed"
+                  />
+                </div>
+
+                {/* Error */}
+                {error && (
+                  <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+                    {error}
+                  </div>
+                )}
+
+                {/* Actions */}
+                <div className="flex gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowQuoteForm(false)}
+                    className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-400 font-semibold px-4 py-3 rounded-xl transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={submitQuote}
+                    disabled={isSubmitting}
+                    className="flex-1 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-semibold px-4 py-3 rounded-xl transition-all shadow-lg shadow-indigo-600/25 disabled:shadow-none flex items-center justify-center gap-2"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        Submitting...
+                      </>
+                    ) : (
+                      'Submit Quote'
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Mobile sticky CTA */}
+      {/* Mobile sticky CTA overlay */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 p-4 shadow-lg z-40">
         <button
           onClick={handleQuote}
@@ -258,114 +386,6 @@ export default function RFQDetailPage() {
           {isLoggedIn ? 'Submit Your Quote' : 'Login to Quote'}
         </button>
       </div>
-
-      {/* Quote Form Modal */}
-      {showQuoteForm && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-slate-200 sticky top-0 bg-white rounded-t-2xl">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-slate-900">Submit Your Quote</h2>
-                <button onClick={() => setShowQuoteForm(false)} className="text-slate-400 hover:text-slate-600 text-2xl leading-none">×</button>
-              </div>
-              <p className="text-slate-500 text-sm mt-1">Quote for: <span className="font-medium text-slate-700">{rfq.title}</span></p>
-            </div>
-
-            <div className="p-6 space-y-6">
-              <div>
-                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Required Information</p>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-1.5">Your Price (₹) *</label>
-                    <input
-                      type="number"
-                      value={quoteData.price}
-                      onChange={(e) => setQuoteData({ ...quoteData, price: e.target.value })}
-                      placeholder="50000"
-                      className="w-full px-4 py-2.5 bg-white border border-slate-300 text-slate-900 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all placeholder:text-slate-400"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-1.5">Quantity *</label>
-                    <input
-                      type="text"
-                      value={quoteData.quantity}
-                      onChange={(e) => setQuoteData({ ...quoteData, quantity: e.target.value })}
-                      placeholder="500 units"
-                      className="w-full px-4 py-2.5 bg-white border border-slate-300 text-slate-900 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all placeholder:text-slate-400"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-1.5">Delivery Timeline *</label>
-                    <input
-                      type="text"
-                      value={quoteData.timeline}
-                      onChange={(e) => setQuoteData({ ...quoteData, timeline: e.target.value })}
-                      placeholder="21 days"
-                      className="w-full px-4 py-2.5 bg-white border border-slate-300 text-slate-900 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all placeholder:text-slate-400"
-                      required
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Your Offer</p>
-                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Description *</label>
-                <textarea
-                  value={quoteData.description}
-                  onChange={(e) => setQuoteData({ ...quoteData, description: e.target.value })}
-                  placeholder="Describe your product specifications, material quality, certifications, and what makes your offer competitive..."
-                  rows={4}
-                  className="w-full px-4 py-3 bg-white border border-slate-300 text-slate-900 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all placeholder:text-slate-400 text-sm leading-relaxed"
-                  required
-                />
-              </div>
-
-              <div>
-                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Terms & Conditions</p>
-                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Terms</label>
-                <textarea
-                  value={quoteData.terms}
-                  onChange={(e) => setQuoteData({ ...quoteData, terms: e.target.value })}
-                  placeholder="Payment terms (e.g., 50% advance, 50% on delivery), warranty details, delivery terms, GST inclusion status..."
-                  rows={3}
-                  className="w-full px-4 py-3 bg-white border border-slate-300 text-slate-900 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all placeholder:text-slate-400 text-sm leading-relaxed"
-                />
-              </div>
-
-              {error && (
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">{error}</div>
-              )}
-
-              <div className="flex gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setShowQuoteForm(false)}
-                  className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-4 py-3 rounded-xl transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={submitQuote}
-                  disabled={isSubmitting}
-                  className="flex-1 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-semibold px-4 py-3 rounded-xl transition-all shadow-lg shadow-indigo-600/25 disabled:shadow-none flex items-center justify-center gap-2"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Submitting...
-                    </>
-                  ) : 'Submit Quote'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

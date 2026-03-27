@@ -23,35 +23,31 @@ interface SupplierMatch {
  */
 export async function matchSuppliersToRFQ(rfqId: string): Promise<SupplierMatch[]> {
   try {
-    const rfq = await prisma.rfq.findUnique({
+    const rfq = await prisma.rFQ.findUnique({
       where: { id: rfqId },
       include: {
-        buyer: { include: { company: true } },
+        user: true,
       },
     })
 
     if (!rfq) throw new Error('RFQ not found')
 
     // Find suppliers by category
-    const suppliers = await prisma.company.findMany({
+    const suppliers = await prisma.user.findMany({
       where: {
-        category: rfq.category,
+        location: rfq.location ?? undefined,
+        role: 'SUPPLIER',
         isActive: true,
-        isVerified: true,
-        type: { in: ['SUPPLIER', 'BOTH'] },
-      },
-      include: {
-        users: { where: { role: 'SUPPLIER' } },
       },
     })
 
     // Calculate matches
     const matches: SupplierMatch[] = suppliers.map(supplier => ({
-      supplierId: supplier.users[0]?.id || '',
-      companyId: supplier.id,
-      confidenceScore: supplier.trustScore / 10,
+      supplierId: supplier.id,
+      companyId: supplier.company || '',
+      confidenceScore: (supplier.trustScore || 0) / 10,
       reasons: ['Category match', 'Verified supplier'],
-      trustScore: supplier.trustScore,
+      trustScore: supplier.trustScore || 0,
     }))
 
     return matches.sort((a, b) => b.confidenceScore - a.confidenceScore).slice(0, 10)
