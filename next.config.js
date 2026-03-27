@@ -1,5 +1,6 @@
 const path = require('path');
 
+// Build: 2026-03-28 — dark homepage, ₹999 plan, schema v2
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
