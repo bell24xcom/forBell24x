@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { MessageCircle, RefreshCw, TrendingUp, ExternalLink, Zap } from 'lucide-react';
+import { MessageCircle, RefreshCw, TrendingUp, ExternalLink, Zap, Send } from 'lucide-react';
 
 const RANGES = [{ label: '7 Days', value: 7 }, { label: '30 Days', value: 30 }, { label: '90 Days', value: 90 }];
 
@@ -42,16 +42,38 @@ interface OutreachStats {
   days: number;
 }
 
+interface BatchSupplier {
+  id: string;
+  name: string | null;
+  company: string;
+  phone: string | null;
+  email: string | null;
+  location: string | null;
+  trustScore: number;
+  claimLink: string;
+  waLink: string | null;
+}
+
+interface OutreachBatchStats {
+  total: number;
+  unclaimed: number;
+  claimed: number;
+  contactedToday: number;
+}
+
 export default function OutreachPage() {
-  const [data,    setData]    = useState<OutreachStats | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error,   setError]   = useState('');
-  const [days,    setDays]    = useState(30);
+  const [data,        setData]        = useState<OutreachStats | null>(null);
+  const [loading,     setLoading]     = useState(true);
+  const [error,       setError]       = useState('');
+  const [days,        setDays]        = useState(30);
+  const [batch,       setBatch]       = useState<BatchSupplier[]>([]);
+  const [batchLoading,setBatchLoading]= useState(false);
+  const [batchStats,  setBatchStats]  = useState<OutreachBatchStats | null>(null);
 
   const fetchData = useCallback(async () => {
     setLoading(true); setError('');
     try {
-      const res  = await fetch(`/api/admin/outreach-stats?days=${days}`);
+      const res  = await fetch(`/api/admin/outreach-stats?days=${days}`, { credentials: 'include' });
       const json = await res.json();
       if (!json.success) throw new Error(json.error || 'Failed');
       setData(json);
@@ -62,7 +84,50 @@ export default function OutreachPage() {
     }
   }, [days]);
 
-  useEffect(() => { fetchData(); }, [fetchData]);
+  const fetchBatchStats = useCallback(async () => {
+    try {
+      const res  = await fetch('/api/admin/outreach/stats', { credentials: 'include' });
+      const json = await res.json();
+      if (json.success) setBatchStats(json);
+    } catch { /* silent */ }
+  }, []);
+
+  useEffect(() => { fetchData(); fetchBatchStats(); }, [fetchData, fetchBatchStats]);
+
+  const generateBatch = async () => {
+    setBatchLoading(true);
+    try {
+      const res  = await fetch('/api/admin/outreach/daily-batch', {
+        method: 'POST',
+        credentials: 'include',
+      });
+      const json = await res.json();
+      if (json.success) {
+        setBatch(json.suppliers);
+        fetchBatchStats();
+      }
+    } catch (e) {
+      console.error('Batch generation failed:', e);
+    } finally {
+      setBatchLoading(false);
+    }
+  };
+
+  const exportCSV = () => {
+    const headers = 'name,company,phone,email,location,trust_score,whatsapp_link,claim_link';
+    const rows = batch.map(s =>
+      `"${s.name ?? ''}","${s.company}","${s.phone ?? ''}","${s.email ?? ''}",` +
+      `"${s.location ?? ''}",${s.trustScore},"${s.waLink ?? ''}","${s.claimLink}"`
+    );
+    const csv  = [headers, ...rows].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = `bell24h-outreach-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   const funnel = data ? [
     { label: 'Outreach Sent',      value: data.period.outreachSent,   color: 'bg-blue-500' },
@@ -74,6 +139,112 @@ export default function OutreachPage() {
 
   return (
     <div className="space-y-6">
+
+      {/* ===== DAILY BATCH GENERATOR ===== */}
+      <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-5">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+          <div>
+            <h2 className="text-lg font-bold text-white flex items-center gap-2">
+              <Send className="w-5 h-5 text-green-400" /> Daily Outreach Batch
+            </h2>
+            <p className="text-slate-400 text-sm mt-0.5">
+              Generate 20 unclaimed suppliers to contact today via WhatsApp
+            </p>
+          </div>
+          <button
+            onClick={generateBatch}
+            disabled={batchLoading}
+            className="bg-green-600 hover:bg-green-700 disabled:bg-slate-600 text-white font-semibold px-5 py-2.5 rounded-lg min-h-[44px] transition-colors flex items-center gap-2 text-sm"
+          >
+            {batchLoading ? (
+              <>
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Generating...
+              </>
+            ) : (
+              "Generate Today's 20 →"
+            )}
+          </button>
+        </div>
+
+        {/* Batch stats */}
+        {batchStats && (
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+            {[
+              { label: 'Total Suppliers',   value: batchStats.total,          color: 'text-blue-400' },
+              { label: 'Unclaimed',         value: batchStats.unclaimed,      color: 'text-amber-400' },
+              { label: 'Claimed',           value: batchStats.claimed,        color: 'text-green-400' },
+              { label: 'Contacted Today',   value: batchStats.contactedToday, color: 'text-purple-400' },
+            ].map(s => (
+              <div key={s.label} className="bg-slate-900/60 rounded-lg p-3 text-center">
+                <p className={`text-xl font-bold ${s.color}`}>{s.value}</p>
+                <p className="text-slate-500 text-xs mt-0.5">{s.label}</p>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Results table */}
+        {batch.length > 0 && (
+          <div className="rounded-xl overflow-hidden border border-slate-700/50">
+            <div className="flex items-center justify-between px-4 py-3 bg-slate-900/40 border-b border-slate-700/50">
+              <span className="text-white text-sm font-medium">{batch.length} suppliers ready to contact</span>
+              <button onClick={exportCSV} className="text-slate-400 hover:text-white text-xs transition-colors">
+                Export CSV ↓
+              </button>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-slate-700/50">
+                    {['#', 'Company', 'Location', 'Phone', 'Actions'].map(h => (
+                      <th key={h} className="text-left text-slate-400 text-xs font-medium uppercase tracking-wide px-4 py-3">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-700/30">
+                  {batch.map((s, i) => (
+                    <tr key={s.id} className="hover:bg-slate-700/20 transition-colors">
+                      <td className="px-4 py-3 text-slate-500 text-xs">{i + 1}</td>
+                      <td className="px-4 py-3">
+                        <p className="text-white text-sm font-medium">{s.company}</p>
+                        <p className="text-slate-500 text-xs">Trust: {s.trustScore}</p>
+                      </td>
+                      <td className="px-4 py-3 text-slate-300 text-sm">{s.location || '—'}</td>
+                      <td className="px-4 py-3 text-slate-400 text-xs font-mono">
+                        {s.phone ? `${s.phone.slice(0, 6)}****` : '—'}
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          {s.waLink && (
+                            <a
+                              href={s.waLink}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap"
+                            >
+                              Open WA ↗
+                            </a>
+                          )}
+                          <button
+                            onClick={() => { navigator.clipboard.writeText(s.claimLink); }}
+                            className="bg-slate-600 hover:bg-slate-500 text-white text-xs px-3 py-1.5 rounded-lg transition-colors"
+                          >
+                            Copy Link
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ===== OUTREACH CAMPAIGNS (existing content below) ===== */}
+
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
