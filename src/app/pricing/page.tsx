@@ -100,6 +100,46 @@ const pricingTiers: PricingTier[] = [
     uptime: '99.5%'
   },
   {
+    id: 'verified',
+    name: 'Verified Supplier',
+    description: 'Get the Verified badge and move to the top of every buyer\'s shortlist.',
+    price: 999,
+    currency: '₹',
+    period: 'month',
+    features: [
+      'Verified Supplier badge — buyers filter for this first',
+      'Priority AI matching — appear before unverified suppliers',
+      'Unlimited RFQ notifications in your category',
+      'GST verified + phone confirmed trust signals shown to buyers',
+      'Direct message access to matched buyers',
+      'Monthly performance report — quotes, views, response rate',
+    ],
+    limitations: [],
+    color: 'blue',
+    popular: true,
+    buttonText: 'Get Verified →',
+    buttonVariant: 'primary',
+    maxRFQs: -1,
+    maxSuppliers: -1,
+    aiFeatures: true,
+    prioritySupport: false,
+    customDomain: false,
+    apiAccess: false,
+    analytics: true,
+    escrowProtection: false,
+    voiceRFQ: true,
+    videoRFQ: false,
+    hindiSupport: true,
+    gstVerification: true,
+    trustScoring: true,
+    mobileApp: true,
+    whiteLabel: false,
+    dedicatedManager: false,
+    customIntegrations: false,
+    sla: '24h',
+    uptime: '99.9%',
+  },
+  {
     id: 'professional',
     name: 'Professional',
     description: 'Ideal for growing businesses with higher volume needs',
@@ -261,7 +301,69 @@ export default function PricingPage() {
       return;
     }
 
+    // Route subscription plans to subscribe endpoint
+    if (tier.id === 'verified') {
+      await handleSubscribe('VERIFIED');
+      return;
+    }
+
     await initiateRazorpayCheckout(tier);
+  };
+
+  const handleSubscribe = async (plan: string) => {
+    setCheckoutLoading(true);
+    try {
+      const res = await fetch('/api/payment/subscribe', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan }),
+      });
+
+      if (res.status === 401) {
+        router.push('/auth/phone-email?redirect=/pricing');
+        return;
+      }
+
+      if (!res.ok) {
+        setPaymentError('Unable to start payment. Please try again.');
+        return;
+      }
+
+      const { orderId, amount, keyId } = await res.json();
+
+      if (!keyId) {
+        setPaymentError('Payment system not configured. Please contact bell24h.helpline@gmail.com');
+        return;
+      }
+
+      const loaded = await loadRazorpayScript();
+      if (!loaded) throw new Error('Razorpay could not be loaded. Please try again.');
+
+      const userData = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('bell24h_user') || '{}') : {};
+      const rzp = new (window as any).Razorpay({
+        key: keyId,
+        amount,
+        currency: 'INR',
+        order_id: orderId,
+        name: 'Bell24h',
+        description: plan === 'VERIFIED' ? 'Verified Supplier — ₹999/month' : 'Professional — ₹2,999/month',
+        prefill: {
+          name: userData.name || '',
+          email: userData.email || '',
+          contact: userData.phone ? `+91${userData.phone}` : '',
+        },
+        theme: { color: '#2563EB' },
+        handler: () => {
+          router.push('/dashboard?payment=success&plan=' + plan);
+        },
+      });
+      rzp.open();
+    } catch (err) {
+      setPaymentError(err instanceof Error ? err.message : 'Payment error. Please try again.');
+    } finally {
+      setCheckoutLoading(false);
+    }
   };
 
   const initiateRazorpayCheckout = async (tier: PricingTier) => {
@@ -349,21 +451,21 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="page-container">
+    <div className="min-h-screen bg-[#0F172A]">
       {/* Header */}
-      <div className="bg-white shadow-sm">
+      <div className="bg-[#0F172A] border-b border-slate-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
-            <h1 className="page-title">
+            <h1 className="text-3xl font-bold text-white text-center mb-2">
               Choose Your Perfect Plan
             </h1>
-            <p className="page-subtitle mb-8">
+            <p className="text-slate-400 text-lg text-center mb-8">
               Scale your B2B operations with our flexible pricing plans
             </p>
             
             {/* Billing Toggle */}
             <div className="flex items-center justify-center space-x-4 mb-8">
-              <span className={`text-sm font-medium ${billingPeriod === 'monthly' ? 'text-neutral-900' : 'text-slate-400'}`}>
+              <span className={`text-sm font-medium ${billingPeriod === 'monthly' ? 'text-white' : 'text-slate-400'}`}>
                 Monthly
               </span>
               <button
@@ -376,11 +478,11 @@ export default function PricingPage() {
                   }`}
                 />
               </button>
-              <span className={`text-sm font-medium ${billingPeriod === 'yearly' ? 'text-neutral-900' : 'text-slate-400'}`}>
+              <span className={`text-sm font-medium ${billingPeriod === 'yearly' ? 'text-white' : 'text-slate-400'}`}>
                 Yearly
               </span>
               {billingPeriod === 'yearly' && (
-                <span className="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">
+                <span className="bg-green-900/40 text-green-400 text-xs font-medium px-2 py-1 rounded-full">
                   Save 17%
                 </span>
               )}
@@ -409,7 +511,7 @@ export default function PricingPage() {
           {pricingTiers.map((tier) => (
             <div
               key={tier.id}
-              className={`relative bg-white rounded-2xl shadow-lg p-8 ${
+              className={`relative bg-slate-800 border border-slate-700 rounded-2xl p-8 ${
                 tier.popular ? 'ring-2 ring-indigo-500 transform scale-105' : ''
               }`}
             >
@@ -421,12 +523,12 @@ export default function PricingPage() {
                 </div>
               )}
 
-              <div className="page-header">
-                <h3 className="text-2xl font-bold text-neutral-900 mb-2">{tier.name}</h3>
+              <div className="mb-6">
+                <h3 className="text-2xl font-bold text-white mb-2">{tier.name}</h3>
                 <p className="text-slate-300 mb-6">{tier.description}</p>
                 
                 <div className="mb-4">
-                  <span className="text-5xl font-bold text-neutral-900">
+                  <span className="text-5xl font-bold text-white">
                     {tier.price === 0 ? 'Free' : `${tier.currency}${getDiscountedPrice(tier).toLocaleString()}`}
                   </span>
                   {tier.price > 0 && (
@@ -439,7 +541,7 @@ export default function PricingPage() {
                     <span className="text-lg text-slate-400 line-through">
                       {tier.currency}{(tier.originalPrice * 12).toLocaleString()}
                     </span>
-                    <span className="bg-red-100 text-red-800 text-sm font-medium px-2 py-1 rounded">
+                    <span className="bg-red-900/40 text-red-400 text-sm font-medium px-2 py-1 rounded">
                       Save {tier.currency}{getSavings(tier).toLocaleString()}
                     </span>
                   </div>
@@ -478,7 +580,7 @@ export default function PricingPage() {
                     ? 'bg-indigo-600 text-white hover:bg-indigo-700'
                     : tier.buttonVariant === 'secondary'
                     ? 'bg-purple-600 text-white hover:bg-purple-700'
-                    : 'border-2 border-indigo-600 text-indigo-600 hover:bg-indigo-50'
+                    : 'border-2 border-indigo-600 text-indigo-400 hover:bg-indigo-900/30'
                 }`}
               >
                 {checkoutLoading && selectedTier === tier.id ? 'Processing...' : tier.buttonText}
@@ -492,35 +594,35 @@ export default function PricingPage() {
       </div>
 
       {/* Feature Comparison */}
-      <div className="bg-neutral-50 py-16">
+      <div className="bg-slate-900 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="page-title">
+            <h2 className="text-2xl font-bold text-white mb-2">
               Compare All Features
             </h2>
-            <p className="page-subtitle">
+            <p className="text-slate-400 text-base">
               See what's included in each plan
             </p>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+          <div className="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-neutral-50">
+                <thead className="bg-slate-900">
                   <tr>
                     <th className="px-6 py-4 text-left text-sm font-medium text-slate-400 uppercase tracking-wide">
                       Features
                     </th>
                     {pricingTiers.map((tier) => (
-                      <th key={tier.id} className="px-6 py-4 text-center text-sm font-medium text-neutral-900">
+                      <th key={tier.id} className="px-6 py-4 text-center text-sm font-medium text-white">
                         {tier.name}
                       </th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200">
+                <tbody className="divide-y divide-slate-700">
                   <tr>
-                    <td className="px-6 py-4 text-sm font-medium text-neutral-900">Monthly RFQs</td>
+                    <td className="px-6 py-4 text-sm font-medium text-white">Monthly RFQs</td>
                     {pricingTiers.map((tier) => (
                       <td key={tier.id} className="px-6 py-4 text-center text-sm text-slate-400">
                         {tier.maxRFQs === -1 ? 'Unlimited' : tier.maxRFQs}
@@ -528,7 +630,7 @@ export default function PricingPage() {
                     ))}
                   </tr>
                   <tr>
-                    <td className="px-6 py-4 text-sm font-medium text-neutral-900">AI Matching</td>
+                    <td className="px-6 py-4 text-sm font-medium text-white">AI Matching</td>
                     {pricingTiers.map((tier) => (
                       <td key={tier.id} className="px-6 py-4 text-center text-sm text-slate-400">
                         {tier.aiFeatures ? '✓' : '✗'}
@@ -536,7 +638,7 @@ export default function PricingPage() {
                     ))}
                   </tr>
                   <tr>
-                    <td className="px-6 py-4 text-sm font-medium text-neutral-900">Voice RFQ</td>
+                    <td className="px-6 py-4 text-sm font-medium text-white">Voice RFQ</td>
                     {pricingTiers.map((tier) => (
                       <td key={tier.id} className="px-6 py-4 text-center text-sm text-slate-400">
                         {tier.voiceRFQ ? '✓' : '✗'}
@@ -544,7 +646,7 @@ export default function PricingPage() {
                     ))}
                   </tr>
                   <tr>
-                    <td className="px-6 py-4 text-sm font-medium text-neutral-900">Video RFQ</td>
+                    <td className="px-6 py-4 text-sm font-medium text-white">Video RFQ</td>
                     {pricingTiers.map((tier) => (
                       <td key={tier.id} className="px-6 py-4 text-center text-sm text-slate-400">
                         {tier.videoRFQ ? '✓' : '✗'}
@@ -552,7 +654,7 @@ export default function PricingPage() {
                     ))}
                   </tr>
                   <tr>
-                    <td className="px-6 py-4 text-sm font-medium text-neutral-900">Escrow Protection</td>
+                    <td className="px-6 py-4 text-sm font-medium text-white">Escrow Protection</td>
                     {pricingTiers.map((tier) => (
                       <td key={tier.id} className="px-6 py-4 text-center text-sm text-slate-400">
                         {tier.escrowProtection ? '✓' : '✗'}
@@ -560,7 +662,7 @@ export default function PricingPage() {
                     ))}
                   </tr>
                   <tr>
-                    <td className="px-6 py-4 text-sm font-medium text-neutral-900">API Access</td>
+                    <td className="px-6 py-4 text-sm font-medium text-white">API Access</td>
                     {pricingTiers.map((tier) => (
                       <td key={tier.id} className="px-6 py-4 text-center text-sm text-slate-400">
                         {tier.apiAccess ? '✓' : '✗'}
@@ -568,7 +670,7 @@ export default function PricingPage() {
                     ))}
                   </tr>
                   <tr>
-                    <td className="px-6 py-4 text-sm font-medium text-neutral-900">White Label</td>
+                    <td className="px-6 py-4 text-sm font-medium text-white">White Label</td>
                     {pricingTiers.map((tier) => (
                       <td key={tier.id} className="px-6 py-4 text-center text-sm text-slate-400">
                         {tier.whiteLabel ? '✓' : '✗'}
@@ -576,7 +678,7 @@ export default function PricingPage() {
                     ))}
                   </tr>
                   <tr>
-                    <td className="px-6 py-4 text-sm font-medium text-neutral-900">Dedicated Manager</td>
+                    <td className="px-6 py-4 text-sm font-medium text-white">Dedicated Manager</td>
                     {pricingTiers.map((tier) => (
                       <td key={tier.id} className="px-6 py-4 text-center text-sm text-slate-400">
                         {tier.dedicatedManager ? '✓' : '✗'}
@@ -604,21 +706,21 @@ export default function PricingPage() {
       <div className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="page-title">
+            <h2 className="text-2xl font-bold text-white mb-2">
               Add-ons & Extensions
             </h2>
-            <p className="page-subtitle">
+            <p className="text-slate-400 text-base">
               Enhance your plan with additional features
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {addOns.map((addon, index) => (
-              <div key={index} className="bg-white rounded-lg shadow-md p-6">
-                <h3 className="text-lg font-semibold text-neutral-900 mb-2">{addon.name}</h3>
-                <p className="feature-description">{addon.description}</p>
+              <div key={index} className="bg-slate-800 border border-slate-700 rounded-lg p-6">
+                <h3 className="text-lg font-semibold text-white mb-2">{addon.name}</h3>
+                <p className="text-slate-400 text-sm mb-4">{addon.description}</p>
                 <div className="mb-4">
-                  <span className="text-2xl font-bold text-neutral-900">
+                  <span className="text-2xl font-bold text-white">
                     {addon.currency}{addon.price.toLocaleString()}
                   </span>
                   <span className="text-slate-400 ml-1">{addon.unit}</span>
@@ -626,12 +728,12 @@ export default function PricingPage() {
                 <ul className="space-y-2">
                   {addon.features.map((feature, featureIndex) => (
                     <li key={featureIndex} className="flex items-start">
-                      <span className="text-green-500 mr-2 mt-1">✓</span>
+                      <span className="text-green-400 mr-2 mt-1">✓</span>
                       <span className="text-sm text-slate-400">{feature}</span>
                     </li>
                   ))}
                 </ul>
-                <button className="w-full mt-4 bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-primary-700 transition-colors">
+                <button className="w-full mt-4 bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition-colors">
                   Add to Plan
                 </button>
               </div>
@@ -641,17 +743,17 @@ export default function PricingPage() {
       </div>
 
       {/* FAQ */}
-      <div className="bg-neutral-50 py-16">
+      <div className="bg-slate-900 py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="page-title">
+            <h2 className="text-2xl font-bold text-white mb-2">
               Frequently Asked Questions
             </h2>
           </div>
 
           <div className="space-y-8">
             <div>
-              <h3 className="text-lg font-semibold text-neutral-900 mb-2">
+              <h3 className="text-lg font-semibold text-white mb-2">
                 Can I change my plan anytime?
               </h3>
               <p className="text-slate-300">
@@ -660,7 +762,7 @@ export default function PricingPage() {
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold text-neutral-900 mb-2">
+              <h3 className="text-lg font-semibold text-white mb-2">
                 What happens if I exceed my RFQ limit?
               </h3>
               <p className="text-slate-300">
@@ -669,7 +771,7 @@ export default function PricingPage() {
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold text-neutral-900 mb-2">
+              <h3 className="text-lg font-semibold text-white mb-2">
                 Is there a free trial?
               </h3>
               <p className="text-slate-300">
@@ -678,7 +780,7 @@ export default function PricingPage() {
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold text-neutral-900 mb-2">
+              <h3 className="text-lg font-semibold text-white mb-2">
                 What payment methods do you accept?
               </h3>
               <p className="text-slate-300">
@@ -690,15 +792,15 @@ export default function PricingPage() {
       </div>
 
       {/* CTA Section */}
-      <div className="bg-neutral-50">
+      <div className="bg-[#0F172A] py-16">
         <div className="max-w-4xl mx-auto text-center px-4">
-          <h2 className="text-3xl font-bold mb-4">Ready to Get Started?</h2>
-          <p className="text-xl mb-8">Join thousands of businesses already using Bell24h</p>
+          <h2 className="text-3xl font-bold text-white mb-4">Ready to Get Started?</h2>
+          <p className="text-xl text-slate-300 mb-8">Join thousands of businesses already using Bell24h</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/auth/register" className="bg-white text-indigo-600 px-8 py-3 rounded-lg font-semibold hover:bg-neutral-100">
+            <Link href="/auth/phone-email?redirect=/pricing" className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-lg font-semibold min-h-[44px] flex items-center justify-center transition-colors">
               Start Free Trial
             </Link>
-            <Link href="/contact" className="bg-transparent border-2 border-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-primary-600">
+            <Link href="/contact" className="bg-transparent border-2 border-slate-600 text-slate-300 px-8 py-3 rounded-lg font-semibold hover:bg-slate-800 hover:text-white min-h-[44px] flex items-center justify-center transition-colors">
               Contact Sales
             </Link>
           </div>

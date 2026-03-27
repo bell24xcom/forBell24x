@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 
 // Subscription plan pricing (in INR)
 export const PLANS: Record<string, { name: string; amount: number; label: string }> = {
+  verified:   { name: 'verified',   amount: 999,  label: 'Verified Supplier' },
   starter:    { name: 'starter',    amount: 999,  label: 'Starter'    },
   growth:     { name: 'growth',     amount: 2999, label: 'Growth'     },
   enterprise: { name: 'enterprise', amount: 7999, label: 'Enterprise' },
@@ -46,7 +47,7 @@ export async function POST(request: NextRequest) {
         amount: planConfig.amount * 100,
         currency: 'INR',
         plan: planKey,
-        key: 'rzp_test_placeholder',
+        keyId: 'rzp_test_placeholder',
       });
     }
 
@@ -56,7 +57,7 @@ export async function POST(request: NextRequest) {
     const order = await razorpay.orders.create({
       amount: planConfig.amount * 100, // paise
       currency: 'INR',
-      receipt: `sub_${planKey}_${user.userId}_${Date.now()}`,
+      receipt: `sub_${planKey}_${Date.now()}`.slice(0, 40),
       notes: {
         userId: user.userId,
         type: 'SUBSCRIPTION',
@@ -73,7 +74,7 @@ export async function POST(request: NextRequest) {
       currency: order.currency,
       plan: planKey,
       planLabel: planConfig.label,
-      key: keyId,
+      keyId,
     });
   } catch (error) {
     console.error('[Subscribe] create-order error:', error);
