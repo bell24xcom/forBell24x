@@ -1,188 +1,91 @@
-// Bell24h Production Middleware
-// Combines security, rate limiting, caching, and performance optimizations
-
 import { NextRequest, NextResponse } from 'next/server';
 
-// Middleware configuration
-const middlewareConfig = {
-  // Routes that should be protected
-  protectedRoutes: [
-    '/admin',
-    '/api/admin',
-    '/api/auth',
-    '/api/rfq',
-    '/api/voice-rfq'
-  ],
-  
-  // Routes that need rate limiting
-  rateLimitedRoutes: {
-    '/api/auth/send-otp': 'otp',
-    '/api/auth/verify-otp': 'auth',
-    '/api/rfq/create': 'api',
-    '/api/voice-rfq/process': 'api',
-    '/api/admin': 'admin',
-    '/api/marketplace/search': 'search'
-  },
-  
-  // Static assets that should be cached
-  staticAssets: [
-    '/_next/static',
-    '/images',
-    '/icons',
-    '/favicon.ico'
-  ],
-  
-  // API routes that should not be cached
-  noCacheRoutes: [
-    '/api/auth',
-    '/api/admin',
-    '/api/health'
-  ]
+// ─── Rate Limiting Configuration ──────────────────────────────────────────────
+// Note: In serverless (Vercel), this is per-instance. 
+// For global limiting, use Upstash Redis + @upstash/ratelimit.
+const RATE_LIMIT_WINDOW = 15 * 60 * 1000; // 15 minutes
+const MAX_REQUESTS = 100;
+const ipCache = new Map<string, { count: number; start: number }>();
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const userData = ipCache.get(ip);
+
+  if (!userData) {
+    ipCache.set(ip, { count: 1, start: now });
+    return false;
+  }
+
+  if (now - userData.start > RATE_LIMIT_WINDOW) {
+    ipCache.set(ip, { count: 1, start: now });
+    return false;
+  }
+
+  userData.count += 1;
+  return userData.count > MAX_REQUESTS;
+}
+
+// ─── Content Security Policy ──────────────────────────────────────────────────
+const getCSP = () => {
+  const csp = `
+    default-src 'self';
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com https://www.google-analytics.com;
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+    img-src 'self' blob: data: https://*.insforge.app https://*.insforge.site https://www.google-analytics.com;
+    font-src 'self' https://fonts.gstatic.com;
+    connect-src 'self' https://*.insforge.app https://*.insforge.site https://*.nvidia.com https://api.brevo.com;
+    frame-src 'none';
+    object-src 'none';
+    base-uri 'self';
+    form-action 'self';
+    frame-ancestors 'none';
+    upgrade-insecure-requests;
+  `.replace(/\s{2,}/g, ' ').trim();
+  return csp;
 };
 
-// Main middleware function
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  
-  // Skip middleware for static assets
-  if (pathname.startsWith('/_next/static') || 
-      pathname.startsWith('/favicon.ico') ||
-      pathname.startsWith('/images/')) {
-    return NextResponse.next();
+  const ip = request.ip || '127.0.0.1';
+
+  // 1. Directory Access & Path Traversal Protection
+  const forbiddenPaths = ['/node_modules', '/.env', '/package.json', '/prisma/schema.prisma'];
+  if (forbiddenPaths.some(p => pathname.toLowerCase().includes(p)) || pathname.includes('..')) {
+    return new NextResponse(null, { status: 403 });
   }
 
-  // Create response with security headers
-  let response = NextResponse.next();
-  
-  // Add security headers
-  response.headers.set('X-Content-Type-Options', 'nosniff');
+  // 2. Global Rate Limiting (Skip for static assets)
+  const isStatic = pathname.startsWith('/_next') || pathname.includes('.');
+  if (!isStatic && isRateLimited(ip)) {
+    return new NextResponse('Too Many Requests', { status: 429 });
+  }
+
+  // 3. Stricter limits for Auth and Marketing APIs
+  if (pathname.startsWith('/api/auth') || pathname.startsWith('/api/marketing')) {
+    // Logic for even stricter limits could be added here
+  }
+
+  const response = NextResponse.next();
+
+  // 4. Secure Headers
+  response.headers.set('Content-Security-Policy', getCSP());
   response.headers.set('X-Frame-Options', 'DENY');
+  response.headers.set('X-Content-Type-Options', 'nosniff');
   response.headers.set('X-XSS-Protection', '1; mode=block');
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
   response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
-  
-  // API route specific handling
+
+  // 5. Cache Leaks Protection for API
   if (pathname.startsWith('/api/')) {
-    response = handleAPIRoute(request, response);
-  }
-  
-  // Admin route protection
-  if (pathname.startsWith('/admin')) {
-    response = handleAdminRoute(request, response);
-  }
-  
-  // Performance optimizations
-  response = addPerformanceHeaders(request, response);
-  
-  // Caching headers
-  response = addCachingHeaders(request, response);
-  
-  return response;
-}
-
-// Handle API routes
-function handleAPIRoute(request: NextRequest, response: NextResponse): NextResponse {
-  const { pathname } = request.nextUrl;
-  
-  // Add API-specific security headers
-  response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
-  response.headers.set('Pragma', 'no-cache');
-  response.headers.set('Expires', '0');
-  
-  // Apply rate limiting based on route
-  const rateLimitType = middlewareConfig.rateLimitedRoutes[pathname as keyof typeof middlewareConfig.rateLimitedRoutes];
-  if (rateLimitType) {
-    // Note: Rate limiting logic would be applied here
-    // For now, we'll add rate limit headers
-    response.headers.set('X-RateLimit-Limit', '100');
-    response.headers.set('X-RateLimit-Remaining', '99');
-  }
-  
-  // Add CORS headers for API routes
-  response.headers.set('Access-Control-Allow-Origin', process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bell24h.com');
-  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-  
-  // Handle preflight requests
-  if (request.method === 'OPTIONS') {
-    return new NextResponse(null, { status: 200, headers: response.headers });
-  }
-  
-  return response;
-}
-
-// Handle admin routes
-// Page-level auth is handled client-side in app/admin/layout.tsx.
-// Middleware only guards /api/admin/* API routes.
-function handleAdminRoute(request: NextRequest, response: NextResponse): NextResponse {
-  response.headers.set('X-Frame-Options', 'DENY');
-  response.headers.set('X-Content-Type-Options', 'nosniff');
-  response.headers.set('X-XSS-Protection', '1; mode=block');
-
-  const { pathname } = request.nextUrl;
-
-  // Only protect API routes here — page routes are protected client-side
-  if (pathname.startsWith('/api/admin/') && !pathname.startsWith('/api/admin/login')) {
-    const adminToken = request.cookies.get('admin-token')?.value;
-    const authToken  = request.cookies.get('auth-token')?.value;
-    if (!adminToken && !authToken) {
-      return new NextResponse(JSON.stringify({ success: false, message: 'Admin authentication required' }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
-  }
-
-  // Full JWT + role verification is done inside each /api/admin/* handler via requireAdmin().
-  return response;
-}
-
-// Add performance headers
-function addPerformanceHeaders(request: NextRequest, response: NextResponse): NextResponse {
-  // Add performance hints
-  response.headers.set('X-DNS-Prefetch-Control', 'on');
-  response.headers.set('X-Download-Options', 'noopen');
-  response.headers.set('X-Permitted-Cross-Domain-Policies', 'none');
-  
-  // Add resource hints for critical resources
-  if (request.nextUrl.pathname === '/') {
-    response.headers.set('Link', '</fonts/inter.woff2>; rel=preload; as=font; type=font/woff2; crossorigin');
-  }
-  
-  return response;
-}
-
-// Add caching headers
-function addCachingHeaders(request: NextRequest, response: NextResponse): NextResponse {
-  const { pathname } = request.nextUrl;
-  
-  // Static assets - long cache
-  if (pathname.startsWith('/_next/static/')) {
-    response.headers.set('Cache-Control', 'public, max-age=31536000, immutable');
-    return response;
-  }
-  
-  // Images - medium cache
-  if (pathname.startsWith('/images/') || pathname.startsWith('/icons/')) {
-    response.headers.set('Cache-Control', 'public, max-age=86400');
-    return response;
-  }
-  
-  // API routes - no cache
-  if (pathname.startsWith('/api/')) {
-    response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     response.headers.set('Pragma', 'no-cache');
     response.headers.set('Expires', '0');
-    return response;
   }
-  
-  // HTML pages - short cache
-  response.headers.set('Cache-Control', 'public, max-age=300, s-maxage=300');
-  
+
   return response;
 }
 
-// Middleware configuration
 export const config = {
   matcher: [
     /*
@@ -194,12 +97,4 @@ export const config = {
      */
     '/((?!_next/static|_next/image|favicon.ico|public/).*)',
   ],
-};
-
-// Export individual middleware functions for testing
-export {
-  handleAPIRoute,
-  handleAdminRoute,
-  addPerformanceHeaders,
-  addCachingHeaders
 };

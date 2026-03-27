@@ -27,11 +27,11 @@ model User {
   avatar               String?
   preferences          Json?
   plan                 UserPlan       @default(FREE)
-  planActivatedAt      DateTime?      @map("plan_activated_at")
-  planExpiresAt        DateTime?      @map("plan_expires_at")
-  isClaimed            Boolean        @default(true)  @map("is_claimed")
   claimedAt            DateTime?      @map("claimed_at")
   importedFrom         String?        @map("imported_from")
+  isClaimed            Boolean        @default(true) @map("is_claimed")
+  planActivatedAt      DateTime?      @map("plan_activated_at")
+  planExpiresAt        DateTime?      @map("plan_expires_at")
   buyerDeals           Deal[]         @relation("BuyerDeals")
   supplierDeals        Deal[]         @relation("SupplierDeals")
   leads                Lead[]
@@ -105,8 +105,6 @@ model RFQ {
   estimatedValue Float?
   expiresAt      DateTime?
   isPublic       Boolean       @default(true)
-  isSeeded       Boolean       @default(false) @map("is_seeded")
-  slug           String?       @unique
   location       String?
   maxBudget      Float?
   minBudget      Float?
@@ -117,6 +115,8 @@ model RFQ {
   type           String?
   views          Int           @default(0)
   urgency        RFQUrgency    @default(NORMAL)
+  isSeeded       Boolean       @default(false) @map("is_seeded")
+  slug           String?       @unique
   deals          Deal[]
   quotes         Quote[]
   categoryRel    Category?     @relation(fields: [categoryId], references: [id])
@@ -324,6 +324,115 @@ model LeadSupplier {
   @@map("lead_suppliers")
 }
 
+model RfqMemory {
+  id         String   @id @default(cuid())
+  rfqId      String   @unique @map("rfq_id")
+  title      String
+  category   String
+  product    String?
+  intent     String?
+  priceRange String?  @map("price_range")
+  quantity   String?
+  location   String?
+  metadata   Json?
+  embedding  String?
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@map("rfq_memory")
+}
+
+model InteractionMemory {
+  id         String   @id @default(cuid())
+  rfqId      String?  @map("rfq_id")
+  userId     String?  @map("user_id")
+  sessionId  String?  @map("session_id")
+  actionType String   @map("action_type")
+  source     String?
+  metadata   Json?
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@map("interaction_memory")
+}
+
+model QuoteMemory {
+  id         String            @id @default(cuid())
+  rfqId      String            @map("rfq_id")
+  supplierId String            @map("supplier_id")
+  price      Float
+  quantity   String
+  status     QuoteMemoryStatus @default(PENDING)
+  metadata   Json?
+  createdAt  DateTime          @default(now()) @map("created_at")
+
+  @@map("quote_memory")
+}
+
+model MarketInsight {
+  id             String      @id @default(cuid())
+  category       String      @unique
+  avgPrice       Float?      @map("avg_price")
+  minPrice       Float?      @map("min_price")
+  maxPrice       Float?      @map("max_price")
+  successRate    Float?      @default(0) @map("success_rate")
+  avgTimeline    String?     @map("avg_timeline")
+  demandTrend    DemandTrend @default(STABLE)
+  rfqCount       Int         @default(0) @map("rfq_count")
+  quoteCount     Int         @default(0) @map("quote_count")
+  conversionRate Float?      @default(0) @map("conversion_rate")
+  lastUpdated    DateTime    @default(now()) @map("last_updated")
+  metadata       Json?
+
+  @@map("market_insights")
+}
+
+model ExternalLead {
+  id          String    @id @default(cuid())
+  source      String
+  rawText     String    @map("raw_text")
+  name        String?
+  company     String?
+  phone       String?
+  email       String?
+  location    String?
+  category    String?
+  requirement String?
+  budgetHint  String?   @map("budget_hint")
+  status      String    @default("new")
+  rfqId       String?   @map("rfq_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  processedAt DateTime? @map("processed_at")
+
+  @@map("external_leads")
+}
+
+model UserBehaviorMemory {
+  id                  String   @id @default(cuid())
+  category            String   @unique
+  sessionCount        Int      @default(0) @map("session_count")
+  avgDropStage        String?  @map("avg_drop_stage")
+  dropRate            Float?   @default(0) @map("drop_rate")
+  avgTimeToQuoteHours Float?   @map("avg_time_to_quote_hours")
+  conversionRate      Float?   @default(0) @map("conversion_rate")
+  topFailures         Json?    @map("top_failures")
+  lastAnalyzed        DateTime @default(now()) @map("last_analyzed")
+
+  @@map("user_behavior_memory")
+}
+
+model Feedback {
+  id        String   @id @default(cuid())
+  userId    String?  @map("user_id")
+  rfqId     String?  @map("rfq_id")
+  role      String?
+  type      String
+  rating    Int?
+  message   String
+  page      String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("feedback")
+}
+
 enum UserRole {
   SUPPLIER
   BUYER
@@ -384,54 +493,6 @@ enum LeadStatus {
   CLOSED_LOST
 }
 
-// ─── ELEPHANT MEMORY ENGINE ───────────────────────────────────────────────────
-
-// Stores structured metadata for every RFQ for fast retrieval
-model RfqMemory {
-  id          String   @id @default(cuid())
-  rfqId      String   @unique @map("rfq_id")
-  title      String
-  category   String
-  product    String?
-  intent     String?
-  priceRange String?  @map("price_range")
-  quantity   String?
-  location   String?
-  metadata   Json?
-  embedding  String?  // vector embedding stored as base64 string (Chroma-compatible)
-  createdAt  DateTime @default(now()) @map("created_at")
-
-  @@map("rfq_memory")
-}
-
-// Tracks every user interaction with the platform
-model InteractionMemory {
-  id          String    @id @default(cuid())
-  rfqId      String?   @map("rfq_id")
-  userId     String?   @map("user_id")
-  sessionId  String?   @map("session_id")
-  actionType String    @map("action_type") // view | click | quote | bookmark | share
-  source     String?   // marketplace | dashboard | whatsapp | email
-  metadata   Json?
-  createdAt  DateTime  @default(now()) @map("created_at")
-
-  @@map("interaction_memory")
-}
-
-// Stores every supplier quote for conversion analysis
-model QuoteMemory {
-  id          String      @id @default(cuid())
-  rfqId      String      @map("rfq_id")
-  supplierId  String      @map("supplier_id")
-  price      Float
-  quantity   String
-  status     QuoteMemoryStatus @default(PENDING)
-  metadata   Json?
-  createdAt  DateTime    @default(now()) @map("created_at")
-
-  @@map("quote_memory")
-}
-
 enum QuoteMemoryStatus {
   PENDING
   WON
@@ -439,80 +500,10 @@ enum QuoteMemoryStatus {
   EXPIRED
 }
 
-// Aggregated market intelligence per category
-model MarketInsight {
-  id            String   @id @default(cuid())
-  category      String   @unique
-  avgPrice      Float?   @map("avg_price")
-  minPrice      Float?   @map("min_price")
-  maxPrice      Float?   @map("max_price")
-  successRate   Float?   @default(0) @map("success_rate")
-  avgTimeline   String?  @map("avg_timeline")
-  demandTrend   DemandTrend @default(STABLE)
-  rfqCount      Int      @default(0) @map("rfq_count")
-  quoteCount    Int      @default(0) @map("quote_count")
-  conversionRate Float?  @default(0) @map("conversion_rate")
-  lastUpdated   DateTime @default(now()) @map("last_updated")
-  metadata      Json?
-
-  @@map("market_insights")
-}
-
 enum DemandTrend {
   RISING
   STABLE
   DECLINING
-}
-
-// Scraped / imported leads from external sources
-model ExternalLead {
-  id          String   @id @default(cuid())
-  source      String   // linkedin | tradeindia | reddit | manual | csv | whatsapp
-  rawText     String   @map("raw_text")      // original unstructured text
-  name        String?
-  company     String?
-  phone       String?
-  email       String?
-  location    String?
-  category    String?  // AI-classified
-  requirement String?  // cleaned requirement text
-  budgetHint  String?  @map("budget_hint")
-  status      String   @default("new") // new | converted | rejected | duplicate
-  rfqId       String?  @map("rfq_id")  // set after conversion
-  createdAt   DateTime @default(now()) @map("created_at")
-  processedAt DateTime? @map("processed_at")
-
-  @@map("external_leads")
-}
-
-// Aggregated user behavior per category — updated by daily cron
-model UserBehaviorMemory {
-  id                   String   @id @default(cuid())
-  category             String   @unique
-  sessionCount         Int      @default(0) @map("session_count")
-  avgDropStage         String?  @map("avg_drop_stage")  // e.g. rfq_viewed | quote_started
-  dropRate             Float?   @default(0) @map("drop_rate")
-  avgTimeToQuoteHours  Float?   @map("avg_time_to_quote_hours")
-  conversionRate       Float?   @default(0) @map("conversion_rate")
-  topFailures          Json?    @map("top_failures")    // { stage: count }
-  lastAnalyzed         DateTime @default(now()) @map("last_analyzed")
-
-  @@map("user_behavior_memory")
-}
-
-// User feedback — captures supplier/buyer experience
-model Feedback {
-  id        String   @id @default(cuid())
-  userId    String?  @map("user_id")
-  rfqId     String?  @map("rfq_id")
-  role      String?  // buyer | supplier
-  type      String   // suggestion | bug | praise | friction
-  rating    Int?     // 1–5
-  message   String
-  page      String?  // which page feedback was submitted from
-  createdAt DateTime @default(now()) @map("created_at")
-
-  @@map("feedback")
 }
 
 enum NotificationType {

@@ -1,1 +1,0 @@
-// Your complete category-page-template.tsx content here

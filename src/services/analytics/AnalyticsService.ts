@@ -193,31 +193,31 @@ export class AnalyticsService extends EventEmitter {
   }
 
   private async calculateConversionRate(userId: string): Promise<number> {
-    const totalRFQs = await this.prisma.rfq.count({
-      where: { userId }
+    const totalRFQs = await this.prisma.rFQ.count({
+      where: { createdBy: userId }
     });
 
-    const completedRFQs = await this.prisma.rfq.count({
+    const completedRFQs = await this.prisma.rFQ.count({
       where: {
-        userId,
+        createdBy: userId,
         status: 'COMPLETED'
       }
     });
 
-    return (completedRFQs / totalRFQs) * 100;
+    return totalRFQs > 0 ? (completedRFQs / totalRFQs) * 100 : 0;
   }
 
   private async calculateRFQCompletionRate(): Promise<number> {
-    const totalRFQs = await this.prisma.rfq.count();
-    const completedRFQs = await this.prisma.rfq.count({
+    const totalRFQs = await this.prisma.rFQ.count();
+    const completedRFQs = await this.prisma.rFQ.count({
       where: { status: 'COMPLETED' }
     });
 
-    return (completedRFQs / totalRFQs) * 100;
+    return totalRFQs > 0 ? (completedRFQs / totalRFQs) * 100 : 0;
   }
 
   private async calculateSupplierResponseTime(): Promise<number> {
-    const responses = await this.prisma.rfqResponse.findMany({
+    const responses = await this.prisma.quote.findMany({
       select: {
         createdAt: true,
         rfq: {
@@ -228,8 +228,10 @@ export class AnalyticsService extends EventEmitter {
       }
     });
 
+    if (responses.length === 0) return 0;
+
     return responses.reduce((acc, response) => {
-      const responseTime = response.createdAt.getTime() - response.rfq.createdAt.getTime();
+      const responseTime = response.createdAt.getTime() - (response.rfq?.createdAt.getTime() || response.createdAt.getTime());
       return acc + responseTime;
     }, 0) / responses.length;
   }

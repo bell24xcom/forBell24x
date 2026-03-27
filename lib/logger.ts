@@ -1,62 +1,65 @@
 /**
- * Structured Logger for Bell24h.com
- * Production-ready logging with timestamps, namespaces, and log levels.
+ * Structured Logging Utility for Bell24h
  */
 
-type LogLevel = 'info' | 'warn' | 'error' | 'debug';
+type LogLevel = 'info' | 'warn' | 'error' | 'security';
 
-interface LogEntry {
-  timestamp: string;
-  level: LogLevel;
-  namespace: string;
-  message: string;
-  data?: any;
+interface LogContext {
+  userId?: string;
+  requestId?: string;
+  path?: string;
+  [key: string]: any;
 }
 
-function formatLog(entry: LogEntry): string {
-  const base = `[${entry.timestamp}] [${entry.level.toUpperCase()}] [${entry.namespace}] ${entry.message}`;
-  return entry.data ? `${base} ${JSON.stringify(entry.data)}` : base;
-}
+class Logger {
+  private isProd = process.env.NODE_ENV === 'production';
 
-function log(level: LogLevel, namespace: string, message: string, data?: any) {
-  const entry: LogEntry = {
-    timestamp: new Date().toISOString(),
-    level,
-    namespace,
-    message,
-    data,
-  };
+  private log(level: LogLevel, message: string, context?: LogContext) {
+    const timestamp = new Date().toISOString();
+    
+    // Sanitize context: remove sensitive keys
+    const sanitizedContext = context ? { ...context } : {};
+    const sensitiveKeys = ['password', 'token', 'otp', 'secret', 'apikey', 'auth'];
+    
+    Object.keys(sanitizedContext).forEach(key => {
+      if (sensitiveKeys.some(sk => key.toLowerCase().includes(key))) {
+        sanitizedContext[key] = '[REDACTED]';
+      }
+    });
 
-  const formatted = formatLog(entry);
+    const payload = {
+      timestamp,
+      level,
+      message,
+      ...sanitizedContext
+    };
 
-  switch (level) {
-    case 'error': console.error(formatted); break;
-    case 'warn':  console.warn(formatted);  break;
-    case 'debug':
-      if (process.env.NODE_ENV !== 'production') console.debug(formatted);
-      break;
-    default: console.log(formatted);
+    if (this.isProd) {
+      // In production, we log as a single line JSON for log aggregators (ELK, Datadog, etc.)
+      console.log(JSON.stringify(payload));
+    } else {
+      // In development, use colored output or more readable format
+      const color = level === 'error' ? '\x1b[31m' : level === 'warn' ? '\x1b[33m' : level === 'security' ? '\x1b[35m' : '\x1b[32m';
+      console.log(`${color}[${level.toUpperCase()}]\x1b[0m ${message}`, context ? sanitizedContext : '');
+    }
+  }
+
+  info(message: string, context?: LogContext) {
+    this.log('info', message, context);
+  }
+
+  warn(message: string, context?: LogContext) {
+    this.log('warn', message, context);
+  }
+
+  error(message: string, context?: LogContext) {
+    this.log('error', message, context);
+  }
+
+  security(message: string, context?: LogContext) {
+    this.log('security', message, context);
   }
 }
 
-/**
- * Create a namespaced logger instance
- */
-export function createLogger(namespace: string) {
-  return {
-    info:  (message: string, data?: any) => log('info',  namespace, message, data),
-    warn:  (message: string, data?: any) => log('warn',  namespace, message, data),
-    error: (message: string, data?: any) => log('error', namespace, message, data),
-    debug: (message: string, data?: any) => log('debug', namespace, message, data),
-  };
-}
-
-// Default logger for quick use
-export const logger = createLogger('bell24h');
-
-// Pre-created loggers for key modules
-export const authLogger   = createLogger('auth');
-export const apiLogger    = createLogger('api');
-export const dbLogger     = createLogger('db');
-export const aiLogger     = createLogger('ai');
-export const paymentLogger = createLogger('payment');
+export const logger = new Logger();
+export const authLogger = logger;
