@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { Play, Pause, Volume2 } from 'lucide-react';
+import { Play, Pause, Volume2, MicOff } from 'lucide-react';
 
 interface AudioPlayerProps {
   audioUrl: string;
@@ -11,6 +11,7 @@ export default function AudioPlayer({ audioUrl }: AudioPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [audioError, setAudioError] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const togglePlay = () => {
@@ -50,6 +51,15 @@ export default function AudioPlayer({ audioUrl }: AudioPlayerProps) {
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
 
+  if (audioError) {
+    return (
+      <div className="bg-white/10 rounded-lg p-4 flex items-center gap-3 text-white/60">
+        <MicOff className="w-5 h-5 flex-shrink-0" />
+        <span className="text-sm">Demo audio not available</span>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white/10 rounded-lg p-4">
       <audio
@@ -58,6 +68,7 @@ export default function AudioPlayer({ audioUrl }: AudioPlayerProps) {
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
         onEnded={() => setIsPlaying(false)}
+        onError={() => { setAudioError(true); setIsPlaying(false); }}
       />
       
       <div className="flex items-center gap-4">
