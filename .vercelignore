@@ -70,7 +70,6 @@ mirror.git/
 client/
 frontend/
 backend/
-src/
 2nd-SSH/
 # admin/ - REMOVED: Admin pages need to deploy
 ai-explainability-service/
