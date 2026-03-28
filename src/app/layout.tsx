@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     siteName: 'Bell24h',
     images: [
       {
-        url: '/og-image.jpg',
+        url: '/og-image.svg',
         width: 1200,
         height: 630,
         alt: 'Bell24h - B2B Supplier Marketplace',
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: "Bell24h — India's B2B Marketplace",
     description: "Post RFQs via voice, video, or text. AI-powered matching across 450+ categories.",
-    images: ['/og-image.jpg'],
+    images: ['/og-image.svg'],
   },
   robots: {
     index: true,
@@ -61,6 +61,61 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="scroll-smooth dark">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              "name": "Bell24h",
+              "alternateName": "Bell 24H",
+              "url": "https://www.bell24h.com",
+              "logo": "https://www.bell24h.com/favicon.svg",
+              "description": "India's AI-powered B2B RFQ marketplace. Post RFQs by voice, video, or text. Get quotes from verified suppliers in 24 hours.",
+              "foundingDate": "2026",
+              "contactPoint": {
+                "@type": "ContactPoint",
+                "telephone": "+91-90049-62871",
+                "contactType": "customer service",
+                "areaServed": "IN",
+                "availableLanguage": ["English", "Hindi"]
+              },
+              "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "Lodha Upper Thane, Sarang Bhiwandi",
+                "addressLocality": "Thane",
+                "postalCode": "421302",
+                "addressRegion": "Maharashtra",
+                "addressCountry": "IN"
+              },
+              "sameAs": [
+                "https://www.linkedin.com/company/bell24h",
+                "https://twitter.com/bell24h"
+              ]
+            })
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "name": "Bell24h",
+              "url": "https://www.bell24h.com",
+              "potentialAction": {
+                "@type": "SearchAction",
+                "target": {
+                  "@type": "EntryPoint",
+                  "urlTemplate": "https://www.bell24h.com/marketplace?search={search_term_string}"
+                },
+                "query-input": "required name=search_term_string"
+              }
+            })
+          }}
+        />
+      </head>
       <body className="font-sans bg-[#0F172A] text-white antialiased">
         <DashboardProvider>
           <Header />

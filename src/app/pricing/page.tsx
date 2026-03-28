@@ -164,7 +164,7 @@ const pricingTiers: PricingTier[] = [
       'Standard SLA'
     ],
     color: 'blue',
-    popular: true,
+    popular: false,
     buttonText: 'Start Professional',
     buttonVariant: 'primary',
     maxRFQs: 50,
