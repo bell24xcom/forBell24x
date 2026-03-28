@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import { DashboardProvider } from '@/contexts/DashboardContext'
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.bell24h.com'),
@@ -61,11 +62,13 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body className="font-sans bg-[#0F172A] text-white antialiased">
-        <Header />
-        <main className="min-h-screen">
-          {children}
-        </main>
-        <Footer />
+        <DashboardProvider>
+          <Header />
+          <main className="min-h-screen">
+            {children}
+          </main>
+          <Footer />
+        </DashboardProvider>
       </body>
     </html>
   )
