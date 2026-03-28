@@ -2,11 +2,6 @@ import type { Metadata } from 'next'
 import './globals.css'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
-import ConditionalHeader from '@/components/ConditionalHeader'
-import LaunchBanner from '@/components/LaunchBanner'
-import ClientProviders from '@/components/ClientProviders'
-import SchemaMarkup from '@/components/SEO/SchemaMarkup'
-import Analytics from '@/components/SEO/Analytics'
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.bell24h.com'),
@@ -66,16 +61,11 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body className="font-sans bg-[#0F172A] text-white antialiased">
-        <SchemaMarkup />
-        <Analytics />
-        <ClientProviders>
-          {process.env.NEXT_PUBLIC_LAUNCH_MODE === 'true' && <LaunchBanner />}
-          <ConditionalHeader />
-          <main className="min-h-screen">
-            {children}
-          </main>
-          <Footer />
-        </ClientProviders>
+        <Header />
+        <main className="min-h-screen">
+          {children}
+        </main>
+        <Footer />
       </body>
     </html>
   )
