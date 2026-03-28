@@ -12,22 +12,72 @@ interface CategoryPageProps {
 export const revalidate = 300; // cache 5 minutes
 
 // Common slug aliases — maps incoming slug → canonical DB slug
+// Real DB slugs from seed: metals-alloys, chemicals-petrochemicals, textiles-garments,
+// machinery-equipment, electronics-electricals, construction-real-estate, food-beverages,
+// pharmaceuticals-healthcare, automotive-transport, plastics-rubber, paper-printing,
+// agriculture-farming, it-telecom, furniture-wood, safety-security
 const SLUG_ALIASES: Record<string, string> = {
-  'steel-metals': 'minerals-metallurgy',
-  'metals-steel': 'minerals-metallurgy',
-  'food': 'food-beverage',
-  'food-beverages': 'food-beverage',
-  'food-and-beverage': 'food-beverage',
-  'packaging': 'packaging-printing',
-  'packaging-materials': 'packaging-printing',
-  'industrial': 'machinery',
-  'industrial-equipment': 'machinery',
-  'automotive': 'automobiles-parts',
-  'automotive-parts': 'automobiles-parts',
-  'apparel': 'apparel-clothing',
-  'garments': 'apparel-clothing',
-  'textiles': 'textiles-leather-products',
-  'agriculture-farming': 'agriculture',
+  // Metals / Steel
+  'steel-metals': 'metals-alloys',
+  'metals-steel': 'metals-alloys',
+  'steel': 'metals-alloys',
+  'steel-metal': 'metals-alloys',
+  'minerals-metallurgy': 'metals-alloys',
+  'metals': 'metals-alloys',
+  // Textiles / Apparel
+  'apparel-clothing': 'textiles-garments',
+  'apparel': 'textiles-garments',
+  'garments': 'textiles-garments',
+  'textiles': 'textiles-garments',
+  'textiles-leather-products': 'textiles-garments',
+  'clothing': 'textiles-garments',
+  // Food
+  'food': 'food-beverages',
+  'food-beverage': 'food-beverages',
+  'food-and-beverage': 'food-beverages',
+  // Packaging / Paper
+  'packaging': 'paper-printing',
+  'packaging-materials': 'paper-printing',
+  'packaging-printing': 'paper-printing',
+  'paper': 'paper-printing',
+  'printing': 'paper-printing',
+  // Machinery
+  'industrial': 'machinery-equipment',
+  'industrial-equipment': 'machinery-equipment',
+  'machinery': 'machinery-equipment',
+  // Automotive
+  'automotive': 'automotive-transport',
+  'automotive-parts': 'automotive-transport',
+  'automobiles-parts': 'automotive-transport',
+  'transport': 'automotive-transport',
+  // Agriculture
+  'agriculture': 'agriculture-farming',
+  // Chemicals
+  'chemicals': 'chemicals-petrochemicals',
+  'petrochemicals': 'chemicals-petrochemicals',
+  // Electronics
+  'electronics': 'electronics-electricals',
+  'electricals': 'electronics-electricals',
+  // Construction
+  'construction': 'construction-real-estate',
+  'real-estate': 'construction-real-estate',
+  // Pharma
+  'pharma': 'pharmaceuticals-healthcare',
+  'pharmaceuticals': 'pharmaceuticals-healthcare',
+  'healthcare': 'pharmaceuticals-healthcare',
+  // Plastics
+  'plastics': 'plastics-rubber',
+  'rubber': 'plastics-rubber',
+  // IT / Telecom
+  'it': 'it-telecom',
+  'telecom': 'it-telecom',
+  'technology': 'it-telecom',
+  // Furniture
+  'furniture': 'furniture-wood',
+  'wood': 'furniture-wood',
+  // Safety
+  'safety': 'safety-security',
+  'security': 'safety-security',
 };
 
 async function getCategory(slug: string) {
