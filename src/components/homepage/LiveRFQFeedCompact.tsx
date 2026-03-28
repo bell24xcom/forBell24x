@@ -72,7 +72,7 @@ export default function LiveRFQFeedCompact() {
         {filteredRFQs.slice(0, 6).map((rfq) => (
           <Link
             key={rfq.id}
-            href={`/rfq/${rfq.id}`}
+            href={rfq.id.startsWith('rfq-') ? `/marketplace` : `/rfq/${rfq.id}`}
             className="block p-4 hover:bg-slate-700/30 transition"
           >
             <div className="flex items-start gap-3">

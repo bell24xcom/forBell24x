@@ -136,8 +136,7 @@ export default function FeaturedDemoCarousel() {
               {currentRFQ.type === 'voice' && (
                 <div className="mb-6">
                   <AudioPlayer
-                    src={`/api/demo/audio/${currentRFQ.id}`}
-                    title={currentRFQ.title}
+                    audioUrl={`/api/demo/audio/${currentRFQ.id}`}
                   />
                 </div>
               )}
@@ -179,7 +178,7 @@ export default function FeaturedDemoCarousel() {
               {/* Actions */}
               <div className="flex flex-wrap gap-4">
                 <Link
-                  href={`/rfq/${currentRFQ.id}`}
+                  href={currentRFQ.id.startsWith('rfq-') ? `/marketplace` : `/rfq/${currentRFQ.id}`}
                   className="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition flex items-center gap-2"
                 >
                   <Play className="w-5 h-5" />
