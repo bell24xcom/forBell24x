@@ -69,7 +69,6 @@ function LoginModal({ onClose }: { onClose: () => void }) {
       if (!data.success) { setError(data.message || 'Invalid OTP'); return; }
       if (data.token) localStorage.setItem('bell24h_token', data.token);
       if (data.user) localStorage.setItem('bell24h_user', JSON.stringify(data.user));
-      onClose();
       router.push('/dashboard');
     } catch { setError('Network error. Try again.'); }
     finally { setLoading(false); }
