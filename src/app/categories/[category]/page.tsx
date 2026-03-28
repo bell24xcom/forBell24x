@@ -11,18 +11,39 @@ interface CategoryPageProps {
 
 export const revalidate = 300; // cache 5 minutes
 
+// Common slug aliases — maps incoming slug → canonical DB slug
+const SLUG_ALIASES: Record<string, string> = {
+  'steel-metals': 'minerals-metallurgy',
+  'metals-steel': 'minerals-metallurgy',
+  'food': 'food-beverage',
+  'food-beverages': 'food-beverage',
+  'food-and-beverage': 'food-beverage',
+  'packaging': 'packaging-printing',
+  'packaging-materials': 'packaging-printing',
+  'industrial': 'machinery',
+  'industrial-equipment': 'machinery',
+  'automotive': 'automobiles-parts',
+  'automotive-parts': 'automobiles-parts',
+  'apparel': 'apparel-clothing',
+  'garments': 'apparel-clothing',
+  'textiles': 'textiles-leather-products',
+  'agriculture-farming': 'agriculture',
+};
+
 async function getCategory(slug: string) {
+  // Resolve alias before querying
+  const resolvedSlug = SLUG_ALIASES[slug] ?? slug;
   try {
-    console.log('[Category Page] Fetching category with slug:', slug);
-    // Flexible slug matching: handle hyphens vs underscores, case differences
+    console.log('[Category Page] Fetching category with slug:', resolvedSlug);
+    // Flexible slug matching: handle hyphens vs underscores, case differences, and aliases
     const category = await prisma.category.findFirst({
       where: {
         OR: [
-          { slug: slug },
-          { slug: slug.replace(/-/g, '_') },
-          { slug: slug.replace(/_/g, '-') },
-          { name: { contains: slug.replace(/-/g, ' '), mode: 'insensitive' } },
-          { name: { contains: slug.replace(/_/g, ' '), mode: 'insensitive' } },
+          { slug: resolvedSlug },
+          { slug: resolvedSlug.replace(/-/g, '_') },
+          { slug: resolvedSlug.replace(/_/g, '-') },
+          { name: { contains: resolvedSlug.replace(/-/g, ' '), mode: 'insensitive' } },
+          { name: { contains: resolvedSlug.replace(/_/g, ' '), mode: 'insensitive' } },
         ],
         isActive: true
       },

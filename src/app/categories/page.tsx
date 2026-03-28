@@ -64,8 +64,20 @@ async function getCategories(): Promise<DisplayCategory[]> {
   return FALLBACK_CATEGORIES;
 }
 
-export default async function CategoriesPage() {
-  const categories = await getCategories();
+export default async function CategoriesPage({
+  searchParams,
+}: {
+  searchParams?: { q?: string };
+}) {
+  const allCategories = await getCategories();
+  const query = searchParams?.q?.toLowerCase().trim() ?? '';
+  const categories = query
+    ? allCategories.filter(
+        (cat) =>
+          cat.title.toLowerCase().includes(query) ||
+          cat.slug.toLowerCase().includes(query)
+      )
+    : allCategories;
 
   return (
     <div className="min-h-screen bg-[var(--bg-primary)]">
@@ -73,9 +85,27 @@ export default async function CategoriesPage() {
         <div className="text-center mb-10">
           <h1 className="text-3xl font-bold text-white mb-3">All Categories</h1>
           <p className="text-slate-400 max-w-2xl mx-auto">
-            Browse {categories.length < 30 ? '450+' : `${categories.length}+`} product and service categories. Find verified suppliers across India.
+            Browse {allCategories.length < 30 ? '450+' : `${allCategories.length}+`} product and service categories. Find verified suppliers across India.
           </p>
         </div>
+
+        {/* Search */}
+        <form method="GET" action="/categories" className="mb-8 max-w-md mx-auto">
+          <input
+            type="text"
+            name="q"
+            defaultValue={searchParams?.q ?? ''}
+            placeholder="Search categories..."
+            className="w-full px-4 py-3 bg-slate-800 border border-slate-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-500"
+          />
+        </form>
+
+        {categories.length === 0 && (
+          <p className="text-center text-slate-400 mb-8">
+            No categories match &ldquo;{searchParams?.q}&rdquo;.{' '}
+            <Link href="/categories" className="text-blue-400 underline">Clear search</Link>
+          </p>
+        )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {categories.map((cat) => (
