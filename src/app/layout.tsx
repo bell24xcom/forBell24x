@@ -3,6 +3,7 @@ import './globals.css'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { DashboardProvider } from '@/contexts/DashboardContext'
+import { AuthProvider } from '@/src/app/contexts/AuthContext'
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.bell24h.com'),
@@ -117,13 +118,15 @@ export default function RootLayout({
         />
       </head>
       <body className="font-sans bg-[#0F172A] text-white antialiased">
-        <DashboardProvider>
-          <Header />
-          <main className="min-h-screen">
-            {children}
-          </main>
-          <Footer />
-        </DashboardProvider>
+        <AuthProvider>
+          <DashboardProvider>
+            <Header />
+            <main className="min-h-screen">
+              {children}
+            </main>
+            <Footer />
+          </DashboardProvider>
+        </AuthProvider>
       </body>
     </html>
   )
