@@ -1,24 +1,25 @@
 import { MetadataRoute } from 'next'
 
 export default function robots(): MetadataRoute.Robots {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://bell24h.com'
-  
   return {
     rules: [
       {
         userAgent: '*',
         allow: '/',
         disallow: [
-          '/admin',
-          '/api/private',
-          '/dashboard',
-          '/profile',
+          '/api/',
+          '/admin/',
+          '/dashboard/',
+          '/supplier/dashboard',
+          '/supplier/profile/edit',
           '/settings',
+          '/profile',
           '/_next',
-          '/api/auth'
+          '/api/auth',
+          '/api/private',
         ],
       },
     ],
-    sitemap: `${siteUrl}/sitemap.xml`,
+    sitemap: 'https://www.bell24h.com/sitemap.xml',
   }
 }
