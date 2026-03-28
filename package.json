@@ -1,7 +1,7 @@
 {
-  "name": "bell24h-blockchain",
+  "name": "bell24h",
   "version": "1.0.0",
-  "description": "Bell24h B2B Marketplace with Blockchain Integration",
+  "description": "Bell24h B2B RFQ Marketplace",
   "main": "index.js",
   "scripts": {
     "dev": "next dev",
