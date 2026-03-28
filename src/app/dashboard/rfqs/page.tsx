@@ -235,7 +235,11 @@ export default function MyRFQsPage() {
                 )}
 
                 {!loading && !error && rfqs.map(rfq => (
-                  <tr key={rfq.id} className="hover:bg-slate-800 transition-colors">
+                  <tr
+                    key={rfq.id}
+                    onClick={() => router.push(`/rfq/${rfq.id}`)}
+                    className="hover:bg-slate-800 transition-colors cursor-pointer"
+                  >
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2.5 max-w-xs">
                         <RFQTypeIcon type={rfq.type} className="w-4 h-4" />
@@ -270,7 +274,7 @@ export default function MyRFQsPage() {
                         {formatDate(rfq.createdAt)}
                       </span>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
                       <WhatsAppShare
                         rfqTitle={rfq.title}
                         rfqId={rfq.id}
