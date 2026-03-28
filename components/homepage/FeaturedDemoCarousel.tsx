@@ -174,7 +174,7 @@ export default function FeaturedDemoCarousel() {
               {/* Action Buttons */}
               <div className="flex gap-4">
                 <Link
-                  href={`/rfq/${currentRFQ?.id}`}
+                  href={currentRFQ?.id?.startsWith('rfq-') ? '/marketplace' : `/rfq/${currentRFQ?.id}`}
                   className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition text-center"
                 >
                   View Full RFQ

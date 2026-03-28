@@ -88,7 +88,7 @@ export default function Header() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      router.push(`/categories?q=${encodeURIComponent(searchQuery.trim())}`);
+      router.push(`/marketplace?search=${encodeURIComponent(searchQuery.trim())}`);
       setSearchQuery('');
     }
   };
