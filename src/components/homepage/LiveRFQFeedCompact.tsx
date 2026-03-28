@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Clock, MapPin, Mic, Video, FileText, MessageCircle, Eye } from 'lucide-react';
+import { Clock, MapPin, Mic, Video, FileText, MessageCircle } from 'lucide-react';
 import Link from 'next/link';
 import { ALL_MOCK_RFQS, type MockRFQ } from '@/data/mockRFQs';
 
@@ -24,26 +24,26 @@ export default function LiveRFQFeedCompact() {
     return `${Math.floor(seconds / 86400)}d ago`;
   };
 
-  const getTypeIcon = (t: 'voice' | 'video' | 'text') => 
+  const getTypeIcon = (t: 'voice' | 'video' | 'text') =>
     t === 'voice' ? <Mic className="w-4 h-4" /> : t === 'video' ? <Video className="w-4 h-4" /> : <FileText className="w-4 h-4" />;
-  
-  const getTypeColor = (t: 'voice' | 'video' | 'text') => 
-    t === 'voice' ? 'bg-blue-100 text-blue-700' : t === 'video' ? 'bg-purple-100 text-purple-700' : 'bg-green-100 text-green-700';
+
+  const getTypeColor = (t: 'voice' | 'video' | 'text') =>
+    t === 'voice' ? 'bg-blue-900/30 text-blue-300' : t === 'video' ? 'bg-purple-900/30 text-purple-300' : 'bg-green-900/30 text-green-300';
 
   return (
-    <div className="bg-white border rounded-xl shadow-sm">
+    <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl">
       {/* Header */}
-      <div className="p-4 border-b">
+      <div className="p-4 border-b border-slate-700/50">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="font-semibold text-lg flex items-center gap-2">
+          <h2 className="font-semibold text-lg flex items-center gap-2 text-white">
             <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
             Live RFQs
           </h2>
-          <Link href="/rfq" className="text-sm text-blue-600 hover:text-blue-700 font-medium">
+          <Link href="/rfq" className="text-sm text-blue-400 hover:text-blue-300 font-medium">
             View All →
           </Link>
         </div>
-        
+
         {/* Filter Tabs */}
         <div className="flex gap-2">
           {(['all', 'voice', 'video', 'text'] as const).map((t) => (
@@ -52,8 +52,8 @@ export default function LiveRFQFeedCompact() {
               onClick={() => setFilter(t)}
               className={`px-3 py-1 rounded-lg text-xs font-semibold transition ${
                 filter === t
-                  ? t === 'all' ? 'bg-gray-900 text-white' : getTypeColor(t) + ' border-2'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? t === 'all' ? 'bg-slate-200 text-slate-900' : getTypeColor(t) + ' border-2 border-current'
+                  : 'bg-slate-700/50 text-slate-300 hover:bg-slate-600/50'
               }`}
             >
               {t === 'all' ? 'All' : (
@@ -68,21 +68,21 @@ export default function LiveRFQFeedCompact() {
       </div>
 
       {/* RFQ List */}
-      <div className="divide-y">
+      <div className="divide-y divide-slate-700/50">
         {filteredRFQs.slice(0, 6).map((rfq) => (
           <Link
             key={rfq.id}
             href={`/rfq/${rfq.id}`}
-            className="block p-4 hover:bg-gray-50 transition"
+            className="block p-4 hover:bg-slate-700/30 transition"
           >
             <div className="flex items-start gap-3">
-              <div className={`${getTypeColor(rfq.type)} p-2 rounded-lg`}>
+              <div className={`${getTypeColor(rfq.type)} p-2 rounded-lg flex-shrink-0`}>
                 {getTypeIcon(rfq.type)}
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-gray-900 mb-1 truncate">{rfq.title}</h3>
-                <p className="text-sm text-gray-600 mb-2 line-clamp-2">{rfq.description}</p>
-                <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500">
+                <h3 className="font-semibold text-white mb-1 truncate">{rfq.title}</h3>
+                <p className="text-sm text-slate-400 mb-2 line-clamp-2">{rfq.description}</p>
+                <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
                   <span className="flex items-center gap-1">
                     <MapPin className="w-3 h-3" />
                     {rfq.location}
@@ -104,11 +104,8 @@ export default function LiveRFQFeedCompact() {
 
       {/* Load More */}
       {filteredRFQs.length > 6 && (
-        <div className="p-4 border-t text-center">
-          <Link
-            href="/rfq"
-            className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-          >
+        <div className="p-4 border-t border-slate-700/50 text-center">
+          <Link href="/rfq" className="text-sm text-blue-400 hover:text-blue-300 font-medium">
             Load More RFQs →
           </Link>
         </div>
@@ -116,4 +113,3 @@ export default function LiveRFQFeedCompact() {
     </div>
   );
 }
-
