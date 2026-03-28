@@ -117,16 +117,28 @@ export default function Header() {
             <div className="hidden md:flex items-center gap-6 flex-1 justify-end">
               {/* Nav Links */}
               <Link
+                href="/rfq/demo/all"
+                className="text-slate-300 hover:text-white text-sm font-medium transition-colors"
+              >
+                Demo RFQs
+              </Link>
+              <Link
+                href="/rfq/create"
+                className="text-slate-300 hover:text-white text-sm font-medium transition-colors"
+              >
+                Post RFQ
+              </Link>
+              <Link
+                href="/rfq"
+                className="text-slate-300 hover:text-white text-sm font-medium transition-colors"
+              >
+                Browse RFQs
+              </Link>
+              <Link
                 href="/suppliers"
                 className="text-slate-300 hover:text-white text-sm font-medium transition-colors"
               >
                 Suppliers
-              </Link>
-              <Link
-                href="/categories"
-                className="text-slate-300 hover:text-white text-sm font-medium transition-colors"
-              >
-                Browse
               </Link>
 
               {/* Search Bar */}
@@ -199,18 +211,32 @@ export default function Header() {
               </form>
 
               <Link
+                href="/rfq/demo/all"
+                className="block text-slate-300 hover:text-white transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Demo RFQs
+              </Link>
+              <Link
+                href="/rfq/create"
+                className="block text-slate-300 hover:text-white transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Post RFQ
+              </Link>
+              <Link
+                href="/rfq"
+                className="block text-slate-300 hover:text-white transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Browse RFQs
+              </Link>
+              <Link
                 href="/suppliers"
                 className="block text-slate-300 hover:text-white transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Suppliers
-              </Link>
-              <Link
-                href="/categories"
-                className="block text-slate-300 hover:text-white transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Browse Categories
               </Link>
 
               {isLoggedIn ? (
