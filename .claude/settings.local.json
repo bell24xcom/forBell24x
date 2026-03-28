@@ -59,7 +59,9 @@
       "Bash(gh api:*)",
       "Bash(do echo:*)",
       "Bash(do sed:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(do:*)",
+      "Bash(echo:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

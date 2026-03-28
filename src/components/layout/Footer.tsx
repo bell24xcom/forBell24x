@@ -162,8 +162,9 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-white/10 mt-8 pt-8 text-center text-gray-400">
-          <p>© {currentYear} BELL Technology Pvt Ltd. Made in India 🚀</p>
+        <div className="border-t border-white/10 mt-8 pt-8 text-center">
+          <p className="text-gray-400">© {currentYear} BELL Technology Pvt Ltd. Made in India 🇮🇳</p>
+          <p className="text-slate-500 text-xs mt-1">bell24h.com • ₹500Cr+ in transactions • 10,000+ verified suppliers</p>
         </div>
       </div>
     </footer>
