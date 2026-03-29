@@ -33,52 +33,16 @@ export default function SupplierLeadsPage() {
 
   useEffect(() => {
     fetchLeads();
-    fetchUserCredits();
   }, []);
 
   const fetchLeads = async () => {
     try {
-      // In a real app, this would fetch from /api/supplier/leads
-      // For demo, we'll create mock data
-      const mockLeads: Lead[] = [
-        {
-          id: '1',
-          category: 'Electronics',
-          product: 'Industrial IoT Sensors',
-          quantity: '100 units',
-          budget: 500000,
-          buyerName: 'Rajesh Kumar',
-          buyerCompany: 'TechCorp Industries',
-          buyerEmail: 'rajesh@techcorp.com',
-          buyerPhone: '+91 98765 43210',
-          description: 'Need temperature and humidity sensors for manufacturing facility',
-          urgency: 'immediate',
-          location: 'Mumbai',
-          status: 'new',
-          createdAt: new Date().toISOString(),
-          contactHidden: true,
-          unlocked: false
-        },
-        {
-          id: '2',
-          category: 'Manufacturing',
-          product: 'Textile Machinery',
-          quantity: '2 machines',
-          budget: 1500000,
-          buyerName: 'Priya Sharma',
-          buyerCompany: 'FashionCorp Ltd',
-          buyerEmail: 'priya@fashioncorp.com',
-          buyerPhone: '+91 98765 43211',
-          description: 'Looking for automated weaving machines',
-          urgency: '30days',
-          location: 'Delhi',
-          status: 'new',
-          createdAt: new Date().toISOString(),
-          contactHidden: true,
-          unlocked: false
-        }
-      ];
-      setLeads(mockLeads);
+      const res = await fetch('/api/supplier/leads', { credentials: 'include' });
+      const data = await res.json();
+      if (data.success) {
+        setLeads(data.leads);
+        setUserCredits(data.credits ?? 0);
+      }
     } catch (error) {
       console.error('Error fetching leads:', error);
     } finally {
@@ -88,8 +52,9 @@ export default function SupplierLeadsPage() {
 
   const fetchUserCredits = async () => {
     try {
-      // In a real app, this would fetch from /api/user/credits
-      setUserCredits(5); // Mock credits
+      const res = await fetch('/api/supplier/leads', { credentials: 'include' });
+      const data = await res.json();
+      if (data.success) setUserCredits(data.credits ?? 0);
     } catch (error) {
       console.error('Error fetching credits:', error);
     }
@@ -105,10 +70,8 @@ export default function SupplierLeadsPage() {
       const response = await fetch('/api/leads/unlock', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          leadId,
-          supplierId: 'demo-supplier-123' // In real app, get from auth context
-        })
+        credentials: 'include',
+        body: JSON.stringify({ leadId })
       });
 
       const result = await response.json();
@@ -351,8 +314,7 @@ export default function SupplierLeadsPage() {
                   </button>
                 </div>
                 
-                <CreditPurchase 
-                  userId="demo-supplier-123"
+                <CreditPurchase
                   onSuccess={() => {
                     setShowPurchase(false);
                     fetchUserCredits();

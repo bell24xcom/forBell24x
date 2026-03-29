@@ -19,10 +19,10 @@ export default function CheckoutPage() {
   useEffect(() => {
     const fetchDeal = async () => {
       try {
-        // Fetch deal from InsForge via admin rfq route logic or specialized route
-        const res = await fetch(`/api/admin/marketing/deals?id=${dealId}`);
+        const res = await fetch(`/api/deal/${dealId}`, { credentials: 'include' });
         const data = await res.json();
-        setDeal(data[0]);
+        if (!res.ok) throw new Error(data.error || 'Failed to load deal');
+        setDeal(data.deal);
       } catch (err) {
         setError('Failed to load deal details.');
       } finally {
