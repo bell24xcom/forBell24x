@@ -33,6 +33,11 @@ export default function RFQDetailPage() {
     terms: '',
   });
   const [error, setError] = useState('');
+  // Buyer quotes state
+  const [quotes, setQuotes] = useState<any[]>([]);
+  const [quotesLoading, setQuotesLoading] = useState(false);
+  const [accepting, setAccepting] = useState(false);
+  const [isOwner, setIsOwner] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
   const { user } = useSession();
@@ -113,6 +118,44 @@ export default function RFQDetailPage() {
       router.push(`/auth/phone-email?redirect=${encodeURIComponent(pathname)}`);
     } else {
       setShowQuoteForm(true);
+    }
+  };
+
+  // Fetch quotes when RFQ loads and current user is the buyer
+  useEffect(() => {
+    if (!rfq || !user) return;
+    if (rfq.createdBy && rfq.createdBy === user.id) {
+      setIsOwner(true);
+      setQuotesLoading(true);
+      fetch(`/api/rfq/${rfq.id}/quotes`, { credentials: 'include' })
+        .then(r => r.json())
+        .then(d => { if (d.quotes) setQuotes(d.quotes); })
+        .catch(() => {})
+        .finally(() => setQuotesLoading(false));
+    }
+  }, [rfq, user]);
+
+  const handleAcceptQuote = async (quoteId: string) => {
+    if (!confirm('Accept this quote and create a deal?')) return;
+    setAccepting(true);
+    try {
+      const res = await fetch('/api/deal/select', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ quoteId }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('Quote accepted! Deal created.');
+        router.push('/dashboard/deals');
+      } else {
+        alert(data.error || 'Failed to accept quote');
+      }
+    } catch {
+      alert('Error accepting quote');
+    } finally {
+      setAccepting(false);
     }
   };
 
@@ -238,7 +281,101 @@ export default function RFQDetailPage() {
             </div>
           </div>
 
-          {/* Sticky CTA Bar */}
+          {/* Quotes Section — visible only to the buyer who owns this RFQ */}
+          {isOwner && (
+            <div className="p-6 border-t border-slate-200">
+              <h3 className="text-lg font-bold text-slate-900 mb-1">
+                Quotes Received
+              </h3>
+              <p className="text-slate-500 text-sm mb-5">
+                {quotes.length} quote{quotes.length !== 1 ? 's' : ''} received
+              </p>
+
+              {quotesLoading ? (
+                <div className="space-y-3">
+                  {[1, 2].map(i => (
+                    <div key={i} className="bg-slate-100 rounded-xl p-5 animate-pulse">
+                      <div className="h-4 bg-slate-200 rounded w-1/2 mb-3" />
+                      <div className="h-3 bg-slate-200/60 rounded w-1/3" />
+                    </div>
+                  ))}
+                </div>
+              ) : quotes.length === 0 ? (
+                <div className="bg-slate-50 border border-slate-200 rounded-xl p-8 text-center">
+                  <p className="text-3xl mb-3">⏳</p>
+                  <p className="text-slate-700 font-medium">No quotes yet</p>
+                  <p className="text-slate-400 text-sm mt-1">
+                    Suppliers are being notified. Check back in a few hours.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {quotes.map((quote: any) => (
+                    <div
+                      key={quote.id}
+                      className={`border rounded-xl p-5 transition-colors ${
+                        quote.status === 'ACCEPTED'
+                          ? 'border-green-300 bg-green-50'
+                          : quote.status === 'REJECTED'
+                          ? 'border-slate-200 bg-slate-50 opacity-60'
+                          : 'border-slate-200 bg-white hover:border-indigo-300'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <p className="text-slate-900 font-semibold">
+                              {quote.supplier?.company || quote.supplier?.name || 'Supplier'}
+                            </p>
+                            {quote.supplier?.trustScore != null && (
+                              <span className="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">
+                                Trust: {quote.supplier.trustScore}/100
+                              </span>
+                            )}
+                          </div>
+                          {quote.supplier?.city && (
+                            <p className="text-slate-400 text-xs mb-2">📍 {quote.supplier.city}</p>
+                          )}
+                          <p className="text-2xl font-bold text-indigo-600">
+                            ₹{Number(quote.price).toLocaleString('en-IN')}
+                          </p>
+                          {quote.deliveryDays && (
+                            <p className="text-slate-500 text-sm mt-1">
+                              🚚 Delivery in {quote.deliveryDays} days
+                            </p>
+                          )}
+                          {quote.notes && (
+                            <p className="text-slate-600 text-sm mt-3 bg-slate-50 rounded-lg p-3 border border-slate-100">
+                              {quote.notes}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex-shrink-0">
+                          {quote.status === 'ACCEPTED' ? (
+                            <span className="bg-green-600 text-white px-3 py-1.5 rounded-full text-sm font-medium">
+                              ✓ Accepted
+                            </span>
+                          ) : quote.status === 'REJECTED' ? (
+                            <span className="text-slate-400 text-sm">Rejected</span>
+                          ) : rfq?.status === 'ACTIVE' ? (
+                            <button
+                              onClick={() => handleAcceptQuote(quote.id)}
+                              disabled={accepting}
+                              className="bg-green-600 hover:bg-green-500 disabled:opacity-50 text-white font-semibold px-4 py-2 rounded-lg text-sm min-h-[40px] transition-colors whitespace-nowrap"
+                            >
+                              {accepting ? '...' : '✓ Accept'}
+                            </button>
+                          ) : null}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+        {/* Sticky CTA Bar */}
           <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 md:static fixed-bottom-bar md:border-t md:border-slate-200 md:rounded-b-2xl">
             <div className="flex items-center justify-between gap-4">
               <div className="hidden md:block text-sm text-slate-500">

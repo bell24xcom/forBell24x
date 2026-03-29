@@ -54,6 +54,8 @@ export async function GET(request: NextRequest) {
         location:    rfq.location,
         createdAt:   rfq.createdAt,
         views:       rfq.views,
+        status:      rfq.status,
+        createdBy:   rfq.createdBy,
         user:        rfq.user,
       },
     });
