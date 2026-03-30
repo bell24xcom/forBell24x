@@ -25,10 +25,16 @@ export function middleware(request: NextRequest) {
   const token = request.cookies.get('auth-token')?.value
   const isProtected =
     pathname.startsWith('/dashboard') ||
-    pathname.startsWith('/rfq/create')
+    pathname.startsWith('/supplier') ||
+    pathname.startsWith('/rfq/create') ||
+    pathname.startsWith('/checkout') ||
+    pathname.startsWith('/wallet') ||
+    pathname.startsWith('/messages') ||
+    pathname.startsWith('/notifications') ||
+    pathname.startsWith('/negotiation')
 
   if (isProtected && !token) {
-    const loginUrl = new URL('/auth/login-otp', request.url)
+    const loginUrl = new URL('/auth/phone-email', request.url)
     loginUrl.searchParams.set('redirect', pathname)
     return NextResponse.redirect(loginUrl)
   }
@@ -37,5 +43,15 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/dashboard/:path*', '/rfq/create'],
+  matcher: [
+    '/admin/:path*',
+    '/dashboard/:path*',
+    '/supplier/:path*',
+    '/rfq/create',
+    '/checkout/:path*',
+    '/wallet/:path*',
+    '/messages/:path*',
+    '/notifications',
+    '/negotiation/:path*',
+  ],
 }
