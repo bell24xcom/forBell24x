@@ -115,31 +115,20 @@ export default function Header() {
 
             {/* Desktop: Nav + Search + Auth */}
             <div className="hidden md:flex items-center gap-6 flex-1 justify-end">
-              {/* Nav Links */}
-              <Link
-                href="/rfq/demo/all"
-                className="text-slate-300 hover:text-white text-sm font-medium transition-colors"
-              >
-                Demo RFQs
-              </Link>
-              <Link
-                href="/rfq/create"
-                className="text-slate-300 hover:text-white text-sm font-medium transition-colors"
-              >
-                Post RFQ
-              </Link>
-              <Link
-                href="/rfq"
-                className="text-slate-300 hover:text-white text-sm font-medium transition-colors"
-              >
-                Browse RFQs
-              </Link>
-              <Link
-                href="/suppliers"
-                className="text-slate-300 hover:text-white text-sm font-medium transition-colors"
-              >
-                Suppliers
-              </Link>
+              {/* Nav Links — different for logged in vs logged out */}
+              {isLoggedIn ? (
+                <>
+                  <Link href="/rfq/create" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Post RFQ</Link>
+                  <Link href="/marketplace" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Marketplace</Link>
+                  <Link href="/suppliers" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Suppliers</Link>
+                </>
+              ) : (
+                <>
+                  <Link href="/marketplace" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Marketplace</Link>
+                  <Link href="/suppliers" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Suppliers</Link>
+                  <Link href="/pricing" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Pricing</Link>
+                </>
+              )}
 
               {/* Search Bar */}
               <form onSubmit={handleSearch} className="relative">
@@ -156,33 +145,29 @@ export default function Header() {
               {/* Auth */}
               {isLoggedIn ? (
                 <div className="flex items-center gap-4">
-                  <Link
-                    href="/dashboard"
-                    className="text-slate-300 hover:text-white text-sm font-medium transition-colors"
-                  >
-                    Dashboard
-                  </Link>
+                  <Link href="/dashboard" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Dashboard</Link>
                   <Link href="/notifications" className="relative text-slate-400 hover:text-white transition-colors">
                     <Bell className="w-5 h-5" />
                     <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
                   </Link>
-                  <span className="text-slate-300 text-sm font-medium">
-                    {user?.name || user?.companyName || 'User'}
-                  </span>
-                  <button
-                    onClick={handleLogout}
-                    className="text-slate-400 hover:text-white text-sm transition-colors"
-                  >
-                    Logout
-                  </button>
+                  <span className="text-slate-300 text-sm font-medium">{user?.name || user?.companyName || 'User'}</span>
+                  <button onClick={handleLogout} className="text-slate-400 hover:text-white text-sm transition-colors">Logout</button>
                 </div>
               ) : (
-                <button
-                  onClick={handleLogin}
-                  className="bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
-                >
-                  Login / Register
-                </button>
+                <div className="flex items-center gap-3">
+                  <Link
+                    href="/rfq/create"
+                    className="bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
+                  >
+                    Post RFQ
+                  </Link>
+                  <button
+                    onClick={handleLogin}
+                    className="border border-slate-600 hover:border-slate-400 text-slate-300 hover:text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+                  >
+                    Login
+                  </button>
+                </div>
               )}
             </div>
 
@@ -210,49 +195,24 @@ export default function Header() {
                 />
               </form>
 
-              <Link
-                href="/rfq/demo/all"
-                className="block text-slate-300 hover:text-white transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Demo RFQs
-              </Link>
-              <Link
-                href="/rfq/create"
-                className="block text-slate-300 hover:text-white transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Post RFQ
-              </Link>
-              <Link
-                href="/rfq"
-                className="block text-slate-300 hover:text-white transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Browse RFQs
-              </Link>
-              <Link
-                href="/suppliers"
-                className="block text-slate-300 hover:text-white transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Suppliers
-              </Link>
-
+              <Link href="/marketplace" className="block text-slate-300 hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Marketplace</Link>
+              <Link href="/suppliers" className="block text-slate-300 hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Suppliers</Link>
               {isLoggedIn ? (
-                <button
-                  onClick={() => { handleLogout(); setIsMenuOpen(false); }}
-                  className="w-full text-left text-slate-300 hover:text-white transition-colors"
-                >
-                  Logout ({user?.name || 'User'})
-                </button>
+                <>
+                  <Link href="/rfq/create" className="block text-slate-300 hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Post RFQ</Link>
+                  <Link href="/dashboard" className="block text-slate-300 hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Dashboard</Link>
+                  <button onClick={() => { handleLogout(); setIsMenuOpen(false); }} className="w-full text-left text-slate-300 hover:text-white transition-colors">
+                    Logout ({user?.name || 'User'})
+                  </button>
+                </>
               ) : (
-                <button
-                  onClick={() => { handleLogin(); setIsMenuOpen(false); }}
-                  className="w-full bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors"
-                >
-                  Login / Register
-                </button>
+                <>
+                  <Link href="/pricing" className="block text-slate-300 hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Pricing</Link>
+                  <Link href="/rfq/create" className="block bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors text-center" onClick={() => setIsMenuOpen(false)}>Post RFQ</Link>
+                  <button onClick={() => { handleLogin(); setIsMenuOpen(false); }} className="w-full border border-slate-600 text-slate-300 hover:text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors">
+                    Login / Register
+                  </button>
+                </>
               )}
             </div>
           )}

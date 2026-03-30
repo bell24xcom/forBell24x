@@ -68,7 +68,7 @@ export default function RFQTypeShowcase() {
               >
                 {/* Icon */}
                 <div className="flex justify-center mb-6">
-                  <div className={`w-20 h-20 rounded-full bg-white dark:bg-gray-700 flex items-center justify-center ${type.textColor}`}>
+                  <div className={`w-20 h-20 rounded-full flex items-center justify-center text-white ${type.buttonColor}`}>
                     <Icon className="w-10 h-10" />
                   </div>
                 </div>

@@ -78,6 +78,24 @@ const SLUG_ALIASES: Record<string, string> = {
   // Safety
   'safety': 'safety-security',
   'security': 'safety-security',
+  'security-protection': 'safety-security',
+  // Plastics / Rubber (reversed slug)
+  'rubber-plastics': 'plastics-rubber',
+  // Paper / Packaging (reversed slug)
+  'packaging-printing': 'paper-printing',
+  // Electronics extra aliases
+  'electronics-electrical': 'electronics-electricals',
+  'consumer-electronics': 'electronics-electricals',
+  'electrical-equipment': 'electronics-electricals',
+  'computer-hardware': 'it-telecom',
+  // Health / Medical
+  'health-medical': 'pharmaceuticals-healthcare',
+  'medical': 'pharmaceuticals-healthcare',
+  // Additional common ones
+  'minerals-metallurgy': 'metals-alloys',
+  'food-and-beverages': 'food-beverages',
+  'it-technology': 'it-telecom',
+  'software': 'it-telecom',
 };
 
 async function getCategory(slug: string) {

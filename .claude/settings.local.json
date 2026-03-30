@@ -61,7 +61,8 @@
       "Bash(do sed:*)",
       "Bash(rm:*)",
       "Bash(do:*)",
-      "Bash(echo:*)"
+      "Bash(echo:*)",
+      "Bash(cd \"C:/Users/Sanika/Projects/bell24h\" && echo \"--- PENDING ITEMS ---\" && ls src/app/claim 2>/dev/null && echo \"claim dir exists\" || echo \"claim dir MISSING\"\nls \"src/app/claim/[token]/page.tsx\" 2>/dev/null && echo \"claim page EXISTS\" || echo \"claim page MISSING\"\nls src/app/api/admin/outreach/daily-batch/route.ts 2>/dev/null && echo \"outreach batch EXISTS\" || echo \"outreach batch MISSING\"\nls src/app/api/payment/subscribe/route.ts 2>/dev/null && echo \"payment subscribe EXISTS\" || echo \"payment subscribe MISSING\"\ngrep \"claimToken\" prisma/schema.prisma 2>/dev/null && echo \"claimToken in schema\" || echo \"claimToken NOT in schema\"\ngrep \"isClaimed\" prisma/schema.prisma 2>/dev/null | head -3\ngrep -c \"wa.me\\\\|whatsapp\\\\|WhatsApp\" src/app/admin/outreach/page.tsx 2>/dev/null && echo \"WA links in outreach page\" || echo \"NO WA links in outreach\")"
     ]
   },
   "enableAllProjectMcpServers": true,
