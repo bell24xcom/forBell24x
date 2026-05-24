@@ -62,7 +62,7 @@ export default function HeroRFQDemo() {
             <span className="text-sm font-medium text-cyan-400">AI-Powered RFQ System</span>
           </div>
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-black mb-6 text-white leading-tight">
-            Ready to Transform Your Procurement?
+            Post RFQs in 3 Different Ways
           </h1>
           <p className="text-lg md:text-xl lg:text-2xl text-gray-300 mb-8 max-w-4xl mx-auto leading-relaxed">
             Join thousands of businesses using Bell24H for faster, smarter B2B transactions
