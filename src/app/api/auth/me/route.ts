@@ -1,17 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import jwt from 'jsonwebtoken';
+import { verifyToken } from '@/lib/jwt';
 
 export const dynamic = 'force-dynamic';
-
-// Use the exact same secret and fallback as lib/jwt.ts generateToken
-const JWT_SECRET = (() => {
-  const s = process.env.JWT_SECRET;
-  if (!s || s === 'bell24h_jwt_secret_change_in_production') {
-    return 'dev_only_jwt_secret_not_for_production';
-  }
-  return s;
-})();
 
 export async function GET(request: NextRequest) {
   console.log('[/api/auth/me] Called');
@@ -27,18 +18,18 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'No token' }, { status: 401 });
     }
 
-    let payload: { userId?: string; id?: string; sub?: string; role?: string; phone?: string };
+    let userId: string;
     try {
-      payload = jwt.verify(token, JWT_SECRET) as typeof payload;
-      console.log('[/api/auth/me] JWT verified, userId:', payload.userId || payload.id || payload.sub);
+      const payload = verifyToken(token);
+      userId = payload.userId;
+      console.log('[/api/auth/me] JWT verified, userId:', userId);
     } catch (jwtError) {
       console.error('[/api/auth/me] JWT verify failed:', jwtError);
       return NextResponse.json({ success: false, error: 'Invalid or expired token' }, { status: 401 });
     }
 
-    const userId = payload.userId || payload.id || payload.sub;
     if (!userId) {
-      console.error('[/api/auth/me] No userId in token payload:', payload);
+      console.error('[/api/auth/me] No userId in token payload');
       return NextResponse.json({ success: false, error: 'No userId in token' }, { status: 401 });
     }
 
