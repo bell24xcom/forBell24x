@@ -15,9 +15,9 @@ export default function HeroRFQDemo() {
             India's First Multi-Modal B2B Platform
           </div>
           <h1 className="text-6xl md:text-8xl font-black text-white mb-6 leading-tight">
-            Ready to Transform
+            Post RFQs in
             <br />
-            <span className="bg-gradient-to-r from-cyan-400 via-white to-cyan-400 bg-clip-text text-transparent">Your Procurement?</span>
+            <span className="bg-gradient-to-r from-cyan-400 via-white to-cyan-400 bg-clip-text text-transparent">3 Different Ways</span>
           </h1>
           <p className="text-xl md:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto">
             Join thousands of businesses using <span className="text-cyan-400 font-bold">BELL</span> for faster, smarter B2B transactions
