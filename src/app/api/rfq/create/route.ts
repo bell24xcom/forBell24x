@@ -24,9 +24,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: 'Unauthorized: Please log in' }, { status: 401 });
     }
 
-    // 2. Authorize role (Buyer or Admin)
-    if (!hasRole(user, ['BUYER', 'ADMIN'])) {
-      return NextResponse.json({ success: false, error: 'Forbidden: Only buyers can create RFQs' }, { status: 403 });
+    // 2. Authorize role (any authenticated user — on Bell24h, suppliers are also buyers)
+    if (!hasRole(user, ['SUPPLIER', 'BUYER', 'ADMIN'])) {
+      return NextResponse.json({ success: false, error: 'Forbidden: Authentication required' }, { status: 403 });
     }
 
     // 3. Validate request body
