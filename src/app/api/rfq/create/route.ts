@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { onRFQCreated } from '@/lib/orchestration';
 import { getAuthenticatedUser, hasRole } from '@/src/lib/auth-helpers';
 import { z } from 'zod';
 
@@ -48,7 +49,23 @@ export async function POST(req: NextRequest) {
         status: 'ACTIVE',
         createdBy: user.id, // Real user ID from JWT
       },
+      include: { user: { select: { id: true, name: true, email: true } } },
     });
+
+    // 5. Fire orchestration: supplier matching, in-app notifications,
+    //    buyer confirm, n8n webhook, email. Awaited so DB writes
+    //    complete before the serverless function ends; errors are
+    //    swallowed because the RFQ is already saved at this point.
+    if (rfq.user) {
+      try {
+        await onRFQCreated(
+          { id: rfq.id, title: rfq.title, category: rfq.category, location: rfq.location },
+          { id: rfq.user.id, name: rfq.user.name, email: rfq.user.email },
+        );
+      } catch (orchErr) {
+        console.error('[RFQ Create] onRFQCreated failed:', orchErr);
+      }
+    }
 
     return NextResponse.json({ success: true, rfq }, { status: 201 });
   } catch (error) {
