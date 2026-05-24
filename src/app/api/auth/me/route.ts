@@ -33,6 +33,31 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'No userId in token' }, { status: 401 });
     }
 
+    // Hardcoded admin shortcut — /api/admin/login signs a JWT with
+    // userId='admin' for the env-credentialed admin, which has no
+    // DB row. Without this, the DB lookup below 401s and AdminLayout
+    // bounces the user back to the login page.
+    if (userId === 'admin') {
+      return NextResponse.json({
+        success: true,
+        user: {
+          id: 'admin',
+          name: 'Admin',
+          email: process.env.ADMIN_EMAIL || 'admin@bell24h.com',
+          phone: '',
+          company: null,
+          role: 'ADMIN',
+          isVerified: true,
+          isActive: true,
+          gstNumber: null,
+          location: null,
+          avatar: null,
+          preferences: null,
+          lastLoginAt: null,
+        },
+      });
+    }
+
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: {
