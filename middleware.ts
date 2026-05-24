@@ -48,6 +48,15 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const ip = request.ip || '127.0.0.1';
 
+  // ── Admin route protection ────────────────────────────────────────────
+  if (pathname.startsWith('/admin') && pathname !== '/admin/login') {
+    const adminToken = request.cookies.get('admin-token')?.value;
+    if (!adminToken) {
+      return NextResponse.redirect(new URL('/admin/login', request.url));
+    }
+  }
+
+
   // 1. Directory Access & Path Traversal Protection
   const forbiddenPaths = ['/node_modules', '/.env', '/package.json', '/prisma/schema.prisma'];
   if (forbiddenPaths.some(p => pathname.toLowerCase().includes(p)) || pathname.includes('..')) {
