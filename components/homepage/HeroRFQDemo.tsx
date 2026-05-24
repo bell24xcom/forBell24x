@@ -62,7 +62,7 @@ export default function HeroRFQDemo() {
             <span className="text-sm font-medium text-cyan-400">AI-Powered RFQ System</span>
           </div>
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-black mb-6 text-white leading-tight">
-            Ready to Transform Your Procurement?
+            Post RFQs in 3 Different Ways
           </h1>
           <p className="text-lg md:text-xl lg:text-2xl text-gray-300 mb-8 max-w-4xl mx-auto leading-relaxed">
             Join thousands of businesses using Bell24H for faster, smarter B2B transactions
@@ -75,7 +75,7 @@ export default function HeroRFQDemo() {
             onClick={() => setActiveType('text')}
             className={`flex items-center gap-2 px-8 py-5 rounded-2xl font-bold text-lg transition-all ${
               activeType === 'text'
-                ? 'bg-white text-[#0a1128] shadow-2xl scale-105'
+                ? 'bg-white text-slate-900 shadow-2xl scale-105'
                 : 'bg-gray-800/50 border-2 border-gray-600 text-white hover:bg-gray-800 backdrop-blur'
             }`}
           >
@@ -198,7 +198,7 @@ export default function HeroRFQDemo() {
             <div className="flex flex-wrap gap-4 mt-6">
               <Link
                 href={`/rfq/create?type=${activeType}`}
-                className="px-8 py-5 bg-white text-[#0a1128] rounded-2xl font-bold text-lg hover:scale-105 transition shadow-2xl inline-flex items-center gap-2"
+                className="px-8 py-5 bg-white text-slate-900 rounded-2xl font-bold text-lg hover:scale-105 transition shadow-2xl inline-flex items-center gap-2"
               >
                 Try {activeType.charAt(0).toUpperCase() + activeType.slice(1)} RFQ
               </Link>
