@@ -174,25 +174,25 @@ export default function VideoRFQPage() {
 
     setIsCreatingRFQ(true);
     try {
+      const urgencyMap: Record<string, 'LOW' | 'NORMAL' | 'HIGH' | 'URGENT'> = {
+        low: 'LOW', medium: 'NORMAL', high: 'HIGH', urgent: 'URGENT',
+      };
+      const budgetNum = typeof rfqData.budget === 'number' ? rfqData.budget : undefined;
+
       // 1. Save to Neon (Core)
       const neonRes = await fetch('/api/rfq/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           title: rfqData.title,
-          category: rfqData.category,
-          subcategory: rfqData.subcategory,
-          quantity: rfqData.quantity,
-          unit: rfqData.unit,
-          budget: rfqData.budget,
-          currency: rfqData.currency,
-          location: rfqData.location,
-          deliveryDeadline: rfqData.deliveryDeadline,
-          priority: rfqData.priority,
-          specifications: rfqData.specifications,
-          requirements: rfqData.requirements,
           description: transcription,
-          source: 'video',
+          category: rfqData.category,
+          quantity: String(rfqData.quantity ?? ''),
+          unit: rfqData.unit || 'units',
+          minBudget: budgetNum,
+          maxBudget: budgetNum,
+          location: rfqData.location,
+          urgency: urgencyMap[String(rfqData.priority).toLowerCase()] ?? 'NORMAL',
         }),
       });
 
