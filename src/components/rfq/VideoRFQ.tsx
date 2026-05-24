@@ -88,34 +88,48 @@ export const VideoRFQ: React.FC<VideoRFQProps> = ({ category, city, onComplete, 
 
   const handleSubmit = async () => {
     if (!recordedBlob) return;
-    
     setStep('uploading');
-    
-    // Simulate upload progress
-    const interval = setInterval(() => {
-      setUploadProgress(prev => {
-        if (prev >= 95) {
-          clearInterval(interval);
-          return 95;
-        }
-        return prev + 5;
-      });
-    }, 200);
+    setUploadProgress(10);
 
-    // In a real implementation, we would upload to Cloudinary or our API
-    // and store in Guest Session / LocalStorage for "Try Without Login"
-    
-    setTimeout(() => {
+    try {
+      const formData = new FormData();
+      formData.append('video', recordedBlob, 'video-rfq.webm');
+      formData.append('context', `Category: ${category}, City: ${city}`);
+
+      // Show progress while real upload runs
+      const interval = setInterval(() => {
+        setUploadProgress(prev => (prev >= 85 ? 85 : prev + 5));
+      }, 300);
+
+      const res = await fetch('/api/video-rfq', {
+        method: 'POST',
+        body: formData,
+      });
+
       clearInterval(interval);
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error || 'Upload failed');
+
       setUploadProgress(100);
       setStep('success');
       if (onComplete) {
-        onComplete(recordedBlob, { category, city, timestamp: new Date().toISOString() });
+        onComplete(recordedBlob, {
+          category,
+          city,
+          rfqId: data.rfqId,
+          extractedInfo: data.extractedInfo,
+          timestamp: new Date().toISOString(),
+        });
       }
-    }, 2000);
+    } catch (err) {
+      console.error('[VideoRFQ] Submit error:', err);
+      setStep('preview'); // let user retry
+      alert('Failed to submit your Video RFQ. Please try again.');
+    }
   };
 
-  const formatTime = (seconds: number) => {
+    const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
