@@ -75,7 +75,7 @@ export default function HeroRFQDemo() {
             onClick={() => setActiveType('text')}
             className={`flex items-center gap-2 px-8 py-5 rounded-2xl font-bold text-lg transition-all ${
               activeType === 'text'
-                ? 'bg-white text-[#0a1128] shadow-2xl scale-105'
+                ? 'bg-white text-slate-900 shadow-2xl scale-105'
                 : 'bg-gray-800/50 border-2 border-gray-600 text-white hover:bg-gray-800 backdrop-blur'
             }`}
           >
@@ -198,7 +198,7 @@ export default function HeroRFQDemo() {
             <div className="flex flex-wrap gap-4 mt-6">
               <Link
                 href={`/rfq/create?type=${activeType}`}
-                className="px-8 py-5 bg-white text-[#0a1128] rounded-2xl font-bold text-lg hover:scale-105 transition shadow-2xl inline-flex items-center gap-2"
+                className="px-8 py-5 bg-white text-slate-900 rounded-2xl font-bold text-lg hover:scale-105 transition shadow-2xl inline-flex items-center gap-2"
               >
                 Try {activeType.charAt(0).toUpperCase() + activeType.slice(1)} RFQ
               </Link>
