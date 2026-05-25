@@ -6,9 +6,10 @@ export async function GET(request: NextRequest) {
   const uptime = process.uptime();
 
   // Check which env vars are set
-  const hasDatabase  = !!process.env.DATABASE_URL;
-  const hasAuth      = !!process.env.NEXTAUTH_SECRET;
-  const hasInsforge  = !!process.env.INSFORGE_API_KEY;
+  const hasDatabase        = !!process.env.DATABASE_URL;
+  const hasJwt             = !!process.env.JWT_SECRET;
+  const hasMsg91           = !!process.env.MSG91_AUTH_KEY;
+  const hasGroq            = !!process.env.GROQ_API_KEY;
   const hasRazorpay        = !!process.env.RAZORPAY_KEY_ID && !!process.env.RAZORPAY_KEY_SECRET;
   const hasRazorpayWebhook = !!process.env.RAZORPAY_WEBHOOK_SECRET;
 
@@ -32,7 +33,7 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  const allCriticalOk = hasAuth;
+  const allCriticalOk = hasJwt && hasMsg91;
   const status = allCriticalOk ? (dbStatus.connected ? 'healthy' : 'degraded') : 'degraded';
 
   return NextResponse.json(
@@ -48,8 +49,10 @@ export async function GET(request: NextRequest) {
         platform: process.platform,
         configured: {
           database: hasDatabase,
-          auth: hasAuth,
-          insforge: hasInsforge,
+          jwt: hasJwt,
+          msg91: hasMsg91,
+          msg91Email: hasMsg91,
+          groq: hasGroq,
           razorpay: hasRazorpay,
           razorpayWebhook: hasRazorpayWebhook,
         },
