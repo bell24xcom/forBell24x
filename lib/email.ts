@@ -1,23 +1,31 @@
-import nodemailer from 'nodemailer';
-
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtp.zoho.in',
-  port: Number(process.env.SMTP_PORT) || 587,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
-
-export async function sendEmail(to: string, subject: string, html: string) {
-  if (!process.env.SMTP_USER) {
-    console.log('[EMAIL] Not configured — skipping:', subject);
-    return { success: false, reason: 'not_configured' };
+export async function sendEmail(
+  to: string,
+  subject: string,
+  html: string,
+): Promise<{ success: boolean }> {
+  const authKey = process.env.MSG91_AUTH_KEY;
+  if (!authKey) {
+    console.warn('[EMAIL] MSG91_AUTH_KEY not set — skipping:', subject);
+    return { success: false };
   }
-  return transporter.sendMail({
-    from: process.env.SMTP_FROM || 'Bell24h <noreply@bell24h.com>',
-    to,
-    subject,
-    html,
+
+  const res = await fetch('https://control.msg91.com/api/v5/email/send', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', authkey: authKey },
+    body: JSON.stringify({
+      recipients: [{ to: [{ email: to, name: to }] }],
+      from: { email: 'no-reply@bell24h.com' },
+      domain: 'bell24h.com',
+      subject,
+      body: { type: 'text/html', value: html },
+    }),
   });
+
+  if (!res.ok) {
+    const err = await res.text().catch(() => res.statusText);
+    console.error('[EMAIL] MSG91 send failed:', res.status, err);
+    return { success: false };
+  }
+
+  return { success: true };
 }
