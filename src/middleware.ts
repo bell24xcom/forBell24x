@@ -27,7 +27,7 @@ const CSP = `
   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
   img-src 'self' blob: data: https://*.insforge.app https://*.insforge.site https://www.google-analytics.com https://*.razorpay.com;
   font-src 'self' https://fonts.gstatic.com;
-  connect-src 'self' https://*.insforge.app https://*.insforge.site https://*.nvidia.com https://api.brevo.com https://api.resend.com https://api.razorpay.com https://api.msg91.com https://control.msg91.com https://api.groq.com https://api.openai.com;
+  connect-src 'self' https://*.insforge.app https://*.insforge.site https://*.nvidia.com https://api.razorpay.com https://api.msg91.com https://control.msg91.com https://api.groq.com https://api.openai.com;
   media-src 'self' blob:;
   frame-src 'self' https://api.razorpay.com https://checkout.razorpay.com https://verify.msg91.com;
   object-src 'none';

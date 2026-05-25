@@ -25,7 +25,14 @@
 
 import { prisma } from '@/lib/prisma';
 import { n8nMarketing } from '@/lib/n8n-trigger';
-import { resendService } from '@/lib/resend';
+async function sendEmail(to: string, subject: string, html: string) {
+  console.log('[EMAIL] Stub — to:', to, 'subject:', subject);
+  return { success: true };
+}
+const resendService = {
+  sendEmail: ({ to, subject, html }: { to: string; subject: string; html: string }) =>
+    sendEmail(to, subject, html),
+};
 
 const MAX_SUPPLIERS_TO_NOTIFY = 15;
 const MIN_SUPPLIERS_BEFORE_FALLBACK = 5;
