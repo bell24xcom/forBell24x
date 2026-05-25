@@ -3,11 +3,15 @@ export class N8NMarketing {
   private webhookPath: string;
 
   constructor() {
-    this.baseUrl = process.env.N8N_WEBHOOK_URL || 'http://165.232.187.195:5678/webhook/';
+    if (!process.env.N8N_WEBHOOK_URL) {
+      console.warn('[n8n] N8N_WEBHOOK_URL not set — webhook events will be skipped');
+    }
+    this.baseUrl = process.env.N8N_WEBHOOK_URL || '';
     this.webhookPath = 'bell24h-events';
   }
 
   private async sendToN8N(eventType: string, data: unknown) {
+    if (!this.baseUrl) return;
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 5000); // 5s timeout
     try {
