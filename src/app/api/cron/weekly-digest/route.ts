@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyCronSecret } from '@/lib/cronAuth';
-import { resendService } from '@/lib/resend';
+import { sendEmail as _sendEmail } from '@/lib/email';
+const resendService = { sendEmail: ({ to, subject, html }: { to: string; subject: string; html: string }) => _sendEmail(to, subject, html) };
 
 export const dynamic = 'force-dynamic';
 

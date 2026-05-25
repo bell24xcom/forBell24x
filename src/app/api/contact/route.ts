@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { resendService } from '@/lib/resend';
+import { sendEmail } from '@/lib/email';
 
 export async function POST(request: NextRequest) {
   try {
@@ -37,11 +37,7 @@ export async function POST(request: NextRequest) {
       </div>
     `;
 
-    await resendService.sendEmail({
-      to: 'bell24h.helpline@gmail.com',
-      subject: subjectLine,
-      html,
-    });
+    await sendEmail('bell24h.helpline@gmail.com', subjectLine, html);
 
     return NextResponse.json({ success: true });
   } catch (error) {
