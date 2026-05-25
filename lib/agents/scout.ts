@@ -57,49 +57,73 @@ export async function findSuppliers(ctx: {
   });
   winningQuotes.forEach(q => memorySupplierIds.add(q.supplierId));
 
-  // DB search: claimed suppliers; prefer memory-matched suppliers if available
+  // Three-tier supplier search:
+  //   Tier 1: suppliers proven on similar RFQs (memory)
+  //   Tier 2: suppliers who self-declared this category or quoted it before
+  //   Tier 3: any active supplier (last resort so cold-start RFQs still notify someone)
+  const SUPPLIER_SELECT = {
+    id: true,
+    name: true,
+    company: true,
+    phone: true,
+    email: true,
+    location: true,
+    trustScore: true,
+  };
+  const locationFilter = location && location !== 'Pan India' ? { location } : {};
+  const categoryFilter = {
+    OR: [
+      { preferences: { path: ['categories'], array_contains: category } },
+      { quotes: { some: { rfq: { category } } } },
+    ],
+  };
   const hasMemorySuppliers = memorySupplierIds.size > 0;
-  const dbSuppliers = await prisma.user.findMany({
-    where: {
-      role: 'SUPPLIER',
-      isClaimed: true,
-      isActive: true,
-      ...(location && location !== 'Pan India' ? { location } : {}),
-      // If we have category-proven suppliers from memory, prefer them
-      ...(hasMemorySuppliers ? { id: { in: [...memorySupplierIds] } } : {}),
-    },
-    select: {
-      id: true,
-      name: true,
-      company: true,
-      phone: true,
-      email: true,
-      location: true,
-      trustScore: true,
-    },
-    take: 50,
-  });
 
-  // Fallback: if no memory-matched suppliers found, fetch all active suppliers
-  const allSuppliers = dbSuppliers.length > 0 ? dbSuppliers : await prisma.user.findMany({
-    where: {
-      role: 'SUPPLIER',
-      isClaimed: true,
-      isActive: true,
-      ...(location && location !== 'Pan India' ? { location } : {}),
-    },
-    select: {
-      id: true,
-      name: true,
-      company: true,
-      phone: true,
-      email: true,
-      location: true,
-      trustScore: true,
-    },
-    orderBy: { trustScore: 'desc' },
-    take: 30,
-  });
+  // Tier 1 — memory-proven for similar RFQs
+  let allSuppliers = hasMemorySuppliers
+    ? await prisma.user.findMany({
+        where: {
+          role: 'SUPPLIER',
+          isClaimed: true,
+          isActive: true,
+          ...locationFilter,
+          id: { in: [...memorySupplierIds] },
+        },
+        select: SUPPLIER_SELECT,
+        take: 50,
+      })
+    : [];
+
+  // Tier 2 — category-matched via preferences or past quotes
+  if (allSuppliers.length === 0) {
+    allSuppliers = await prisma.user.findMany({
+      where: {
+        role: 'SUPPLIER',
+        isClaimed: true,
+        isActive: true,
+        ...locationFilter,
+        ...categoryFilter,
+      },
+      select: SUPPLIER_SELECT,
+      orderBy: { trustScore: 'desc' },
+      take: 50,
+    });
+  }
+
+  // Tier 3 — true cold start, no category signal anywhere; notify all active in location
+  if (allSuppliers.length === 0) {
+    allSuppliers = await prisma.user.findMany({
+      where: {
+        role: 'SUPPLIER',
+        isClaimed: true,
+        isActive: true,
+        ...locationFilter,
+      },
+      select: SUPPLIER_SELECT,
+      orderBy: { trustScore: 'desc' },
+      take: 30,
+    });
+  }
 
   // Score and rank
   const scored = allSuppliers.map(s => {
