@@ -11,7 +11,7 @@ export default function FinalCTA() {
           Ready to Transform Your Procurement?
         </h2>
         <p className="text-xl text-white/90 mb-12 max-w-3xl mx-auto">
-          Join thousands of businesses using Bell24h for faster, smarter B2B transactions
+          Get your first quote in 24 hours. Free forever.
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center flex-wrap">
