@@ -107,9 +107,9 @@ async function getCategory(slug: string) {
     const category = await prisma.category.findFirst({
       where: {
         OR: [
-          { slug: resolvedSlug },
-          { slug: resolvedSlug.replace(/-/g, '_') },
-          { slug: resolvedSlug.replace(/_/g, '-') },
+          { slug: { equals: resolvedSlug, mode: 'insensitive' } },
+          { slug: { equals: resolvedSlug.replace(/-/g, '_'), mode: 'insensitive' } },
+          { slug: { equals: resolvedSlug.replace(/_/g, '-'), mode: 'insensitive' } },
           { name: { contains: resolvedSlug.replace(/-/g, ' '), mode: 'insensitive' } },
           { name: { contains: resolvedSlug.replace(/_/g, ' '), mode: 'insensitive' } },
         ],
@@ -147,6 +147,42 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
     title: `${category?.name || 'Category'} - Bell24h`,
     description: category?.description || `Find suppliers and create RFQs for ${category?.name || 'this category'}`
   };
+}
+
+async function getCategoryRFQs(categoryId: number, categoryName: string) {
+  try {
+    return await prisma.rFQ.findMany({
+      where: {
+        status: 'ACTIVE',
+        OR: [
+          { categoryId },
+          { category: { equals: categoryName, mode: 'insensitive' } },
+          { category: { contains: categoryName, mode: 'insensitive' } },
+        ],
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 20,
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        quantity: true,
+        location: true,
+        createdAt: true,
+      },
+    });
+  } catch (err) {
+    console.error('[Category Page] RFQ query failed:', err);
+    return [];
+  }
+}
+
+function timeAgo(date: Date): string {
+  const sec = Math.floor((Date.now() - date.getTime()) / 1000);
+  if (sec < 60) return 'just now';
+  if (sec < 3600) return `${Math.floor(sec / 60)} min ago`;
+  if (sec < 86400) return `${Math.floor(sec / 3600)} hours ago`;
+  return `${Math.floor(sec / 86400)} days ago`;
 }
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
@@ -193,6 +229,8 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
       </div>
     );
   }
+
+  const rfqs = await getCategoryRFQs(category.id, category.name);
 
   return (
     <div className="min-h-screen bg-[#0F172A] py-12">
@@ -260,30 +298,46 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
           </div>
         )}
 
-        {/* Popular RFQs in this Category */}
+        {/* Real RFQs in this Category */}
         <div className="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-8">
-          <h2 className="text-2xl font-bold text-white mb-6">Popular Searches in {category.name}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-slate-700/50 border border-slate-600 p-5 rounded-lg">
-                <div className="flex items-center mb-3">
-                  <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center mr-3">
-                    <span className="text-blue-400 font-bold">{i}</span>
+          <h2 className="text-2xl font-bold text-white mb-6">
+            {rfqs.length > 0 ? `Active RFQs in ${category.name}` : `No RFQs in ${category.name} yet`}
+          </h2>
+
+          {rfqs.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {rfqs.map((rfq, i) => (
+                <Link
+                  key={rfq.id}
+                  href={`/rfq/${rfq.id}`}
+                  className="block bg-slate-700/50 border border-slate-600 hover:border-blue-500/50 p-5 rounded-lg transition-all"
+                >
+                  <div className="flex items-center mb-3">
+                    <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
+                      <span className="text-blue-400 font-bold">{i + 1}</span>
+                    </div>
+                    <div className="min-w-0">
+                      <h4 className="font-semibold text-white truncate">{rfq.title}</h4>
+                      <p className="text-xs text-slate-400">
+                        {timeAgo(rfq.createdAt)}
+                        {rfq.location ? ` · ${rfq.location}` : ''}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="font-semibold text-white">Sample RFQ #{i}</h4>
-                    <p className="text-xs text-slate-400">Posted 2 days ago</p>
-                  </div>
-                </div>
-                <p className="text-sm text-slate-300 mb-3">
-                  Example RFQ for {category.name.toLowerCase()} products
-                </p>
-                <button className="text-blue-400 hover:text-blue-300 text-sm font-medium">
-                  View Details →
-                </button>
-              </div>
-            ))}
-          </div>
+                  {rfq.description && (
+                    <p className="text-sm text-slate-300 mb-3 line-clamp-2">{rfq.description}</p>
+                  )}
+                  {rfq.quantity && (
+                    <p className="text-xs text-slate-400">Qty: {rfq.quantity}</p>
+                  )}
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <p className="text-center text-slate-400 py-6">
+              Be the first to post an RFQ in this category — suppliers are watching.
+            </p>
+          )}
 
           <div className="mt-8 text-center">
             <Link
