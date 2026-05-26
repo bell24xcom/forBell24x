@@ -67,6 +67,21 @@ export async function POST(request: NextRequest) {
       if (!transcription) {
         throw new Error('Groq returned empty transcription');
       }
+
+      // Reject unusably short transcriptions — almost certainly the
+      // mic captured silence/noise and Whisper hallucinated a word or two.
+      // Don't generate a garbage RFQ from "you" / "uh" / "ok".
+      if (transcription.trim().length < 10) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'Recording too short or unclear. Please speak for at least 5 seconds describing what you need (product, quantity, location).',
+            transcription,
+            debug: { stage: 'transcription_too_short', length: transcription.trim().length },
+          },
+          { status: 400 },
+        );
+      }
     } catch (transcriptionError) {
       console.error('[Voice RFQ] Transcription error:', transcriptionError);
       return NextResponse.json(
@@ -86,14 +101,19 @@ export async function POST(request: NextRequest) {
 
 Text: "${transcription}"
 
+Rules:
+- If the text is unclear, ambiguous, or doesn't clearly describe a product/service the user wants to buy, set category to "Other" and product to null.
+- Match the category strictly to what the user said. Do NOT guess. If unsure, use "Other".
+- Examples: "cotton t-shirts" → "Apparel & Clothing"; "steel pipes" → "Metals & Alloys"; "LED bulbs" → "Electronics & Electricals".
+
 JSON format (all fields required, use null if not mentioned):
 {
-  "product": "product name",
+  "product": "specific product name (e.g. 'Cotton T-Shirts', 'Steel Pipes') or null if unclear",
   "quantity": number or null,
   "unit": "kg/tons/pieces/meters/liters/boxes/units" or null,
   "location": "city" or null,
   "urgency": "urgent/1_week/2_weeks/1_month/flexible",
-  "category": "Steel & Metals/Electronics/Textiles/Chemicals/Packaging/Industrial Machinery/Auto Components/Rubber & Plastics/Food & Beverages/Construction/Pharmaceuticals/Paper Products/Electrical/Furniture/Other",
+  "category": "Other | Apparel & Clothing | Textiles & Garments | Metals & Alloys | Electronics & Electricals | Machinery & Equipment | Chemicals & Petrochemicals | Construction & Real Estate | Food & Beverages | Pharmaceuticals & Healthcare | Automotive & Transport | Plastics & Rubber | Paper & Printing | Agriculture & Farming | IT & Telecom | Furniture & Wood | Safety & Security",
   "specifications": "specs or null",
   "budgetMin": number or null,
   "budgetMax": number or null
@@ -106,7 +126,7 @@ JSON format (all fields required, use null if not mentioned):
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'llama-3.1-8b-instant',
+          model: 'llama-3.1-70b-versatile',
           messages: [{ role: 'user', content: extractionPrompt }],
           max_tokens: 500,
           temperature: 0.1,
@@ -130,27 +150,28 @@ JSON format (all fields required, use null if not mentioned):
       console.log('[Voice RFQ] Extraction success:', extractedData);
     } catch (extractionError) {
       console.error('[Voice RFQ] Extraction error:', extractionError);
-      // Return transcription but with basic extraction fallback
+      // Return a minimal fallback — do NOT use the raw transcription as a
+      // product name (it leaks "you" / partial words into the title) and do
+      // NOT pick a category. Force the user to fill these in manually.
       extractedData = {
-        product: transcription.substring(0, 50),
+        product: null,
         quantity: null,
         unit: null,
         location: null,
         urgency: 'flexible',
-        category: 'Other',
+        category: null,
         specifications: null,
         budgetMin: null,
         budgetMax: null,
       };
     }
 
-    // Return both transcription and extracted data
     return NextResponse.json({
       success: true,
       transcription,
       transcriptionSource: 'Groq Whisper v3',
       extractedData,
-      aiModel: 'Groq Llama 3.1 8B',
+      aiModel: 'Groq Llama 3.1 70B',
       timestamp: new Date().toISOString(),
       debug: {
         groqKeyPresent: true,
