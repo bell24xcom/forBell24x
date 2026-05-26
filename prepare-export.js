@@ -1,7 +1,7 @@
 /**
- * Bell24H Project Export Preparation Script
+ * Bell24h Project Export Preparation Script
  * 
- * This script prepares the Bell24H project for export from Replit by:
+ * This script prepares the Bell24h project for export from Replit by:
  * 1. Building the client-side application with Vite
  * 2. Creating a list of all important files
  * 3. Providing instructions for downloading the project
@@ -13,7 +13,7 @@ const { exec } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-console.log('📦 Starting Bell24H export preparation...');
+console.log('📦 Starting Bell24h export preparation...');
 
 // Create an export directory if it doesn't exist
 if (!fs.existsSync('export')) {
@@ -53,7 +53,7 @@ function createFileList() {
       const fileListPath = 'export/file_list.txt';
       const fileListStream = fs.createWriteStream(fileListPath);
       
-      fileListStream.write('# Bell24H Project File List\n');
+      fileListStream.write('# Bell24h Project File List\n');
       fileListStream.write('# This file contains a list of important files in the project\n\n');
       
       function writeFileList(dir, base = '') {
@@ -105,11 +105,11 @@ function createExportReadme() {
     
     try {
       const readmePath = 'export/EXPORT_INSTRUCTIONS.md';
-      const readmeContent = `# Bell24H Project Export Instructions
+      const readmeContent = `# Bell24h Project Export Instructions
 
 ## How to Download from Replit
 
-Follow these steps to download the complete Bell24H project from Replit:
+Follow these steps to download the complete Bell24h project from Replit:
 
 1. **Download as ZIP**
    - In the Replit file sidebar, click the three dots (⋮) and select "Download as zip"
@@ -192,7 +192,7 @@ async function prepareExport() {
     console.log('\nTo download the project from Replit:');
     console.log('1. In the file explorer, click the three dots (⋮) and select "Download as zip"');
     console.log('2. Follow the instructions in export/EXPORT_INSTRUCTIONS.md if any files are missing');
-    console.log('\nYou can now download and use the Bell24H project locally or deploy it elsewhere.');
+    console.log('\nYou can now download and use the Bell24h project locally or deploy it elsewhere.');
   } catch (error) {
     console.error('❌ Export preparation failed:', error);
   }

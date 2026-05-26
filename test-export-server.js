@@ -1,5 +1,5 @@
 /**
- * Bell24H Analytics Export Test Server
+ * Bell24h Analytics Export Test Server
  * 
  * This is a minimal Express server that replicates just the analytics export 
  * functionality for testing purposes.
@@ -102,7 +102,7 @@ const jsonToPDF = (data) => {
   html += '@media print { body { padding: 20px; } }';
   html += '</style></head><body>';
   
-  html += '<h1>Bell24H Analytics Export</h1>';
+  html += '<h1>Bell24h Analytics Export</h1>';
   html += '<p>Generated on ' + new Date().toLocaleString() + '</p>';
   
   html += '<table>';
@@ -320,7 +320,7 @@ app.get('/', (req, res) => {
   res.send(`
     <html>
       <head>
-        <title>Bell24H Analytics Export Tester</title>
+        <title>Bell24h Analytics Export Tester</title>
         <style>
           body { font-family: Arial, sans-serif; margin: 0; padding: 20px; line-height: 1.6; }
           h1 { color: #2563eb; }
@@ -338,7 +338,7 @@ app.get('/', (req, res) => {
       </head>
       <body>
         <div class="container">
-          <h1>Bell24H Analytics Export Tester</h1>
+          <h1>Bell24h Analytics Export Tester</h1>
           <p>Use the options below to test the analytics export functionality.</p>
           
           <div class="card">

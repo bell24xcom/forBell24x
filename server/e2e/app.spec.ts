@@ -10,7 +10,7 @@ test.describe('Application Basic Flows', () => {
     });
     
     await test.step('Verify page title', async () => {
-      await expect(page).toHaveTitle(/Bell24H Dashboard/);
+      await expect(page).toHaveTitle(/Bell24h Dashboard/);
     });
   });
 

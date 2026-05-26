@@ -1,5 +1,5 @@
 /**
- * Bell24H Rate Limiting System
+ * Bell24h Rate Limiting System
  *
  * Implements comprehensive rate limiting with Redis for API abuse prevention
  * Supports multiple limiting strategies and enterprise configurations

@@ -155,7 +155,7 @@ async function exportToCsv(data: PerplexityExportData, filename: string): Promis
  */
 async function exportToExcel(data: PerplexityExportData, filename: string): Promise<void> {
   const workbook = new ExcelJS.Workbook();
-  workbook.creator = 'Bell24H Perplexity Dashboard';
+  workbook.creator = 'Bell24h Perplexity Dashboard';
   workbook.created = new Date();
 
   // Overview sheet
@@ -265,7 +265,7 @@ async function exportToPdf(data: PerplexityExportData, filename: string): Promis
   // Define the document definition
   const docDefinition: any = {
     content: [
-      { text: 'Bell24H Perplexity Analysis', style: 'header' },
+      { text: 'Bell24h Perplexity Analysis', style: 'header' },
       { text: new Date(data.timestamp).toLocaleString(), alignment: 'right' },
 
       { text: 'Basic Information', style: 'subheader', margin: [0, 15, 0, 5] },

@@ -18,7 +18,7 @@ app.use((req, res, next) => {
 app.get('/', (req, res) => {
   res.json({ 
     status: 'success', 
-    message: 'Minimal Bell24H server is working!',
+    message: 'Minimal Bell24h server is working!',
     timestamp: new Date().toISOString(),
     version: '1.0.0'
   });
@@ -65,7 +65,7 @@ app.use('*', (req, res) => {
 
 // Start server
 app.listen(port, () => {
-  console.log(`✅ Minimal Bell24H server running on port ${port}`);
+  console.log(`✅ Minimal Bell24h server running on port ${port}`);
   console.log(`🌐 Health check: http://localhost:${port}/api/health`);
   console.log(`🧪 Test endpoint: http://localhost:${port}/api/test`);
   console.log(`📊 Server started at: ${new Date().toISOString()}`);

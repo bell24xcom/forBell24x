@@ -1,4 +1,4 @@
-// Bell24H Comprehensive RFQ Generation System
+// Bell24h Comprehensive RFQ Generation System
 // Generates 600+ realistic demo RFQs for all 50 categories and 300+ subcategories
 
 export interface RFQ {

@@ -1,5 +1,5 @@
 /**
- * Neon Database Service for Bell24H
+ * Neon Database Service for Bell24h
  * 
  * Provides methods for interacting with Neon PostgreSQL,
  * optimized for supplier risk scoring and analytics.

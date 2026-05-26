@@ -1,5 +1,5 @@
 /**
- * Bell24H Multilingual Voice RFQ Test Script
+ * Bell24h Multilingual Voice RFQ Test Script
  * 
  * This script tests the multilingual Voice RFQ API endpoints with support for
  * Hindi and English languages, audio enhancement, and language detection.
@@ -240,7 +240,7 @@ async function testVoiceRfqListing() {
  */
 async function runTests() {
   try {
-    console.log('=== Starting Bell24H Multilingual Voice RFQ Tests ===');
+    console.log('=== Starting Bell24h Multilingual Voice RFQ Tests ===');
     
     // First check if OpenAI API key is present
     if (!process.env.OPENAI_API_KEY) {

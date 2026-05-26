@@ -1,5 +1,5 @@
 /**
- * AI Explainability Service for Bell24H
+ * AI Explainability Service for Bell24h
  * 
  * This service provides utilities for explaining AI model predictions
  * using SHAP, LIME, and perplexity metrics to enhance model transparency.

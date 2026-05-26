@@ -1,5 +1,5 @@
 /**
- * Advanced Perplexity Analytics Service for Bell24H
+ * Advanced Perplexity Analytics Service for Bell24h
  * 
  * This service extends the basic perplexity calculation with advanced
  * business analytics capabilities including temporal analysis, competitive

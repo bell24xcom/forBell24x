@@ -10,7 +10,7 @@ const pool = new Pool({
 
 async function quickSetup() {
   try {
-    console.log('🚀 Quick Database Setup for Bell24H');
+    console.log('🚀 Quick Database Setup for Bell24h');
     console.log('=====================================');
     
     // Test connection

@@ -38,7 +38,7 @@ export class MFAService {
       // Generate QR code URL
       const otpauth = authenticator.keyuri(
         userId,
-        'Bell24H.com',
+        'Bell24h.com',
         secret
       );
 

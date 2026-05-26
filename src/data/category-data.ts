@@ -1,5 +1,5 @@
 /**
- * Bell24H Complete Category Data Structure
+ * Bell24h Complete Category Data Structure
  *
  * Comprehensive category system with subcategories, RFQs, suppliers, and products
  * This connects the category flow from homepage to individual business actions

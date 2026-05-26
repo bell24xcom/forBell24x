@@ -1,7 +1,7 @@
 /**
  * Global SEO Manager
  *
- * Comprehensive SEO management system for Bell24H's global expansion
+ * Comprehensive SEO management system for Bell24h's global expansion
  * Handles meta tags, structured data, sitemaps, and international SEO
  */
 
@@ -112,7 +112,7 @@ export class GlobalSEOManager {
       'og:title': title,
       'og:description': description,
       'og:url': url,
-      'og:site_name': `Bell24H ${this.country.name}`,
+      'og:site_name': `Bell24h ${this.country.name}`,
       'og:image': image || `https://${this.country.domain}/images/og-default.jpg`,
       'og:image:width': '1200',
       'og:image:height': '630',
@@ -196,7 +196,7 @@ export class GlobalSEOManager {
   // Private helper methods
   private generateTitle(type: string, data: any) {
     const templates = GLOBAL_META_TEMPLATES[type as keyof typeof GLOBAL_META_TEMPLATES];
-    if (!templates) return `Bell24H ${this.country.name}`;
+    if (!templates) return `Bell24h ${this.country.name}`;
 
     let title = templates.title;
     title = title.replace('{country}', this.country.name);
@@ -246,7 +246,7 @@ export class GlobalSEOManager {
     return {
       '@context': 'https://schema.org',
       '@type': 'Organization',
-      name: `Bell24H ${this.country.name}`,
+      name: `Bell24h ${this.country.name}`,
       url: `https://${this.country.domain}`,
       logo: `https://${this.country.domain}/logo.png`,
       description: `Leading B2B marketplace in ${
@@ -277,7 +277,7 @@ export class GlobalSEOManager {
     return {
       '@context': 'https://schema.org',
       '@type': 'WebSite',
-      name: `Bell24H ${this.country.name}`,
+      name: `Bell24h ${this.country.name}`,
       url: `https://${this.country.domain}`,
       potentialAction: {
         '@type': 'SearchAction',
@@ -295,7 +295,7 @@ export class GlobalSEOManager {
       description: `Professional B2B marketplace connecting suppliers and buyers in ${this.country.name}`,
       provider: {
         '@type': 'Organization',
-        name: `Bell24H ${this.country.name}`,
+        name: `Bell24h ${this.country.name}`,
       },
     };
   }

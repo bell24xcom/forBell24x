@@ -1,4 +1,4 @@
-// Mock product and RFQ data for Bell24H marketplace
+// Mock product and RFQ data for Bell24h marketplace
 import { ALL_CATEGORIES, type Category } from './categories';
 
 export interface MockProduct {

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Bell24H CI/CD Integration Script
+ * Bell24h CI/CD Integration Script
  * Comprehensive automation for testing, monitoring, and deployment validation
  */
 
@@ -10,7 +10,7 @@ const path = require('path');
 const { spawn, exec } = require('child_process');
 const os = require('os');
 
-class Bell24HCICDIntegration {
+class Bell24hCICDIntegration {
   constructor() {
     this.projectRoot = process.cwd();
     this.reportDir = path.join(this.projectRoot, 'test-reports');
@@ -39,7 +39,7 @@ class Bell24HCICDIntegration {
 
   async run() {
     try {
-      console.log('🔔 Starting Bell24H CI/CD Pipeline...');
+      console.log('🔔 Starting Bell24h CI/CD Pipeline...');
       console.log(`📍 Project Root: ${this.projectRoot}`);
       console.log(`🕒 Start Time: ${this.results.startTime.toISOString()}`);
       
@@ -50,12 +50,12 @@ class Bell24HCICDIntegration {
       await this.sendNotifications();
       
       this.results.status = 'success';
-      console.log('✅ Bell24H CI/CD Pipeline completed successfully!');
+      console.log('✅ Bell24h CI/CD Pipeline completed successfully!');
       
     } catch (error) {
       this.results.status = 'failed';
       this.results.error = error.message;
-      console.error('❌ Bell24H CI/CD Pipeline failed:', error.message);
+      console.error('❌ Bell24h CI/CD Pipeline failed:', error.message);
       
       await this.handleFailure(error);
       process.exit(1);
@@ -240,7 +240,7 @@ class Bell24HCICDIntegration {
       console.log('🔒 Generating security audit report...');
       await this.generateSecurityReport();
       
-      // Generate Bell24H feature-specific reports
+      // Generate Bell24h feature-specific reports
       console.log('🎯 Generating feature-specific reports...');
       await this.generateFeatureReports();
       
@@ -270,13 +270,13 @@ class Bell24HCICDIntegration {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bell24H CI/CD Test Report</title>
+    <title>Bell24h CI/CD Test Report</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50">
     <div class="max-w-6xl mx-auto px-4 py-8">
         <header class="text-center mb-8">
-            <h1 class="text-4xl font-bold text-blue-600 mb-2">🔔 Bell24H CI/CD Test Report</h1>
+            <h1 class="text-4xl font-bold text-blue-600 mb-2">🔔 Bell24h CI/CD Test Report</h1>
             <p class="text-gray-600">Generated: ${new Date().toLocaleString()}</p>
         </header>
         
@@ -524,7 +524,7 @@ class Bell24HCICDIntegration {
 
   async sendSlackNotification(summary) {
     const message = {
-      text: `🔔 Bell24H CI/CD Pipeline ${summary.status === 'success' ? 'Completed Successfully' : 'Failed'}`,
+      text: `🔔 Bell24h CI/CD Pipeline ${summary.status === 'success' ? 'Completed Successfully' : 'Failed'}`,
       attachments: [
         {
           color: summary.status === 'success' ? 'good' : 'danger',
@@ -545,9 +545,9 @@ class Bell24HCICDIntegration {
   async sendEmailNotification(summary) {
     const emailData = {
       to: this.config.notifications.email,
-      subject: `Bell24H CI/CD Pipeline ${summary.status === 'success' ? 'Success' : 'Failure'}`,
+      subject: `Bell24h CI/CD Pipeline ${summary.status === 'success' ? 'Success' : 'Failure'}`,
       body: `
-        Bell24H CI/CD Pipeline Results
+        Bell24h CI/CD Pipeline Results
         
         Status: ${summary.status}
         Duration: ${summary.duration} minutes
@@ -570,9 +570,9 @@ class Bell24HCICDIntegration {
       "@type": "MessageCard",
       "@context": "http://schema.org/extensions",
       "themeColor": summary.status === 'success' ? "00FF00" : "FF0000",
-      "summary": `Bell24H CI/CD Pipeline ${summary.status}`,
+      "summary": `Bell24h CI/CD Pipeline ${summary.status}`,
       "sections": [{
-        "activityTitle": `Bell24H CI/CD Pipeline ${summary.status === 'success' ? 'Completed' : 'Failed'}`,
+        "activityTitle": `Bell24h CI/CD Pipeline ${summary.status === 'success' ? 'Completed' : 'Failed'}`,
         "facts": [
           { "name": "Duration", "value": `${summary.duration} minutes` },
           { "name": "Pass Rate", "value": `${summary.passRate}%` },
@@ -612,7 +612,7 @@ class Bell24HCICDIntegration {
 
   async sendFailureNotification(error) {
     const message = {
-      text: '🚨 Bell24H CI/CD Pipeline Failed',
+      text: '🚨 Bell24h CI/CD Pipeline Failed',
       attachments: [
         {
           color: 'danger',
@@ -793,11 +793,11 @@ class Bell24HCICDIntegration {
 
 // Main execution
 if (require.main === module) {
-  const pipeline = new Bell24HCICDIntegration();
+  const pipeline = new Bell24hCICDIntegration();
   pipeline.run().catch(error => {
     console.error('Pipeline execution failed:', error);
     process.exit(1);
   });
 }
 
-module.exports = { Bell24HCICDIntegration }; 
+module.exports = { Bell24hCICDIntegration }; 

@@ -1,7 +1,7 @@
 /**
- * Bell24H Download Helper Script
+ * Bell24h Download Helper Script
  * 
- * This script provides a simple way to download the Bell24H project from Replit.
+ * This script provides a simple way to download the Bell24h project from Replit.
  * It creates a minimal zip file containing only the essential files needed for development.
  * 
  * Run this script to create a download-ready zip file.
@@ -11,7 +11,7 @@ const fs = require('fs');
 const path = require('path');
 const archiver = require('archiver');
 
-console.log('📦 Starting Bell24H download preparation...');
+console.log('📦 Starting Bell24h download preparation...');
 
 // Create a download directory if it doesn't exist
 if (!fs.existsSync('download')) {
@@ -77,9 +77,9 @@ function createDownloadZip() {
     });
     
     // Create README for the download
-    const readmeContent = `# Bell24H Project Download
+    const readmeContent = `# Bell24h Project Download
 
-This zip file contains the essential source code and configuration files for the Bell24H B2B marketplace platform.
+This zip file contains the essential source code and configuration files for the Bell24h B2B marketplace platform.
 
 ## Getting Started
 
@@ -145,9 +145,9 @@ Set the following environment variables in your \`.env\` file:
     const installScriptContent = `#!/usr/bin/env node
 
 /**
- * Bell24H Install Script
+ * Bell24h Install Script
  * 
- * This script helps set up the Bell24H project after download.
+ * This script helps set up the Bell24h project after download.
  */
 const { execSync } = require('child_process');
 const fs = require('fs');
@@ -159,7 +159,7 @@ const rl = readline.createInterface({
   output: process.stdout
 });
 
-console.log('🔧 Bell24H Project Setup');
+console.log('🔧 Bell24h Project Setup');
 console.log('========================');
 
 // Function to install dependencies
@@ -192,7 +192,7 @@ function setupEnv() {
   } else {
     console.log('⚠️ No .env.example file found. Creating a basic .env file...');
     
-    const basicEnv = \`# Bell24H Environment Variables
+    const basicEnv = \`# Bell24h Environment Variables
 DATABASE_URL=postgresql://username:password@localhost:5432/bell24h
 SESSION_SECRET=change_this_to_a_secure_random_string
 OPENAI_API_KEY=your_openai_api_key\`;
@@ -221,7 +221,7 @@ function askToContinue() {
 // Function to run setup process
 async function setup() {
   try {
-    console.log('Starting Bell24H setup process...');
+    console.log('Starting Bell24h setup process...');
     
     const dependenciesInstalled = installDependencies();
     if (!dependenciesInstalled) {

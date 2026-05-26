@@ -35,7 +35,7 @@ const drizzleDb = drizzle(pool, { schema: dbSchema });
 // Enhanced logging utilities for WebSocket server
 function logInfo(message: string, data?: any): void {
   const timestamp = new Date().toISOString();
-  console.log(`[${timestamp}] [Bell24H WebSocket] ${message}`);
+  console.log(`[${timestamp}] [Bell24h WebSocket] ${message}`);
   if (data) {
     console.log(JSON.stringify(data, null, 2));
   }
@@ -43,13 +43,13 @@ function logInfo(message: string, data?: any): void {
 
 function logError(message: string, error: any): void {
   const timestamp = new Date().toISOString();
-  console.error(`[${timestamp}] [Bell24H WebSocket] ERROR: ${message}`);
+  console.error(`[${timestamp}] [Bell24h WebSocket] ERROR: ${message}`);
   console.error(error);
 }
 
 function logWarning(message: string): void {
   const timestamp = new Date().toISOString();
-  console.warn(`[${timestamp}] [Bell24H WebSocket] WARNING: ${message}`);
+  console.warn(`[${timestamp}] [Bell24h WebSocket] WARNING: ${message}`);
 }
 
 // Test database connection function
@@ -167,7 +167,7 @@ const app = express();
 const server = createServer(app);
 const wss = new WebSocketServer({ server });
 
-logInfo(`Initializing Bell24H WebSocket server on port ${WS_PORT}`);
+logInfo(`Initializing Bell24h WebSocket server on port ${WS_PORT}`);
 logInfo(`JWT auth enabled with secret length: ${JWT_SECRET.length} bytes`);
 logInfo(`Environment: ${process.env.NODE_ENV || 'development'}`)
 
@@ -1031,7 +1031,7 @@ wss.on('connection', async (ws, request) => {
   // Send initial connection success message with recent notifications
   sendToClient(ws, {
     type: 'connection_established',
-    message: 'Successfully connected to Bell24H WebSocket server',
+    message: 'Successfully connected to Bell24h WebSocket server',
     timestamp: new Date().toISOString(),
     recentNotifications: RECENT_NOTIFICATIONS.slice(0, 5) // Send 5 most recent notifications
   });

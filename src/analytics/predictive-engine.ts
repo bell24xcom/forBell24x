@@ -1,5 +1,5 @@
 /**
- * Bell24H AI - Predictive Analytics Engine
+ * Bell24h AI - Predictive Analytics Engine
  * Advanced ML-based predictions for RFQ success rates and supplier reliability
  */
 

@@ -1,5 +1,5 @@
 /**
- * Bell24H Project Download Helper
+ * Bell24h Project Download Helper
  * 
  * This script creates a minimal ZIP archive of the project for download,
  * designed to use minimal resources to save Replit tokens.
@@ -17,7 +17,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-console.log('🚀 Bell24H Project Download Helper');
+console.log('🚀 Bell24h Project Download Helper');
 console.log('This script creates a minimal download package to save Replit tokens.');
 
 // Create output directory if it doesn't exist

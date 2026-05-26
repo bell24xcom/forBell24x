@@ -1,5 +1,5 @@
 /**
- * Bell24H Optimized WebSocket Server (High Concurrency Version)
+ * Bell24h Optimized WebSocket Server (High Concurrency Version)
  * Features:
  * - Advanced connection pooling with sharding
  * - Efficient message batching and prioritization
@@ -61,7 +61,7 @@ const server = http.createServer((req, res) => {
   } else {
     // Default response for other endpoints
     res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end('Bell24H WebSocket Server (High Concurrency Edition)');
+    res.end('Bell24h WebSocket Server (High Concurrency Edition)');
   }
 });
 
@@ -126,7 +126,7 @@ wss.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
     type: 'welcome', 
     connectionId,
     timestamp: Date.now(),
-    message: 'Connected to Bell24H WebSocket Server (High Concurrency)',
+    message: 'Connected to Bell24h WebSocket Server (High Concurrency)',
     features: ['batched_messages', 'priority_queue', 'auto_reconnect']
   };
   
@@ -140,7 +140,7 @@ wss.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
 
 // Start server
 server.listen(DEFAULT_CONFIG.port, () => {
-  console.log(`🚀 Bell24H WebSocket Server (High Concurrency) running on port ${DEFAULT_CONFIG.port}`);
+  console.log(`🚀 Bell24h WebSocket Server (High Concurrency) running on port ${DEFAULT_CONFIG.port}`);
   console.log(`- Max Connections: ${DEFAULT_CONFIG.maxConnections}`);
   console.log(`- Connection Shards: 5`);
   console.log(`- Batch Size: ${DEFAULT_CONFIG.batchSize}`);

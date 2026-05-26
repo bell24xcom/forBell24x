@@ -29,7 +29,7 @@ const categories = [
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'ok', 
-    message: 'Bell24H API Server is running!',
+    message: 'Bell24h API Server is running!',
     timestamp: new Date().toISOString()
   });
 });
@@ -88,7 +88,7 @@ app.post('/api/search', (req, res) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`🚀 Bell24H API Server running on http://localhost:${PORT}`);
+  console.log(`🚀 Bell24h API Server running on http://localhost:${PORT}`);
   console.log(`📊 Health check: http://localhost:${PORT}/health`);
   console.log(`📋 Categories: http://localhost:${PORT}/api/categories`);
   console.log(`🔍 Search: POST http://localhost:${PORT}/api/search`);

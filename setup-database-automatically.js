@@ -499,7 +499,7 @@ async function setupDatabaseAutomatically() {
       console.log(`${row.type}: ${row.count}`);
     });
     
-    console.log('\n🎉 Bell24H Database Setup Completed Successfully!');
+    console.log('\n🎉 Bell24h Database Setup Completed Successfully!');
     console.log('\n✅ What was created:');
     console.log('   • 50 main categories + subcategories');
     console.log('   • Complete table structure for suppliers, products, RFQs');

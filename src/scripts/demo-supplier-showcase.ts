@@ -1,5 +1,5 @@
 /**
- * Bell24H Supplier Generation Demo & Showcase
+ * Bell24h Supplier Generation Demo & Showcase
  *
  * Demonstrates the professional quality of generated supplier data
  * Shows realistic business profiles for enterprise marketplace

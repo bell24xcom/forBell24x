@@ -1,8 +1,8 @@
 /**
- * Bell24H Neon PostgreSQL Integration Server
+ * Bell24h Neon PostgreSQL Integration Server
  * 
  * This server provides a REST API for interacting with your Neon PostgreSQL database.
- * It demonstrates how to integrate Neon with your existing Bell24H application.
+ * It demonstrates how to integrate Neon with your existing Bell24h application.
  */
 
 require('dotenv').config();
@@ -127,7 +127,7 @@ const routes = {
     }
   },
   
-  // Sample RFQ count endpoint (Bell24H specific)
+  // Sample RFQ count endpoint (Bell24h specific)
   '/rfq/count': async (req, res) => {
     try {
       // This assumes you have an 'rfqs' table in your database
@@ -152,7 +152,7 @@ const routes = {
     }
   },
   
-  // Sample supplier risk endpoint (Bell24H specific)
+  // Sample supplier risk endpoint (Bell24h specific)
   '/supplier/:id/risk': async (req, res, params) => {
     try {
       const supplierId = params.id;
@@ -260,12 +260,12 @@ const PORT = process.env.PORT || 3001;
 const server = http.createServer(requestHandler);
 
 server.listen(PORT, () => {
-  console.log(`\x1b[32m✓ Bell24H Neon Integration Server running at http://localhost:${PORT}\x1b[0m`);
+  console.log(`\x1b[32m✓ Bell24h Neon Integration Server running at http://localhost:${PORT}\x1b[0m`);
   console.log('\nAvailable endpoints:');
   console.log('  \x1b[36mGET /health\x1b[0m - Check database connection');
   console.log('  \x1b[36mGET /stats\x1b[0m - Get database statistics');
   console.log('  \x1b[36mGET /tables\x1b[0m - List all tables');
   console.log('  \x1b[36mGET /tables/:name\x1b[0m - Get table schema');
-  console.log('  \x1b[36mGET /rfq/count\x1b[0m - Count RFQs (Bell24H specific)');
-  console.log('  \x1b[36mGET /supplier/:id/risk\x1b[0m - Get supplier risk score (Bell24H specific)');
+  console.log('  \x1b[36mGET /rfq/count\x1b[0m - Count RFQs (Bell24h specific)');
+  console.log('  \x1b[36mGET /supplier/:id/risk\x1b[0m - Get supplier risk score (Bell24h specific)');
 });

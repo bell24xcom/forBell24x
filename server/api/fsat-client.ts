@@ -1,5 +1,5 @@
 /**
- * FSAT API Client for Bell24H.com
+ * FSAT API Client for Bell24h.com
  * 
  * Type-safe API client for communicating with the FSAT (Fast Supplier Allocation Tool)
  * service, which provides supplier matching and RFQ processing capabilities.

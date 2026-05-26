@@ -1,4 +1,4 @@
-// Smart Contract Escrow Type Definitions for Bell24H
+// Smart Contract Escrow Type Definitions for Bell24h
 
 export interface EscrowTransaction {
   id: string;

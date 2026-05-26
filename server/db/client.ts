@@ -1,5 +1,5 @@
 /**
- * Database client for Bell24H application
+ * Database client for Bell24h application
  * 
  * This provides a central database connection instance to be used across the application
  */

@@ -1,4 +1,4 @@
-// Input validation utilities for Bell24H
+// Input validation utilities for Bell24h
 
 export class ValidationError extends Error {
   constructor(message, field) {

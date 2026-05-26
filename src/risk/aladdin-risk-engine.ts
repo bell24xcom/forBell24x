@@ -1,5 +1,5 @@
 /**
- * Bell24H AI - Enterprise-Style Risk Scoring Engine
+ * Bell24h AI - Enterprise-Style Risk Scoring Engine
  * Comprehensive risk assessment system inspired by industry best practices
  * 250+ risk parameters with multi-dimensional analysis
  */

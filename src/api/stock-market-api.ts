@@ -1,5 +1,5 @@
 /**
- * Bell24H AI - India Stock Market API Integration
+ * Bell24h AI - India Stock Market API Integration
  * Real-time NSE/BSE data with multiple API fallbacks and financial intelligence
  */
 
@@ -364,7 +364,7 @@ export class StockMarketAPI {
 
     const response = await fetch(url, {
       headers: {
-        'User-Agent': 'Bell24H-AI-Platform/1.0',
+        'User-Agent': 'Bell24h-AI-Platform/1.0',
       },
     });
 

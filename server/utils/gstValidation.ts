@@ -1,5 +1,5 @@
 /**
- * Bell24H GST Validation Utility with Blockchain Verification
+ * Bell24h GST Validation Utility with Blockchain Verification
  * 
  * This module provides functions for validating GSTIN numbers and
  * verifying them on the Polygon Mumbai Testnet blockchain.

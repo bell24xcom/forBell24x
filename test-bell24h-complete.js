@@ -3,7 +3,7 @@
 /**
  * 🎯 BELL24H COMPREHENSIVE TESTING SCRIPT
  * 
- * This script verifies all components of the Bell24H platform:
+ * This script verifies all components of the Bell24h platform:
  * - Demo data population
  * - AI service functionality
  * - Frontend features
@@ -371,7 +371,7 @@ function generateReport() {
   // Overall assessment
   log(`\n${colors.bright}Overall Assessment:${colors.reset}`, 'bright');
   if (parseFloat(successRate) >= 90) {
-    log('🎉 EXCELLENT: Bell24H platform is fully operational!', 'green');
+    log('🎉 EXCELLENT: Bell24h platform is fully operational!', 'green');
   } else if (parseFloat(successRate) >= 70) {
     log('⚠️ GOOD: Most features working, some issues to address', 'yellow');
   } else {
@@ -395,7 +395,7 @@ function generateReport() {
 // Main test execution
 async function runAllTests() {
   log(`${colors.bright}${colors.magenta}🎯 BELL24H COMPREHENSIVE TESTING SCRIPT${colors.reset}`, 'magenta');
-  log(`${colors.cyan}Testing all components of the Bell24H platform...${colors.reset}`, 'cyan');
+  log(`${colors.cyan}Testing all components of the Bell24h platform...${colors.reset}`, 'cyan');
   
   try {
     await testServiceAvailability();

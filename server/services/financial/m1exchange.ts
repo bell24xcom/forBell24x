@@ -1,7 +1,7 @@
 /**
  * M1 Exchange Financial Services Integration
  * 
- * Provides early milestone payment services for Bell24H marketplace
+ * Provides early milestone payment services for Bell24h marketplace
  * 
  * @module server/services/financial/m1exchange
  */

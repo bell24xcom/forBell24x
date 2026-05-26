@@ -1,5 +1,5 @@
 /**
- * Authentication middleware for Bell24H API endpoints
+ * Authentication middleware for Bell24h API endpoints
  */
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';

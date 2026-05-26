@@ -1,5 +1,5 @@
 /**
- * Simple Demo - Bell24H Supplier Generation System
+ * Simple Demo - Bell24h Supplier Generation System
  *
  * Basic demonstration of the supplier generation capabilities
  * Shows the system can generate professional supplier data

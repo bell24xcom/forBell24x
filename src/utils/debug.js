@@ -1,4 +1,4 @@
-// Comprehensive debugging utility for Bell24H
+// Comprehensive debugging utility for Bell24h
 
 export const debugUtils = {
   // Global error handler
@@ -38,7 +38,7 @@ export const debugUtils = {
       context
     };
 
-    console.error('🔍 Bell24H Error Log:', errorLog);
+    console.error('🔍 Bell24h Error Log:', errorLog);
 
     // In production, you could send this to an error reporting service
     if (process.env.NODE_ENV === 'production') {

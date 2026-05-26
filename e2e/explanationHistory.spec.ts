@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Bell24H - Explanation History E2E Tests', () => {
+test.describe('Bell24h - Explanation History E2E Tests', () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to the explainability admin page
     await page.goto('/admin/explainability');

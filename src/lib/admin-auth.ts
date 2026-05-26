@@ -36,7 +36,7 @@ export class AdminAuthService {
     {
       id: 1,
       email: 'superadmin@bell24h.com',
-      password: 'Bell24H@SuperAdmin2025!',
+      password: 'Bell24h@SuperAdmin2025!',
       role: this.ADMIN_ROLES.SUPER_ADMIN,
       name: 'Super Administrator',
       lastLogin: null,
@@ -46,7 +46,7 @@ export class AdminAuthService {
     {
       id: 2,
       email: 'admin@bell24h.com',
-      password: 'Bell24H@Admin2025!',
+      password: 'Bell24h@Admin2025!',
       role: this.ADMIN_ROLES.PLATFORM_ADMIN,
       name: 'Platform Administrator',
       lastLogin: null,
@@ -56,7 +56,7 @@ export class AdminAuthService {
     {
       id: 3,
       email: 'support@bell24h.com',
-      password: 'Bell24H@Support2025!',
+      password: 'Bell24h@Support2025!',
       role: this.ADMIN_ROLES.SUPPORT_ADMIN,
       name: 'Support Administrator',
       lastLogin: null,
@@ -66,7 +66,7 @@ export class AdminAuthService {
     {
       id: 4,
       email: 'analytics@bell24h.com',
-      password: 'Bell24H@Analytics2025!',
+      password: 'Bell24h@Analytics2025!',
       role: this.ADMIN_ROLES.ANALYTICS_ADMIN,
       name: 'Analytics Administrator',
       lastLogin: null,

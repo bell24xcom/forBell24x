@@ -8,7 +8,7 @@ const pool = new Pool({
 
 async function setupCompleteDatabase() {
   try {
-    console.log('🚀 Setting up complete Bell24H database...');
+    console.log('🚀 Setting up complete Bell24h database...');
     
     // Test connection
     await pool.query('SELECT NOW()');

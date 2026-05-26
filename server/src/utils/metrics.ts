@@ -67,7 +67,7 @@ export async function publishMetrics() {
     // Add more metrics as needed...
     if (metricData.length > 0) {
       await cloudwatch.putMetricData({
-        Namespace: 'Bell24H/WebSocket',
+        Namespace: 'Bell24h/WebSocket',
         MetricData: metricData,
       }).promise();
     }

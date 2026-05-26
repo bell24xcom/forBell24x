@@ -1,4 +1,4 @@
-// Bell24H Enhanced Financial System Types
+// Bell24h Enhanced Financial System Types
 // Comprehensive Banking, GST, and Escrow Integration
 
 export interface BankAccount {

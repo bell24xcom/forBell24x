@@ -1,4 +1,4 @@
-// Bell24H Demo Data Population System
+// Bell24h Demo Data Population System
 // client/src/data/demoData.ts
 
 export interface DemoRFQ {

@@ -1,5 +1,5 @@
 /**
- * Bell24H Error Handling and Monitoring System
+ * Bell24h Error Handling and Monitoring System
  *
  * Comprehensive error handling, logging, and monitoring for security infrastructure
  * Includes structured logging, error tracking, and alerting

@@ -1,5 +1,5 @@
 /**
- * Bell24H Polygon Blockchain Utilities
+ * Bell24h Polygon Blockchain Utilities
  * 
  * Provides functions for interacting with the BusinessVerification smart contract
  * on Polygon Mumbai Testnet.

@@ -1,5 +1,5 @@
 /**
- * Perplexity calculation service for Bell24H AI models
+ * Perplexity calculation service for Bell24h AI models
  * 
  * This service provides utilities to calculate perplexity scores for text inputs,
  * which helps in evaluating language model performance and detecting model drift.

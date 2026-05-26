@@ -5,11 +5,11 @@
 type LogLevel = 'info' | 'warn' | 'error' | 'debug';
 
 class Logger {
-  private prefix: string = '[Bell24H]';
+  private prefix: string = '[Bell24h]';
 
   constructor(namespace?: string) {
     if (namespace) {
-      this.prefix = `[Bell24H:${namespace}]`;
+      this.prefix = `[Bell24h:${namespace}]`;
     }
   }
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Bell24H Homepage & Authentication Testing Script
+ * Bell24h Homepage & Authentication Testing Script
  * Tests the enhanced homepage, login, and registration pages
  */
 
@@ -80,7 +80,7 @@ const testHomepageLoad = async () => {
   // Check for key homepage elements
   const content = response.data;
   const requiredElements = [
-    'Bell24H',
+    'Bell24h',
     'The Future of B2B Procurement',
     'Voice & Video RFQ System',
     'Secure Escrow Payments',
@@ -481,7 +481,7 @@ const testMobileOptimization = async () => {
 
 // Main test runner
 const runAllTests = async () => {
-  console.log(chalk.cyan.bold('\n🚀 Starting Bell24H Homepage & Authentication Tests'));
+  console.log(chalk.cyan.bold('\n🚀 Starting Bell24h Homepage & Authentication Tests'));
   console.log(chalk.gray(`Base URL: ${BASE_URL}\n`));
 
   // Homepage Tests

@@ -180,7 +180,7 @@ export const generateRegionalAdCreatives = async (
       `Streamline your ${product} procurement process`
     ],
     descriptions: [
-      `Bell24H connects you with trusted ${product} suppliers tailored to your business needs.`,
+      `Bell24h connects you with trusted ${product} suppliers tailored to your business needs.`,
       `Save time and money on ${product} procurement with our verified supplier network.`,
       `Get competitive quotes from top ${product} manufacturers in minutes.`
     ],

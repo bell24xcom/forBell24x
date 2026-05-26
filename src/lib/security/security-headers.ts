@@ -1,5 +1,5 @@
 /**
- * Bell24H Security Headers System
+ * Bell24h Security Headers System
  *
  * Implements comprehensive security headers for API and application security
  * Includes CORS, CSP, HSTS, and other security measures
@@ -295,7 +295,7 @@ export class SecurityHeaders {
       'X-Permitted-Cross-Domain-Policies': 'none',
 
       // Custom headers
-      'X-Powered-By': 'Bell24H',
+      'X-Powered-By': 'Bell24h',
       'X-API-Version': '2.1',
       'X-Request-ID': this.generateRequestId(),
 

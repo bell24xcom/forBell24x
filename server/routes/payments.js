@@ -59,7 +59,7 @@ paymentRoutes.post('/create-intent', (req, res) => {
     id: `pi_${Date.now()}`,
     amount,
     currency,
-    description: description || 'Bell24H payment',
+    description: description || 'Bell24h payment',
     client_secret: `sec_${Math.random().toString(36).substring(2, 15)}_${Math.random().toString(36).substring(2, 15)}`,
     status: 'requires_payment_method'
   };

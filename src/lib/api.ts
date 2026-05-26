@@ -1,7 +1,7 @@
 /**
- * API Utilities for Bell24H
+ * API Utilities for Bell24h
  *
- * This file provides centralized API functions for all Bell24H features
+ * This file provides centralized API functions for all Bell24h features
  * including RFQs, suppliers, wallet transactions, and market analytics.
  */
 
@@ -39,7 +39,7 @@ export const apiRequest = async (method: string, endpoint: string, data?: any) =
 };
 
 /**
- * API utility functions for Bell24H.com
+ * API utility functions for Bell24h.com
  * This file provides a centralized collection of API calls
  */
 

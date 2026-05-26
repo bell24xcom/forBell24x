@@ -1,5 +1,5 @@
 /**
- * Bell24H Supplier Population System
+ * Bell24h Supplier Population System
  *
  * Populates the marketplace with comprehensive supplier data
  * Generates 2,000+ realistic suppliers across all 50 categories
@@ -34,7 +34,7 @@ interface PopulationStats {
  * Populate marketplace with all suppliers
  */
 export const populateAllSuppliers = (): PopulationStats => {
-  console.log('🚀 Starting Bell24H supplier population...');
+  console.log('🚀 Starting Bell24h supplier population...');
   const startTime = Date.now();
 
   // Generate all suppliers
@@ -68,7 +68,7 @@ export const populateAllSuppliers = (): PopulationStats => {
  * Populate marketplace with demo suppliers (first 5 categories)
  */
 export const populateDemoSuppliers = (): PopulationStats => {
-  console.log('🚀 Starting Bell24H demo supplier population...');
+  console.log('🚀 Starting Bell24h demo supplier population...');
   const startTime = Date.now();
 
   // Generate demo suppliers

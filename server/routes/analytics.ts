@@ -83,7 +83,7 @@ const jsonToPDF = (data: any[]): string => {
   html += '@media print { body { padding: 20px; } }';
   html += '</style></head><body>';
 
-  html += '<h1>Bell24H Analytics Export</h1>';
+  html += '<h1>Bell24h Analytics Export</h1>';
   html += '<p>Generated on ' + new Date().toLocaleString() + '</p>';
 
   html += '<table>';

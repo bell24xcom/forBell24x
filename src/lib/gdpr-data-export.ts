@@ -1,5 +1,5 @@
 /**
- * Bell24H GDPR Data Export System
+ * Bell24h GDPR Data Export System
  *
  * Comprehensive user data export functionality
  * Implements GDPR Article 20 - Right to Data Portability

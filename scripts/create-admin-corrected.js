@@ -16,10 +16,10 @@ async function createAdmin() {
 
     // First create a company for the admin
     const adminCompany = await prisma.company.upsert({
-      where: { name: 'Bell24H Admin' },
+      where: { name: 'Bell24h Admin' },
       update: {},
       create: {
-        name: 'Bell24H Admin',
+        name: 'Bell24h Admin',
         industry: 'Technology',
         address: 'Bell24h Headquarters',
       }

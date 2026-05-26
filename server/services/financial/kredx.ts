@@ -1,7 +1,7 @@
 /**
  * KredX Financial Services Integration
  * 
- * Provides invoice discounting and financing services for Bell24H marketplace
+ * Provides invoice discounting and financing services for Bell24h marketplace
  * 
  * @module server/services/financial/kredx
  */

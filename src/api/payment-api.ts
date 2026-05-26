@@ -1,4 +1,4 @@
-// Payment API Client for Bell24H
+// Payment API Client for Bell24h
 // Handles all payment-related operations including Razorpay integration
 
 export interface PaymentOrder {
@@ -221,7 +221,7 @@ class PaymentAPI {
         key: orderData.razorpayKey,
         amount: orderData.amount,
         currency: orderData.currency,
-        name: 'Bell24H',
+        name: 'Bell24h',
         description: `Subscription: ${planName}`,
         order_id: orderData.orderId,
         handler: function (response: any) {
