@@ -4,7 +4,7 @@ import CategorySidebar from '@/src/components/homepage/CategorySidebar'
 import LiveRFQFeedCompact from '@/src/components/homepage/LiveRFQFeedCompact'
 import StatsSidebar from '@/src/components/homepage/StatsSidebar'
 import RFQTypeShowcase from '@/components/homepage/RFQTypeShowcase'
-import FeaturedDemoCarousel from '@/components/homepage/FeaturedDemoCarousel'
+// import FeaturedDemoCarousel from '@/components/homepage/FeaturedDemoCarousel' // disabled — no real video source; was black screen + stuck spinner on prod
 import AIFeaturesSection from '@/components/homepage/AIFeaturesSection'
 import HowItWorks from '@/components/homepage/HowItWorks'
 import FinalCTA from '@/components/homepage/FinalCTA'
@@ -45,8 +45,7 @@ export default function HomePage() {
       {/* RFQ Type Showcase */}
       <RFQTypeShowcase />
 
-      {/* Featured Demo Carousel */}
-      <FeaturedDemoCarousel />
+      {/* Featured Demo Carousel — disabled pending real demo content */}
 
       {/* AI Features Section */}
       <AIFeaturesSection />
