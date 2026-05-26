@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { Mic, Video, FileText, Sparkles } from 'lucide-react';
 import Link from 'next/link';
-import AudioPlayer from './AudioPlayer';
 import VideoPlayer from './VideoPlayer';
 
 type RFQType = 'text' | 'voice' | 'video';
@@ -26,16 +25,8 @@ export default function HeroRFQDemo() {
     voice: {
       title: 'Speak Your Requirement',
       description: 'Just speak in any language - our AI understands 12 Indian languages',
-      audioUrl: '/api/demo/audio/sample-voice-rfq.mp3',
-      transcription: 'मुझे 5000 यूनिट स्टील पाइप चाहिए, ग्रेड 304, मुंबई में डिलीवरी',
-      translation: 'I need 5000 units of steel pipes, Grade 304, delivery in Mumbai',
-      aiAnalysis: {
-        product: 'Steel Pipes',
-        quantity: '5000 units',
-        grade: 'Grade 304',
-        location: 'Mumbai',
-        language: 'Hindi',
-      },
+      transcription: 'मुझे 1000 टी-शर्ट चाहिए, भिवंडी डिलीवरी, अर्जेंट',
+      translation: 'I need 1000 T-Shirts, Bhiwandi delivery, Urgent',
     },
     video: {
       title: 'Show Us via Video',
@@ -75,34 +66,34 @@ export default function HeroRFQDemo() {
             onClick={() => setActiveType('voice')}
             className={`flex items-center gap-2 px-8 py-5 rounded-2xl font-bold text-lg transition-all ${
               activeType === 'voice'
-                ? 'bg-cyan-500/20 border-2 border-cyan-500 text-cyan-400 shadow-2xl scale-105'
-                : 'bg-gray-800/50 border-2 border-gray-600 text-white hover:bg-cyan-500/10 backdrop-blur'
+                ? 'bg-cyan-500 border-2 border-cyan-500 text-white shadow-2xl shadow-cyan-500/30 scale-105'
+                : 'bg-slate-900/60 border-2 border-slate-700 text-slate-300 hover:border-cyan-500/50 hover:text-white backdrop-blur'
             }`}
           >
             <Mic className="w-5 h-5" />
-            <span>Try Voice RFQ</span>
+            <span>Voice RFQ</span>
           </button>
           <button
             onClick={() => setActiveType('video')}
             className={`flex items-center gap-2 px-8 py-5 rounded-2xl font-bold text-lg transition-all ${
               activeType === 'video'
-                ? 'bg-cyan-500/20 border-2 border-cyan-500 text-cyan-400 shadow-2xl scale-105'
-                : 'bg-gray-800/50 border-2 border-gray-600 text-white hover:bg-cyan-500/10 backdrop-blur'
+                ? 'bg-cyan-500 border-2 border-cyan-500 text-white shadow-2xl shadow-cyan-500/30 scale-105'
+                : 'bg-slate-900/60 border-2 border-slate-700 text-slate-300 hover:border-cyan-500/50 hover:text-white backdrop-blur'
             }`}
           >
             <Video className="w-5 h-5" />
-            <span>Try Video RFQ</span>
+            <span>Video RFQ</span>
           </button>
           <button
             onClick={() => setActiveType('text')}
             className={`flex items-center gap-2 px-8 py-5 rounded-2xl font-bold text-lg transition-all ${
               activeType === 'text'
-                ? 'bg-white text-slate-900 shadow-2xl scale-105'
-                : 'bg-gray-800/50 border-2 border-gray-600 text-white hover:bg-gray-800 backdrop-blur'
+                ? 'bg-cyan-500 border-2 border-cyan-500 text-white shadow-2xl shadow-cyan-500/30 scale-105'
+                : 'bg-slate-900/60 border-2 border-slate-700 text-slate-300 hover:border-cyan-500/50 hover:text-white backdrop-blur'
             }`}
           >
             <FileText className="w-5 h-5" />
-            <span>Try Text RFQ</span>
+            <span>Text RFQ</span>
           </button>
         </div>
 
@@ -140,34 +131,43 @@ export default function HeroRFQDemo() {
               </div>
             )}
 
-            {/* Voice Demo */}
+            {/* Voice Demo — animated mic + Hindi/English transcript */}
             {activeType === 'voice' && (
-              <div className="space-y-4">
-                <AudioPlayer audioUrl={demoContent.voice.audioUrl} />
-                
-                <div className="bg-white/10 rounded-lg p-4">
-                  <p className="text-sm text-blue-200 mb-1">Original (Hindi)</p>
-                  <p className="font-medium mb-3">{demoContent.voice.transcription}</p>
-                  <p className="text-sm text-blue-200 mb-1">Translation (English)</p>
-                  <p className="font-medium">{demoContent.voice.translation}</p>
+              <div className="space-y-6">
+                <div className="flex items-center justify-center gap-6 py-6">
+                  {/* Left waveform */}
+                  <div className="flex items-end gap-1.5 h-20">
+                    <span className="w-1.5 h-6  bg-orange-500 rounded-full animate-pulse" style={{ animationDelay: '0ms',   animationDuration: '1s' }} />
+                    <span className="w-1.5 h-12 bg-orange-500 rounded-full animate-pulse" style={{ animationDelay: '150ms', animationDuration: '1s' }} />
+                    <span className="w-1.5 h-8  bg-orange-400 rounded-full animate-pulse" style={{ animationDelay: '300ms', animationDuration: '1s' }} />
+                    <span className="w-1.5 h-16 bg-orange-500 rounded-full animate-pulse" style={{ animationDelay: '450ms', animationDuration: '1s' }} />
+                  </div>
+
+                  {/* Mic */}
+                  <div className="w-24 h-24 rounded-full bg-red-500 flex items-center justify-center shadow-2xl shadow-red-500/50 ring-4 ring-red-500/30 animate-pulse">
+                    <Mic className="w-10 h-10 text-white" />
+                  </div>
+
+                  {/* Right waveform (mirrored) */}
+                  <div className="flex items-end gap-1.5 h-20">
+                    <span className="w-1.5 h-16 bg-orange-500 rounded-full animate-pulse" style={{ animationDelay: '450ms', animationDuration: '1s' }} />
+                    <span className="w-1.5 h-8  bg-orange-400 rounded-full animate-pulse" style={{ animationDelay: '300ms', animationDuration: '1s' }} />
+                    <span className="w-1.5 h-12 bg-orange-500 rounded-full animate-pulse" style={{ animationDelay: '150ms', animationDuration: '1s' }} />
+                    <span className="w-1.5 h-6  bg-orange-500 rounded-full animate-pulse" style={{ animationDelay: '0ms',   animationDuration: '1s' }} />
+                  </div>
                 </div>
 
-                <div className="bg-white/10 rounded-lg p-4">
-                  <p className="text-sm text-blue-200 mb-2">AI Extracted Information</p>
-                  <div className="grid grid-cols-2 gap-2 text-sm">
-                    <div>
-                      <span className="text-blue-200">Product:</span> {demoContent.voice.aiAnalysis.product}
-                    </div>
-                    <div>
-                      <span className="text-blue-200">Quantity:</span> {demoContent.voice.aiAnalysis.quantity}
-                    </div>
-                    <div>
-                      <span className="text-blue-200">Grade:</span> {demoContent.voice.aiAnalysis.grade}
-                    </div>
-                    <div>
-                      <span className="text-blue-200">Location:</span> {demoContent.voice.aiAnalysis.location}
-                    </div>
-                  </div>
+                <p lang="hi" className="text-2xl md:text-3xl font-bold text-white text-center leading-relaxed">
+                  {demoContent.voice.transcription}
+                </p>
+
+                <p className="text-lg text-gray-400 text-center">
+                  {demoContent.voice.translation}
+                </p>
+
+                <div className="flex items-center justify-center gap-2 pt-2">
+                  <span className="w-3 h-3 rounded-full bg-red-500 animate-pulse" />
+                  <span className="text-sm font-medium text-red-400 tracking-wide">Recording...</span>
                 </div>
               </div>
             )}
@@ -200,7 +200,7 @@ export default function HeroRFQDemo() {
                 href={activeType === 'voice' ? '/voice-rfq' : activeType === 'video' ? '/video-rfq' : '/rfq/create'}
                 className="px-8 py-5 bg-white text-slate-900 rounded-2xl font-bold text-lg hover:scale-105 transition shadow-2xl inline-flex items-center gap-2"
               >
-                Try {activeType.charAt(0).toUpperCase() + activeType.slice(1)} RFQ
+                {activeType.charAt(0).toUpperCase() + activeType.slice(1)} RFQ
               </Link>
               <Link 
                 href="/rfq/demo/all"

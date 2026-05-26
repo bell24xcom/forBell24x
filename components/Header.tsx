@@ -137,7 +137,7 @@ export default function Header() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search 50+ categories..."
+                  placeholder="Search 450+ categories..."
                   className="w-56 lg:w-72 h-9 pl-9 pr-3 bg-slate-800/60 border border-slate-700/50 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
                 />
               </form>
@@ -190,7 +190,7 @@ export default function Header() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search 50+ categories..."
+                  placeholder="Search 450+ categories..."
                   className="w-full h-10 pl-9 pr-3 bg-slate-800/60 border border-slate-700/50 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-500/50"
                 />
               </form>
