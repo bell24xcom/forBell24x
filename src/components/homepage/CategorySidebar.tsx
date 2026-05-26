@@ -1,15 +1,35 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Search, Filter } from 'lucide-react';
 import Link from 'next/link';
-import { all50Categories as ALL_50_CATEGORIES } from '@/src/data/all-50-categories';
+
+interface Category {
+  id: number;
+  name: string;
+  slug: string;
+  icon?: string | null;
+}
 
 export default function CategorySidebar() {
+  const [categories, setCategories] = useState<Category[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(true);
 
-  const filteredCategories = ALL_50_CATEGORIES.filter(cat =>
-    cat.name.toLowerCase().includes(searchTerm.toLowerCase())
+  useEffect(() => {
+    fetch('/api/categories?level=1')
+      .then(r => r.json())
+      .then(d => {
+        if (d.success && Array.isArray(d.categories)) {
+          setCategories(d.categories);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  const filteredCategories = categories.filter(cat =>
+    cat.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   return (
@@ -35,13 +55,19 @@ export default function CategorySidebar() {
 
         {/* Category List */}
         <div className="max-h-96 overflow-y-auto space-y-1">
+          {loading && (
+            <p className="text-center text-sm text-slate-500 py-4">Loading categories…</p>
+          )}
+          {!loading && filteredCategories.length === 0 && (
+            <p className="text-center text-sm text-slate-500 py-4">No categories match</p>
+          )}
           {filteredCategories.slice(0, 20).map((cat) => (
             <Link
               key={cat.slug}
               href={`/categories/${cat.slug}`}
               className="flex items-center gap-2 p-2 rounded-lg hover:bg-slate-700/50 transition text-sm"
             >
-              <span className="text-lg" aria-hidden>{cat.icon}</span>
+              {cat.icon && <span className="text-lg" aria-hidden>{cat.icon}</span>}
               <span className="flex-1 text-slate-300 hover:text-white">{cat.name}</span>
             </Link>
           ))}
@@ -52,7 +78,7 @@ export default function CategorySidebar() {
             href="/categories"
             className="block text-center text-sm text-blue-400 hover:text-blue-300 mt-3 font-medium"
           >
-            View All {ALL_50_CATEGORIES.length} Categories →
+            View All {categories.length} Categories →
           </Link>
         )}
       </div>
