@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,6 +18,7 @@ export default function VideoRFQPage() {
   const [error, setError] = useState('');
   const [recordingTime, setRecordingTime] = useState(0);
   const [isCreatingRFQ, setIsCreatingRFQ] = useState(false);
+  const [activeStream, setActiveStream] = useState<MediaStream | null>(null);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -25,14 +26,37 @@ export default function VideoRFQPage() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Attach the live camera stream after React has rendered the <video> element.
+  // (Setting srcObject inside startRecording fails because the element is conditionally
+  // rendered and previewRef.current is null until the re-render commits.)
+  useEffect(() => {
+    if (activeStream && previewRef.current) {
+      previewRef.current.srcObject = activeStream;
+    }
+    return () => {
+      if (previewRef.current) previewRef.current.srcObject = null;
+    };
+  }, [activeStream, isRecording]);
+
   const startRecording = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: true, 
-        audio: true 
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
       });
-      
-      mediaRecorderRef.current = new MediaRecorder(stream);
+
+      // Pick an explicit mimeType that includes the audio codec — without this
+      // some Chrome builds default to video-only (vp8) and drop the audio track.
+      const candidates = [
+        'video/webm;codecs=vp9,opus',
+        'video/webm;codecs=vp8,opus',
+        'video/webm;codecs=opus',
+        'video/webm',
+      ];
+      const mimeType = candidates.find(t => MediaRecorder.isTypeSupported(t)) || '';
+      mediaRecorderRef.current = mimeType
+        ? new MediaRecorder(stream, { mimeType })
+        : new MediaRecorder(stream);
       const chunks: BlobPart[] = [];
 
       mediaRecorderRef.current.ondataavailable = (event) => {
@@ -40,32 +64,27 @@ export default function VideoRFQPage() {
       };
 
       mediaRecorderRef.current.onstop = () => {
-        const blob = new Blob(chunks, { type: 'video/webm' });
+        const blob = new Blob(chunks, { type: mimeType || 'video/webm' });
         setVideoBlob(blob);
         setVideoUrl(URL.createObjectURL(blob));
-        // Stop live preview stream
-        if (previewRef.current) previewRef.current.srcObject = null;
+        // Stop tracks and clear the live preview
         stream.getTracks().forEach(track => track.stop());
+        setActiveStream(null);
       };
 
-      // Show live camera feed during recording
-      if (previewRef.current) {
-        previewRef.current.srcObject = stream;
-      }
-
+      // Mount the preview <video> via state, then the useEffect attaches srcObject
+      setActiveStream(stream);
       mediaRecorderRef.current.start();
       setIsRecording(true);
       setError('');
       setRecordingTime(0);
 
-      // Start timer
       timerRef.current = setInterval(() => {
         setRecordingTime(prev => prev + 1);
       }, 1000);
-
     } catch (err) {
       console.error('Error accessing camera:', err);
-      setError('Unable to access camera. Please check permissions.');
+      setError('Unable to access camera/mic. Please check browser permissions.');
     }
   };
 
@@ -240,7 +259,7 @@ export default function VideoRFQPage() {
           ← Back
         </button>
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Video RFQ Creator</h1>
+          <h1 className="text-3xl font-bold text-white mb-2">Video RFQ</h1>
           <p className="text-slate-300">Create RFQs using video with AI-powered transcription and analysis</p>
         </div>
 
