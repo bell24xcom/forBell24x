@@ -45,6 +45,17 @@ export default function VideoRFQPage() {
         audio: true,
       });
 
+      // Diagnostic: surface track counts so a black-screen / no-audio report
+      // can be cross-checked against what the browser actually granted.
+      const audioTracks = stream.getAudioTracks();
+      const videoTracks = stream.getVideoTracks();
+      console.log('[VideoRFQ] tracks granted — audio:', audioTracks.length, 'video:', videoTracks.length);
+      if (audioTracks.length === 0) {
+        stream.getTracks().forEach(t => t.stop());
+        setError('Microphone access was not granted. Please allow microphone access in your browser, then try again.');
+        return;
+      }
+
       // Pick an explicit mimeType that includes the audio codec — without this
       // some Chrome builds default to video-only (vp8) and drop the audio track.
       const candidates = [
@@ -54,6 +65,7 @@ export default function VideoRFQPage() {
         'video/webm',
       ];
       const mimeType = candidates.find(t => MediaRecorder.isTypeSupported(t)) || '';
+      console.log('[VideoRFQ] using mimeType:', mimeType || '(browser default)');
       mediaRecorderRef.current = mimeType
         ? new MediaRecorder(stream, { mimeType })
         : new MediaRecorder(stream);
@@ -65,6 +77,7 @@ export default function VideoRFQPage() {
 
       mediaRecorderRef.current.onstop = () => {
         const blob = new Blob(chunks, { type: mimeType || 'video/webm' });
+        console.log('[VideoRFQ] recorded blob size:', blob.size, 'bytes, type:', blob.type);
         setVideoBlob(blob);
         setVideoUrl(URL.createObjectURL(blob));
         // Stop tracks and clear the live preview

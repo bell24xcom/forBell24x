@@ -1,17 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { aiClient } from '@/lib/ai-client';
 import { prisma } from '@/lib/prisma';
 import { storeRFQ, extractRFQMeta } from '@/lib/memory-engine';
 import { agentZero } from '@/lib/agents/agent-zero';
 import { verifyToken } from '@/lib/jwt';
 
-// Helper function to extract numeric budget from string
-// Handles formats: "₹2.5L", "₹50,000", "100000", "2L - 5L"
+// "₹2.5L" / "₹50,000" / "100000" / "2L - 5L" → integer
 function extractBudgetNumber(budgetStr: string): number {
-  if (!budgetStr || budgetStr === 'To be discussed' || budgetStr === 'Not specified') {
-    return 0;
-  }
-  // Match first number with optional lakhs suffix
+  if (!budgetStr || budgetStr === 'To be discussed' || budgetStr === 'Not specified') return 0;
   const match = budgetStr.match(/([\d.,]+)\s*(L|lakh|lakhs)?/i);
   if (!match) return 0;
   const num = parseFloat(match[1].replace(/,/g, ''));
@@ -19,95 +14,201 @@ function extractBudgetNumber(budgetStr: string): number {
   return isNaN(num) ? 0 : Math.round(num * multiplier);
 }
 
-// Real AI-powered video RFQ processing via NVIDIA MiniMax M2.1
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const videoFile = formData.get('video') as File | null;
-    const additionalContext = formData.get('context') as string || '';
+    const additionalContext = (formData.get('context') as string) || '';
 
     if (!videoFile) {
+      return NextResponse.json({ success: false, error: 'Video file is required' }, { status: 400 });
+    }
+
+    const groqKey = process.env.GROQ_API_KEY;
+    if (!groqKey || groqKey === 'your-groq-api-key-here') {
       return NextResponse.json(
-        { success: false, error: 'Video file is required' },
-        { status: 400 }
+        { success: false, error: 'Server transcription unavailable: GROQ_API_KEY not configured' },
+        { status: 503 },
       );
     }
 
-    // Convert video file to buffer
-    const videoBytes = await videoFile.arrayBuffer();
-    const videoBuffer = Buffer.from(videoBytes);
+    const videoBuffer = Buffer.from(await videoFile.arrayBuffer());
+    console.log('[VideoRFQ] Received video:', videoFile.size, 'bytes, type:', videoFile.type);
 
-    // Optional auth — video RFQ can be submitted by logged-in or guest users
+    // STEP 1 — Transcribe with Groq Whisper. Whisper accepts webm and decodes
+    // the audio track on its side, so we can ship the recording as-is.
+    let transcription = '';
+    try {
+      const fd = new FormData();
+      fd.append('file', new Blob([videoBuffer], { type: videoFile.type || 'video/webm' }), videoFile.name || 'video.webm');
+      fd.append('model', 'whisper-large-v3');
+      fd.append('response_format', 'json');
+
+      const whisperRes = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${groqKey}` },
+        body: fd,
+      });
+
+      if (!whisperRes.ok) {
+        const errText = await whisperRes.text();
+        console.error('[VideoRFQ] Whisper failed:', whisperRes.status, errText);
+        return NextResponse.json(
+          {
+            success: false,
+            error: `Audio transcription failed (${whisperRes.status}). The video may have no audio track — check that your microphone is enabled when recording.`,
+          },
+          { status: 502 },
+        );
+      }
+
+      transcription = ((await whisperRes.json()) as any).text || '';
+      console.log('[VideoRFQ] Whisper transcription:', transcription.substring(0, 200));
+    } catch (e) {
+      console.error('[VideoRFQ] Whisper exception:', e);
+      return NextResponse.json(
+        { success: false, error: 'Audio transcription failed: ' + String(e) },
+        { status: 502 },
+      );
+    }
+
+    if (transcription.trim().length < 10) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Could not extract speech from the video. Please re-record with the microphone enabled and speak clearly about the product.',
+          transcription,
+        },
+        { status: 400 },
+      );
+    }
+
+    // STEP 2 — Extract structured RFQ with Groq Llama (same prompt shape as voice-rfq)
+    const extractionPrompt = `Extract RFQ details from this requirement. Return ONLY valid JSON, no markdown.
+
+Text: "${transcription}${additionalContext ? `\n\nAdditional context: ${additionalContext}` : ''}"
+
+Rules:
+- If the text is unclear or doesn't describe a product, set category to "Other" and title to null.
+- Match category strictly to what's said. Do NOT guess.
+- Examples: "cotton t-shirts" → "Apparel & Clothing"; "steel pipes" → "Metals & Alloys".
+
+JSON (all fields required, use null if not mentioned):
+{
+  "title": "concise product name 5-10 words or null",
+  "description": "1-2 sentence summary of what they need",
+  "category": "Other | Apparel & Clothing | Textiles & Garments | Metals & Alloys | Electronics & Electricals | Machinery & Equipment | Chemicals & Petrochemicals | Construction & Real Estate | Food & Beverages | Pharmaceuticals & Healthcare | Automotive & Transport | Plastics & Rubber | Paper & Printing | Agriculture & Farming | IT & Telecom | Furniture & Wood | Safety & Security",
+  "quantity": "e.g. '1000 pieces' or 'To be discussed'",
+  "unit": "pieces/kg/tons/meters/liters/boxes/units",
+  "budget": "e.g. '₹50,000' or 'To be discussed'",
+  "timeline": "e.g. '2 weeks' or '1 month'",
+  "specifications": ["spec1", "spec2"],
+  "location": "city or 'Not specified'",
+  "urgency": "low/medium/high"
+}`;
+
+    let extracted: any = {};
+    try {
+      const llmRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${groqKey}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'llama-3.1-70b-versatile',
+          messages: [{ role: 'user', content: extractionPrompt }],
+          max_tokens: 600,
+          temperature: 0.1,
+        }),
+      });
+
+      if (!llmRes.ok) throw new Error(`Groq LLM ${llmRes.status}`);
+      const llmData = await llmRes.json();
+      const content = llmData.choices?.[0]?.message?.content || '';
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) throw new Error('No JSON in LLM response');
+      extracted = JSON.parse(jsonMatch[0]);
+      console.log('[VideoRFQ] LLM extraction:', extracted);
+    } catch (e) {
+      console.error('[VideoRFQ] Extraction failed, returning transcription only:', e);
+      // Don't fake the title/category — leave them null so the UI prompts the user to fill in.
+      extracted = {};
+    }
+
+    const processedRFQ = {
+      title: extracted.title || null,
+      description: extracted.description || transcription,
+      category: extracted.category || null,
+      quantity: extracted.quantity || 'To be discussed',
+      unit: extracted.unit || 'units',
+      budget: extracted.budget || 'To be discussed',
+      timeline: extracted.timeline || '2 weeks',
+      specifications: extracted.specifications || [],
+      visualFeatures: [],
+      location: extracted.location || 'Not specified',
+      urgency: extracted.urgency || 'medium',
+      aiPowered: true,
+      aiModel: 'Groq Whisper + Llama 3.1 70B',
+    };
+
+    // Optional auth
     const token =
       request.cookies.get('auth-token')?.value ||
       request.headers.get('authorization')?.replace('Bearer ', '');
     const authPayload = token ? verifyToken(token) : null;
     const userId = authPayload?.userId ?? null;
 
-    // Try NVIDIA MiniMax AI first, fall back to basic analysis
-    let processedRFQ;
-    try {
-      processedRFQ = await processVideoWithNvidiaAI(videoBuffer, videoFile.type, additionalContext);
-    } catch (aiError) {
-      console.warn('NVIDIA AI unavailable, using basic analysis fallback:', aiError);
-      processedRFQ = processVideoWithBasicAnalysis(videoFile.name, additionalContext);
-    }
-
-    // Map AI urgency string to Prisma RFQUrgency enum
     const urgencyMap: Record<string, 'LOW' | 'NORMAL' | 'HIGH' | 'URGENT'> = {
       low: 'LOW', medium: 'NORMAL', high: 'HIGH', urgent: 'URGENT',
     };
-    const urgency = urgencyMap[processedRFQ.urgency?.toLowerCase()] ?? 'NORMAL';
+    const urgency = urgencyMap[String(processedRFQ.urgency).toLowerCase()] ?? 'NORMAL';
 
-    // Save Video RFQ to database
     let savedRFQId: string | null = null;
-    try {
-      const savedRFQ = await prisma.rFQ.create({
-        data: {
-          title: processedRFQ.title,
-          description: processedRFQ.description,
-          category: processedRFQ.category,
-          quantity: processedRFQ.quantity || 'To be discussed',
-          unit: processedRFQ.unit || 'units',
-          maxBudget: extractBudgetNumber(processedRFQ.budget) || null,
-          location: processedRFQ.location !== 'Not specified' ? processedRFQ.location : null,
-          timeline: processedRFQ.timeline,
-          urgency,
-          type: 'VIDEO',
-          status: 'OPEN',
-          isSeeded: false,
-          createdBy: userId,
-          expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-        },
-      });
+    if (processedRFQ.title && processedRFQ.category) {
+      try {
+        const savedRFQ = await prisma.rFQ.create({
+          data: {
+            title: processedRFQ.title,
+            description: processedRFQ.description,
+            category: processedRFQ.category,
+            quantity: processedRFQ.quantity,
+            unit: processedRFQ.unit,
+            maxBudget: extractBudgetNumber(processedRFQ.budget) || null,
+            location: processedRFQ.location !== 'Not specified' ? processedRFQ.location : null,
+            timeline: processedRFQ.timeline,
+            urgency,
+            type: 'VIDEO',
+            status: 'OPEN',
+            isSeeded: false,
+            createdBy: userId,
+            expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+          },
+        });
+        savedRFQId = savedRFQ.id;
+        console.log('[VideoRFQ] Saved to DB:', savedRFQ.id);
 
-      savedRFQId = savedRFQ.id;
-      console.log('[VideoRFQ] Saved to DB:', savedRFQ.id);
-
-      // Memory + Agent (fire-and-forget — don't block response)
-      const meta = extractRFQMeta({
-        id: savedRFQ.id,
-        title: savedRFQ.title,
-        category: savedRFQ.category,
-        description: savedRFQ.description,
-        quantity: savedRFQ.quantity,
-        location: savedRFQ.location,
-        maxBudget: savedRFQ.maxBudget,
-        minBudget: null,
-      });
-      storeRFQ(meta).catch((e: unknown) => console.error('[VideoRFQ] storeRFQ error:', e));
-      agentZero({ ...savedRFQ, urgency: savedRFQ.urgency as string }).catch(
-        (e: unknown) => console.error('[VideoRFQ] agentZero error:', e)
-      );
-    } catch (dbErr) {
-      console.error('[VideoRFQ] DB save failed:', dbErr);
-      // Non-fatal: user still gets extracted data
+        // Memory + Agent (fire-and-forget)
+        const meta = extractRFQMeta({
+          id: savedRFQ.id,
+          title: savedRFQ.title,
+          category: savedRFQ.category,
+          description: savedRFQ.description,
+          quantity: savedRFQ.quantity,
+          location: savedRFQ.location,
+          maxBudget: savedRFQ.maxBudget,
+          minBudget: null,
+        });
+        storeRFQ(meta).catch((e) => console.error('[VideoRFQ] storeRFQ error:', e));
+        agentZero({ ...savedRFQ, urgency: savedRFQ.urgency as string }).catch((e) =>
+          console.error('[VideoRFQ] agentZero error:', e),
+        );
+      } catch (dbErr) {
+        console.error('[VideoRFQ] DB save failed:', dbErr);
+      }
     }
 
     return NextResponse.json({
       success: true,
       rfqId: savedRFQId,
-      transcription: processedRFQ.description,
+      transcription,
       extractedInfo: {
         title: processedRFQ.title,
         description: processedRFQ.description,
@@ -121,151 +222,17 @@ export async function POST(request: NextRequest) {
         deliveryDeadline: processedRFQ.timeline,
         priority: processedRFQ.urgency,
         specifications: processedRFQ.specifications,
-        requirements: processedRFQ.visualFeatures || [],
+        requirements: processedRFQ.visualFeatures,
         aiPowered: processedRFQ.aiPowered,
-        aiModel: processedRFQ.aiModel
+        aiModel: processedRFQ.aiModel,
       },
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   } catch (error) {
     console.error('[API_ERROR] /api/video-rfq', error instanceof Error ? error.message : error);
     return NextResponse.json(
-      { success: false, error: 'Failed to process video input', retryable: true },
-      { status: 500 }
+      { success: false, error: 'Failed to process video', retryable: true },
+      { status: 500 },
     );
   }
-}
-
-// NVIDIA MiniMax M2.1 - real video AI analysis
-async function processVideoWithNvidiaAI(videoBuffer: Buffer, mimeType: string, context: string) {
-  const client = aiClient.getClient('video'); // MiniMax M2.1
-
-  if (!client) throw new Error('NVIDIA video client not available');
-
-  const base64Video = videoBuffer.toString('base64');
-
-  const systemPrompt = `You are an expert B2B procurement analyst for Bell24h.com, an Indian B2B marketplace.
-Analyze the industrial/commercial product video and extract a structured RFQ. Always respond with valid JSON only.
-
-Return this exact JSON structure:
-{
-  "title": "product/service name from video (concise, 5-10 words)",
-  "description": "detailed description of product shown in video",
-  "category": "one of: Agriculture, Apparel & Fashion, Automobile, Chemical, Electronics & Electrical, Food Products & Beverage, Industrial Machinery, Packaging & Paper, Real Estate & Construction, Textiles, Tools & Equipment, Health & Beauty, Logistics, Other",
-  "quantity": "estimated quantity if visible (e.g. 100 pieces, 10 tons) or 'To be discussed'",
-  "unit": "pieces/kg/tons/meters/liters/boxes",
-  "budget": "estimated budget range or 'To be discussed'",
-  "timeline": "estimated delivery timeline (e.g. 2 weeks, 1 month, urgent)",
-  "specifications": ["visible spec1", "visible spec2", "visible spec3"],
-  "visualFeatures": ["feature1 from video", "feature2 from video"],
-  "location": "if mentioned in video, else 'Not specified'",
-  "urgency": "low/medium/high"
-}`;
-
-  const userPrompt = context
-    ? `Analyze this product video and extract RFQ details. Additional context: ${context}`
-    : 'Analyze this product video and extract RFQ details for the B2B marketplace.';
-
-  const response = await (client as any).chat.completions.create({
-    model: 'minimaxai/minimax-m2.1',
-    messages: [
-      { role: 'system', content: systemPrompt },
-      {
-        role: 'user',
-        content: [
-          {
-            type: 'video',
-            source: {
-              type: 'base64',
-              media_type: mimeType || 'video/mp4',
-              data: base64Video
-            }
-          },
-          {
-            type: 'text',
-            text: userPrompt
-          }
-        ]
-      }
-    ],
-    temperature: 0.4,
-    max_tokens: 1200,
-  });
-
-  const content = response.choices[0]?.message?.content || '';
-
-  // Parse JSON from response
-  const jsonMatch = content.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) throw new Error('No JSON in AI response');
-
-  const extracted = JSON.parse(jsonMatch[0]);
-
-  return {
-    id: `video-rfq-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-    title: extracted.title || 'Video RFQ',
-    description: extracted.description || 'Product shown in uploaded video',
-    category: extracted.category || 'Other',
-    quantity: extracted.quantity || 'To be discussed',
-    unit: extracted.unit || 'units',
-    budget: extracted.budget || 'To be discussed',
-    timeline: extracted.timeline || '2 weeks',
-    specifications: extracted.specifications || [],
-    visualFeatures: extracted.visualFeatures || [],
-    location: extracted.location || 'Not specified',
-    urgency: extracted.urgency || 'medium',
-    status: 'draft' as const,
-    createdAt: new Date().toISOString(),
-    createdVia: 'video' as const,
-    aiPowered: true,
-    aiModel: 'NVIDIA MiniMax M2.1'
-  };
-}
-
-// Basic analysis fallback (no AI dependency)
-function processVideoWithBasicAnalysis(filename: string, context: string) {
-  const contextLower = context.toLowerCase();
-
-  const categoryKeywords: Record<string, string[]> = {
-    'Industrial Machinery': ['machine', 'machinery', 'equipment', 'industrial', 'manufacturing', 'cnc', 'lathe'],
-    'Textiles': ['cotton', 'fabric', 'textile', 'clothing', 'garment', 'apparel', 'yarn'],
-    'Electronics & Electrical': ['electronic', 'circuit', 'led', 'sensor', 'component', 'device', 'electrical'],
-    'Real Estate & Construction': ['construction', 'building', 'cement', 'brick', 'tile', 'infrastructure'],
-    'Chemical': ['chemical', 'pharmaceutical', 'medicine', 'compound', 'solvent'],
-    'Packaging & Paper': ['packaging', 'box', 'label', 'container', 'wrapper', 'corrugated'],
-    'Automobile': ['automotive', 'car', 'vehicle', 'engine', 'brake', 'auto'],
-    'Agriculture': ['seeds', 'fertilizer', 'pesticide', 'crop', 'agri', 'farm'],
-    'Food Products & Beverage': ['food', 'beverage', 'snack', 'spice', 'grain'],
-  };
-
-  let category = 'Other';
-  for (const [cat, keywords] of Object.entries(categoryKeywords)) {
-    if (keywords.some(kw => contextLower.includes(kw) || filename.toLowerCase().includes(kw))) {
-      category = cat;
-      break;
-    }
-  }
-
-  const title = context
-    ? context.split(' ').slice(0, 6).join(' ')
-    : filename.replace(/\.(mp4|mov|avi|webm)$/i, '');
-
-  return {
-    id: `video-rfq-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-    title: title || 'Video RFQ',
-    description: `Product shown in video: ${filename}${context ? `. Context: ${context}` : ''}`,
-    category,
-    quantity: 'To be discussed',
-    unit: 'units',
-    budget: 'To be discussed',
-    timeline: '2 weeks',
-    specifications: ['Details extracted from video'],
-    visualFeatures: ['Upload successful - awaiting AI analysis'],
-    location: 'Not specified',
-    urgency: 'medium',
-    status: 'draft' as const,
-    createdAt: new Date().toISOString(),
-    createdVia: 'video' as const,
-    aiPowered: false,
-    aiModel: 'basic-fallback'
-  };
 }
