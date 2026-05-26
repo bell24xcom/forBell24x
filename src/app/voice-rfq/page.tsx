@@ -17,6 +17,27 @@ interface VoiceRFQData {
   createdVia: 'voice' | 'manual';
 }
 
+// Same list as the LLM extraction prompt — user picks from these if AI is unsure
+const CATEGORIES = [
+  'Other',
+  'Apparel & Clothing',
+  'Textiles & Garments',
+  'Metals & Alloys',
+  'Electronics & Electricals',
+  'Machinery & Equipment',
+  'Chemicals & Petrochemicals',
+  'Construction & Real Estate',
+  'Food & Beverages',
+  'Pharmaceuticals & Healthcare',
+  'Automotive & Transport',
+  'Plastics & Rubber',
+  'Paper & Printing',
+  'Agriculture & Farming',
+  'IT & Telecom',
+  'Furniture & Wood',
+  'Safety & Security',
+];
+
 export default function VoiceRFQPage() {
   const router = useRouter();
   const [isRecording, setIsRecording] = useState(false);
@@ -165,11 +186,13 @@ export default function VoiceRFQPage() {
         };
 
         const productName = clean(data.extractedData.product);
+        const aiCategory = clean(data.extractedData.category);
         const rfq: VoiceRFQData = {
           id: `voice-rfq-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           title: productName || `Voice RFQ - ${transcription.substring(0, 50)}`,
           description: transcription,
-          category: clean(data.extractedData.category) || 'Other',
+          // Empty string when AI is unsure — the UI will force the user to pick.
+          category: aiCategory && CATEGORIES.includes(aiCategory) ? aiCategory : '',
           quantity: data.extractedData.quantity && clean(data.extractedData.quantity)
             ? `${data.extractedData.quantity} ${data.extractedData.unit || 'units'}`
             : '1 units',
@@ -355,7 +378,22 @@ export default function VoiceRFQPage() {
                     <strong className="text-slate-300">Title:</strong> <span className="text-white">{generatedRFQ.title || 'N/A'}</span>
                   </div>
                   <div className="text-base">
-                    <strong className="text-slate-300">Category:</strong> <span className="text-white">{generatedRFQ.category || 'N/A'}</span>
+                    <strong className="text-slate-300 block mb-1">Category:</strong>
+                    <select
+                      value={generatedRFQ.category}
+                      onChange={(e) => setGeneratedRFQ({ ...generatedRFQ, category: e.target.value })}
+                      className={`w-full bg-slate-900 border rounded-lg px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+                        generatedRFQ.category ? 'border-slate-600' : 'border-amber-500/60'
+                      }`}
+                    >
+                      <option value="">— Select a category —</option>
+                      {CATEGORIES.map((c) => (
+                        <option key={c} value={c}>{c}</option>
+                      ))}
+                    </select>
+                    {!generatedRFQ.category && (
+                      <p className="text-xs text-amber-400 mt-1">AI couldn't determine the category. Please pick one before saving.</p>
+                    )}
                   </div>
                   <div className="text-base">
                     <strong className="text-slate-300">Description:</strong> <span className="text-white">{generatedRFQ.description || 'N/A'}</span>
@@ -385,7 +423,8 @@ export default function VoiceRFQPage() {
                 <div className="flex gap-4 mt-6">
                   <button
                     onClick={saveRFQ}
-                    className="bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 active:scale-95 transition-all shadow-lg shadow-emerald-600/20 font-semibold min-h-[44px]"
+                    disabled={!generatedRFQ.category}
+                    className="bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 active:scale-95 transition-all shadow-lg shadow-emerald-600/20 font-semibold min-h-[44px] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-emerald-600"
                   >
                     Save RFQ
                   </button>
