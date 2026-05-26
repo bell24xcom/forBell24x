@@ -34,12 +34,34 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const validatedData = CreateRFQSchema.parse(body);
 
+    // 3b. Resolve categoryId FK from the free-text category name so the RFQ
+    //     joins cleanly to /categories/[slug] listings. Best-effort — if the
+    //     name doesn't match a row we save without the FK and fall back to
+    //     the existing free-text column.
+    let categoryId: number | undefined;
+    try {
+      const cat = await prisma.category.findFirst({
+        where: {
+          isActive: true,
+          OR: [
+            { name: { equals: validatedData.category, mode: 'insensitive' } },
+            { name: { contains: validatedData.category, mode: 'insensitive' } },
+          ],
+        },
+        select: { id: true },
+      });
+      if (cat) categoryId = cat.id;
+    } catch (e) {
+      console.warn('[RFQ Create] categoryId lookup failed (non-fatal):', e);
+    }
+
     // 4. Create RFQ in database
     const rfq = await prisma.rFQ.create({
       data: {
         title: validatedData.title,
         description: validatedData.description,
         category: validatedData.category,
+        categoryId,
         quantity: validatedData.quantity,
         unit: validatedData.unit,
         minBudget: validatedData.minBudget,
