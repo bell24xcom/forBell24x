@@ -1,5 +1,5 @@
 /**
- * Bell24H Security Middleware
+ * Bell24h Security Middleware
  *
  * Comprehensive security middleware for API routes
  * Integrates rate limiting, security headers, CSRF protection, and more

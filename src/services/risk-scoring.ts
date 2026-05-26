@@ -1,5 +1,5 @@
 /**
- * Bell24H Risk Scoring Engine
+ * Bell24h Risk Scoring Engine
  *
  * Aladdin-style comprehensive risk assessment for suppliers, markets, and portfolios
  * Provides enterprise-grade risk analytics for B2B procurement decisions

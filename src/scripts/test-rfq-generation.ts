@@ -1,4 +1,4 @@
-// Test Script for Bell24H RFQ Generation System
+// Test Script for Bell24h RFQ Generation System
 // Run this to see sample generated RFQs
 
 import {

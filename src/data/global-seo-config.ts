@@ -1,5 +1,5 @@
 /**
- * Bell24H Global SEO Configuration
+ * Bell24h Global SEO Configuration
  *
  * Comprehensive international SEO setup for 75+ countries
  * Includes localization, currencies, languages, and market-specific content
@@ -42,7 +42,7 @@ export const GLOBAL_SEO_CONFIG: Record<string, CountrySEO> = {
     topIndustries: ['Manufacturing', 'Textiles', 'Chemicals', 'Agriculture', 'IT Services'],
     searchEngines: ['Google', 'Bing'],
     localSuppliers: 534281,
-    metaTitleTemplate: '{category} Suppliers in India - Bell24H B2B Marketplace',
+    metaTitleTemplate: '{category} Suppliers in India - Bell24h B2B Marketplace',
     metaDescriptionTemplate:
       'Find verified {category} suppliers in India. 500K+ manufacturers, exporters & traders. Get instant quotes, ISO certified suppliers. #1 B2B marketplace.',
     keywords: [
@@ -72,7 +72,7 @@ export const GLOBAL_SEO_CONFIG: Record<string, CountrySEO> = {
     topIndustries: ['Automotive', 'Machinery', 'Chemicals', 'Electronics', 'Precision Engineering'],
     searchEngines: ['Google.de', 'Bing'],
     localSuppliers: 45230,
-    metaTitleTemplate: '{category} Lieferanten in Deutschland - Bell24H B2B Marktplatz',
+    metaTitleTemplate: '{category} Lieferanten in Deutschland - Bell24h B2B Marktplatz',
     metaDescriptionTemplate:
       'Finden Sie verifizierte {category} Lieferanten in Deutschland. 45K+ Hersteller, Exporteure. Sofortige Angebote, ISO-zertifiziert.',
     keywords: [
@@ -106,7 +106,7 @@ export const GLOBAL_SEO_CONFIG: Record<string, CountrySEO> = {
     ],
     searchEngines: ['Google.co.uk', 'Bing'],
     localSuppliers: 38420,
-    metaTitleTemplate: '{category} Suppliers in UK - Bell24H B2B Marketplace',
+    metaTitleTemplate: '{category} Suppliers in UK - Bell24h B2B Marketplace',
     metaDescriptionTemplate:
       'Find verified {category} suppliers in United Kingdom. 38K+ manufacturers, exporters & traders. Instant quotes, ISO certified.',
     keywords: [
@@ -135,7 +135,7 @@ export const GLOBAL_SEO_CONFIG: Record<string, CountrySEO> = {
     topIndustries: ['Clean Technology', 'Automotive', 'Forestry', 'Mining', 'Telecommunications'],
     searchEngines: ['Google.se', 'Bing'],
     localSuppliers: 12850,
-    metaTitleTemplate: '{category} Leverantörer i Sverige - Bell24H B2B Marknadsplats',
+    metaTitleTemplate: '{category} Leverantörer i Sverige - Bell24h B2B Marknadsplats',
     metaDescriptionTemplate:
       'Hitta verifierade {category} leverantörer i Sverige. 12K+ tillverkare, exportörer. Direktofferter, ISO-certifierade.',
     keywords: [
@@ -169,7 +169,7 @@ export const GLOBAL_SEO_CONFIG: Record<string, CountrySEO> = {
     ],
     searchEngines: ['Google.ch', 'Bing'],
     localSuppliers: 18750,
-    metaTitleTemplate: '{category} Lieferanten in der Schweiz - Bell24H B2B Marktplatz',
+    metaTitleTemplate: '{category} Lieferanten in der Schweiz - Bell24h B2B Marktplatz',
     metaDescriptionTemplate:
       'Finden Sie verifizierte {category} Lieferanten in der Schweiz. 18K+ Hersteller, Präzisionstechnik, Pharma.',
     keywords: [
@@ -198,7 +198,7 @@ export const GLOBAL_SEO_CONFIG: Record<string, CountrySEO> = {
     topIndustries: ['Construction', 'Oil & Gas', 'Real Estate', 'Trading', 'Tourism'],
     searchEngines: ['Google.ae', 'Bing'],
     localSuppliers: 28640,
-    metaTitleTemplate: '{category} Suppliers in UAE - Bell24H B2B Marketplace Dubai',
+    metaTitleTemplate: '{category} Suppliers in UAE - Bell24h B2B Marketplace Dubai',
     metaDescriptionTemplate:
       'Find verified {category} suppliers in UAE, Dubai, Abu Dhabi. 28K+ manufacturers, traders. Vision 2071 certified suppliers.',
     keywords: [
@@ -227,7 +227,7 @@ export const GLOBAL_SEO_CONFIG: Record<string, CountrySEO> = {
     topIndustries: ['Oil & Gas', 'Petrochemicals', 'Mining', 'Logistics', 'Tourism'],
     searchEngines: ['Google.com.om', 'Bing'],
     localSuppliers: 8420,
-    metaTitleTemplate: '{category} Suppliers in Oman - Bell24H B2B Marketplace Muscat',
+    metaTitleTemplate: '{category} Suppliers in Oman - Bell24h B2B Marketplace Muscat',
     metaDescriptionTemplate:
       'Find verified {category} suppliers in Oman, Muscat. 8K+ manufacturers, oil & gas suppliers. Vision 2040 partners.',
     keywords: [
@@ -255,7 +255,7 @@ export const GLOBAL_SEO_CONFIG: Record<string, CountrySEO> = {
     topIndustries: ['Oil & Gas', 'Petrochemicals', 'Construction', 'Manufacturing', 'Mining'],
     searchEngines: ['Google.com.sa', 'Bing'],
     localSuppliers: 35680,
-    metaTitleTemplate: '{category} Suppliers in Saudi Arabia - Bell24H B2B Marketplace',
+    metaTitleTemplate: '{category} Suppliers in Saudi Arabia - Bell24h B2B Marketplace',
     metaDescriptionTemplate:
       'Find verified {category} suppliers in Saudi Arabia. 35K+ manufacturers, Vision 2030 projects. NEOM, AMAALA certified.',
     keywords: [
@@ -290,7 +290,7 @@ export const GLOBAL_SEO_CONFIG: Record<string, CountrySEO> = {
     ],
     searchEngines: ['Google.com.sg', 'Bing'],
     localSuppliers: 22450,
-    metaTitleTemplate: '{category} Suppliers in Singapore - Bell24H B2B Marketplace',
+    metaTitleTemplate: '{category} Suppliers in Singapore - Bell24h B2B Marketplace',
     metaDescriptionTemplate:
       'Find verified {category} suppliers in Singapore. 22K+ manufacturers, ASEAN trading hub. Smart Nation certified.',
     keywords: [
@@ -318,7 +318,7 @@ export const GLOBAL_SEO_CONFIG: Record<string, CountrySEO> = {
     topIndustries: ['Electronics', 'Automotive', 'Shipbuilding', 'Steel', 'Chemicals'],
     searchEngines: ['Google.co.kr', 'Naver', 'Daum'],
     localSuppliers: 42580,
-    metaTitleTemplate: '{category} 공급업체 한국 - Bell24H B2B 마켓플레이스',
+    metaTitleTemplate: '{category} 공급업체 한국 - Bell24h B2B 마켓플레이스',
     metaDescriptionTemplate:
       '한국의 검증된 {category} 공급업체를 찾아보세요. 42K+ 제조업체, 수출업체. 즉시 견적, ISO 인증.',
     keywords: ['B2B 마켓플레이스 한국', '공급업체 한국', '제조업체 한국', '수출업체 한국'],
@@ -341,7 +341,7 @@ export const GLOBAL_SEO_CONFIG: Record<string, CountrySEO> = {
     topIndustries: ['Automotive', 'Electronics', 'Machinery', 'Chemicals', 'Precision Instruments'],
     searchEngines: ['Google.co.jp', 'Yahoo Japan'],
     localSuppliers: 38920,
-    metaTitleTemplate: '{category} サプライヤー 日本 - Bell24H B2Bマーケットプレイス',
+    metaTitleTemplate: '{category} サプライヤー 日本 - Bell24h B2Bマーケットプレイス',
     metaDescriptionTemplate:
       '日本の検証済み{category}サプライヤーを見つけてください。38K+メーカー、輸出業者。即座の見積もり、ISO認証。',
     keywords: ['B2Bマーケットプレイス日本', 'サプライヤー日本', 'メーカー日本', '卸売日本'],
@@ -364,7 +364,7 @@ export const GLOBAL_SEO_CONFIG: Record<string, CountrySEO> = {
     topIndustries: ['Mining', 'Agriculture', 'Manufacturing', 'Energy', 'Technology'],
     searchEngines: ['Google.com.au', 'Bing'],
     localSuppliers: 25840,
-    metaTitleTemplate: '{category} Suppliers in Australia - Bell24H B2B Marketplace',
+    metaTitleTemplate: '{category} Suppliers in Australia - Bell24h B2B Marketplace',
     metaDescriptionTemplate:
       'Find verified {category} suppliers in Australia. 25K+ manufacturers, miners, exporters. Instant quotes, Australian certified.',
     keywords: [
@@ -393,7 +393,7 @@ export const GLOBAL_SEO_CONFIG: Record<string, CountrySEO> = {
     topIndustries: ['Technology', 'Healthcare', 'Manufacturing', 'Aerospace', 'Automotive'],
     searchEngines: ['Google.com', 'Bing'],
     localSuppliers: 89420,
-    metaTitleTemplate: '{category} Suppliers in USA - Bell24H B2B Marketplace',
+    metaTitleTemplate: '{category} Suppliers in USA - Bell24h B2B Marketplace',
     metaDescriptionTemplate:
       'Find verified {category} suppliers in United States. 89K+ manufacturers, exporters & distributors. Instant quotes, ISO certified.',
     keywords: [
@@ -422,7 +422,7 @@ export const GLOBAL_SEO_CONFIG: Record<string, CountrySEO> = {
     topIndustries: ['Natural Resources', 'Aerospace', 'Agriculture', 'Technology', 'Manufacturing'],
     searchEngines: ['Google.ca', 'Bing'],
     localSuppliers: 28350,
-    metaTitleTemplate: '{category} Suppliers in Canada - Bell24H B2B Marketplace',
+    metaTitleTemplate: '{category} Suppliers in Canada - Bell24h B2B Marketplace',
     metaDescriptionTemplate:
       'Find verified {category} suppliers in Canada. 28K+ manufacturers, exporters. Bilingual service, ISO certified.',
     keywords: [
@@ -451,7 +451,7 @@ export const GLOBAL_SEO_CONFIG: Record<string, CountrySEO> = {
     topIndustries: ['Aerospace', 'Automotive', 'Luxury Goods', 'Agriculture', 'Technology'],
     searchEngines: ['Google.fr', 'Bing'],
     localSuppliers: 32480,
-    metaTitleTemplate: '{category} Fournisseurs en France - Bell24H Marketplace B2B',
+    metaTitleTemplate: '{category} Fournisseurs en France - Bell24h Marketplace B2B',
     metaDescriptionTemplate:
       'Trouvez des fournisseurs {category} vérifiés en France. 32K+ fabricants, exportateurs. Devis instantanés, certifiés ISO.',
     keywords: [
@@ -479,7 +479,7 @@ export const GLOBAL_SEO_CONFIG: Record<string, CountrySEO> = {
     topIndustries: ['Agriculture', 'Mining', 'Manufacturing', 'Oil & Gas', 'Automotive'],
     searchEngines: ['Google.com.br', 'Bing'],
     localSuppliers: 45280,
-    metaTitleTemplate: 'Fornecedores {category} no Brasil - Bell24H Marketplace B2B',
+    metaTitleTemplate: 'Fornecedores {category} no Brasil - Bell24h Marketplace B2B',
     metaDescriptionTemplate:
       'Encontre fornecedores {category} verificados no Brasil. 45K+ fabricantes, exportadores. Cotações instantâneas, certificados ISO.',
     keywords: [
@@ -508,7 +508,7 @@ export const GLOBAL_SEO_CONFIG: Record<string, CountrySEO> = {
     topIndustries: ['Manufacturing', 'Electronics', 'Textiles', 'Machinery', 'Chemicals'],
     searchEngines: ['Baidu', 'Sogou', 'Bing'],
     localSuppliers: 750000,
-    metaTitleTemplate: '{category} 供应商 中国 - Bell24H B2B市场',
+    metaTitleTemplate: '{category} 供应商 中国 - Bell24h B2B市场',
     metaDescriptionTemplate:
       '在中国寻找经过验证的{category}供应商。75万+制造商，出口商。即时报价，ISO认证。',
     keywords: ['B2B市场 中国', '供应商 中国', '制造商 中国', '出口商 中国'],
@@ -531,7 +531,7 @@ export const GLOBAL_SEO_CONFIG: Record<string, CountrySEO> = {
     topIndustries: ['Trading', 'Financial Services', 'Logistics', 'Electronics', 'Textiles'],
     searchEngines: ['Google.com.hk', 'Yahoo Hong Kong'],
     localSuppliers: 85000,
-    metaTitleTemplate: '{category} 供應商 香港 - Bell24H B2B市場',
+    metaTitleTemplate: '{category} 供應商 香港 - Bell24h B2B市場',
     metaDescriptionTemplate:
       '在香港尋找經過驗證的{category}供應商。85K+製造商，貿易商。即時報價，ISO認證。',
     keywords: ['B2B市場 香港', '供應商 香港', '貿易商 香港', '製造商 香港'],
@@ -554,7 +554,7 @@ export const GLOBAL_SEO_CONFIG: Record<string, CountrySEO> = {
     topIndustries: ['Semiconductors', 'Electronics', 'Machinery', 'Chemicals', 'Textiles'],
     searchEngines: ['Google.com.tw', 'Yahoo Taiwan'],
     localSuppliers: 125000,
-    metaTitleTemplate: '{category} 供應商 台灣 - Bell24H B2B市場',
+    metaTitleTemplate: '{category} 供應商 台灣 - Bell24h B2B市場',
     metaDescriptionTemplate:
       '在台灣尋找經過驗證的{category}供應商。125K+製造商，出口商。即時報價，ISO認證。',
     keywords: ['B2B市場 台灣', '供應商 台灣', '製造商 台灣', '出口商 台灣'],
@@ -578,7 +578,7 @@ export const GLOBAL_SEO_CONFIG: Record<string, CountrySEO> = {
     topIndustries: ['Automotive', 'Electronics', 'Agriculture', 'Textiles', 'Food Processing'],
     searchEngines: ['Google.co.th', 'Bing'],
     localSuppliers: 95000,
-    metaTitleTemplate: '{category} ผู้จำหน่าย ในประเทศไทย - Bell24H B2B Marketplace',
+    metaTitleTemplate: '{category} ผู้จำหน่าย ในประเทศไทย - Bell24h B2B Marketplace',
     metaDescriptionTemplate:
       'ค้นหาผู้จำหน่าย {category} ที่ได้รับการยืนยันในประเทศไทย 95K+ ผู้ผลิต ผู้ส่งออก ใบเสนอราคาทันที',
     keywords: ['B2B marketplace Thailand', 'ผู้จำหน่าย ไทย', 'ผู้ผลิต ไทย', 'ส่งออก ไทย'],
@@ -602,7 +602,7 @@ export const GLOBAL_SEO_CONFIG: Record<string, CountrySEO> = {
     topIndustries: ['Palm Oil', 'Electronics', 'Automotive', 'Petrochemicals', 'Rubber'],
     searchEngines: ['Google.com.my', 'Bing'],
     localSuppliers: 78000,
-    metaTitleTemplate: '{category} Suppliers in Malaysia - Bell24H B2B Marketplace',
+    metaTitleTemplate: '{category} Suppliers in Malaysia - Bell24h B2B Marketplace',
     metaDescriptionTemplate:
       'Find verified {category} suppliers in Malaysia. 78K+ manufacturers, exporters. Instant quotes, SIRIM certified.',
     keywords: [
@@ -658,36 +658,36 @@ export const INDUSTRY_KEYWORDS: Record<string, Record<string, string[]>> = {
 export const GLOBAL_META_TEMPLATES = {
   homepage: {
     title:
-      'Bell24H - Global B2B Marketplace | Connect with {localSuppliers}+ Verified Suppliers in {country}',
+      'Bell24h - Global B2B Marketplace | Connect with {localSuppliers}+ Verified Suppliers in {country}',
     description:
       "World's largest B2B marketplace. Find verified suppliers, manufacturers & exporters in {country}. Get instant quotes, secure payments, ISO certified vendors.",
     keywords:
       'B2B marketplace, suppliers {country}, manufacturers {country}, wholesale {country}, verified suppliers',
   },
   category: {
-    title: '{category} Suppliers in {country} - Bell24H B2B Marketplace',
+    title: '{category} Suppliers in {country} - Bell24h B2B Marketplace',
     description:
       'Find verified {category} suppliers in {country}. {supplierCount}+ manufacturers, exporters & traders. Get instant quotes, compare prices. {topIndustry} specialists.',
     keywords:
       '{category} suppliers {country}, {category} manufacturers {country}, {category} exporters {country}',
   },
   supplier: {
-    title: '{companyName} - {category} Supplier in {city}, {country} | Bell24H',
+    title: '{companyName} - {category} Supplier in {city}, {country} | Bell24h',
     description:
       '{companyName} is a verified {category} supplier in {city}, {country}. {rating}/10 rating, {certifications} certified. Get quotes for {products}.',
     keywords: '{companyName}, {category} supplier {city}, {category} manufacturer {country}',
   },
   search: {
-    title: 'Search Results - Bell24H {country} B2B Marketplace',
+    title: 'Search Results - Bell24h {country} B2B Marketplace',
     description:
       'Search results for suppliers and manufacturers in {country}. Find verified suppliers, get instant quotes, compare prices from {localSuppliers}+ businesses.',
     keywords: 'search suppliers {country}, find manufacturers {country}, B2B search {country}',
   },
   about: {
-    title: 'About Bell24H - Leading B2B Marketplace in {country}',
+    title: 'About Bell24h - Leading B2B Marketplace in {country}',
     description:
-      'Learn about Bell24H, the leading B2B marketplace in {country}. Connecting {localSuppliers}+ verified suppliers with global buyers since 2024.',
-    keywords: 'about Bell24H, B2B marketplace {country}, company information, Bell24H {country}',
+      'Learn about Bell24h, the leading B2B marketplace in {country}. Connecting {localSuppliers}+ verified suppliers with global buyers since 2024.',
+    keywords: 'about Bell24h, B2B marketplace {country}, company information, Bell24h {country}',
   },
 };
 
@@ -696,7 +696,7 @@ export const STRUCTURED_DATA_TEMPLATES = {
   organization: (country: CountrySEO) => ({
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: `Bell24H ${country.name}`,
+    name: `Bell24h ${country.name}`,
     url: `https://${country.domain}`,
     logo: `https://${country.domain}/logo.png`,
     description: `Leading B2B marketplace in ${country.name} connecting ${country.localSuppliers}+ verified suppliers`,
@@ -709,7 +709,7 @@ export const STRUCTURED_DATA_TEMPLATES = {
   marketplace: (country: CountrySEO) => ({
     '@context': 'https://schema.org',
     '@type': 'Marketplace',
-    name: `Bell24H ${country.name} B2B Marketplace`,
+    name: `Bell24h ${country.name} B2B Marketplace`,
     description: `B2B marketplace with ${country.localSuppliers}+ verified suppliers in ${country.name}`,
     url: `https://${country.domain}`,
     areaServed: country.name,
@@ -732,7 +732,7 @@ export const HREFLANG_CONFIG = Object.values(GLOBAL_SEO_CONFIG).map(country => (
 export const generateLocalBusinessSchema = (country: CountrySEO) => ({
   '@context': 'https://schema.org',
   '@type': 'LocalBusiness',
-  name: `Bell24H ${country.name}`,
+  name: `Bell24h ${country.name}`,
   image: `https://${country.domain}/images/bell24h-${country.code.toLowerCase()}.jpg`,
   telephone: '+91-80-4040-7000', // Add local numbers for each country
   address: {

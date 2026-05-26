@@ -1,18 +1,18 @@
 
-// RazorpayX Test Configuration for Bell24H B2B Marketplace
+// RazorpayX Test Configuration for Bell24h B2B Marketplace
 export const RAZORPAY_TEST_CONFIG = {
   key_id: process.env.RAZORPAY_KEY_ID || 'rzp_test_YOUR_TEST_KEY',
   key_secret: process.env.RAZORPAY_KEY_SECRET || 'YOUR_TEST_SECRET',
   currency: 'INR',
-  name: 'Bell24H B2B Marketplace',
-  description: 'B2B Transaction for Bell24H',
+  name: 'Bell24h B2B Marketplace',
+  description: 'B2B Transaction for Bell24h',
   prefill: {
     name: 'Test User',
     email: 'test@bell24h.com',
     contact: '+919876543210',
   },
   notes: {
-    address: 'Bell24H B2B Marketplace',
+    address: 'Bell24h B2B Marketplace',
     merchant_order_id: 'BELL24H_ORDER_',
   },
   theme: {
@@ -88,7 +88,7 @@ export const createTestPayment = async (amount: number, currency: string = 'INR'
       receipt: `BELL24H_TEST_${Date.now()}`,
       notes: {
         test_transaction: 'true',
-        marketplace: 'Bell24H',
+        marketplace: 'Bell24h',
         environment: 'test',
       },
     };
@@ -291,6 +291,6 @@ export const generateTestReport = (testResults: any[]) => {
     details: testResults,
     timestamp: new Date().toISOString(),
     environment: 'test',
-    marketplace: 'Bell24H',
+    marketplace: 'Bell24h',
   };
 };

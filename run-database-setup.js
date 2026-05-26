@@ -9,7 +9,7 @@ const pool = new Pool({
 
 async function runDatabaseSetup() {
   try {
-    console.log('🚀 Starting Bell24H Database Setup with 400+ Categories...');
+    console.log('🚀 Starting Bell24h Database Setup with 400+ Categories...');
     console.log('========================================================');
     
     // Test connection

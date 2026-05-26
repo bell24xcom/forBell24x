@@ -1,5 +1,5 @@
 /**
- * Bell24H Right to be Forgotten System
+ * Bell24h Right to be Forgotten System
  *
  * Implements GDPR Article 17 - Right to Erasure
  * Comprehensive data deletion with audit trails

@@ -1,5 +1,5 @@
 /**
- * AZR (Absolute Zero Reasoner) Service for Bell24H
+ * AZR (Absolute Zero Reasoner) Service for Bell24h
  * 
  * This service provides advanced reasoning and explainability capabilities
  * by integrating with the AZR framework.

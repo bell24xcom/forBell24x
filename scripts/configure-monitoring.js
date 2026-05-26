@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
 /**
- * Bell24H Monitoring Configuration Script
+ * Bell24h Monitoring Configuration Script
  * 
  * This script helps configure monitoring thresholds and alerts
- * for the Bell24H marketplace admin system.
+ * for the Bell24h marketplace admin system.
  */
 
 const readline = require('readline');
@@ -215,9 +215,9 @@ function generateMonitoringConfig() {
     generatedAt: new Date().toISOString(),
     monitoring: monitoringConfig,
     metadata: {
-      description: 'Bell24H Marketplace Monitoring Configuration',
+      description: 'Bell24h Marketplace Monitoring Configuration',
       environment: process.env.NODE_ENV || 'development',
-      marketplace: 'Bell24H'
+      marketplace: 'Bell24h'
     }
   };
   
@@ -226,7 +226,7 @@ function generateMonitoringConfig() {
 
 // Generate environment variables for monitoring
 function generateMonitoringEnv() {
-  const envContent = `# Bell24H Monitoring Configuration
+  const envContent = `# Bell24h Monitoring Configuration
 # Generated on: ${new Date().toISOString()}
 
 # System Health Thresholds
@@ -302,8 +302,8 @@ function saveConfiguration() {
 
 // Main configuration function
 async function configureMonitoring() {
-  log.header('Bell24H Monitoring Configuration');
-  log.info('This script will help you configure monitoring thresholds and alerts for your Bell24H marketplace.');
+  log.header('Bell24h Monitoring Configuration');
+  log.info('This script will help you configure monitoring thresholds and alerts for your Bell24h marketplace.');
   
   try {
     await configureSystemHealth();

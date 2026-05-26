@@ -228,7 +228,7 @@ const sendReportEmail = async (recipient: string, reportPath: string): Promise<v
     const mailOptions = {
       from: process.env.SMTP_FROM,
       to: recipient,
-      subject: 'Scheduled Report from Bell24H',
+      subject: 'Scheduled Report from Bell24h',
       text: 'Please find your scheduled report attached.',
       attachments: [
         {

@@ -1,5 +1,5 @@
 /**
- * Bell24H Global SEO Demo
+ * Bell24h Global SEO Demo
  *
  * Demonstrates the global SEO system working across all 75+ countries
  * Shows meta generation, localization, and international SEO features
@@ -20,7 +20,7 @@ const GLOBAL_SEO_CONFIG = {
     topIndustries: ['Manufacturing', 'Textiles', 'Chemicals', 'Agriculture', 'IT Services'],
     searchEngines: ['Google', 'Bing'],
     localSuppliers: 534281,
-    metaTitleTemplate: '{category} Suppliers in India - Bell24H B2B Marketplace',
+    metaTitleTemplate: '{category} Suppliers in India - Bell24h B2B Marketplace',
     metaDescriptionTemplate:
       'Find verified {category} suppliers in India. 500K+ manufacturers, exporters & traders. Get instant quotes, ISO certified suppliers.',
     keywords: [
@@ -47,7 +47,7 @@ const GLOBAL_SEO_CONFIG = {
     topIndustries: ['Technology', 'Healthcare', 'Manufacturing', 'Aerospace', 'Automotive'],
     searchEngines: ['Google.com', 'Bing'],
     localSuppliers: 89420,
-    metaTitleTemplate: '{category} Suppliers in USA - Bell24H B2B Marketplace',
+    metaTitleTemplate: '{category} Suppliers in USA - Bell24h B2B Marketplace',
     metaDescriptionTemplate:
       'Find verified {category} suppliers in United States. 89K+ manufacturers, exporters & distributors. Instant quotes, ISO certified.',
     keywords: ['B2B marketplace USA', 'suppliers USA', 'manufacturers America', 'wholesale USA'],
@@ -69,7 +69,7 @@ const GLOBAL_SEO_CONFIG = {
     topIndustries: ['Automotive', 'Machinery', 'Chemicals', 'Electronics', 'Precision Engineering'],
     searchEngines: ['Google.de', 'Bing'],
     localSuppliers: 45230,
-    metaTitleTemplate: '{category} Lieferanten in Deutschland - Bell24H B2B Marktplatz',
+    metaTitleTemplate: '{category} Lieferanten in Deutschland - Bell24h B2B Marktplatz',
     metaDescriptionTemplate:
       'Finden Sie verifizierte {category} Lieferanten in Deutschland. 45K+ Hersteller, Exporteure.',
     keywords: ['B2B Marktplatz Deutschland', 'Lieferanten Deutschland', 'Hersteller Deutschland'],
@@ -91,7 +91,7 @@ const GLOBAL_SEO_CONFIG = {
     topIndustries: ['Construction', 'Oil & Gas', 'Real Estate', 'Trading', 'Tourism'],
     searchEngines: ['Google.ae', 'Bing'],
     localSuppliers: 28640,
-    metaTitleTemplate: '{category} Suppliers in UAE - Bell24H B2B Marketplace Dubai',
+    metaTitleTemplate: '{category} Suppliers in UAE - Bell24h B2B Marketplace Dubai',
     metaDescriptionTemplate:
       'Find verified {category} suppliers in UAE, Dubai, Abu Dhabi. 28K+ manufacturers, traders.',
     keywords: ['B2B marketplace UAE', 'suppliers Dubai', 'manufacturers UAE', 'traders Abu Dhabi'],
@@ -113,7 +113,7 @@ const GLOBAL_SEO_CONFIG = {
     topIndustries: ['Automotive', 'Electronics', 'Machinery', 'Chemicals', 'Precision Instruments'],
     searchEngines: ['Google.co.jp', 'Yahoo Japan'],
     localSuppliers: 38920,
-    metaTitleTemplate: '{category} サプライヤー 日本 - Bell24H B2Bマーケットプレイス',
+    metaTitleTemplate: '{category} サプライヤー 日本 - Bell24h B2Bマーケットプレイス',
     metaDescriptionTemplate:
       '日本の検証済み{category}サプライヤーを見つけてください。38K+メーカー、輸出業者。',
     keywords: ['B2Bマーケットプレイス日本', 'サプライヤー日本', 'メーカー日本', '卸売日本'],
@@ -135,7 +135,7 @@ const GLOBAL_SEO_CONFIG = {
     topIndustries: ['Agriculture', 'Mining', 'Manufacturing', 'Oil & Gas', 'Automotive'],
     searchEngines: ['Google.com.br', 'Bing'],
     localSuppliers: 45280,
-    metaTitleTemplate: 'Fornecedores {category} no Brasil - Bell24H Marketplace B2B',
+    metaTitleTemplate: 'Fornecedores {category} no Brasil - Bell24h Marketplace B2B',
     metaDescriptionTemplate:
       'Encontre fornecedores {category} verificados no Brasil. 45K+ fabricantes, exportadores.',
     keywords: ['marketplace B2B Brasil', 'fornecedores Brasil', 'fabricantes Brasil'],
@@ -179,7 +179,7 @@ class GlobalSEOManager {
     return {
       '@context': 'https://schema.org',
       '@type': 'Organization',
-      name: `Bell24H ${this.country.name}`,
+      name: `Bell24h ${this.country.name}`,
       url: `https://${this.country.domain}`,
       description: `Leading B2B marketplace in ${
         this.country.name

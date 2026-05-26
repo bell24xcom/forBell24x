@@ -4,7 +4,7 @@ import { getClientQueryClient } from './queryClient.ts';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 /**
- * QueryClient configuration for Bell24H
+ * QueryClient configuration for Bell24h
  * Centralizes data fetching and caching
  */
 // Removed direct instantiation of QueryClient. Will use getClientQueryClient from queryClient.ts

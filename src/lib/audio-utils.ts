@@ -1,4 +1,4 @@
-// Simple audio utilities for the Bell24H application
+// Simple audio utilities for the Bell24h application
 
 type SoundType = 'success' | 'error' | 'notification' | 'match' | 'upload';
 

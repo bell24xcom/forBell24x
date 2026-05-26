@@ -1,5 +1,5 @@
 /**
- * Bell24H Comprehensive Supplier Generation System
+ * Bell24h Comprehensive Supplier Generation System
  *
  * Generates 2,000+ realistic Indian supplier profiles across all 50 categories
  * Focus: Professional business data without images for enterprise marketplace

@@ -37,9 +37,9 @@ export const sendEmail = async (options: EmailOptions): Promise<void> => {
 export const emailTemplates = {
   verification: (name: string, verificationLink: string) => ({
     subject: 'Verify your email address',
-    text: `Hi ${name},\n\nPlease verify your email address by clicking this link: ${verificationLink}\n\nBest regards,\nThe Bell24H Team`,
+    text: `Hi ${name},\n\nPlease verify your email address by clicking this link: ${verificationLink}\n\nBest regards,\nThe Bell24h Team`,
     html: `
-      <h1>Welcome to Bell24H!</h1>
+      <h1>Welcome to Bell24h!</h1>
       <p>Hi ${name},</p>
       <p>Please verify your email address by clicking the button below:</p>
       <a href="${verificationLink}" style="
@@ -53,13 +53,13 @@ export const emailTemplates = {
       ">Verify Email</a>
       <p>Or copy and paste this link in your browser:</p>
       <p>${verificationLink}</p>
-      <p>Best regards,<br>The Bell24H Team</p>
+      <p>Best regards,<br>The Bell24h Team</p>
     `,
   }),
 
   passwordReset: (name: string, resetLink: string) => ({
     subject: 'Reset your password',
-    text: `Hi ${name},\n\nClick this link to reset your password: ${resetLink}\n\nBest regards,\nThe Bell24H Team`,
+    text: `Hi ${name},\n\nClick this link to reset your password: ${resetLink}\n\nBest regards,\nThe Bell24h Team`,
     html: `
       <h1>Password Reset</h1>
       <p>Hi ${name},</p>
@@ -75,35 +75,35 @@ export const emailTemplates = {
       ">Reset Password</a>
       <p>Or copy and paste this link in your browser:</p>
       <p>${resetLink}</p>
-      <p>Best regards,<br>The Bell24H Team</p>
+      <p>Best regards,<br>The Bell24h Team</p>
     `,
   }),
 
   welcome: (name: string) => ({
-    subject: 'Welcome to Bell24H!',
-    text: `Hi ${name},\n\nWelcome to Bell24H! We're excited to have you on board.\n\nBest regards,\nThe Bell24H Team`,
+    subject: 'Welcome to Bell24h!',
+    text: `Hi ${name},\n\nWelcome to Bell24h! We're excited to have you on board.\n\nBest regards,\nThe Bell24h Team`,
     html: `
-      <h1>Welcome to Bell24H!</h1>
+      <h1>Welcome to Bell24h!</h1>
       <p>Hi ${name},</p>
-      <p>Welcome to Bell24H! We're excited to have you on board.</p>
+      <p>Welcome to Bell24h! We're excited to have you on board.</p>
       <p>Here are some things you can do to get started:</p>
       <ul>
         <li>Complete your profile</li>
         <li>Browse available RFQs</li>
         <li>Connect with other businesses</li>
       </ul>
-      <p>Best regards,<br>The Bell24H Team</p>
+      <p>Best regards,<br>The Bell24h Team</p>
     `,
   }),
 
   notification: (name: string, message: string) => ({
-    subject: 'New notification from Bell24H',
-    text: `Hi ${name},\n\n${message}\n\nBest regards,\nThe Bell24H Team`,
+    subject: 'New notification from Bell24h',
+    text: `Hi ${name},\n\n${message}\n\nBest regards,\nThe Bell24h Team`,
     html: `
       <h1>New Notification</h1>
       <p>Hi ${name},</p>
       <p>${message}</p>
-      <p>Best regards,<br>The Bell24H Team</p>
+      <p>Best regards,<br>The Bell24h Team</p>
     `,
   }),
 }; 

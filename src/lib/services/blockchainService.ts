@@ -134,7 +134,7 @@ class BlockchainService {
     // Escrow Contract
     const escrowContract: SmartContract = {
       address: process.env.ESCROW_CONTRACT_ADDRESS || '',
-      name: 'Bell24HEscrow',
+      name: 'Bell24hEscrow',
       abi: this.getEscrowABI(),
       bytecode: this.getEscrowBytecode(),
       deployedAt: new Date(),
@@ -144,7 +144,7 @@ class BlockchainService {
     // Verification Contract
     const verificationContract: SmartContract = {
       address: process.env.VERIFICATION_CONTRACT_ADDRESS || '',
-      name: 'Bell24HVerification',
+      name: 'Bell24hVerification',
       abi: this.getVerificationABI(),
       bytecode: this.getVerificationBytecode(),
       deployedAt: new Date(),

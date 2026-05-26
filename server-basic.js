@@ -19,7 +19,7 @@ app.use(express.json());
 
 // API Health check route
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'healthy', message: 'Bell24H API is running' });
+  res.json({ status: 'healthy', message: 'Bell24h API is running' });
 });
 
 // Database status check
@@ -89,7 +89,7 @@ app.get('*', (req, res) => {
     <!DOCTYPE html>
     <html>
       <head>
-        <title>Bell24H Database Viewer</title>
+        <title>Bell24h Database Viewer</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
         <style>
           body { padding: 20px; }
@@ -122,7 +122,7 @@ app.get('*', (req, res) => {
       <body>
         <div class="container">
           <div class="header">
-            <h1>Bell24H Database Viewer</h1>
+            <h1>Bell24h Database Viewer</h1>
             <p class="lead">View database tables and their contents</p>
             <button class="btn btn-light" id="fetchTables">Fetch Database Tables</button>
           </div>
@@ -245,5 +245,5 @@ app.use((err, req, res, next) => {
 
 // Start the server
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Bell24H Database Viewer running on port ${PORT}`);
+  console.log(`Bell24h Database Viewer running on port ${PORT}`);
 });

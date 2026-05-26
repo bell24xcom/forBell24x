@@ -122,7 +122,7 @@ async function checkDatabaseStatus() {
       
       if (mainCount.rows[0].count >= 50 && subCount.rows[0].count >= 400) {
         console.log('🎉 COMPLETE SUCCESS: All 50 main categories + 400+ subcategories are in place!');
-        console.log('✅ Database is ready for Bell24H marketplace');
+        console.log('✅ Database is ready for Bell24h marketplace');
       } else {
         console.log('⚠️  PARTIAL SUCCESS: Some categories are missing');
         console.log(`   Main categories: ${mainCount.rows[0].count}/50`);

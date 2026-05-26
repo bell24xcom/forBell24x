@@ -1,5 +1,5 @@
 /**
- * Bell24H GDPR Cookie Consent Management System
+ * Bell24h GDPR Cookie Consent Management System
  *
  * Comprehensive cookie management with granular controls
  * Full GDPR compliance with consent tracking and withdrawal
@@ -46,21 +46,21 @@ export const COOKIE_CATEGORIES: CookieCategory[] = [
         name: 'bell24h_session',
         purpose: 'Maintains user session and authentication state',
         duration: '24 hours',
-        provider: 'Bell24H',
+        provider: 'Bell24h',
         category: 'essential',
       },
       {
         name: 'bell24h_csrf',
         purpose: 'Prevents cross-site request forgery attacks',
         duration: 'Session',
-        provider: 'Bell24H',
+        provider: 'Bell24h',
         category: 'essential',
       },
       {
         name: 'bell24h_consent',
         purpose: 'Stores your cookie consent preferences',
         duration: '1 year',
-        provider: 'Bell24H',
+        provider: 'Bell24h',
         category: 'essential',
       },
     ],
@@ -77,21 +77,21 @@ export const COOKIE_CATEGORIES: CookieCategory[] = [
         name: 'bell24h_preferences',
         purpose: 'Stores user preferences like language, currency, and theme',
         duration: '6 months',
-        provider: 'Bell24H',
+        provider: 'Bell24h',
         category: 'functional',
       },
       {
         name: 'bell24h_dashboard_layout',
         purpose: 'Remembers dashboard layout and customizations',
         duration: '3 months',
-        provider: 'Bell24H',
+        provider: 'Bell24h',
         category: 'functional',
       },
       {
         name: 'bell24h_search_history',
         purpose: 'Stores recent search queries for improved experience',
         duration: '30 days',
-        provider: 'Bell24H',
+        provider: 'Bell24h',
         category: 'functional',
       },
     ],
@@ -122,7 +122,7 @@ export const COOKIE_CATEGORIES: CookieCategory[] = [
         name: 'bell24h_analytics',
         purpose: 'Tracks user behavior and platform usage patterns',
         duration: '1 year',
-        provider: 'Bell24H',
+        provider: 'Bell24h',
         category: 'analytics',
       },
     ],
@@ -153,7 +153,7 @@ export const COOKIE_CATEGORIES: CookieCategory[] = [
         name: 'bell24h_marketing',
         purpose: 'Personalizes marketing content and recommendations',
         duration: '6 months',
-        provider: 'Bell24H',
+        provider: 'Bell24h',
         category: 'marketing',
       },
     ],
@@ -170,7 +170,7 @@ export const COOKIE_CATEGORIES: CookieCategory[] = [
         name: 'bell24h_performance',
         purpose: 'Monitors page load times and performance metrics',
         duration: '30 days',
-        provider: 'Bell24H',
+        provider: 'Bell24h',
         category: 'performance',
       },
       {

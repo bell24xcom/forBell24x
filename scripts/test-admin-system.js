@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Bell24H Admin System Testing Script
+ * Bell24h Admin System Testing Script
  * 
  * This script tests all admin functionality to ensure the system is ready for production.
  * Run this script after setting up the admin system to verify everything works correctly.
@@ -261,7 +261,7 @@ async function testDatabase() {
 
 // Main test runner
 async function runAllTests() {
-  log.header('🚀 Starting Bell24H Admin System Tests');
+  log.header('🚀 Starting Bell24h Admin System Tests');
   log.info(`Base URL: ${BASE_URL}`);
   log.info(`Admin Email: ${ADMIN_EMAIL}`);
   

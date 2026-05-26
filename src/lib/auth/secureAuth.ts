@@ -25,7 +25,7 @@ export const AUTH_CONFIG = {
 
   // MFA configuration
   mfa: {
-    issuer: 'Bell24H',
+    issuer: 'Bell24h',
     algorithm: 'SHA1',
     digits: 6,
     period: 30,

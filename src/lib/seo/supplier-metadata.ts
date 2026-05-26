@@ -28,12 +28,12 @@ export function generateSupplierMetadata(supplier: SupplierWithRelations): Metad
   const aiProducts = supplier.ai_extracted_products?.slice(0, 5) || [];
   const allProducts = [...new Set([...productNames, ...aiProducts])];
   
-  const title = `${supplier.company_name} - ${supplier.category?.name || 'Supplier'} in ${supplier.city || 'India'} | Bell24H`;
+  const title = `${supplier.company_name} - ${supplier.category?.name || 'Supplier'} in ${supplier.city || 'India'} | Bell24h`;
   
   const description = supplier.business_description || 
     `${supplier.company_name} is a leading ${supplier.business_type || 'supplier'} of ${supplier.category?.name || 'products'} based in ${supplier.city}, ${supplier.state}. ${
       allProducts.length > 0 ? `Specializing in ${allProducts.join(', ')}.` : ''
-    } Connect with verified suppliers on Bell24H B2B marketplace.`;
+    } Connect with verified suppliers on Bell24h B2B marketplace.`;
 
   const keywords = [
     supplier.company_name,
@@ -59,7 +59,7 @@ export function generateSupplierMetadata(supplier: SupplierWithRelations): Metad
       description,
       type: 'profile',
       url: `https://bell24h.com/suppliers/${supplier.slug}`,
-      siteName: 'Bell24H',
+      siteName: 'Bell24h',
       locale: 'en_IN',
       images: [
         {

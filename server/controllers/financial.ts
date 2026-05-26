@@ -1,7 +1,7 @@
 /**
  * Financial Services API Controller
  * 
- * Handles API endpoints for Bell24H financial services including KredX and M1 Exchange
+ * Handles API endpoints for Bell24h financial services including KredX and M1 Exchange
  * 
  * @module server/controllers/financial
  */
@@ -252,7 +252,7 @@ router.get('/compare',
           'You need immediate payment after completing deliverables',
           'Your payment is already in escrow',
           'You prefer simplicity and direct integration',
-          'You want to maintain full visibility in your Bell24H wallet'
+          'You want to maintain full visibility in your Bell24h wallet'
         ]
       }
     });

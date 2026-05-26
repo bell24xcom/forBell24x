@@ -2,7 +2,7 @@
  * Perplexity AI API Service
  * 
  * This service provides a simple interface to communicate with the Perplexity AI API,
- * allowing Bell24H to leverage advanced language models for RFQ analysis and text processing.
+ * allowing Bell24h to leverage advanced language models for RFQ analysis and text processing.
  */
 
 import axios from 'axios';

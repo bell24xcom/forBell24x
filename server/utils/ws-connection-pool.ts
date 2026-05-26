@@ -1,5 +1,5 @@
 /**
- * Bell24H Advanced WebSocket Connection Pool
+ * Bell24h Advanced WebSocket Connection Pool
  * 
  * Features:
  * - Connection sharding for better memory management

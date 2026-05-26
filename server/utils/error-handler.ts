@@ -1,8 +1,8 @@
 /**
- * Bell24H Error Handling Utilities
+ * Bell24h Error Handling Utilities
  * 
  * This module provides consistent error handling patterns
- * for the Bell24H application, ensuring proper TypeScript
+ * for the Bell24h application, ensuring proper TypeScript
  * compatibility and standardized error responses.
  */
 

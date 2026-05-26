@@ -1,7 +1,7 @@
 /**
- * Bell24H Project Export Files Script
+ * Bell24h Project Export Files Script
  * 
- * This script prepares the Bell24H project for export from Replit by:
+ * This script prepares the Bell24h project for export from Replit by:
  * 1. Creating a list of all important files
  * 2. Providing instructions for downloading the project
  * 
@@ -11,7 +11,7 @@
 const fs = require('fs');
 const path = require('path');
 
-console.log('📦 Starting Bell24H export file preparation...');
+console.log('📦 Starting Bell24h export file preparation...');
 
 // Create an export directory if it doesn't exist
 if (!fs.existsSync('export')) {
@@ -28,7 +28,7 @@ function createFileList() {
       const fileListPath = 'export/important_files.txt';
       const fileListStream = fs.createWriteStream(fileListPath);
       
-      fileListStream.write('# Bell24H Project Important Files\n');
+      fileListStream.write('# Bell24h Project Important Files\n');
       fileListStream.write('# Make sure these files are included in your download\n\n');
       
       // List of critical files and directories
@@ -118,11 +118,11 @@ function createExportReadme() {
     
     try {
       const readmePath = 'export/README_FOR_EXPORT.md';
-      const readmeContent = `# Bell24H Project Export Instructions
+      const readmeContent = `# Bell24h Project Export Instructions
 
 ## Exporting the Project from Replit
 
-Follow these steps to export the complete Bell24H project from Replit:
+Follow these steps to export the complete Bell24h project from Replit:
 
 ### 1. Using Replit's Download Feature
 
@@ -195,7 +195,7 @@ Follow these steps to export the complete Bell24H project from Replit:
    cd client && npm run build
    \`\`\`
 
-## Bell24H Features
+## Bell24h Features
 
 1. **Voice-Based RFQ**
    - Multilingual support (Hindi/English)
@@ -246,7 +246,7 @@ function createZipInstructions() {
     
     try {
       const instructionsPath = 'export/HOW_TO_CREATE_ZIP.md';
-      const instructionsContent = `# How to Create a ZIP File of Bell24H Project
+      const instructionsContent = `# How to Create a ZIP File of Bell24h Project
 
 Since we encountered issues with automatic ZIP creation in Replit, follow these manual steps:
 
@@ -279,7 +279,7 @@ If some files are missing in the ZIP from Option 1, download these critical file
 If you have GitHub access:
 
 1. Create a new GitHub repository
-2. Push the Bell24H project to that repository
+2. Push the Bell24h project to that repository
 3. Download the ZIP from GitHub
 
 ## After Downloading

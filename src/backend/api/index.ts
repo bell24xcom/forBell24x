@@ -60,7 +60,7 @@ router.get('/health', (req, res) => {
 // API documentation endpoint
 router.get('/docs', (req, res) => {
   res.json({
-    message: 'Bell24H Enterprise API Documentation',
+    message: 'Bell24h Enterprise API Documentation',
     version: '1.0.0',
     endpoints: {
       auth: '/api/auth',

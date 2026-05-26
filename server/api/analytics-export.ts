@@ -354,7 +354,7 @@ async function exportToPdf(data: { rfqs?: any[]; bids?: any[]; productShowcases?
   doc.pipe(stream);
   
   // Add title
-  doc.fontSize(20).text(`Bell24H Analytics Export: ${type.toUpperCase()}`, { align: 'center' });
+  doc.fontSize(20).text(`Bell24h Analytics Export: ${type.toUpperCase()}`, { align: 'center' });
   doc.moveDown(2);
   
   if (type === 'summary') {

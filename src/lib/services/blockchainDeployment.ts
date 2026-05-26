@@ -87,7 +87,7 @@ class BlockchainDeploymentService {
   }
 
   /**
-   * Deploy all smart contracts for Bell24H
+   * Deploy all smart contracts for Bell24h
    */
   async deployAllContracts(): Promise<DeploymentResult[]> {
     const results: DeploymentResult[] = [];
@@ -154,7 +154,7 @@ class BlockchainDeploymentService {
     }
 
     return {
-      contractName: 'Bell24HEscrow',
+      contractName: 'Bell24hEscrow',
       address,
       transactionHash: txHash,
       network: this.config.network,
@@ -225,7 +225,7 @@ class BlockchainDeploymentService {
    */
   private getEscrowContractArtifact(): ContractArtifact {
     return {
-      name: 'Bell24HEscrow',
+      name: 'Bell24hEscrow',
       abi: EscrowArtifact.abi,
       bytecode: EscrowArtifact.bytecode,
       constructorArgs: ['address owner', 'uint256 platformFee', 'address feeCollector'],

@@ -1,5 +1,5 @@
 /**
- * Bell24H Market Data Service
+ * Bell24h Market Data Service
  *
  * Comprehensive financial data integration for Indian stock markets
  * Supports NSE, BSE, and international market data for enterprise risk analysis

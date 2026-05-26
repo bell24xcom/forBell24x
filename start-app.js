@@ -1,14 +1,14 @@
 /**
- * Bell24H Application Starter
+ * Bell24h Application Starter
  * 
- * This script starts the Bell24H application by running the server.
+ * This script starts the Bell24h application by running the server.
  */
 
 const { execSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 
-console.log('Starting Bell24H application...');
+console.log('Starting Bell24h application...');
 
 try {
   // Check if TypeScript is available

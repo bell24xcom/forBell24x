@@ -1,5 +1,5 @@
 /**
- * Bell24H Project Packaging Script
+ * Bell24h Project Packaging Script
  * 
  * This script creates a ZIP archive of the project for local development
  * or deployment to other platforms. It includes all necessary files while
@@ -109,7 +109,7 @@ const shouldExclude = (filePath) => {
 };
 
 // Add files and directories to the archive
-console.log('📦 Packaging Bell24H project...');
+console.log('📦 Packaging Bell24h project...');
 includePatterns.forEach(pattern => {
   // Convert glob pattern to regex
   const regexPattern = new RegExp(`^${pattern.replace(/\*/g, '.*')}$`);
@@ -137,7 +137,7 @@ includePatterns.forEach(pattern => {
 const envExamplePath = path.join(__dirname, '.env.example');
 if (!fs.existsSync(envExamplePath)) {
   console.log('📄 Creating .env.example file...');
-  const envExample = `# Bell24H Environment Variables
+  const envExample = `# Bell24h Environment Variables
 # Copy this file to .env and fill in your actual values
 
 # Database connection
@@ -164,7 +164,7 @@ OPENAI_API_KEY=your_openai_api_key_here
 const readmePath = path.join(__dirname, 'README.md');
 if (!fs.existsSync(readmePath)) {
   console.log('📄 Creating README.md file...');
-  const readme = `# Bell24H Marketplace
+  const readme = `# Bell24h Marketplace
 
 An AI-powered RFQ platform connecting buyers and suppliers with intelligent matching, blockchain security, and comprehensive financial services.
 

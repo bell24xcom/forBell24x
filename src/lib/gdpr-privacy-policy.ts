@@ -1,5 +1,5 @@
 /**
- * Bell24H Privacy Policy and User Consent Tracking System
+ * Bell24h Privacy Policy and User Consent Tracking System
  *
  * Implements GDPR compliance for privacy policy management
  * with user consent tracking and version control
@@ -58,14 +58,14 @@ export interface ConsentHistory {
 export const CURRENT_PRIVACY_POLICY: PrivacyPolicy = {
   version: '2.1',
   effectiveDate: new Date('2024-01-15'),
-  title: 'Bell24H Privacy Policy',
+  title: 'Bell24h Privacy Policy',
   content: [
     {
       id: 'introduction',
       title: 'Introduction',
-      content: `Bell24H ("we", "our", or "us") is committed to protecting your privacy and personal data. This Privacy Policy explains how we collect, use, share, and protect your information when you use our B2B marketplace platform and services.
+      content: `Bell24h ("we", "our", or "us") is committed to protecting your privacy and personal data. This Privacy Policy explains how we collect, use, share, and protect your information when you use our B2B marketplace platform and services.
 
-This policy applies to all users of Bell24H services, including buyers, suppliers, and administrators. By using our services, you agree to the collection and use of information in accordance with this policy.`,
+This policy applies to all users of Bell24h services, including buyers, suppliers, and administrators. By using our services, you agree to the collection and use of information in accordance with this policy.`,
       lastUpdated: new Date('2024-01-15'),
       lawReferences: ['GDPR Article 13', 'GDPR Article 14'],
     },

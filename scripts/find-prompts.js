@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-console.log('🔍 Searching for recent prompts in Bell24H platform...\n');
+console.log('🔍 Searching for recent prompts in Bell24h platform...\n');
 
 // Check for conversation files
 console.log('📁 Checking for conversation data files...');
@@ -106,7 +106,7 @@ samplePrompts.forEach((prompt, index) => {
 // Show browser check instructions
 console.log('🌐 === CHECK BROWSER STORAGE ===');
 console.log('To find prompts in your browser:');
-console.log('1. Open Bell24H app in browser');
+console.log('1. Open Bell24h app in browser');
 console.log('2. Press F12 → Application tab → Local Storage');
 console.log('3. Look for keys containing "conversation" or "chat"');
 console.log('4. Run in console: Object.keys(localStorage)');
@@ -114,7 +114,7 @@ console.log('');
 
 // Show setup instructions
 console.log('🔧 === TO ENABLE PROMPT TRACKING ===');
-console.log('Your Bell24H platform needs conversation storage setup:');
+console.log('Your Bell24h platform needs conversation storage setup:');
 console.log('');
 console.log('Option 1 - Database (Recommended):');
 console.log('• Add Conversation model to Prisma schema');

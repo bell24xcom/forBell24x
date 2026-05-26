@@ -35,8 +35,8 @@ function updateFileContent(filePath) {
     let content = fs.readFileSync(filePath, 'utf8');
     const originalContent = content;
     
-    // Replace Bell24H with Bell24H (case-sensitive)
-    content = content.replace(/Bell24H/g, 'Bell24H');
+    // Replace Bell24h with Bell24h (case-sensitive)
+    content = content.replace(/Bell24h/g, 'Bell24h');
     
     // Only write if content changed
     if (content !== originalContent) {
@@ -85,7 +85,7 @@ async function updateBrandConsistency() {
   }
   
   console.log('\n🎯 Brand consistency update complete!');
-  console.log('💡 All "Bell24H" instances have been updated to "Bell24H"');
+  console.log('💡 All "Bell24h" instances have been updated to "Bell24h"');
 }
 
 // Run the update

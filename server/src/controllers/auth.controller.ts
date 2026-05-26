@@ -6,7 +6,7 @@ export const generateMfaSecret = async (req: Request, res: Response) => {
   const secret = authenticator.generateSecret();
   
   try {
-    const otpauthUrl = authenticator.keyuri(req.user.email, 'Bell24H', secret);
+    const otpauthUrl = authenticator.keyuri(req.user.email, 'Bell24h', secret);
     const qrCode = await QRCode.toDataURL(otpauthUrl);
     
     res.status(200).json({ secret, qrCode });

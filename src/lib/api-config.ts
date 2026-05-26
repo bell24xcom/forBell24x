@@ -1,5 +1,5 @@
 /**
- * API Configuration for Bell24H
+ * API Configuration for Bell24h
  * Allows switching between production and test APIs during development
  */
 

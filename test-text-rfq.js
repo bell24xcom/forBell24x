@@ -31,7 +31,7 @@ async function sendRfqRequest(rfqData) {
 
 async function runTests() {
   console.log('=======================================');
-  console.log('Bell24H Text-Based RFQ API Tests');
+  console.log('Bell24h Text-Based RFQ API Tests');
   console.log('=======================================\n');
 
   let allTestsPassed = true;

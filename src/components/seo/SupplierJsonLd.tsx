@@ -65,7 +65,7 @@ export function SupplierJsonLd({ supplier }: { supplier: any }) {
       },
     }),
     
-    // Bell24H specific
+    // Bell24h specific
     identifier: {
       '@type': 'PropertyValue',
       name: 'bell24h_id',
@@ -74,7 +74,7 @@ export function SupplierJsonLd({ supplier }: { supplier: any }) {
     
     // Verification status
     ...(supplier.is_verified && {
-      award: 'Bell24H Verified Supplier',
+      award: 'Bell24h Verified Supplier',
     }),
   };
 

@@ -1,5 +1,5 @@
 /**
- * Bell24H Voice RFQ Test Script
+ * Bell24h Voice RFQ Test Script
  * 
  * This script tests the Voice RFQ API endpoints with multilingual support.
  */
@@ -204,7 +204,7 @@ async function testVoiceRfqListing() {
  */
 async function runTests() {
   console.log('=======================================');
-  console.log('Bell24H Multilingual Voice RFQ API Tests');
+  console.log('Bell24h Multilingual Voice RFQ API Tests');
   console.log('=======================================\n');
   
   const uploadEnglishResult = await testVoiceRfqUploadEnglish();

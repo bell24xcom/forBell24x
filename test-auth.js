@@ -166,7 +166,7 @@ const testUnauthenticatedAccess = async () => {
 };
 
 const runTests = async () => {
-  console.log('🧪 Starting Bell24H Authentication System Tests...');
+  console.log('🧪 Starting Bell24h Authentication System Tests...');
   console.log('============================================');
   
   // First check database connection

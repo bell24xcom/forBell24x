@@ -14,7 +14,7 @@ if (!fs.existsSync(extractedDir)) {
   fs.mkdirSync(extractedDir, { recursive: true });
 }
 
-console.log('Starting Bell24H Voice RFQ Demo...');
+console.log('Starting Bell24h Voice RFQ Demo...');
 
 // Check if we have the OpenAI API key
 if (!process.env.OPENAI_API_KEY) {

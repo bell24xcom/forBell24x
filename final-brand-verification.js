@@ -29,14 +29,14 @@ function getAllFiles(dirPath, arrayOfFiles = []) {
   return arrayOfFiles;
 }
 
-// Function to check for remaining Bell24H instances
+// Function to check for remaining Bell24h instances
 function checkForRemainingInstances(filePath) {
   try {
     const content = fs.readFileSync(filePath, 'utf8');
-    const matches = content.match(/Bell24H/g);
+    const matches = content.match(/Bell24h/g);
     
     if (matches) {
-      console.log(`⚠️ Found ${matches.length} remaining "Bell24H" instances in: ${path.relative(process.cwd(), filePath)}`);
+      console.log(`⚠️ Found ${matches.length} remaining "Bell24h" instances in: ${path.relative(process.cwd(), filePath)}`);
       return { filePath, count: matches.length, content };
     }
     return null;
@@ -48,7 +48,7 @@ function checkForRemainingInstances(filePath) {
 // Function to update remaining instances
 function updateRemainingInstances(filePath, content) {
   try {
-    const updatedContent = content.replace(/Bell24H/g, 'Bell24H');
+    const updatedContent = content.replace(/Bell24h/g, 'Bell24h');
     fs.writeFileSync(filePath, updatedContent, 'utf8');
     console.log(`✅ Updated remaining instances in: ${path.relative(process.cwd(), filePath)}`);
     return true;
@@ -66,7 +66,7 @@ async function finalBrandVerification() {
   const projectRoot = path.join(__dirname);
   const allFiles = getAllFiles(projectRoot);
   
-  console.log(`📁 Checking ${allFiles.length} files for remaining "Bell24H" instances...`);
+  console.log(`📁 Checking ${allFiles.length} files for remaining "Bell24h" instances...`);
   
   const remainingInstances = [];
   
@@ -78,10 +78,10 @@ async function finalBrandVerification() {
   }
   
   if (remainingInstances.length === 0) {
-    console.log('\n🎉 SUCCESS: No remaining "Bell24H" instances found!');
+    console.log('\n🎉 SUCCESS: No remaining "Bell24h" instances found!');
     console.log('✅ Brand consistency is 100% complete');
   } else {
-    console.log(`\n⚠️ Found ${remainingInstances.length} files with remaining "Bell24H" instances`);
+    console.log(`\n⚠️ Found ${remainingInstances.length} files with remaining "Bell24h" instances`);
     console.log('🔄 Updating remaining instances...');
     
     let updatedCount = 0;
@@ -107,7 +107,7 @@ async function finalBrandVerification() {
   
   if (finalCheck.length === 0) {
     console.log('🎉 BRAND CONSISTENCY: 100% COMPLETE!');
-    console.log('✅ All "Bell24H" instances have been successfully updated to "Bell24H"');
+    console.log('✅ All "Bell24h" instances have been successfully updated to "Bell24h"');
   } else {
     console.log(`⚠️ Still found ${finalCheck.length} files with remaining instances`);
     console.log('These may be intentional (like URLs or specific references)');

@@ -70,7 +70,7 @@ async function query(text, params) {
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'UP', message: 'Bell24H API server is running' });
+  res.json({ status: 'UP', message: 'Bell24h API server is running' });
 });
 
 // Get all users (limited fields for security)
@@ -451,7 +451,7 @@ app.use((err, req, res, next) => {
 
 // Start server
 app.listen(port, '0.0.0.0', () => {
-  console.log(`Bell24H API server running on http://0.0.0.0:${port}`);
+  console.log(`Bell24h API server running on http://0.0.0.0:${port}`);
   console.log(`- Landing page: http://0.0.0.0:${port}/`);
   console.log(`- Direct HTML paths:`);
   console.log(`  * Landing: http://0.0.0.0:${port}/landing.html`);

@@ -71,7 +71,7 @@ async function initializeApiServer(tradeEscrow, taskQueue = null) {
   // Root endpoint (no auth required)
   app.get('/', (req, res) => {
     res.status(200).json({
-      name: 'Bell24H Oracle API',
+      name: 'Bell24h Oracle API',
       version: packageInfo.version || '1.0.0',
       timestamp: new Date().toISOString()
     });

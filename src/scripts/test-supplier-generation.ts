@@ -1,5 +1,5 @@
 /**
- * Bell24H Supplier Generation Test Suite
+ * Bell24h Supplier Generation Test Suite
  *
  * Tests and demonstrates the comprehensive supplier generation system
  * Validates data quality and system performance
@@ -29,7 +29,7 @@ const TEST_CONFIG = {
  * Main test function
  */
 export const runSupplierGenerationTests = async () => {
-  console.log('🚀 Bell24H Supplier Generation Test Suite Starting...\n');
+  console.log('🚀 Bell24h Supplier Generation Test Suite Starting...\n');
 
   try {
     // Test 1: Demo Population

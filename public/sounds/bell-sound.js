@@ -1,4 +1,4 @@
-// Bell24H Temple Bell Sound Generator
+// Bell24h Temple Bell Sound Generator
 // Web Audio API implementation for immediate bell sound functionality
 
 class TempleBellSound {

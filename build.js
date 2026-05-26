@@ -1,14 +1,14 @@
 /**
- * Bell24H Project Build Script
+ * Bell24h Project Build Script
  * 
- * This script builds the Bell24H application for production.
+ * This script builds the Bell24h application for production.
  * It creates a production-ready build of both the client and server.
  */
 const { exec } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-console.log('📦 Starting Bell24H build process...');
+console.log('📦 Starting Bell24h build process...');
 
 // Create a build directory if it doesn't exist
 if (!fs.existsSync('build')) {
@@ -80,13 +80,13 @@ exec('cd client && npx vite build', (error, stdout, stderr) => {
 #!/usr/bin/env node
 
 /**
- * Bell24H Production Start Script
+ * Bell24h Production Start Script
  */
 const { spawn } = require('child_process');
 const path = require('path');
 
 // Start the server in production mode
-console.log('🚀 Starting Bell24H in production mode...');
+console.log('🚀 Starting Bell24h in production mode...');
 const server = spawn('node', [
   'bell24h-unified-startup.js',
   '--production'

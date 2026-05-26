@@ -1,7 +1,7 @@
 /**
- * Bell24H Unified Application Startup Script
+ * Bell24h Unified Application Startup Script
  * 
- * This script provides a robust way to start the Bell24H application,
+ * This script provides a robust way to start the Bell24h application,
  * handling different execution modes and environment configurations.
  * 
  * Features:
@@ -119,7 +119,7 @@ function getStartCommand() {
 
 // Start the server
 function startServer() {
-  log(`Starting Bell24H application in ${config.environment} mode...`, colors.cyan);
+  log(`Starting Bell24h application in ${config.environment} mode...`, colors.cyan);
   
   try {
     const { command, args } = getStartCommand();

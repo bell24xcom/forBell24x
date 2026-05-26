@@ -48,7 +48,7 @@ const TopNavigationBar = ({ user }: any) => (
         <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-amber-600 rounded-lg flex items-center justify-center mr-2">
           <span className="text-white font-bold text-sm">B24</span>
         </div>
-        Bell24H
+        Bell24h
       </Link>
       <div className="hidden md:flex space-x-4 ml-6">
         <button className="flex items-center px-3 py-2 text-sm font-medium text-slate-300 hover:text-blue-400 hover:bg-slate-800 rounded-md transition-colors">

@@ -1,4 +1,4 @@
-// Bell24H Demo RFQ Population Script
+// Bell24h Demo RFQ Population Script
 // Populates the platform with comprehensive realistic RFQs
 
 import {

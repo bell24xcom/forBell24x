@@ -349,8 +349,8 @@ Host: ${country.domain}`;
   async generateCountryManifests() {
     for (const country of this.countries) {
       const manifest = {
-        name: `Bell24H ${country.name} - B2B Marketplace`,
-        short_name: `Bell24H ${country.name}`,
+        name: `Bell24h ${country.name} - B2B Marketplace`,
+        short_name: `Bell24h ${country.name}`,
         description: `Leading B2B marketplace in ${
           country.name
         } with ${country.localSuppliers.toLocaleString()}+ verified suppliers`,

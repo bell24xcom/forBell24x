@@ -190,5 +190,5 @@ export const sessionStorageManager = new StorageManager('session');
 // With expiration (1 hour)
 // localStorageManager.set('temporaryData', { id: 123, temp: true }, { expiresIn: 60 * 60 * 1000 });
 
-// Clear all Bell24H related data from storage
+// Clear all Bell24h related data from storage
 // localStorageManager.clear();

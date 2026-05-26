@@ -1,5 +1,5 @@
 /**
- * Bell24H Dynamic Pricing System
+ * Bell24h Dynamic Pricing System
  * Revenue Generation from First Month
  * 
  * Multiple Revenue Streams:

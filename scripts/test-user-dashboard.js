@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Bell24H User Dashboard Testing Script
+ * Bell24h User Dashboard Testing Script
  * 
  * This script tests the user dashboard functionality for different user types,
  * subscription levels, and role combinations (buyer/supplier).
@@ -402,7 +402,7 @@ async function testMobileResponsiveness() {
 
 // Main test runner
 async function runAllTests() {
-  log.header('🚀 Starting Bell24H User Dashboard Tests');
+  log.header('🚀 Starting Bell24h User Dashboard Tests');
   log.info(`Base URL: ${BASE_URL}`);
   log.info(`Testing ${Object.keys(TEST_USERS).length} user types`);
   

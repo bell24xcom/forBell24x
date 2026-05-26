@@ -72,7 +72,7 @@ async function query(text: string, params?: any[]) {
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'UP', message: 'Bell24H API server is running' });
+  res.json({ status: 'UP', message: 'Bell24h API server is running' });
 });
 
 // Get all users (limited fields for security)

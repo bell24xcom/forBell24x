@@ -1,5 +1,5 @@
 /**
- * Health Check API for Bell24H
+ * Health Check API for Bell24h
  * 
  * This API provides endpoints for checking the health of various services,
  * including the Neon PostgreSQL database connection.

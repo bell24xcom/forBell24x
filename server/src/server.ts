@@ -109,7 +109,7 @@ app.get('/health', (req, res) => {
 
 // API Routes
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', message: 'Bell24H API is running!' });
+  res.json({ status: 'ok', message: 'Bell24h API is running!' });
 });
 
 // Use Category Routes

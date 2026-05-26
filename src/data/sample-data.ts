@@ -1,4 +1,4 @@
-// Bell24H Sample Data for Trial Users
+// Bell24h Sample Data for Trial Users
 // Comprehensive content to demonstrate platform value
 
 export const sampleCategories = [
@@ -313,7 +313,7 @@ export const sampleAIAnalysis = {
       industry: 'Electronics',
       savings: '₹45,00,000',
       timeSaved: '60%',
-      testimonial: 'Bell24H helped us find the perfect semiconductor supplier in just 2 days!',
+      testimonial: 'Bell24h helped us find the perfect semiconductor supplier in just 2 days!',
     },
     {
       company: 'AutoManufacturing Ltd.',
@@ -327,7 +327,7 @@ export const sampleAIAnalysis = {
       industry: 'Textiles',
       savings: '₹25,00,000',
       timeSaved: '50%',
-      testimonial: 'Bell24H transformed our procurement process completely.',
+      testimonial: 'Bell24h transformed our procurement process completely.',
     },
   ],
 };

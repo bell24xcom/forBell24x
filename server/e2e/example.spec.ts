@@ -7,5 +7,5 @@ test('basic test', async ({ page }) => {
 
 test('basic test with app', async ({ page }) => {
   await page.goto('/');
-  await expect(page).toHaveTitle(/Bell24H/);
+  await expect(page).toHaveTitle(/Bell24h/);
 });

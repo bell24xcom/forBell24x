@@ -1,7 +1,7 @@
 /**
- * Bell24H Project Export Script
+ * Bell24h Project Export Script
  * 
- * This script creates a comprehensive zip archive of the Bell24H project
+ * This script creates a comprehensive zip archive of the Bell24h project
  * that can be downloaded from Replit and deployed elsewhere.
  * 
  * Features:
@@ -16,7 +16,7 @@ const fs = require('fs');
 const path = require('path');
 const archiver = require('archiver');
 
-console.log('📦 Starting Bell24H export process...');
+console.log('📦 Starting Bell24h export process...');
 
 // Create an export directory if it doesn't exist
 if (!fs.existsSync('export')) {

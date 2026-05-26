@@ -1,5 +1,5 @@
 /**
- * Voice RFQ API Endpoint for Bell24H
+ * Voice RFQ API Endpoint for Bell24h
  * 
  * This API endpoint handles both voice-to-text and text-based RFQ creation
  * with multilingual support using Google Cloud NLP or fallback regex patterns.

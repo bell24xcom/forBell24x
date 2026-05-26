@@ -1,4 +1,4 @@
-// Performance monitoring utility for Bell24H
+// Performance monitoring utility for Bell24h
 
 class PerformanceMonitor {
   constructor() {

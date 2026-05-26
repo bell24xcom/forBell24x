@@ -1,5 +1,5 @@
 /**
- * Bell24H Automated Subscription Billing System
+ * Bell24h Automated Subscription Billing System
  *
  * Comprehensive subscription management with Stripe integration
  * Supports Pro (₹8,000/year) and Enterprise (₹50,000/year) tiers

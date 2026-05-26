@@ -1,5 +1,5 @@
 /**
- * Perplexity API for Bell24H
+ * Perplexity API for Bell24h
  * 
  * This API provides endpoints for calculating perplexity scores,
  * analyzing model quality, and explaining AI model predictions.

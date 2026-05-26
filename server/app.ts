@@ -68,7 +68,7 @@ import { registerRoutes } from './routes/index';
 app.get('/', (req, res) => {
   res.json({
     status: 'ok',
-    message: 'Bell24H API Server',
+    message: 'Bell24h API Server',
     version: '1.0.0',
     documentation: '/api/docs'
   });
@@ -80,7 +80,7 @@ app.get('/direct-test', (req, res) => {
     message: 'Direct route works!', 
     timestamp: new Date().toISOString(),
     port: process.env.PORT || 3000,
-    server: 'Bell24H Backend'
+    server: 'Bell24h Backend'
   });
 });
 

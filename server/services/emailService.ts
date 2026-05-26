@@ -183,7 +183,7 @@ export class EmailService {
       };
       
       await this.transporter.sendMail({
-        from: `"Bell24H" <${this.fromEmail}>`,
+        from: `"Bell24h" <${this.fromEmail}>`,
         to: emailData.email,
         subject: emailData.subject,
         html,
@@ -213,7 +213,7 @@ export class EmailService {
       };
       
       await this.transporter.sendMail({
-        from: `"Bell24H" <${this.fromEmail}>`,
+        from: `"Bell24h" <${this.fromEmail}>`,
         to: emailData.email,
         subject: emailData.subject,
         html,
@@ -365,7 +365,7 @@ export class EmailService {
       <html>
         <head>
           <meta charset="utf-8">
-          <title>${context.subject || 'Bell24H Notification'}</title>
+          <title>${context.subject || 'Bell24h Notification'}</title>
           <style>
             body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
             .header { background-color: #4CAF50; color: white; padding: 20px; text-align: center; }
@@ -376,7 +376,7 @@ export class EmailService {
         </head>
         <body>
           <div class="header">
-            <h1>Bell24H</h1>
+            <h1>Bell24h</h1>
           </div>
           <div class="content">
             <h2>${context.subject || 'Notification'}</h2>
@@ -384,7 +384,7 @@ export class EmailService {
             ${context.actionUrl ? `<a href="${context.actionUrl}" class="button">${context.actionText || 'Take Action'}</a>` : ''}
           </div>
           <div class="footer">
-            <p>&copy; ${new Date().getFullYear()} Bell24H. All rights reserved.</p>
+            <p>&copy; ${new Date().getFullYear()} Bell24h. All rights reserved.</p>
           </div>
         </body>
       </html>

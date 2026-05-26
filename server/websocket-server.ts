@@ -1,5 +1,5 @@
 /**
- * Bell24H Optimized WebSocket Server
+ * Bell24h Optimized WebSocket Server
  * Features:
  * - Connection pooling
  * - Batched message handling
@@ -178,7 +178,7 @@ const server = http.createServer((req, res) => {
   } else {
     // Default response for other endpoints
     res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end('Bell24H WebSocket Server');
+    res.end('Bell24h WebSocket Server');
   }
 });
 
@@ -203,7 +203,7 @@ wss.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
     type: 'welcome', 
     clientId,
     timestamp: Date.now(),
-    message: 'Connected to Bell24H WebSocket Server'
+    message: 'Connected to Bell24h WebSocket Server'
   }));
   
   console.log(`Client connected: ${clientId} - Current active: ${pool.metrics.connectionsActive}`);
@@ -287,7 +287,7 @@ setInterval(async () => {
 
 // Start server
 server.listen(DEFAULT_CONFIG.port, () => {
-  console.log(`Bell24H WebSocket Server running on port ${DEFAULT_CONFIG.port}`);
+  console.log(`Bell24h WebSocket Server running on port ${DEFAULT_CONFIG.port}`);
   console.log(`- Max Connections: ${DEFAULT_CONFIG.maxConnections}`);
   console.log(`- Batch Size: ${DEFAULT_CONFIG.batchSize}`);
   console.log(`- Batch Interval: ${DEFAULT_CONFIG.batchIntervalMs}ms`);
