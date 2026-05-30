@@ -156,3 +156,52 @@ If a proposed feature serves none of these three, push back before building.
 
 - docs/VYAPARSETHU_MASTER_PLAN.md — single source of truth for strategy (17 chapters)
 - docs/NEXT_30_DAYS_SPRINT.md — current sprint, day-by-day
+
+## Trade Confidence Score™ Formula
+
+```
+Trust Score =
+  30% Payment History
++ 20% On-time Delivery
++ 15% Response Speed
++ 15% Repeat Orders
++ 10% Dispute Rate
++ 10% Verification Strength
+= Score out of 100
+```
+
+Compute via **daily cron at 2 AM IST only** — never real-time. Use Vercel Cron.
+Stored on the User model as `trustScore` (already exists in schema).
+
+**North Star metric — Trust Velocity:** `Successful Transactions ÷ Time` (trades/week).
+Not page views, not registrations, not RFQs. This is the only metric to obsess over.
+
+## Controlled Rebrand Scope (Visual Only)
+
+The rebrand is **display text only**. The following must NOT change during rebrand work:
+
+- `prisma/schema.prisma` — no migration, no column renames
+- `src/app/api/*` — no API route changes
+- Authentication logic, middleware, env vars
+- Vercel/Neon/MSG91/Razorpay configuration and callback URLs
+- Domain: bell24h.com stays primary until 50+ verified suppliers onboarded;
+  vyaparsethu.com becomes primary only at Phase 2 (30–60 days out)
+
+Safe replacements: `Bell24h` → `VyaparSethu`, `BELL24H` → `VYAPARSETHU` in UI text only.
+Footer must include small "Formerly Bell24h" note during transition.
+Remove all fake/seeded aggregate numbers from public pages (replace with
+"Launching Soon — Reserve your category").
+
+## Current Sprint (May 31 – June 29, 2026)
+
+Goal: rebrand executed + first 30 verified suppliers in pipeline.
+
+| Week | Dates | Focus |
+|------|-------|-------|
+| 1 | May 31 – Jun 6 | Visual rebrand: logo assets → `/public/brand/`, UI text, homepage copy, dashboard cleanup, email/social identity |
+| 2 | Jun 7 – 13 | Founder WhatsApp outreach: 20 contacts/day, Day 1→3→5→7→14 cadence |
+| 3 | Jun 14 – 20 | VIP Claim Profile program: 3 clusters × 5 companies each (Steel/Metals Kalamboli, Corrugated Bhiwandi, Industrial Adhesives Navi Mumbai) |
+| 4 | Jun 21 – 29 | Trust Score MVP (Prisma + daily cron), Business Conversations on Requirements (30s poll, NOT WebSockets), SHAP explainability in UI |
+
+Sprint hard stop: if Day 14 has 0 verified suppliers, stop building and do in-person
+Bhiwandi market outreach before any more code work.
