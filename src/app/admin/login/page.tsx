@@ -1,10 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
 export default function AdminLoginPage() {
-  const [mode, setMode] = useState<'password' | 'otp'>('password')
+  const [mode, setMode] = useState<'password' | 'otp'>('otp')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [phone, setPhone] = useState('')
@@ -13,6 +13,33 @@ export default function AdminLoginPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
+
+  // Bug 2 — auto-redirect if already authenticated via localStorage
+  useEffect(() => {
+    const stored = localStorage.getItem('bell24h_user')
+    if (stored) {
+      try {
+        const user = JSON.parse(stored)
+        if (user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN') {
+          router.push('/admin/dashboard')
+        }
+      } catch {
+        localStorage.removeItem('bell24h_user')
+      }
+    }
+  }, [router])
+
+  // Bug 2 — auto-redirect if already authenticated via cookie session
+  useEffect(() => {
+    fetch('/api/auth/me', { credentials: 'include' })
+      .then(r => r.json())
+      .then(data => {
+        if (data?.user?.role === 'ADMIN' || data?.user?.role === 'SUPER_ADMIN') {
+          router.push('/admin/dashboard')
+        }
+      })
+      .catch(() => {})
+  }, [router])
 
   // Email + Password login (admin@bell24h.com / Bell@2026)
   const handlePasswordLogin = async (e: React.FormEvent) => {
@@ -30,7 +57,7 @@ export default function AdminLoginPage() {
       if (data.success) {
         router.push('/admin/dashboard')
       } else {
-        setError(data.error || 'Invalid credentials')
+        setError(data.message || data.error || 'Invalid credentials')
       }
     } catch {
       setError('Login failed. Try again.')
@@ -137,6 +164,12 @@ export default function AdminLoginPage() {
         {/* Email + Password Form */}
         {mode === 'password' && (
           <form onSubmit={handlePasswordLogin} className="space-y-4">
+            <p className="text-xs text-slate-500 bg-slate-800/60 border border-slate-700/50 rounded-lg px-3 py-2 text-center">
+              Email login requires a registered admin email. If you registered via phone OTP, use the{' '}
+              <button type="button" onClick={() => setMode('otp')} className="text-indigo-400 hover:text-indigo-300 underline">
+                Phone OTP tab
+              </button>{' '}instead.
+            </p>
             <div>
               <label className="text-slate-400 text-xs font-medium block mb-1.5">Admin Email</label>
               <input
