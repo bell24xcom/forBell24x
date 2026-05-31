@@ -43,7 +43,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [authChecked, setAuthChecked] = useState(false);
   const [adminName, setAdminName]     = useState('');
 
+  const isLoginPage = pathname === '/admin/login';
+
   useEffect(() => {
+    // Bug 3 — skip auth check on the login page
+    if (isLoginPage) return;
     let cancelled = false;
 
     const checkAdmin = async (attempt = 1) => {
@@ -110,6 +114,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     });
     window.location.href = '/auth/phone-email';
   };
+
+  // Bug 3 — render login page without admin shell or sidebar
+  if (isLoginPage) {
+    return <>{children}</>;
+  }
 
   // Show loading spinner while checking auth
   if (!authChecked) {
