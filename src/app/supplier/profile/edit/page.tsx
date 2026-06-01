@@ -117,7 +117,12 @@ export default function EditProfilePage() {
       .then(r => r.json())
       .then(data => {
         if (data.success && data.profile) {
-          setFormData(prev => ({ ...prev, ...data.profile }));
+          setFormData(prev => ({
+            ...prev,
+            ...data.profile,
+            // Guard: DB may return null or non-array for categories (JSON column edge case)
+            categories: Array.isArray(data.profile.categories) ? data.profile.categories : [],
+          }));
         }
       })
       .catch(() => { /* stay with localStorage data */ });
@@ -154,6 +159,7 @@ export default function EditProfilePage() {
           } catch { /* ignore */ }
         }
         setSaveSuccess(true);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         setTimeout(() => setSaveSuccess(false), 3000);
       } else {
         setSaveError(data.message || 'Failed to update profile');
@@ -446,8 +452,16 @@ export default function EditProfilePage() {
 
           {/* Save Button */}
           <div className="flex items-center gap-4">
-            <button type="submit" disabled={loading} className="px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg transition-colors disabled:opacity-50">
-              {loading ? 'Saving...' : 'Save Profile'}
+            <button
+              type="submit"
+              disabled={loading || saveSuccess}
+              className={`px-8 py-3 font-semibold rounded-lg transition-colors disabled:opacity-75 ${
+                saveSuccess
+                  ? 'bg-emerald-500 text-white cursor-default'
+                  : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+              }`}
+            >
+              {loading ? 'Saving...' : saveSuccess ? '✓ Saved' : 'Save Profile'}
             </button>
             <button type="button" onClick={() => router.back()} className="px-6 py-3 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg transition-colors">
               Cancel
