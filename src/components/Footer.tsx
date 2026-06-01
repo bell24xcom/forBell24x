@@ -12,14 +12,15 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
           <div>
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center gap-2 mb-1">
               <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xl">B</span>
+                <span className="text-white font-bold text-xl">V</span>
               </div>
-              <span className="font-bold text-2xl text-white">Bell24h</span>
+              <span className="font-bold text-2xl text-white">VyaparSethu</span>
             </div>
+            <p className="text-xs text-blue-300 mb-3">Commerce Connections Globally</p>
             <p className="text-sm mb-4">
-              India's fastest B2B procurement platform. Every user can buy AND sell. Voice-powered RFQs, AI matching, and secure transactions.
+              India's B2B trade network. Every user can buy AND sell. Voice-powered requirements, AI matching, and protected payments.
             </p>
             <div className="flex gap-3">
               <a href="#" className="p-2 bg-gray-800 hover:bg-blue-600 rounded-lg transition-colors">
@@ -79,26 +80,26 @@ export default function Footer() {
 
           {/* For Posting RFQs (Buying) */}
           <div>
-            <h3 className="text-white font-semibold text-lg mb-4">Post RFQs</h3>
+            <h3 className="text-white font-semibold text-lg mb-4">Post Requirements</h3>
             <ul className="space-y-2">
               <li>
                 <Link href="/rfq/voice" className="hover:text-blue-400 transition-colors">
-                  Voice RFQ
+                  Speak Requirement
                 </Link>
               </li>
               <li>
                 <Link href="/rfq/video" className="hover:text-blue-400 transition-colors">
-                  Video RFQ
+                  Video Requirement
                 </Link>
               </li>
               <li>
                 <Link href="/rfq/create" className="hover:text-blue-400 transition-colors">
-                  Text RFQ
+                  Text Requirement
                 </Link>
               </li>
               <li>
                 <Link href="/rfq/my-rfqs" className="hover:text-blue-400 transition-colors">
-                  My RFQs
+                  My Requirements
                 </Link>
               </li>
               <li>
@@ -173,7 +174,8 @@ export default function Footer() {
         <div className="container mx-auto px-4 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm">
-              © {currentYear} Bell24h. All rights reserved.
+              © {currentYear} VyaparSethu. All rights reserved.
+              <span className="text-gray-500 ml-2">Formerly Bell24h</span>
             </p>
             <div className="flex gap-6 text-sm">
               <Link href="/legal/privacy" className="hover:text-blue-400 transition-colors">

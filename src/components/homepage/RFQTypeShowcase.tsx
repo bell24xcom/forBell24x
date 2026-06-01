@@ -2,17 +2,13 @@
 
 import { FileText, Mic, Video, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
-import { getMockRFQStats } from '@/data/mockRFQs';
 
 export default function RFQTypeShowcase() {
-  const stats = getMockRFQStats();
-
   const types = [
     {
       icon: FileText,
-      title: 'Text RFQ',
+      title: 'Text Requirement',
       description: 'Type your requirement with full specifications',
-      count: stats.total - stats.voiceRFQs - stats.videoRFQs,
       color: 'blue',
       bgGradient: 'from-blue-50 to-blue-100',
       textColor: 'text-blue-700',
@@ -22,9 +18,8 @@ export default function RFQTypeShowcase() {
     },
     {
       icon: Mic,
-      title: 'Voice RFQ',
+      title: 'Speak Requirement',
       description: 'Just speak in any language - our AI understands 12 Indian languages',
-      count: stats.voiceRFQs,
       color: 'purple',
       bgGradient: 'from-purple-50 to-purple-100',
       textColor: 'text-purple-700',
@@ -34,9 +29,8 @@ export default function RFQTypeShowcase() {
     },
     {
       icon: Video,
-      title: 'Video RFQ',
+      title: 'Video Requirement',
       description: 'Record or upload a video showing the product you need',
-      count: stats.videoRFQs,
       color: 'pink',
       bgGradient: 'from-pink-50 to-pink-100',
       textColor: 'text-pink-700',
@@ -51,7 +45,7 @@ export default function RFQTypeShowcase() {
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            How Bell24h Accepts RFQs
+            How VyaparSethu Accepts Requirements
           </h2>
           <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
             Choose the method that works best for you. Our AI handles all three formats seamlessly.
@@ -81,16 +75,6 @@ export default function RFQTypeShowcase() {
                   {type.description}
                 </p>
 
-                {/* Stats */}
-                <div className="text-center mb-6">
-                  <p className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
-                    ~{type.count.toLocaleString()}
-                  </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {type.title} Demos Available
-                  </p>
-                </div>
-
                 {/* Actions */}
                 <div className="space-y-3">
                   <Link
@@ -104,7 +88,7 @@ export default function RFQTypeShowcase() {
                     href={type.demoLink}
                     className="w-full py-4 px-6 rounded-lg flex flex-col items-center gap-2 font-semibold transition-colors text-center bg-white text-blue-700 hover:bg-blue-100 border border-gray-300 dark:border-gray-600"
                   >
-                    View {type.count.toLocaleString()}+ Demos
+                    View Live Demos
                   </Link>
                 </div>
               </div>

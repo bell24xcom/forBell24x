@@ -14,42 +14,28 @@ export default function HeroRFQDemo() {
             <TrendingUp className="w-4 h-4" />
             India's First Multi-Modal B2B Platform
           </div>
-          <h1 className="text-6xl md:text-8xl font-black text-white mb-6 leading-tight">
-            Post RFQs in
+          <h1 className="text-5xl md:text-7xl font-black text-white mb-6 leading-tight">
+            Get Verified Quotations from
             <br />
-            <span className="bg-gradient-to-r from-cyan-400 via-white to-cyan-400 bg-clip-text text-transparent">3 Different Ways</span>
+            <span className="bg-gradient-to-r from-cyan-400 via-white to-cyan-400 bg-clip-text text-transparent">Trusted Suppliers — In 24 Hours.</span>
           </h1>
           <p className="text-xl md:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto">
-            Join thousands of businesses using <span className="text-cyan-400 font-bold">BELL</span> for faster, smarter B2B transactions
+            Verified Suppliers • Protected Payments • Faster Quotations
           </p>
-          <div className="flex flex-wrap justify-center gap-12 mb-16">
-            <div className="text-center">
-              <div className="text-4xl md:text-5xl font-bold text-cyan-400 mb-2">10,000+</div>
-              <div className="text-gray-400">Active Suppliers</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl md:text-5xl font-bold text-cyan-400 mb-2">50+</div>
-              <div className="text-gray-400">Categories</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl md:text-5xl font-bold text-cyan-400 mb-2">&lt;60s</div>
-              <div className="text-gray-400">Avg Response</div>
-            </div>
-          </div>
         </div>
         <div className="bg-gray-900/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-8 max-w-4xl mx-auto">
           <div className="flex flex-wrap gap-4 mb-8 justify-center">
             <button onClick={() => setActiveTab('voice')} className={`flex items-center gap-2 px-8 py-4 rounded-xl font-bold transition-all ${activeTab === 'voice' ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg scale-105 border-2 border-cyan-400' : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border border-gray-700'}`}>
               <Mic className="w-5 h-5" />
-              Voice RFQ
+              Speak Requirement
             </button>
             <button onClick={() => setActiveTab('video')} className={`flex items-center gap-2 px-8 py-4 rounded-xl font-bold transition-all ${activeTab === 'video' ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg scale-105 border-2 border-cyan-400' : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border border-gray-700'}`}>
               <Video className="w-5 h-5" />
-              Video RFQ
+              Video Requirement
             </button>
             <button onClick={() => setActiveTab('text')} className={`flex items-center gap-2 px-8 py-4 rounded-xl font-bold transition-all ${activeTab === 'text' ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg scale-105 border-2 border-cyan-400' : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border border-gray-700'}`}>
               <FileText className="w-5 h-5" />
-              Text RFQ
+              Text Requirement
             </button>
           </div>
           <div className="min-h-[400px]">
@@ -61,7 +47,7 @@ export default function HeroRFQDemo() {
                       <Mic className="w-8 h-8 text-white" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-2xl text-white">Record Your RFQ</h3>
+                      <h3 className="font-bold text-2xl text-white">Record Your Requirement</h3>
                       <p className="text-gray-400">Speak naturally, we'll handle the rest</p>
                     </div>
                   </div>
@@ -84,7 +70,7 @@ export default function HeroRFQDemo() {
                       <div className="flex items-start gap-3"><CheckCircle className="w-6 h-6 text-cyan-400" /><div><div className="font-bold text-white mb-1">Instant Post</div><div className="text-sm text-gray-400">Live in 30 seconds</div></div></div>
                     </div>
                     <Link href="/rfq/voice" className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white py-4 rounded-xl font-bold hover:from-cyan-600 hover:to-blue-700 transition-all flex items-center justify-center gap-2 shadow-lg">
-                      Try Voice RFQ Free
+                      Try Speak Requirement Free
                       <Send className="w-5 h-5" />
                     </Link>
                   </div>
@@ -114,7 +100,7 @@ export default function HeroRFQDemo() {
                       </div>
                     </div>
                     <Link href="/rfq/video" className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white py-4 rounded-xl font-bold hover:from-cyan-600 hover:to-blue-700 transition-all flex items-center justify-center gap-2 shadow-lg">
-                      Try Video RFQ Free
+                      Try Video Requirement Free
                       <Send className="w-5 h-5" />
                     </Link>
                   </div>
@@ -129,7 +115,7 @@ export default function HeroRFQDemo() {
                       <FileText className="w-8 h-8 text-white" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-2xl text-white">Classic Text RFQ</h3>
+                      <h3 className="font-bold text-2xl text-white">Classic Text Requirement</h3>
                       <p className="text-gray-400">Traditional form with smart assistance</p>
                     </div>
                   </div>
@@ -149,23 +135,13 @@ export default function HeroRFQDemo() {
                       </div>
                     </div>
                     <Link href="/rfq/create" className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white py-4 rounded-xl font-bold hover:from-cyan-600 hover:to-blue-700 transition-all flex items-center justify-center gap-2 shadow-lg">
-                      Try Text RFQ Free
+                      Try Text Requirement Free
                       <Send className="w-5 h-5" />
                     </Link>
                   </div>
                 </div>
               </div>
             )}
-          </div>
-        </div>
-        <div className="mt-16 text-center">
-          <p className="text-gray-400 mb-6 text-lg">Trusted by leading businesses across India</p>
-          <div className="flex flex-wrap justify-center gap-12 items-center">
-            <div className="text-white font-bold text-xl opacity-60 hover:opacity-100 transition-opacity">Tata Group</div>
-            <div className="text-white font-bold text-xl opacity-60 hover:opacity-100 transition-opacity">Reliance</div>
-            <div className="text-white font-bold text-xl opacity-60 hover:opacity-100 transition-opacity">L&T</div>
-            <div className="text-white font-bold text-xl opacity-60 hover:opacity-100 transition-opacity">Mahindra</div>
-            <div className="text-white font-bold text-xl opacity-60 hover:opacity-100 transition-opacity">Adani</div>
           </div>
         </div>
       </div>
