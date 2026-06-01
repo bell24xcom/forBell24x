@@ -135,7 +135,7 @@ export default function DashboardPage() {
 
     setUser(JSON.parse(userData));
     loadDashboardData();
-    const liveInterval = setInterval(fetchLatestRfqs, 30000);
+    const liveInterval = setInterval(fetchLatestRfqs, 60000);
     return () => clearInterval(liveInterval);
   }, [router]);
 
@@ -454,6 +454,12 @@ export default function DashboardPage() {
                   <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
                   <span className="text-green-400 text-xs">Live</span>
                 </div>
+                <button
+                  onClick={fetchLatestRfqs}
+                  className="text-slate-400 hover:text-white text-xs px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors"
+                >
+                  ↻ Refresh
+                </button>
                 <Link href="/marketplace" className="text-blue-400 text-sm hover:text-blue-300">View All →</Link>
               </div>
             </div>

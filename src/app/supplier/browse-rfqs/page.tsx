@@ -41,11 +41,15 @@ export default function BrowseRFQsPage() {
     setSupplierCategories(cats);
   }, []);
 
+  // Stable key derived from the array content — prevents new interval on every render
+  const categoryKey = supplierCategories.join(',');
+
   useEffect(() => {
     fetchRFQs();
-    const interval = setInterval(fetchRFQs, 30000);
+    const interval = setInterval(fetchRFQs, 60000);
     return () => clearInterval(interval);
-  }, [showAllCategories, supplierCategories]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showAllCategories, categoryKey]);
 
   const fetchRFQs = async () => {
     try {
@@ -158,7 +162,7 @@ export default function BrowseRFQsPage() {
             )}
             <div className="flex items-center gap-2 px-3 py-2 bg-green-900/20 border border-green-800 rounded-lg">
               <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-              <span className="text-green-400 text-xs font-medium">Live — refreshes every 30s</span>
+              <span className="text-green-400 text-xs font-medium">Live — refreshes every 60s</span>
             </div>
           </div>
         </div>
@@ -198,6 +202,12 @@ export default function BrowseRFQsPage() {
               <option value="Construction">Construction</option>
               <option value="Other">Other</option>
             </select>
+            <button
+              onClick={fetchRFQs}
+              className="px-4 py-2.5 bg-slate-700 hover:bg-slate-600 text-slate-300 hover:text-white rounded-lg text-sm transition-colors whitespace-nowrap"
+            >
+              ↻ Refresh
+            </button>
           </div>
         </div>
 
