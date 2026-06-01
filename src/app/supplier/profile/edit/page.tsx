@@ -25,6 +25,7 @@ export default function EditProfilePage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [saveError, setSaveError] = useState('');
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [gstVerifying, setGstVerifying] = useState(false);
   const [gstStatus, setGstStatus] = useState<{ msg: string; type: 'success' | 'warn' | 'error' } | null>(null);
@@ -95,27 +96,38 @@ export default function EditProfilePage() {
     reviews: 0,
   });
 
-  // Load user data on mount
+  // Seed form instantly from localStorage, then overwrite with full profile from API
   useEffect(() => {
-    const userData = localStorage.getItem('bell24h_user');
-    if (userData) {
+    const stored = localStorage.getItem('bell24h_user');
+    if (stored) {
       try {
-        const user = JSON.parse(userData);
+        const u = JSON.parse(stored);
         setFormData(prev => ({
           ...prev,
-          companyName: user.company || '',
-          email: user.email || '',
-          phone: user.phone || '',
-          city: user.location || '',
+          companyName: u.company   || '',
+          email:       u.email     || '',
+          phone:       u.phone     || '',
+          city:        u.location  || '',
         }));
-      } catch (e) { /* ignore parse errors */ }
+      } catch { /* ignore */ }
     }
+
+    // Full profile from API (has all preferences fields)
+    fetch('/api/supplier/profile', { credentials: 'include' })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success && data.profile) {
+          setFormData(prev => ({ ...prev, ...data.profile }));
+        }
+      })
+      .catch(() => { /* stay with localStorage data */ });
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setSaveSuccess(false);
+    setSaveError('');
 
     try {
       const response = await fetch('/api/supplier/profile', {
@@ -125,15 +137,31 @@ export default function EditProfilePage() {
         body: JSON.stringify(formData),
       });
 
-      if (response.ok) {
+      const data = await response.json();
+
+      if (data.success) {
+        // Sync updated core fields back into localStorage so header picks them up
+        const stored = localStorage.getItem('bell24h_user');
+        if (stored && data.user) {
+          try {
+            const parsed = JSON.parse(stored);
+            localStorage.setItem('bell24h_user', JSON.stringify({
+              ...parsed,
+              company:  data.user.company  ?? parsed.company,
+              email:    data.user.email    ?? parsed.email,
+              location: data.user.location ?? parsed.location,
+            }));
+          } catch { /* ignore */ }
+        }
         setSaveSuccess(true);
         setTimeout(() => setSaveSuccess(false), 3000);
       } else {
-        alert('Failed to update profile');
+        setSaveError(data.message || 'Failed to update profile');
+        setTimeout(() => setSaveError(''), 4000);
       }
-    } catch (error) {
-      console.error('Error updating profile:', error);
-      alert('Failed to update profile');
+    } catch {
+      setSaveError('Network error — please try again');
+      setTimeout(() => setSaveError(''), 4000);
     } finally {
       setLoading(false);
     }
@@ -166,6 +194,14 @@ export default function EditProfilePage() {
           <div className="bg-emerald-900/30 border border-emerald-700 rounded-lg p-4 flex items-center gap-3">
             <CheckCircle className="w-5 h-5 text-emerald-400" />
             <p className="text-emerald-300">Profile updated successfully!</p>
+          </div>
+        )}
+
+        {/* Error Banner */}
+        {saveError && (
+          <div className="bg-red-900/30 border border-red-700 rounded-lg p-4 flex items-center gap-3">
+            <AlertCircle className="w-5 h-5 text-red-400" />
+            <p className="text-red-300">{saveError}</p>
           </div>
         )}
 
