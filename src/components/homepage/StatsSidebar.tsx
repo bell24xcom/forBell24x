@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { TrendingUp, Users, ShoppingCart, MapPin } from 'lucide-react';
+import { TrendingUp, Users, ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
 
 interface Stats {
@@ -26,9 +26,8 @@ export default function StatsSidebar() {
 
   const items = [
     { icon: Users,        value: stats ? fmt(stats.suppliers)  : '—', label: 'Verified Suppliers', color: 'text-blue-400',   bgColor: 'bg-blue-900/30' },
-    { icon: TrendingUp,   value: stats ? fmt(stats.rfqs)       : '—', label: 'Active RFQs',        color: 'text-purple-400', bgColor: 'bg-purple-900/30' },
+    { icon: TrendingUp,   value: stats ? fmt(stats.rfqs)       : '—', label: 'Active Requirements', color: 'text-purple-400', bgColor: 'bg-purple-900/30' },
     { icon: ShoppingCart, value: stats ? fmt(stats.categories) : '—', label: 'Categories',         color: 'text-green-400',  bgColor: 'bg-green-900/30' },
-    { icon: MapPin,       value: '100+',                              label: 'Cities',             color: 'text-orange-400', bgColor: 'bg-orange-900/30' },
   ];
 
   return (

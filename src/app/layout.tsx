@@ -8,25 +8,25 @@ import { AuthProvider } from '@/src/app/contexts/AuthContext'
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.bell24h.com'),
   title: {
-    default: 'Bell24h — B2B Marketplace | Voice & Video RFQs',
-    template: '%s | Bell24h',
+    default: 'VyaparSethu — Protected Trade Infrastructure',
+    template: '%s | VyaparSethu',
   },
-  description: "India's #1 B2B supplier marketplace. Post RFQs via voice, video, or text. AI-powered matching across 450+ categories.",
+  description: "VyaparSethu — Verified suppliers, protected payments, faster quotations for Indian MSMEs.",
   keywords: ['B2B marketplace India', 'voice RFQ', 'video RFQ', 'supplier marketplace', 'procurement platform', 'AI supplier matching', 'verified suppliers India', 'B2B procurement'],
   authors: [{ name: 'Digitex Studio' }],
   formatDetection: { email: false, telephone: false },
   alternates: { canonical: '/' },
   openGraph: {
-    title: "Bell24h — India's B2B Marketplace",
-    description: "Post RFQs via voice, video, or text. AI-powered matching across 450+ categories.",
+    title: "VyaparSethu — Protected Trade Infrastructure",
+    description: "Verified suppliers, protected payments, faster quotations for Indian MSMEs.",
     url: 'https://www.bell24h.com',
-    siteName: 'Bell24h',
+    siteName: 'VyaparSethu',
     images: [
       {
         url: '/og-image.svg',
         width: 1200,
         height: 630,
-        alt: 'Bell24h - B2B Supplier Marketplace',
+        alt: 'VyaparSethu - B2B Supplier Marketplace',
       },
     ],
     locale: 'en_IN',
@@ -34,8 +34,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: "Bell24h — India's B2B Marketplace",
-    description: "Post RFQs via voice, video, or text. AI-powered matching across 450+ categories.",
+    title: "VyaparSethu — Protected Trade Infrastructure",
+    description: "Verified suppliers, protected payments, faster quotations for Indian MSMEs.",
     images: ['/og-image.svg'],
   },
   robots: {
@@ -69,8 +69,8 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "Organization",
-              "name": "Bell24h",
-              "alternateName": "Bell 24H",
+              "name": "VyaparSethu",
+              "alternateName": "Bell24h",
               "url": "https://www.bell24h.com",
               "logo": "https://www.bell24h.com/favicon.svg",
               "description": "India's AI-powered B2B RFQ marketplace. Post RFQs by voice, video, or text. Get quotes from verified suppliers in 24 hours.",
@@ -103,7 +103,7 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "WebSite",
-              "name": "Bell24h",
+              "name": "VyaparSethu",
               "url": "https://www.bell24h.com",
               "potentialAction": {
                 "@type": "SearchAction",
