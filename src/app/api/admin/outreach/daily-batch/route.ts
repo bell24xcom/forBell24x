@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin, isErrorResponse } from '@/lib/admin-auth';
 import { randomUUID } from 'crypto';
+import { SITE_URL } from '@/lib/site-url';
 
 export const dynamic = 'force-dynamic';
 
@@ -50,7 +51,7 @@ export async function POST(request: NextRequest) {
 
     for (const supplier of suppliers) {
       const token = randomUUID();
-      const claimLink = `https://bell24h.com/claim/${token}`;
+      const claimLink = `${SITE_URL}/claim/${token}`;
       const phone = supplier.phone?.replace(/\D/g, '').slice(-10) || '';
       const companyName = supplier.company || supplier.name || 'Your Business';
 

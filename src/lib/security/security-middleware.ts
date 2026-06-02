@@ -6,6 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { SITE_URL } from '@/lib/site-url';
 import {
   globalRateLimiter,
   rateLimitUtils,
@@ -79,7 +80,7 @@ const DEFAULT_MIDDLEWARE_CONFIG: SecurityMiddlewareConfig = {
     enabled: true,
     origins:
       process.env.NODE_ENV === 'production'
-        ? ['https://bell24h.com', 'https://www.bell24h.com', 'https://app.bell24h.com']
+        ? [SITE_URL, SITE_URL.replace('https://www.', 'https://')]
         : ['http://localhost:3000', 'http://127.0.0.1:3000'],
   },
   csrf: {

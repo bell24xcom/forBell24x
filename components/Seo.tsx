@@ -1,4 +1,5 @@
 import { Metadata } from 'next'
+import { SITE_URL } from '@/lib/site-url'
 
 interface SeoProps {
   title?: string
@@ -8,7 +9,7 @@ interface SeoProps {
   ogImage?: string
 }
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://bell24h.com'
+const siteUrl = SITE_URL
 const defaultTitle = 'Bell24h - India\'s Fastest B2B Match-Making Engine'
 const defaultDescription = 'Post RFQ. Get 3 Verified Quotes in 24 Hours. Bell24h uses 200 live data signals to match you with pre-qualified Indian suppliers.'
 

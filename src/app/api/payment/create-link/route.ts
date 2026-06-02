@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { SITE_URL } from '@/lib/site-url';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
@@ -38,7 +39,7 @@ export async function POST(req: NextRequest) {
           email: true
         },
         reminder_enable: true,
-        callback_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/payment/success`,
+        callback_url: `${process.env.NEXT_PUBLIC_BASE_URL || SITE_URL}/payment/success`,
         callback_method: 'get'
       })
     });

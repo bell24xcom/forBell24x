@@ -5,6 +5,8 @@
  * Includes CORS, CSP, HSTS, and other security measures
  */
 
+import { SITE_URL } from '@/lib/site-url';
+
 export interface SecurityConfig {
   cors?: CORSConfig;
   csp?: CSPConfig;
@@ -73,7 +75,7 @@ export const DEFAULT_SECURITY_CONFIG: SecurityConfig = {
   cors: {
     origin:
       process.env.NODE_ENV === 'production'
-        ? ['https://bell24h.com', 'https://www.bell24h.com', 'https://app.bell24h.com']
+        ? [SITE_URL, SITE_URL.replace('https://www.', 'https://')]
         : ['http://localhost:3000', 'http://127.0.0.1:3000'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: [

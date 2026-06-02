@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { SITE_URL } from '@/lib/site-url';
 
 export const metadata: Metadata = {
   title: 'Voice RFQ — Speak Your Requirement in Hindi or English',
@@ -6,7 +7,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Voice RFQ — Post Your Requirement by Speaking | Bell24h',
     description: 'India\'s first voice-powered B2B procurement. Speak in Hindi or English — AI does the rest.',
-    url: 'https://bell24h.com/voice-rfq',
+    url: `${SITE_URL}/voice-rfq`,
   },
 };
 
