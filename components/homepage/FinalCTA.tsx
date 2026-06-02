@@ -20,7 +20,7 @@ export default function FinalCTA() {
             className="px-8 py-4 bg-white text-blue-600 rounded-lg font-bold hover:bg-gray-100 inline-flex items-center gap-2 transition-colors shadow-lg"
           >
             <Mic className="w-5 h-5" />
-            Try Voice RFQ
+            Try Speak Requirement
           </Link>
           
           <Link 
@@ -28,7 +28,7 @@ export default function FinalCTA() {
             className="px-8 py-4 bg-white/10 text-white border-2 border-white rounded-lg font-bold hover:bg-white/20 inline-flex items-center gap-2 transition-colors backdrop-blur-sm"
           >
             <Video className="w-5 h-5" />
-            Try Video RFQ
+            Try Video Requirement
           </Link>
           
           <Link 
@@ -36,7 +36,7 @@ export default function FinalCTA() {
             className="px-8 py-4 bg-white/10 text-white border-2 border-white rounded-lg font-bold hover:bg-white/20 inline-flex items-center gap-2 transition-colors backdrop-blur-sm"
           >
             <FileText className="w-5 h-5" />
-            Try Text RFQ
+            Try Text Requirement
           </Link>
         </div>
         

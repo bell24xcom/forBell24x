@@ -20,19 +20,19 @@ interface NavItem {
 
 const buyerNavItems: NavItem[] = [
   { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
-  { divider: true, label: 'POST RFQ' },
-  { icon: Mic, label: 'Voice RFQ', href: '/voice-rfq', highlight: true },
-  { icon: Video, label: 'Video RFQ', href: '/video-rfq' },
-  { icon: FileEdit, label: 'Text RFQ', href: '/rfq/create' },
-  { divider: true, label: 'MY RFQS' },
-  { icon: FileText, label: 'My RFQs', href: '/dashboard/rfqs' },
+  { divider: true, label: 'POST REQUIREMENT' },
+  { icon: Mic, label: 'Speak Requirement', href: '/voice-rfq', highlight: true },
+  { icon: Video, label: 'Video Requirement', href: '/video-rfq' },
+  { icon: FileEdit, label: 'Text Requirement', href: '/rfq/create' },
+  { divider: true, label: 'MY REQUIREMENTS' },
+  { icon: FileText, label: 'My Requirements', href: '/dashboard/rfqs' },
   { icon: MessageSquare, label: 'Quotes Inbox', href: '/dashboard/quotes' },
   { icon: Users2, label: 'Active Deals', href: '/dashboard/deals' },
   { divider: true, label: 'TOOLS' },
   { icon: Mail, label: 'Messages', href: '/dashboard/messages' },
   { icon: Wallet, label: 'Wallet', href: '/dashboard/wallet' },
   { icon: List, label: 'Ledger', href: '/dashboard/wallet/ledger' },
-  { icon: Shield, label: 'Escrow', href: '/dashboard/escrow' },
+  { icon: Shield, label: 'Protected Payment', href: '/dashboard/escrow' },
   { icon: BarChart3, label: 'Analytics', href: '/dashboard/analytics' },
   { divider: true, label: 'ACCOUNT' },
   { icon: User, label: 'Profile & KYC', href: '/profile' },
@@ -43,7 +43,7 @@ const buyerNavItems: NavItem[] = [
 const supplierNavItems: NavItem[] = [
   { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
   { divider: true, label: 'BUSINESS' },
-  { icon: Search, label: 'Browse RFQs', href: '/supplier/browse-rfqs', highlight: true },
+  { icon: Search, label: 'Browse Requirements', href: '/supplier/browse-rfqs', highlight: true },
   { icon: FileText, label: 'My Quotes', href: '/supplier/my-quotes' },
   { icon: Users2, label: 'Active Deals', href: '/dashboard/deals' },
   { divider: true, label: 'PRODUCTS' },
@@ -54,7 +54,7 @@ const supplierNavItems: NavItem[] = [
   { icon: Mail, label: 'Messages', href: '/dashboard/messages' },
   { icon: Wallet, label: 'Wallet & Earnings', href: '/dashboard/wallet' },
   { icon: List, label: 'Ledger', href: '/dashboard/wallet/ledger' },
-  { icon: Shield, label: 'Escrow', href: '/dashboard/escrow' },
+  { icon: Shield, label: 'Protected Payment', href: '/dashboard/escrow' },
   { icon: BarChart3, label: 'Performance', href: '/dashboard/analytics' },
   { divider: true, label: 'PROFILE' },
   { icon: Star, label: 'Profile & Trust Score', href: '/supplier/profile/edit' },
@@ -89,7 +89,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             >
               {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
-            <Link href="/" className="text-xl font-bold">Bell24h</Link>
+            <Link href="/" className="text-xl font-bold">VyaparSethu</Link>
           </div>
 
           {/* Center: Mode Tabs */}
