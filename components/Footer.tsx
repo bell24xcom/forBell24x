@@ -10,17 +10,19 @@ export default function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
           <div>
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center gap-2 mb-2">
               <div className="w-7 h-7 bg-blue-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xs">B</span>
+                <span className="text-white font-bold text-xs">V</span>
               </div>
               <div className="flex items-baseline gap-0.5">
-                <span className="text-base font-bold text-white">BELL</span>
-                <span className="text-base font-bold text-blue-400">24H</span>
+                <span className="text-base font-bold text-white">Vyapar</span>
+                <span className="text-base font-bold text-blue-400">Sethu</span>
               </div>
             </div>
+            <p className="text-blue-300 text-xs mb-1">Commerce Connections Globally</p>
+            <p className="text-slate-600 text-xs mb-3">Formerly Bell24h</p>
             <p className="text-slate-500 text-sm leading-relaxed mb-3">
-              India&apos;s fastest B2B marketplace. AI-powered supplier matching with voice, video, and text RFQs.
+              India&apos;s B2B trade network. AI-powered supplier matching with voice, video, and text requirements.
             </p>
             <p className="text-slate-600 text-xs leading-relaxed mb-4">
               By Digitex Studio<br />
@@ -48,7 +50,7 @@ export default function Footer() {
           <div>
             <h4 className="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-4">Product</h4>
             <ul className="space-y-2.5">
-              <li><Link href="/rfq/create" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">Post RFQ</Link></li>
+              <li><Link href="/rfq/create" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">Post Requirement</Link></li>
               <li><Link href="/suppliers" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">Find Suppliers</Link></li>
               <li><Link href="/categories" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">Browse Categories</Link></li>
               <li><Link href="/pricing" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">Pricing</Link></li>
@@ -84,7 +86,7 @@ export default function Footer() {
         <div className="max-w-6xl mx-auto px-4 py-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
             <p className="text-slate-600 text-xs">
-              &copy; {new Date().getFullYear()} Bell24h. Operated by Digitex Studio. All rights reserved. Made in India 🇮🇳
+              &copy; {new Date().getFullYear()} VyaparSethu. Operated by Digitex Studio. All rights reserved. Made in India 🇮🇳
             </p>
             <p className="text-slate-600 text-xs">
               GSTIN: 27AAAPP9753F2ZF | <a href="mailto:bell24h.helpline@gmail.com" className="hover:text-slate-400 transition-colors">bell24h.helpline@gmail.com</a>

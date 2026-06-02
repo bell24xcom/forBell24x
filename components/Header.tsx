@@ -105,11 +105,11 @@ export default function Header() {
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2 shrink-0">
               <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">B</span>
+                <span className="text-white font-bold text-sm">V</span>
               </div>
               <div className="flex items-baseline gap-0.5">
-                <span className="text-lg font-bold text-white">BELL</span>
-                <span className="text-lg font-bold text-blue-400">24H</span>
+                <span className="text-lg font-bold text-white">Vyapar</span>
+                <span className="text-lg font-bold text-blue-400">Sethu</span>
               </div>
             </Link>
 
@@ -118,7 +118,7 @@ export default function Header() {
               {/* Nav Links — different for logged in vs logged out */}
               {isLoggedIn ? (
                 <>
-                  <Link href="/rfq/create" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Post RFQ</Link>
+                  <Link href="/rfq/create" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Post Requirement</Link>
                   <Link href="/marketplace" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Marketplace</Link>
                   <Link href="/suppliers" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Suppliers</Link>
                 </>
@@ -159,7 +159,7 @@ export default function Header() {
                     href="/rfq/create"
                     className="bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
                   >
-                    Post RFQ
+                    Post Requirement
                   </Link>
                   <button
                     onClick={handleLogin}
@@ -199,7 +199,7 @@ export default function Header() {
               <Link href="/suppliers" className="block text-slate-300 hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Suppliers</Link>
               {isLoggedIn ? (
                 <>
-                  <Link href="/rfq/create" className="block text-slate-300 hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Post RFQ</Link>
+                  <Link href="/rfq/create" className="block text-slate-300 hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Post Requirement</Link>
                   <Link href="/dashboard" className="block text-slate-300 hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Dashboard</Link>
                   <button onClick={() => { handleLogout(); setIsMenuOpen(false); }} className="w-full text-left text-slate-300 hover:text-white transition-colors">
                     Logout ({user?.name || 'User'})
@@ -208,7 +208,7 @@ export default function Header() {
               ) : (
                 <>
                   <Link href="/pricing" className="block text-slate-300 hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Pricing</Link>
-                  <Link href="/rfq/create" className="block bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors text-center" onClick={() => setIsMenuOpen(false)}>Post RFQ</Link>
+                  <Link href="/rfq/create" className="block bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors text-center" onClick={() => setIsMenuOpen(false)}>Post Requirement</Link>
                   <button onClick={() => { handleLogin(); setIsMenuOpen(false); }} className="w-full border border-slate-600 text-slate-300 hover:text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors">
                     Login / Register
                   </button>

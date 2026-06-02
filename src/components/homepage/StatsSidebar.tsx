@@ -1,56 +1,21 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { TrendingUp, Users, ShoppingCart } from 'lucide-react';
+import { Rocket, MapPin } from 'lucide-react';
 import Link from 'next/link';
 
-interface Stats {
-  suppliers: number;
-  rfqs: number;
-  categories: number;
-}
-
-const fmt = (n: number) => new Intl.NumberFormat('en-IN').format(n);
-
 export default function StatsSidebar() {
-  const [stats, setStats] = useState<Stats | null>(null);
-
-  useEffect(() => {
-    fetch('/api/stats')
-      .then(r => r.json())
-      .then(d => {
-        if (d.success) setStats(d.stats);
-      })
-      .catch(() => {});
-  }, []);
-
-  const items = [
-    { icon: Users,        value: stats ? fmt(stats.suppliers)  : '—', label: 'Verified Suppliers', color: 'text-blue-400',   bgColor: 'bg-blue-900/30' },
-    { icon: TrendingUp,   value: stats ? fmt(stats.rfqs)       : '—', label: 'Active Requirements', color: 'text-purple-400', bgColor: 'bg-purple-900/30' },
-    { icon: ShoppingCart, value: stats ? fmt(stats.categories) : '—', label: 'Categories',         color: 'text-green-400',  bgColor: 'bg-green-900/30' },
-  ];
-
   return (
     <aside className="space-y-6">
-      {/* Quick Stats */}
+      {/* Launch status (replaces pre-launch seeded counts) */}
       <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-4">
-        <h3 className="font-semibold text-lg mb-4 flex items-center gap-2 text-white">
-          <TrendingUp className="w-5 h-5 text-blue-400" />
-          Quick Stats
-        </h3>
-        <div className="space-y-3">
-          {items.map((stat, idx) => (
-            <div key={idx} className={`${stat.bgColor} rounded-lg p-3`}>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <stat.icon className={`w-5 h-5 ${stat.color}`} />
-                  <span className="text-sm text-slate-400">{stat.label}</span>
-                </div>
-                <span className={`font-bold text-lg ${stat.color}`}>{stat.value}</span>
-              </div>
-            </div>
-          ))}
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-cyan-500/10 border border-cyan-400/30 rounded-full text-cyan-300 text-xs font-bold mb-3">
+          <Rocket className="w-3.5 h-3.5" />
+          Launching Soon — Reserve your category
         </div>
+        <p className="flex items-center gap-2 text-sm text-slate-400">
+          <MapPin className="w-4 h-4 text-cyan-400 shrink-0" />
+          Currently onboarding: Mumbai-Kalamboli-Bhiwandi cluster
+        </p>
       </div>
 
       {/* Featured Categories */}

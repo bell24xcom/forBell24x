@@ -13,7 +13,7 @@ export default function HeroRFQDemo() {
   const demoContent = {
     text: {
       title: 'Type Your Requirement',
-      description: 'Traditional text-based RFQ with full specifications',
+      description: 'Traditional text-based requirement with full specifications',
       example: {
         product: 'Industrial LED Bulbs',
         quantity: '10,000 units',
@@ -50,13 +50,13 @@ export default function HeroRFQDemo() {
         <div className="text-center mb-12 relative z-10">
           <div className="inline-flex items-center gap-2 bg-gray-900/80 backdrop-blur-sm px-4 py-2 rounded-full mb-6 border border-cyan-500/20">
             <Sparkles className="w-4 h-4 text-cyan-400" />
-            <span className="text-sm font-medium text-cyan-400">AI-Powered RFQ System</span>
+            <span className="text-sm font-medium text-cyan-400">AI-Powered Requirement System</span>
           </div>
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-black mb-6 text-white leading-tight">
-            Post RFQs in 3 Different Ways
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 text-white leading-tight">
+            Get Verified Quotations from Trusted Suppliers — In 24 Hours.
           </h1>
           <p className="text-lg md:text-xl lg:text-2xl text-gray-300 mb-8 max-w-4xl mx-auto leading-relaxed">
-            Choose Voice, Video, or Text. AI-powered matching across 450+ categories.
+            Verified Suppliers • Protected Payments • Faster Quotations
           </p>
         </div>
 
@@ -71,7 +71,7 @@ export default function HeroRFQDemo() {
             }`}
           >
             <Mic className="w-5 h-5" />
-            <span>Voice RFQ</span>
+            <span>Speak Requirement</span>
           </button>
           <button
             onClick={() => setActiveType('video')}
@@ -82,7 +82,7 @@ export default function HeroRFQDemo() {
             }`}
           >
             <Video className="w-5 h-5" />
-            <span>Video RFQ</span>
+            <span>Video Requirement</span>
           </button>
           <button
             onClick={() => setActiveType('text')}
@@ -93,7 +93,7 @@ export default function HeroRFQDemo() {
             }`}
           >
             <FileText className="w-5 h-5" />
-            <span>Text RFQ</span>
+            <span>Text Requirement</span>
           </button>
         </div>
 
@@ -200,7 +200,7 @@ export default function HeroRFQDemo() {
                 href={activeType === 'voice' ? '/voice-rfq' : activeType === 'video' ? '/video-rfq' : '/rfq/create'}
                 className="px-8 py-5 bg-white text-slate-900 rounded-2xl font-bold text-lg hover:scale-105 transition shadow-2xl inline-flex items-center gap-2"
               >
-                {activeType.charAt(0).toUpperCase() + activeType.slice(1)} RFQ
+                {activeType.charAt(0).toUpperCase() + activeType.slice(1)} Requirement
               </Link>
               <Link 
                 href="/rfq/demo/all"
@@ -209,26 +209,6 @@ export default function HeroRFQDemo() {
                 View All Demos
               </Link>
             </div>
-          </div>
-        </div>
-
-        {/* Stats */}
-        <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
-          <div className="text-center bg-gray-900/50 rounded-lg p-4 border border-cyan-500/20">
-            <p className="text-3xl font-bold mb-1 text-cyan-400">~800</p>
-            <p className="text-sm text-gray-400">Text RFQs</p>
-          </div>
-          <div className="text-center bg-gray-900/50 rounded-lg p-4 border border-cyan-500/20">
-            <p className="text-3xl font-bold mb-1 text-cyan-400">~300</p>
-            <p className="text-sm text-gray-400">Voice RFQs</p>
-          </div>
-          <div className="text-center bg-gray-900/50 rounded-lg p-4 border border-cyan-500/20">
-            <p className="text-3xl font-bold mb-1 text-cyan-400">~150</p>
-            <p className="text-sm text-gray-400">Video RFQs</p>
-          </div>
-          <div className="text-center bg-gray-900/50 rounded-lg p-4 border border-cyan-500/20">
-            <p className="text-3xl font-bold mb-1 text-cyan-400">12+</p>
-            <p className="text-sm text-gray-400">Languages</p>
           </div>
         </div>
 
