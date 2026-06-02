@@ -1,10 +1,12 @@
+import { SITE_URL } from '@/lib/site-url';
+
 export default function SchemaMarkup() {
   const organization = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: 'Bell24h',
-    url: 'https://www.bell24h.com',
-    logo: 'https://www.bell24h.com/og-image.jpg',
+    url: SITE_URL,
+    logo: `${SITE_URL}/og-image.jpg`,
     description: "India's AI-powered B2B procurement marketplace. Post RFQs via voice, video, or text. 450+ categories.",
     address: {
       '@type': 'PostalAddress',
@@ -20,19 +22,19 @@ export default function SchemaMarkup() {
       email: 'bell24h.helpline@gmail.com',
       availableLanguage: ['English', 'Hindi'],
     },
-    sameAs: ['https://www.bell24h.com'],
+    sameAs: [SITE_URL],
   };
 
   const website = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: 'Bell24h',
-    url: 'https://www.bell24h.com',
+    url: SITE_URL,
     potentialAction: {
       '@type': 'SearchAction',
       target: {
         '@type': 'EntryPoint',
-        urlTemplate: 'https://www.bell24h.com/marketplace?q={search_term_string}',
+        urlTemplate: `${SITE_URL}/marketplace?q={search_term_string}`,
       },
       'query-input': 'required name=search_term_string',
     },
