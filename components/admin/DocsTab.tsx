@@ -270,7 +270,7 @@ A: Yes, our API supports integration with most major ERP systems.
 ## Support Questions
 
 **Q: How can I contact support?**
-A: You can reach our support team through the help center or email support@bell24h.com.
+A: You can reach our support team through the help center or email bell24h.helpline@gmail.com.
 
 **Q: What are your support hours?**
 A: We provide 24/7 support for premium users and business hours support for all users.`,
