@@ -9,7 +9,7 @@ export default function RefundPage() {
       <div className="prose prose-slate max-w-none">
         <p>Refunds and cancellations are handled as per the agreement between buyer and supplier. Platform fees (if any) are non-refundable unless a duplicate charge occurs.</p>
         <h2>Payment Gateway</h2>
-        <p>Payments processed via Razorpay follow RBI and card network guidelines. For charge disputes, contact us at support@bell24h.com.</p>
+        <p>Payments processed via Razorpay follow RBI and card network guidelines. For charge disputes, contact us at bell24h.helpline@gmail.com.</p>
       </div>
     </main>
   )

@@ -38,10 +38,10 @@ export default function MediaPage() {
               <h3 className="text-xl font-semibold text-white mb-2">Media Contact</h3>
               <p className="text-slate-300 mb-3">Get in touch with our media relations team</p>
               <a
-                href="mailto:media@bell24h.com"
+                href="mailto:bell24h.helpline@gmail.com"
                 className="text-blue-400 hover:text-blue-300 font-semibold"
               >
-                media@bell24h.com
+                bell24h.helpline@gmail.com
               </a>
             </div>
           </div>
@@ -49,7 +49,7 @@ export default function MediaPage() {
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="mailto:media@bell24h.com"
+              href="mailto:bell24h.helpline@gmail.com"
               className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors text-center"
             >
               Send Media Inquiry
@@ -66,8 +66,8 @@ export default function MediaPage() {
         {/* Direct Contact Email */}
         <div className="text-center text-slate-300 mb-8">
           <p className="text-lg font-semibold text-white mb-2">For Press Inquiries:</p>
-          <a href="mailto:media@bell24h.com" className="text-blue-400 hover:text-blue-300 text-xl font-semibold">
-            media@bell24h.com
+          <a href="mailto:bell24h.helpline@gmail.com" className="text-blue-400 hover:text-blue-300 text-xl font-semibold">
+            bell24h.helpline@gmail.com
           </a>
         </div>
 

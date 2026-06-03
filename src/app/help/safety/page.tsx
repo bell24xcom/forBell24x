@@ -152,7 +152,7 @@ export default function SafetyPage() {
                 If you encounter fraud, suspicious behavior, or security vulnerabilities, contact us immediately:
               </p>
               <div className="space-y-2 text-slate-300">
-                <p><strong className="text-white">Security Email:</strong> <a href="mailto:security@bell24h.com" className="text-blue-400 hover:text-blue-300">security@bell24h.com</a></p>
+                <p><strong className="text-white">Security Email:</strong> <a href="mailto:bell24h.helpline@gmail.com" className="text-blue-400 hover:text-blue-300">bell24h.helpline@gmail.com</a></p>
                 <p><strong className="text-white">Support Email:</strong> <a href="mailto:bell24h.helpline@gmail.com" className="text-blue-400 hover:text-blue-300">bell24h.helpline@gmail.com</a></p>
                 <p><strong className="text-white">Phone:</strong> +91-9004962871 (24/7 for emergencies)</p>
                 <p className="text-sm text-slate-400 mt-4">All reports are confidential and investigated within 24-48 hours.</p>

@@ -88,7 +88,7 @@ export default function TestimonialsPage() {
 
         <div className="mt-12 text-center">
           <p className="text-slate-400 mb-4">Have a success story with Bell24h?</p>
-          <a href="mailto:testimonials@bell24h.com" className="text-blue-400 hover:text-blue-300 font-medium">
+          <a href="mailto:bell24h.helpline@gmail.com" className="text-blue-400 hover:text-blue-300 font-medium">
             Share your testimonial →
           </a>
         </div>
