@@ -39,6 +39,7 @@ export default function PhoneEmailAuth() {
   const [redirecting, setRedirecting] = useState(false); // prevents form flash during navigation
   const phoneRef       = useRef('');
   const loginCalledRef = useRef(false); // prevent double-firing
+  const verifiedRef    = useRef(false); // true once MSG91 returns a valid token — suppresses spurious failure callbacks
 
   // If already authenticated, redirect immediately (handles back-button to login page)
   // Use polling to handle cookie propagation delay from verify step
@@ -183,17 +184,22 @@ export default function PhoneEmailAuth() {
 
     // Widget mode: verify via MSG91 widget
     if (sentViaWidget && window.verifyOtp) {
+      verifiedRef.current = false; // fresh attempt
       window.verifyOtp(
         parseInt(otp, 10),
         async (data: unknown) => {
           const accessToken = extractToken(data);
           console.log('[MSG91 verifyOtp success] data=', data, 'token=', accessToken?.slice(0, 20));
           if (accessToken) {
+            verifiedRef.current = true; // token obtained — any later failure callback is spurious
             await completeWidgetLogin(accessToken);
           }
           // If no token here, initSendOTP.success callback will handle it
         },
         (err) => {
+          // Suppress false-failure: MSG91 can fire failure even after a successful
+          // verify. If a valid token was already obtained, ignore it.
+          if (verifiedRef.current) return;
           console.error('MSG91 verifyOtp failed:', err);
           setError('Invalid OTP. Please check and try again.');
           setLoading(false);
@@ -278,6 +284,7 @@ export default function PhoneEmailAuth() {
                   const accessToken = extractToken(data);
                   console.log('[MSG91 success] data=', data, 'token=', accessToken?.slice(0, 20));
                   if (accessToken) {
+                    verifiedRef.current = true; // token obtained — suppress any later failure callback
                     await completeWidgetLogin(accessToken);
                   } else {
                     setError('Verification failed — no token received. Please try again.');
@@ -285,6 +292,8 @@ export default function PhoneEmailAuth() {
                   }
                 },
                 failure: (err: unknown) => {
+                  // Suppress false-failure: ignore if verification already succeeded this attempt
+                  if (verifiedRef.current) return;
                   console.error('MSG91 widget failure:', err);
                   setError('OTP verification failed. Please try again.');
                   setLoading(false);
@@ -303,7 +312,7 @@ export default function PhoneEmailAuth() {
               <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
                 <Shield className="w-8 h-8 text-blue-600" />
               </div>
-              <h1 className="text-2xl font-bold text-neutral-900">Bell24h Login</h1>
+              <h1 className="text-2xl font-bold text-neutral-900">VyaparSethu Login</h1>
               <p className="text-slate-300 mt-2">
                 {step === 'phone' ? 'Enter your mobile number to continue' : 'Enter the OTP sent to your phone'}
               </p>
@@ -425,7 +434,7 @@ export default function PhoneEmailAuth() {
             <div className="mt-6 text-center">
               <p className="text-sm text-slate-300 mb-3">Need help? Contact us on WhatsApp</p>
               <a
-                href="https://wa.me/919876543210?text=Hi, I need supplier verification service"
+                href="https://wa.me/919004962871?text=Hi, I need supplier verification service"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
