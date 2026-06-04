@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin, isErrorResponse } from '@/lib/admin-auth';
 import { sendEmail as _sendEmail } from '@/lib/email';
+import { SITE_URL, SITE_HOST } from '@/lib/site-url';
 const resendService = { sendEmail: ({ to, subject, html }: { to: string; subject: string; html: string }) => _sendEmail(to, subject, html) };
 
 export const dynamic = 'force-dynamic';
@@ -47,7 +48,7 @@ export async function POST(req: NextRequest) {
 
       const prefs = supplier.preferences as Record<string, unknown> | null;
       const categories: string[] = Array.isArray(prefs?.categories) ? (prefs.categories as string[]) : [];
-      const claimUrl = `https://bell24h.com/auth/phone-email?claim=${supplier.id}`;
+      const claimUrl = `${SITE_URL}/auth/phone-email?claim=${supplier.id}`;
 
       try {
         await resendService.sendEmail({
@@ -72,7 +73,7 @@ export async function POST(req: NextRequest) {
                 <p style="color:#94A3B8;font-size:13px;">This profile was created based on publicly available business information. Claiming is free and takes under 2 minutes.</p>
               </div>
               <div style="background:#f1f5f9;padding:16px 24px;text-align:center;color:#64748b;font-size:12px;">
-                Bell24h · Digitex Studio · bell24h.com<br>
+                Bell24h · Digitex Studio · ${SITE_HOST}<br>
                 <a href="${claimUrl}" style="color:#2563EB;text-decoration:none;">Claim your profile</a>
               </div>
             </div>

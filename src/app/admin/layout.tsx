@@ -105,8 +105,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }, []);
 
   const handleLogout = () => {
-    // Clear auth-token cookie for all domain variants
-    const domains = ['', 'bell24h.com', 'www.bell24h.com', window.location.hostname];
+    // Clear auth/admin cookies across host + registrable-domain variants,
+    // derived from the CURRENT hostname so logout works on any domain
+    // (bell24h.com today, vyaparsethu.com after cutover).
+    const host = window.location.hostname;
+    const parts = host.split('.');
+    const baseDomain = parts.length > 2 ? parts.slice(-2).join('.') : host;
+    const domains = host === 'localhost' ? [''] : ['', host, baseDomain, `.${baseDomain}`];
     domains.forEach(domain => {
       const d = domain ? `; domain=${domain}` : '';
       document.cookie = `auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT${d}`;

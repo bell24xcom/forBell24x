@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { SITE_URL } from '@/lib/site-url';
 
 interface SupplierWithRelations {
   id: string;
@@ -58,7 +59,7 @@ export function generateSupplierMetadata(supplier: SupplierWithRelations): Metad
       title,
       description,
       type: 'profile',
-      url: `https://bell24h.com/suppliers/${supplier.slug}`,
+      url: `${SITE_URL}/suppliers/${supplier.slug}`,
       siteName: 'Bell24h',
       locale: 'en_IN',
       images: [

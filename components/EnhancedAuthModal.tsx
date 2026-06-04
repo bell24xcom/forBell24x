@@ -402,7 +402,7 @@ export default function EnhancedAuthModal({ isOpen, onClose, onSuccess }: Enhanc
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <span className="text-white text-lg font-bold">🔔</span>
               </div>
-              <h2 className="text-xl font-bold text-gray-900">Join Bell24h</h2>
+              <h2 className="text-xl font-bold text-gray-900">Join VyaparSethu</h2>
             </div>
             <button
               onClick={onClose}

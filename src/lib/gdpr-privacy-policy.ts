@@ -363,7 +363,7 @@ This policy applies to all users of Bell24h services, including buyers, supplier
           title: 'Contact Details',
           content: `You can reach our Data Protection Officer and support team through multiple channels.`,
           examples: [
-            'Email: privacy@bell24h.com',
+            'Email: bell24h.helpline@gmail.com',
             'Phone: +91-XXXX-XXXX',
             'Address: Mumbai, India',
             'Online form: /contact',
@@ -553,7 +553,7 @@ export class PrivacyPolicyManager {
         'Right to data portability',
         'Right to object to processing',
       ],
-      contactInfo: 'privacy@bell24h.com',
+      contactInfo: 'bell24h.helpline@gmail.com',
     };
   }
 

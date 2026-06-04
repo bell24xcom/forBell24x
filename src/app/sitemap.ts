@@ -1,11 +1,12 @@
 import { MetadataRoute } from 'next'
 import { prisma } from '@/lib/prisma'
+import { SITE_URL } from '@/lib/site-url'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 3600 // regenerate every hour
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const siteUrl = 'https://www.bell24h.com'
+  const siteUrl = SITE_URL
 
   // Static pages — verified URLs only
   const staticPages: MetadataRoute.Sitemap = [

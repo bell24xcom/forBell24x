@@ -1,5 +1,7 @@
 'use client';
 
+import { SITE_URL } from '@/lib/site-url';
+
 interface WhatsAppShareProps {
   rfqTitle: string;
   rfqId: string;
@@ -20,7 +22,7 @@ export default function WhatsAppShare({ rfqTitle, rfqId, category, budget, locat
     const text = encodeURIComponent(
       `🔔 New RFQ on Bell24h!\n\n` +
       `"${rfqTitle}"${categoryText}${locationText}${budgetText}\n\n` +
-      `Quote now → https://bell24h.com/rfq/${rfqId}\n\n` +
+      `Quote now → ${SITE_URL}/rfq/${rfqId}\n\n` +
       `Bell24h — India's AI-powered B2B Procurement Platform`
     );
 
