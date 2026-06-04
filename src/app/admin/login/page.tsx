@@ -131,7 +131,7 @@ export default function AdminLoginPage() {
             <span className="text-white font-bold text-xl">B</span>
           </div>
           <h1 className="text-2xl font-bold text-white">Admin Access</h1>
-          <p className="text-slate-400 text-sm mt-1">Bell24h Control Panel</p>
+          <p className="text-slate-400 text-sm mt-1">VyaparSethu Control Panel</p>
         </div>
 
         {/* Mode Toggle */}
@@ -176,7 +176,7 @@ export default function AdminLoginPage() {
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                placeholder="admin@bell24h.com"
+                placeholder="admin@vyaparsethu.com"
                 required
                 className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 min-h-[44px]"
               />
