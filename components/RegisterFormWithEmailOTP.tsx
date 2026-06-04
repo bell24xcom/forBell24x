@@ -244,7 +244,7 @@ function RegisterFormContent({ onSwitchView, onClose }) {
       className="max-w-2xl mx-auto bg-gray-900 rounded-2xl p-8 shadow-2xl"
     >
       <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-white mb-2">Join Bell24h</h2>
+        <h2 className="text-3xl font-bold text-white mb-2">Join VyaparSethu</h2>
         <p className="text-gray-400">Create your supplier account in minutes</p>
       </div>
 

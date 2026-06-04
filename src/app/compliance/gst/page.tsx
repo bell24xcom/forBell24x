@@ -179,7 +179,7 @@ export default function GSTCompliancePage() {
               Need help with GST compliance, invoicing, or verification?
             </p>
             <div className="space-y-2 text-slate-300">
-              <p><strong className="text-white">Email:</strong> <a href="mailto:compliance@bell24h.com" className="text-blue-400 hover:text-blue-300">compliance@bell24h.com</a></p>
+              <p><strong className="text-white">Email:</strong> <a href="mailto:bell24h.helpline@gmail.com" className="text-blue-400 hover:text-blue-300">bell24h.helpline@gmail.com</a></p>
               <p><strong className="text-white">Phone:</strong> +91-9004962871</p>
               <p><strong className="text-white">Support Hours:</strong> Monday-Saturday, 10:00 AM - 7:00 PM IST</p>
             </div>

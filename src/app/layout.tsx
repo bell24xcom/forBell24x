@@ -4,9 +4,10 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { DashboardProvider } from '@/contexts/DashboardContext'
 import { AuthProvider } from '@/src/app/contexts/AuthContext'
+import { SITE_URL } from '@/lib/site-url'
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://www.bell24h.com'),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: 'VyaparSethu — Protected Trade Infrastructure',
     template: '%s | VyaparSethu',
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "VyaparSethu — Protected Trade Infrastructure",
     description: "Verified suppliers, protected payments, faster quotations for Indian MSMEs.",
-    url: 'https://www.bell24h.com',
+    url: SITE_URL,
     siteName: 'VyaparSethu',
     images: [
       {
@@ -71,8 +72,8 @@ export default function RootLayout({
               "@type": "Organization",
               "name": "VyaparSethu",
               "alternateName": "Bell24h",
-              "url": "https://www.bell24h.com",
-              "logo": "https://www.bell24h.com/favicon.svg",
+              "url": SITE_URL,
+              "logo": `${SITE_URL}/favicon.svg`,
               "description": "India's AI-powered B2B RFQ marketplace. Post RFQs by voice, video, or text. Get quotes from verified suppliers in 24 hours.",
               "foundingDate": "2026",
               "contactPoint": {
@@ -104,12 +105,12 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "WebSite",
               "name": "VyaparSethu",
-              "url": "https://www.bell24h.com",
+              "url": SITE_URL,
               "potentialAction": {
                 "@type": "SearchAction",
                 "target": {
                   "@type": "EntryPoint",
-                  "urlTemplate": "https://www.bell24h.com/marketplace?search={search_term_string}"
+                  "urlTemplate": `${SITE_URL}/marketplace?search={search_term_string}`
                 },
                 "query-input": "required name=search_term_string"
               }

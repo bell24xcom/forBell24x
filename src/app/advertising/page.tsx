@@ -68,7 +68,7 @@ export default function AdvertisingPage() {
               Register Now
             </Link>
             <a
-              href="mailto:ads@bell24h.com"
+              href="mailto:bell24h.helpline@gmail.com"
               className="bg-slate-700 hover:bg-slate-600 text-white font-semibold py-3 px-8 rounded-lg transition-colors text-center"
             >
               Contact Sales
@@ -79,8 +79,8 @@ export default function AdvertisingPage() {
         {/* Contact Email */}
         <div className="text-center text-slate-300 mb-8">
           <p className="mb-2">Have questions about advertising?</p>
-          <a href="mailto:ads@bell24h.com" className="text-blue-400 hover:text-blue-300 font-semibold">
-            ads@bell24h.com
+          <a href="mailto:bell24h.helpline@gmail.com" className="text-blue-400 hover:text-blue-300 font-semibold">
+            bell24h.helpline@gmail.com
           </a>
         </div>
 

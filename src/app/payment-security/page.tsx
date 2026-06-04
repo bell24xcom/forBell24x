@@ -152,7 +152,7 @@ export default function PaymentSecurityPage() {
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <h3 className="font-semibold text-neutral-900 mb-2">Security Team</h3>
-                <p className="text-slate-300">security@bell24h.com</p>
+                <p className="text-slate-300">bell24h.helpline@gmail.com</p>
                 <p className="text-slate-300">+91 98765 43210</p>
               </div>
               <div>

@@ -1,8 +1,10 @@
+import { SITE_URL } from '@/lib/site-url';
+
 export function SupplierJsonLd({ supplier }: { supplier: any }) {
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
-    '@id': `https://bell24h.com/suppliers/${supplier.slug}`,
+    '@id': `${SITE_URL}/suppliers/${supplier.slug}`,
     name: supplier.company_name,
     description: supplier.business_description || `${supplier.company_name} - ${supplier.business_type} in ${supplier.city}`,
     

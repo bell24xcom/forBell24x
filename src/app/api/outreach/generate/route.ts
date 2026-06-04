@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { logEvent } from '@/lib/log-event';
+import { SITE_URL } from '@/lib/site-url';
 
 export const dynamic = 'force-dynamic';
 
@@ -79,7 +80,7 @@ export async function GET(request: NextRequest) {
           ? ` Budget: ₹${Number(topRFQ.maxBudget).toLocaleString('en-IN')}.`
           : '';
         const loc = topRFQ.location ? ` Location: ${topRFQ.location}.` : '';
-        const link = `https://www.bell24h.com/rfq/${topRFQ.id}`;
+        const link = `${SITE_URL}/rfq/${topRFQ.id}`;
 
         const city = (s.location || '').split(',')[0].trim() || 'India';
         const productSummary = topRFQ.quantity
@@ -89,7 +90,7 @@ export async function GET(request: NextRequest) {
 
         const email = {
           subject: `New RFQ Opportunity: ${topRFQ.title} — Bell24h`,
-          body: `Hi ${name},\n\nA buyer on Bell24h is looking for ${topRFQ.title} in ${category}.\n\nQuantity: ${topRFQ.quantity || 'To be discussed'}${budget}${loc}\n\nYou can view full details and submit your quote here:\n${link}\n\nThis is free to quote during our beta phase.\n\n— Bell24h Team\nhttps://www.bell24h.com`,
+          body: `Hi ${name},\n\nA buyer on Bell24h is looking for ${topRFQ.title} in ${category}.\n\nQuantity: ${topRFQ.quantity || 'To be discussed'}${budget}${loc}\n\nYou can view full details and submit your quote here:\n${link}\n\nThis is free to quote during our beta phase.\n\n— Bell24h Team\n${SITE_URL}`,
         };
 
         const cleanPhone = s.phone ? s.phone.replace(/\D/g, '').replace(/^91/, '') : null;
@@ -114,7 +115,7 @@ export async function GET(request: NextRequest) {
       return {
         category,
         rfqCount: categoryRFQs.length,
-        featuredRFQ: { id: topRFQ.id, title: topRFQ.title, link: `https://www.bell24h.com/rfq/${topRFQ.id}` },
+        featuredRFQ: { id: topRFQ.id, title: topRFQ.title, link: `${SITE_URL}/rfq/${topRFQ.id}` },
         suppliers: messages,
       };
     });

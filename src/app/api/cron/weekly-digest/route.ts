@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyCronSecret } from '@/lib/cronAuth';
 import { sendEmail as _sendEmail } from '@/lib/email';
+import { SITE_URL, SITE_HOST } from '@/lib/site-url';
 const resendService = { sendEmail: ({ to, subject, html }: { to: string; subject: string; html: string }) => _sendEmail(to, subject, html) };
 
 export const dynamic = 'force-dynamic';
@@ -54,13 +55,13 @@ export async function GET(request: NextRequest) {
                 <p>This week, <strong>${newRFQs} new RFQ${newRFQs > 1 ? 's' : ''}</strong> were posted${categories.length > 0 ? ` in: ${categories.join(', ')}` : ''}.</p>
                 <p>Browse and submit quotes to grow your business.</p>
                 <p style="text-align:center;">
-                  <a href="https://bell24h.com/supplier/browse-rfqs" style="display:inline-block;background:#2563EB;color:white;padding:12px 28px;text-decoration:none;border-radius:8px;font-weight:bold;">
+                  <a href="${SITE_URL}/supplier/browse-rfqs" style="display:inline-block;background:#2563EB;color:white;padding:12px 28px;text-decoration:none;border-radius:8px;font-weight:bold;">
                     Browse RFQs →
                   </a>
                 </p>
               </div>
               <div style="background:#f1f5f9;padding:16px 24px;text-align:center;color:#64748b;font-size:12px;">
-                Bell24h · Digitex Studio · bell24h.com
+                Bell24h · Digitex Studio · ${SITE_HOST}
               </div>
             </div>
           `,

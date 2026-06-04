@@ -71,12 +71,19 @@ export default function Header() {
     localStorage.removeItem('user');
     sessionStorage.clear();
 
-    // Aggressively clear cookie across all domain variants (fixes mobile Chrome)
+    // Aggressively clear cookie across host + registrable-domain variants,
+    // derived from the CURRENT hostname so logout works on any domain
+    // (bell24h.com today, vyaparsethu.com after cutover). Fixes mobile Chrome.
     const exp = 'expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    const host = window.location.hostname;
     document.cookie = `auth-token=; ${exp}`;
-    document.cookie = `auth-token=; ${exp} domain=bell24h.com;`;
-    document.cookie = `auth-token=; ${exp} domain=.bell24h.com;`;
-    document.cookie = `auth-token=; ${exp} domain=www.bell24h.com;`;
+    if (host !== 'localhost') {
+      const parts = host.split('.');
+      const baseDomain = parts.length > 2 ? parts.slice(-2).join('.') : host;
+      for (const d of [host, baseDomain, `.${baseDomain}`]) {
+        document.cookie = `auth-token=; ${exp} domain=${d};`;
+      }
+    }
 
     setIsLoggedIn(false);
     setUser(null);
