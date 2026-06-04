@@ -456,9 +456,9 @@ export default function LoginPage() {
         <div className="login-card">
           {/* Brand Header */}
           <div className="brand-header">
-            <div className="brand-name">Bell24h</div>
+            <div className="brand-name">VyaparSethu</div>
             <h1 className="welcome-title">Welcome Back</h1>
-            <p className="welcome-subtitle">Sign in with your phone number</p>
+            <p className="welcome-subtitle">Sign in to VyaparSethu</p>
           </div>
 
           {/* Error Message */}
@@ -562,7 +562,7 @@ export default function LoginPage() {
           {/* Sign Up Link */}
           <div className="signup-link">
             <p className="signup-link-text">
-              New to Bell24h?{' '}
+              New to VyaparSethu?{' '}
               <Link href="/auth/phone-email" className="signup-link-button">
                 Create account
               </Link>
