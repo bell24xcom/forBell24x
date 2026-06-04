@@ -21,6 +21,7 @@ export default function CreateRFQPage() {
     minBudget: '',
     maxBudget: '',
     timeline: '',
+    location: '',
     requirements: '',
     urgency: 'normal'
   });
@@ -290,6 +291,22 @@ export default function CreateRFQPage() {
                 </div>
               </div>
               
+              <div>
+                <label htmlFor="location" className="block text-sm font-medium text-slate-300 mb-2">
+                  Delivery Location *
+                </label>
+                <input
+                  id="location"
+                  name="location"
+                  type="text"
+                  required
+                  value={formData.location}
+                  onChange={handleChange}
+                  className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                  placeholder="e.g., Mumbai, Maharashtra"
+                />
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="timeline" className="block text-sm font-medium text-slate-300 mb-2">
