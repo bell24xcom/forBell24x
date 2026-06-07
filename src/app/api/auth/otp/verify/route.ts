@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const rawPhone = body.phone?.toString() || '';
-    const otp = body.otp?.toString() || '';
+    const otp = (body.otp?.toString() || '').trim();
     const phone = normalizePhone(rawPhone);
 
     if (!phone || !otp || otp.length !== 6) {

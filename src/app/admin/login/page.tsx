@@ -81,7 +81,7 @@ export default function AdminLoginPage() {
       if (data.success) {
         setOtpSent(true)
       } else {
-        setError(data.error || 'Failed to send OTP')
+        setError(data.message || data.error || 'Failed to send OTP')
       }
     } catch {
       setError('Failed to send OTP')
@@ -112,7 +112,7 @@ export default function AdminLoginPage() {
           setError('This account does not have admin access.')
         }
       } else {
-        setError(data.error || 'Invalid OTP')
+        setError(data.message || data.error || 'Invalid OTP')
       }
     } catch {
       setError('Verification failed')
