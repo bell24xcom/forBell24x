@@ -94,13 +94,20 @@ export async function POST(request: NextRequest) {
       token,
     });
 
-    response.cookies.set('auth-token', token, {
+    const cookieOpts = {
       httpOnly: true,
       secure:   process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      sameSite: 'lax' as const,
       maxAge:   7 * 24 * 60 * 60,
       path:     '/',
-    });
+    };
+
+    response.cookies.set('auth-token', token, cookieOpts);
+
+    // Middleware gates /admin/* on 'admin-token'; set it for admin users
+    if (user.role === 'ADMIN' || user.role === 'SUPER_ADMIN') {
+      response.cookies.set('admin-token', token, cookieOpts);
+    }
 
     return response;
 
