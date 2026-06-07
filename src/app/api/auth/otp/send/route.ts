@@ -84,10 +84,11 @@ export async function POST(request: NextRequest) {
 }
 
 async function sendViaMSG91(phone: string, otp: string): Promise<{ success: boolean; error?: string }> {
-    const AUTH_KEY  = process.env.MSG91_AUTH_KEY;
-    const WIDGET_ID = process.env.NEXT_PUBLIC_MSG91_WIDGET_ID;
+    const AUTH_KEY   = process.env.MSG91_AUTH_KEY;
+    const TEMPLATE_ID = process.env.MSG91_TEMPLATE_ID;
+    const SENDER_ID  = process.env.MSG91_SENDER_ID;
 
-  if (!AUTH_KEY || !WIDGET_ID) {
+  if (!AUTH_KEY || !TEMPLATE_ID || !SENDER_ID) {
         authLogger.warn('MSG91 credentials not configured — OTP will not be sent via SMS');
         return { success: false, error: 'MSG91 not configured' };
   }
@@ -97,9 +98,10 @@ async function sendViaMSG91(phone: string, otp: string): Promise<{ success: bool
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'authkey': AUTH_KEY },
                 body: JSON.stringify({
-                          widget_id: WIDGET_ID,
+                          template_id: TEMPLATE_ID,
                           mobile: `91${phone}`,
                           authkey: AUTH_KEY,
+                          sender: SENDER_ID,
                           otp,
                 }),
         });
