@@ -90,9 +90,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'RFQ ID and price are required' }, { status: 400 });
     }
 
-    // Validate RFQ exists and is active+public
+    // Validate RFQ exists and is open for quoting (ACTIVE or QUOTED both accept new quotes)
     const rfq = await prisma.rFQ.findFirst({
-      where: { id: rfqId, isPublic: true, status: 'ACTIVE' },
+      where: { id: rfqId, isPublic: true, status: { in: ['ACTIVE', 'QUOTED'] } },
     });
 
     if (!rfq) {

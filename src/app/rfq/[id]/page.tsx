@@ -95,8 +95,8 @@ export default function RFQDetailPage() {
           terms: quoteData.terms,
         }),
       });
-      if (!response.ok) throw new Error('Failed to submit quote');
       const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Failed to submit quote');
       if (data.success) {
         setShowQuoteForm(false);
         setQuoteData({ price: '', quantity: '', timeline: '', description: '', terms: '' });

@@ -57,11 +57,11 @@ export async function POST(request: NextRequest) {
 
       const msg = encodeURIComponent(
         `Namaste! 🙏\n\n` +
-        `Your business "${companyName}" has a verified profile on Bell24h — ` +
-        `India's AI-powered B2B marketplace.\n\n` +
-        `Buyers are searching for your products right now.\n\n` +
+        `Your business "${companyName}" has a verified profile on VyaparSethu — ` +
+        `India's B2B Supplier & Buyer Network.\n\n` +
+        `Verified buyers are searching for your products right now.\n\n` +
         `Claim your FREE profile in 2 minutes:\n${claimLink}\n\n` +
-        `— Team Bell24h`
+        `— Team VyaparSethu\nvyaparsethu.com`
       );
 
       const waLink = phone.length === 10
