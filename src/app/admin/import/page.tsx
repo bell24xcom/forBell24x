@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Papa from 'papaparse';
-import { Upload, AlertTriangle, CheckCircle, Send, FileText } from 'lucide-react';
+import { Upload, AlertTriangle, CheckCircle, Send, FileText, RefreshCw, Zap, Link } from 'lucide-react';
 
 interface ParsedRow { [key: string]: string }
 interface MappedSupplier { company: string; category: string; city: string; state?: string; gstNumber?: string; phone?: string; description?: string }
@@ -42,6 +42,40 @@ export default function ImportSuppliersPage() {
   const [result,    setResult]    = useState<{ imported: number; skipped: number; errors: string[] } | null>(null);
   const [invResult, setInvResult] = useState<{ sent: number } | null>(null);
   const [fileName,  setFileName]  = useState('');
+
+  // ── Pull from bell24h-v2 ──
+  const [v2Url,        setV2Url]        = useState('');
+  const [v2Key,        setV2Key]        = useState('');
+  const [v2Configured, setV2Configured] = useState(false);
+  const [pulling,      setPulling]      = useState(false);
+  const [pullResult,   setPullResult]   = useState<{ imported: number; skipped: number; errors: string[] } | null>(null);
+
+  useEffect(() => {
+    fetch('/api/admin/pull-v2', { credentials: 'include' })
+      .then(r => r.json())
+      .then(d => {
+        if (d.configured) { setV2Configured(true); setV2Url(d.v2Url || ''); }
+      })
+      .catch(() => {});
+  }, []);
+
+  const handlePullV2 = async () => {
+    if (!v2Url.trim()) { alert('Enter the bell24h-v2 URL'); return; }
+    setPulling(true);
+    setPullResult(null);
+    try {
+      const res  = await fetch('/api/admin/pull-v2', {
+        method:  'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ v2Url: v2Url.trim(), apiKey: v2Key.trim() }),
+      });
+      const data = await res.json();
+      if (data.success) setPullResult({ imported: data.imported, skipped: data.skipped, errors: data.errors || [] });
+      else alert(data.error || 'Pull failed');
+    } catch { alert('Network error'); }
+    finally { setPulling(false); }
+  };
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -114,7 +148,101 @@ export default function ImportSuppliersPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-xl font-bold text-white">Import Suppliers</h1>
-        <p className="text-slate-400 text-sm">Bulk upload unclaimed supplier profiles from CSV. Max 500 per import.</p>
+        <p className="text-slate-400 text-sm">Pull directly from bell24h-v2, or upload a CSV file.</p>
+      </div>
+
+      {/* ── Pull from bell24h-v2 (Live Sync) ── */}
+      <div className="bg-indigo-950/40 border border-indigo-700/50 rounded-xl p-5 space-y-4">
+        <div className="flex items-center gap-2">
+          <Zap className="w-5 h-5 text-indigo-400" />
+          <h2 className="text-white font-semibold">Pull from bell24h-v2</h2>
+          {v2Configured && (
+            <span className="text-xs bg-green-900/40 border border-green-700/50 text-green-400 px-2 py-0.5 rounded-full">
+              ✓ Configured
+            </span>
+          )}
+        </div>
+        <p className="text-slate-400 text-sm">
+          Directly import all supplier contacts from bell24h-v2 — no CSV download needed.
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div>
+            <label className="block text-xs text-slate-400 mb-1">bell24h-v2 URL</label>
+            <input
+              type="url"
+              value={v2Url}
+              onChange={e => setV2Url(e.target.value)}
+              placeholder="https://bell24h-v2.vercel.app"
+              className="w-full px-3 py-2 bg-slate-900 border border-slate-700 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-slate-400 mb-1">Export API Key (optional)</label>
+            <input
+              type="password"
+              value={v2Key}
+              onChange={e => setV2Key(e.target.value)}
+              placeholder="EXPORT_API_KEY value"
+              className="w-full px-3 py-2 bg-slate-900 border border-slate-700 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+        </div>
+
+        <button
+          onClick={handlePullV2}
+          disabled={pulling || !v2Url.trim()}
+          className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-700 text-white rounded-lg font-semibold text-sm transition-colors min-h-[44px]"
+        >
+          {pulling ? (
+            <><RefreshCw className="w-4 h-4 animate-spin" /> Pulling contacts…</>
+          ) : (
+            <><Link className="w-4 h-4" /> Pull All Contacts from bell24h-v2</>
+          )}
+        </button>
+
+        {pullResult && (
+          <div className="bg-slate-900/60 border border-slate-700 rounded-xl p-4 space-y-3">
+            <div className="flex items-center gap-2">
+              <CheckCircle className="w-4 h-4 text-green-400" />
+              <span className="text-white font-semibold text-sm">Pull Complete</span>
+            </div>
+            <div className="grid grid-cols-3 gap-3 text-sm">
+              <div className="bg-green-900/20 border border-green-700/40 rounded-lg p-3 text-center">
+                <p className="text-green-400 font-bold text-xl">{pullResult.imported}</p>
+                <p className="text-slate-400 text-xs">Imported</p>
+              </div>
+              <div className="bg-slate-800 border border-slate-700 rounded-lg p-3 text-center">
+                <p className="text-amber-400 font-bold text-xl">{pullResult.skipped}</p>
+                <p className="text-slate-400 text-xs">Skipped (dupes)</p>
+              </div>
+              <div className="bg-red-900/20 border border-red-700/40 rounded-lg p-3 text-center">
+                <p className="text-red-400 font-bold text-xl">{pullResult.errors.length}</p>
+                <p className="text-slate-400 text-xs">Errors</p>
+              </div>
+            </div>
+            {pullResult.errors.length > 0 && (
+              <div className="bg-red-900/20 border border-red-700/40 rounded-lg p-3">
+                {pullResult.errors.map((e, i) => <p key={i} className="text-red-300 text-xs">{e}</p>)}
+              </div>
+            )}
+            {pullResult.imported > 0 && (
+              <p className="text-slate-400 text-xs">
+                Go to <a href="/admin/outreach" className="text-indigo-400 underline">Outreach</a> to send WhatsApp invitations.
+              </p>
+            )}
+          </div>
+        )}
+
+        <p className="text-slate-600 text-xs">
+          Or set <code className="text-slate-400">BELL24H_V2_URL</code> and <code className="text-slate-400">BELL24H_V2_EXPORT_KEY</code> in Vercel env vars to skip entering it here.
+        </p>
+      </div>
+
+      <div className="flex items-center gap-3">
+        <div className="flex-1 border-t border-slate-700" />
+        <span className="text-slate-500 text-xs font-medium">OR UPLOAD CSV MANUALLY</span>
+        <div className="flex-1 border-t border-slate-700" />
       </div>
 
       {/* File Upload */}

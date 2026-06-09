@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VyaparSethu — Marketing Cards</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #F3F4F6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 24px 64px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .page-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .page-logo-mark {
+      width: 36px; height: 36px;
+      background: #F97316;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .page-title {
+      font-size: 28px;
+      font-weight: 900;
+      color: #1C1917;
+      letter-spacing: -0.02em;
+    }
+
+    .page-subtitle {
+      font-size: 14px;
+      color: #9CA3AF;
+      margin-top: 6px;
+      font-weight: 500;
+    }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 40px;
+    }
+
+    .btn {
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      font-family: inherit;
+      transition: opacity 0.15s;
+    }
+    .btn:hover { opacity: 0.88; }
+
+    .btn-primary { background: #F97316; color: #fff; }
+    .btn-outline { background: #fff; color: #374151; border: 1px solid #D1D5DB; }
+
+    /* ─── CARD GRID ─── */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 360px);
+      gap: 28px;
+    }
+
+    /* ─── SINGLE CARD ─── */
+    .card {
+      width: 360px;
+      background: #FFFFFF;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow:
+        0 0 0 1px rgba(0,0,0,0.06),
+        0 4px 16px rgba(0,0,0,0.08),
+        0 1px 4px rgba(0,0,0,0.04);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* ── Header ── */
+    .card-header {
+      padding: 13px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card-header.orange  { background: #F97316; }
+    .card-header.green   { background: #16A34A; }
+    .card-header.indigo  { background: #4F46E5; }
+    .card-header.teal    { background: #0D9488; }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .header-logomark {
+      width: 22px; height: 22px;
+      background: rgba(255,255,255,0.22);
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .header-wordmark {
+      font-size: 14px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.01em;
+    }
+
+    .header-badge {
+      background: rgba(255,255,255,0.22);
+      border: 1px solid rgba(255,255,255,0.32);
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    /* ── Body ── */
+    .card-body {
+      padding: 22px 22px 18px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-hero {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .card-icon {
+      width: 52px; height: 52px;
+      border-radius: 13px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .card-icon.orange { background: #FFF7ED; border: 1px solid #FFEDD5; }
+    .card-icon.green  { background: #F0FDF4; border: 1px solid #DCFCE7; }
+    .card-icon.indigo { background: #EEF2FF; border: 1px solid #E0E7FF; }
+    .card-icon.teal   { background: #F0FDFA; border: 1px solid #CCFBF1; }
+
+    .card-text {}
+
+    .card-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #111827;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      margin-bottom: 5px;
+    }
+
+    .card-desc {
+      font-size: 12px;
+      color: #6B7280;
+      line-height: 1.55;
+      font-weight: 500;
+    }
+
+    /* ── QR Box ── */
+    .qr-box {
+      border-radius: 14px;
+      padding: 16px 16px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .qr-box.orange { background: #FFFBF7; border: 1.5px solid #FED7AA; }
+    .qr-box.green  { background: #F9FFF9; border: 1.5px solid #BBF7D0; }
+    .qr-box.indigo { background: #F9F9FF; border: 1.5px solid #C7D2FE; }
+    .qr-box.teal   { background: #F0FDFA; border: 1.5px solid #99F6E4; }
+
+    .qr-cta {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .qr-cta.orange { color: #EA580C; }
+    .qr-cta.green  { color: #15803D; }
+    .qr-cta.indigo { color: #4338CA; }
+    .qr-cta.teal   { color: #0F766E; }
+
+    .qr-image-wrap {
+      background: #fff;
+      border-radius: 10px;
+      padding: 8px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+    }
+
+    .qr-image {
+      width: 190px;
+      height: 190px;
+      display: block;
+      border-radius: 4px;
+    }
+
+    .qr-url {
+      margin-top: 9px;
+      font-size: 10.5px;
+      color: #9CA3AF;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+    }
+
+    /* ── Benefits ── */
+    .benefits {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      flex: 1;
+    }
+
+    .benefit {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #374151;
+      font-weight: 500;
+      line-height: 1.4;
+    }
+
+    .benefit-dot {
+      width: 17px; height: 17px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .benefit-dot.orange { background: #F97316; }
+    .benefit-dot.green  { background: #16A34A; }
+    .benefit-dot.indigo { background: #4F46E5; }
+    .benefit-dot.teal   { background: #0D9488; }
+
+    /* ── Footer ── */
+    .card-footer {
+      background: #1C1917;
+      padding: 11px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-left {}
+
+    .footer-domain {
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+
+    .footer-domain.orange { color: #F97316; }
+    .footer-domain.green  { color: #4ADE80; }
+    .footer-domain.indigo { color: #818CF8; }
+    .footer-domain.teal   { color: #2DD4BF; }
+
+    .footer-tagline {
+      font-size: 9.5px;
+      color: #57534E;
+      margin-top: 1px;
+      font-weight: 500;
+    }
+
+    .footer-seal {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 4px 9px;
+      border-radius: 20px;
+    }
+
+    .seal-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #4ADE80;
+      animation: pulse-dot 2s infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.4; }
+    }
+
+    .seal-text {
+      font-size: 9px;
+      font-weight: 700;
+      color: #D6D3D1;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    /* ─── PRINT ─── */
+    @media print {
+      body {
+        background: #fff;
+        padding: 6mm;
+        display: block;
+      }
+      .page-header, .controls { display: none; }
+      .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6mm;
+        width: 210mm;
+      }
+      .card {
+        width: 100%;
+        border-radius: 5mm;
+        box-shadow: 0 0 0 0.3mm #E5E7EB;
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+      .qr-image { width: 160px; height: 160px; }
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 780px) {
+      .cards-grid {
+        grid-template-columns: 1fr;
+      }
+      .card { width: 100%; max-width: 360px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="page-header">
+    <div class="page-logo">
+      <div class="page-logo-mark">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M12 3L3 9L3 21H9V15H15V21H21V9L12 3Z" fill="white" opacity="0.9"/>
+        </svg>
+      </div>
+      <span style="font-size:20px;font-weight:900;color:#1C1917;letter-spacing:-0.02em;">VyaparSethu</span>
+    </div>
+    <div class="page-subtitle">Marketing Acquisition Cards · Phase 1 · June 2026</div>
+  </div>
+
+  <div class="controls">
+    <button class="btn btn-primary" onclick="window.print()">Print All 4 Cards</button>
+    <button class="btn btn-outline" onclick="document.querySelectorAll('.card').forEach(c=>c.style.pageBreakAfter='always')">Prepare for Export</button>
+  </div>
+
+  <div class="cards-grid">
+
+    <!-- ═══════════════════════════════════════ -->
+    <!--  CARD 1 — WhatsApp Supplier Connect    -->
+    <!-- ═══════════════════════════════════════ -->
+    <div class="card">
+
+      <div class="card-header orange">
+        <div class="header-brand">
+          <div class="header-logomark">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+              <path d="M12 3L3 9V21H9V15H15V21H21V9L12 3Z" fill="white"/>
+            </svg>
+          </div>
+          <span class="header-wordmark">VyaparSethu</span>
+        </div>
+        <span class="header-badge">Supplier</span>
+      </div>
+
+      <div class="card-body">
+
+        <div class="card-hero">
+          <div class="card-icon orange">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+              <path d="M20.52 3.48A11.49 11.49 0 0 0 3.48 20.52L2 22l1.48-.48A11.5 11.5 0 1 0 20.52 3.48ZM12 20.5a8.5 8.5 0 1 1 0-17 8.5 8.5 0 0 1 0 17Z" fill="#F97316" opacity="0.25"/>
+              <path d="M17.5 13.8c-.25-.12-1.47-.72-1.7-.8-.23-.08-.4-.12-.57.12-.17.25-.66.8-.8.96-.15.17-.3.19-.55.06-.25-.12-1.05-.39-2-1.23-.74-.66-1.24-1.47-1.38-1.72-.15-.25-.02-.38.11-.5.12-.12.25-.3.37-.46.13-.15.17-.25.25-.42.08-.17.04-.31-.02-.44-.06-.12-.57-1.37-.78-1.88-.2-.49-.41-.42-.57-.43h-.49c-.17 0-.44.06-.67.31S8.5 8.5 8.5 9.63s.77 2.07.88 2.22c.12.15 1.52 2.32 3.68 3.25.51.22.91.35 1.22.45.51.16.98.14 1.35.08.41-.06 1.27-.52 1.45-1.02.18-.5.18-.93.13-1.02-.06-.1-.22-.15-.47-.27Z" fill="#F97316"/>
+            </svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">WhatsApp<br>Supplier Connect</div>
+            <div class="card-desc">Register as a Verified Supplier in minutes. Direct onboarding via WhatsApp.</div>
+          </div>
+        </div>
+
+        <div class="qr-box orange">
+          <div class="qr-cta orange">📱 Scan to Connect Instantly</div>
+          <div class="qr-image-wrap">
+            <img class="qr-image"
+              src="https://api.qrserver.com/v1/create-qr-code/?size=380x380&data=https%3A%2F%2Fwa.me%2F919004962871%3Ftext%3DHi%2C%2520I%2520want%2520to%2520join%2520VyaparSethu%2520as%2520a%2520Verified%2520Supplier&color=111827&bgcolor=FFFFFF&format=png&ecc=M&margin=1"
+              alt="WhatsApp QR — VyaparSethu Supplier Connect"
+              loading="eager">
+          </div>
+          <div class="qr-url">wa.me/919004962871</div>
+        </div>
+
+        <ul class="benefits">
+          <li class="benefit">
+            <div class="benefit-dot orange">
+              <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.5 6L8 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            Chat directly with our supplier onboarding team
+          </li>
+          <li class="benefit">
+            <div class="benefit-dot orange">
+              <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.5 6L8 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            GST Verification + Trade Confidence Score™
+          </li>
+          <li class="benefit">
+            <div class="benefit-dot orange">
+              <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.5 6L8 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            Start receiving buyer requirements same day
+          </li>
+        </ul>
+
+      </div>
+
+      <div class="card-footer">
+        <div class="footer-left">
+          <div class="footer-domain orange">vyaparsethu.com</div>
+          <div class="footer-tagline">India's B2B Supplier & Buyer Network</div>
+        </div>
+        <div class="footer-seal">
+          <div class="seal-dot"></div>
+          <span class="seal-text">Live</span>
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- ═══════════════════════════════════════ -->
+    <!--  CARD 2 — Supplier Registration        -->
+    <!-- ═══════════════════════════════════════ -->
+    <div class="card">
+
+      <div class="card-header green">
+        <div class="header-brand">
+          <div class="header-logomark">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+              <path d="M12 3L3 9V21H9V15H15V21H21V9L12 3Z" fill="white"/>
+            </svg>
+          </div>
+          <span class="header-wordmark">VyaparSethu</span>
+        </div>
+        <span class="header-badge">Register Free</span>
+      </div>
+
+      <div class="card-body">
+
+        <div class="card-hero">
+          <div class="card-icon green">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+              <rect x="2" y="11" width="20" height="10" rx="2" fill="#16A34A" opacity="0.15" stroke="#16A34A" stroke-width="1.4"/>
+              <path d="M5 11V8a7 7 0 0 1 14 0v3" stroke="#16A34A" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+              <rect x="9" y="14.5" width="6" height="3.5" rx="1" fill="#16A34A" opacity="0.6"/>
+              <path d="M7 7.5h10" stroke="#16A34A" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
+            </svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Supplier<br>Registration</div>
+            <div class="card-desc">Claim your verified profile. Get matched with buyers who need exactly what you supply.</div>
+          </div>
+        </div>
+
+        <div class="qr-box green">
+          <div class="qr-cta green">🏭 Scan to Register Your Business</div>
+          <div class="qr-image-wrap">
+            <img class="qr-image"
+              src="https://api.qrserver.com/v1/create-qr-code/?size=380x380&data=https%3A%2F%2Fvyaparsethu.com%2Fsupplier%2Fregistration&color=111827&bgcolor=FFFFFF&format=png&ecc=M&margin=1"
+              alt="Supplier Registration QR — VyaparSethu"
+              loading="eager">
+          </div>
+          <div class="qr-url">vyaparsethu.com/supplier/registration</div>
+        </div>
+
+        <ul class="benefits">
+          <li class="benefit">
+            <div class="benefit-dot green">
+              <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.5 6L8 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            Free to register — no listing fee, no commission
+          </li>
+          <li class="benefit">
+            <div class="benefit-dot green">
+              <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.5 6L8 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            Matched with verified buyers in your category
+          </li>
+          <li class="benefit">
+            <div class="benefit-dot green">
+              <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.5 6L8 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            Build your Trade Confidence Score™ over time
+          </li>
+        </ul>
+
+      </div>
+
+      <div class="card-footer">
+        <div class="footer-left">
+          <div class="footer-domain green">vyaparsethu.com</div>
+          <div class="footer-tagline">Verified Matching · Protected Payments</div>
+        </div>
+        <div class="footer-seal">
+          <div class="seal-dot"></div>
+          <span class="seal-text">Live</span>
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- ═══════════════════════════════════════ -->
+    <!--  CARD 3 — Buyer RFQ Submission         -->
+    <!-- ═══════════════════════════════════════ -->
+    <div class="card">
+
+      <div class="card-header indigo">
+        <div class="header-brand">
+          <div class="header-logomark">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+              <path d="M12 3L3 9V21H9V15H15V21H21V9L12 3Z" fill="white"/>
+            </svg>
+          </div>
+          <span class="header-wordmark">VyaparSethu</span>
+        </div>
+        <span class="header-badge">Buyers</span>
+      </div>
+
+      <div class="card-body">
+
+        <div class="card-hero">
+          <div class="card-icon indigo">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+              <rect x="4" y="2" width="14" height="18" rx="2" fill="#4F46E5" opacity="0.12" stroke="#4F46E5" stroke-width="1.4"/>
+              <path d="M8 7h6M8 10h6M8 13h4" stroke="#4F46E5" stroke-width="1.5" stroke-linecap="round"/>
+              <circle cx="18" cy="18" r="4" fill="#4F46E5" opacity="0.9"/>
+              <path d="M16.5 18l1 1 2-2" stroke="white" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Post a<br>Requirement</div>
+            <div class="card-desc">Describe what you need. Get competitive quotes from 5+ verified suppliers within 24 hours.</div>
+          </div>
+        </div>
+
+        <div class="qr-box indigo">
+          <div class="qr-cta indigo">📋 Scan to Post Your Requirement</div>
+          <div class="qr-image-wrap">
+            <img class="qr-image"
+              src="https://api.qrserver.com/v1/create-qr-code/?size=380x380&data=https%3A%2F%2Fvyaparsethu.com%2Frfq%2Fnew&color=111827&bgcolor=FFFFFF&format=png&ecc=M&margin=1"
+              alt="Post Requirement QR — VyaparSethu"
+              loading="eager">
+          </div>
+          <div class="qr-url">vyaparsethu.com/rfq/new</div>
+        </div>
+
+        <ul class="benefits">
+          <li class="benefit">
+            <div class="benefit-dot indigo">
+              <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.5 6L8 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            Compare quotes — no more phone-call guessing
+          </li>
+          <li class="benefit">
+            <div class="benefit-dot indigo">
+              <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.5 6L8 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            Protected Payment — money held until you confirm
+          </li>
+          <li class="benefit">
+            <div class="benefit-dot indigo">
+              <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.5 6L8 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            Requirement → Quote → Order in 48 hours
+          </li>
+        </ul>
+
+      </div>
+
+      <div class="card-footer">
+        <div class="footer-left">
+          <div class="footer-domain indigo">vyaparsethu.com</div>
+          <div class="footer-tagline">Quote in 24h · Order in 48h · Settle in 7d</div>
+        </div>
+        <div class="footer-seal">
+          <div class="seal-dot"></div>
+          <span class="seal-text">Live</span>
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- ═══════════════════════════════════════ -->
+    <!--  CARD 4 — Voice Requirement            -->
+    <!-- ═══════════════════════════════════════ -->
+    <div class="card">
+
+      <div class="card-header teal">
+        <div class="header-brand">
+          <div class="header-logomark">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+              <path d="M12 3L3 9V21H9V15H15V21H21V9L12 3Z" fill="white"/>
+            </svg>
+          </div>
+          <span class="header-wordmark">VyaparSethu</span>
+        </div>
+        <span class="header-badge">AI Powered</span>
+      </div>
+
+      <div class="card-body">
+
+        <div class="card-hero">
+          <div class="card-icon teal">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+              <rect x="9" y="2" width="6" height="12" rx="3" fill="#0D9488" opacity="0.2" stroke="#0D9488" stroke-width="1.4"/>
+              <path d="M5 11a7 7 0 0 0 14 0" stroke="#0D9488" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+              <path d="M12 18v3M9 21h6" stroke="#0D9488" stroke-width="1.5" stroke-linecap="round"/>
+              <circle cx="12" cy="8" r="2" fill="#0D9488" opacity="0.5"/>
+            </svg>
+          </div>
+          <div class="card-text">
+            <div class="card-title">Speak Your<br>Requirement</div>
+            <div class="card-desc">No typing. Just speak in Hindi or English — AI creates your sourcing request instantly.</div>
+          </div>
+        </div>
+
+        <div class="qr-box teal">
+          <div class="qr-cta teal">🎙️ Scan · Speak · Source</div>
+          <div class="qr-image-wrap">
+            <img class="qr-image"
+              src="https://api.qrserver.com/v1/create-qr-code/?size=380x380&data=https%3A%2F%2Fvyaparsethu.com%2Frfq%2Fvoice&color=111827&bgcolor=FFFFFF&format=png&ecc=M&margin=1"
+              alt="Voice Requirement QR — VyaparSethu"
+              loading="eager">
+          </div>
+          <div class="qr-url">vyaparsethu.com/rfq/voice</div>
+        </div>
+
+        <ul class="benefits">
+          <li class="benefit">
+            <div class="benefit-dot teal">
+              <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.5 6L8 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            Works in Hindi, English &amp; Hinglish
+          </li>
+          <li class="benefit">
+            <div class="benefit-dot teal">
+              <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.5 6L8 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            AI extracts product, quantity &amp; budget automatically
+          </li>
+          <li class="benefit">
+            <div class="benefit-dot teal">
+              <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.5 6L8 1" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            Ready to send to suppliers in under 30 seconds
+          </li>
+        </ul>
+
+      </div>
+
+      <div class="card-footer">
+        <div class="footer-left">
+          <div class="footer-domain teal">vyaparsethu.com</div>
+          <div class="footer-tagline">Commerce Connections Globally</div>
+        </div>
+        <div class="footer-seal">
+          <div class="seal-dot"></div>
+          <span class="seal-text">Live</span>
+        </div>
+      </div>
+
+    </div>
+
+  </div><!-- /cards-grid -->
+
+  <div style="margin-top:56px;padding:20px;background:#fff;border-radius:12px;box-shadow:0 1px 6px rgba(0,0,0,0.07);max-width:752px;width:100%;">
+    <div style="font-size:12px;font-weight:700;color:#6B7280;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:12px;">Next 4 Cards — Queue</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
+      <div style="padding:12px;background:#F9FAFB;border-radius:8px;border:1px solid #E5E7EB;">
+        <div style="font-size:18px;margin-bottom:6px;">🏆</div>
+        <div style="font-size:11px;font-weight:700;color:#374151;">Why Choose<br>VyaparSethu</div>
+      </div>
+      <div style="padding:12px;background:#F9FAFB;border-radius:8px;border:1px solid #E5E7EB;">
+        <div style="font-size:18px;margin-bottom:6px;">📱</div>
+        <div style="font-size:11px;font-weight:700;color:#374151;">Mobile App<br>Download</div>
+      </div>
+      <div style="padding:12px;background:#F9FAFB;border-radius:8px;border:1px solid #E5E7EB;">
+        <div style="font-size:18px;margin-bottom:6px;">✅</div>
+        <div style="font-size:11px;font-weight:700;color:#374151;">Supplier<br>Verification</div>
+      </div>
+      <div style="padding:12px;background:#F9FAFB;border-radius:8px;border:1px solid #E5E7EB;">
+        <div style="font-size:18px;margin-bottom:6px;">💬</div>
+        <div style="font-size:11px;font-weight:700;color:#374151;">WhatsApp<br>Business Support</div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
