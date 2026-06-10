@@ -19,6 +19,18 @@ const RFQ_TYPE_ICONS = {
   text:  <FileText size={18} className="text-slate-500" />,
 };
 
+const QUOTE_STATUS_LABEL: Record<string, string> = {
+  PENDING:  'Under Review',
+  ACCEPTED: 'Accepted',
+  REJECTED: 'Not Selected',
+};
+
+const QUOTE_STATUS_STYLE: Record<string, string> = {
+  PENDING:  'bg-amber-100 text-amber-800 border-amber-200',
+  ACCEPTED: 'bg-green-100 text-green-800 border-green-200',
+  REJECTED: 'bg-slate-100 text-slate-600 border-slate-200',
+};
+
 export default function RFQDetailPage() {
   const [rfq, setRFQ] = useState<any>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -33,6 +45,8 @@ export default function RFQDetailPage() {
     terms: '',
   });
   const [error, setError] = useState('');
+  const [existingQuote, setExistingQuote] = useState<any>(null);
+  const [existingQuoteLoading, setExistingQuoteLoading] = useState(false);
   // Buyer quotes state
   const [quotes, setQuotes] = useState<any[]>([]);
   const [quotesLoading, setQuotesLoading] = useState(false);
@@ -96,7 +110,17 @@ export default function RFQDetailPage() {
         }),
       });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Failed to submit quote');
+      if (!response.ok) {
+        if (data.error === 'You have already quoted on this RFQ') {
+          setShowQuoteForm(false);
+          fetch(`/api/supplier/quotes?rfqId=${rfq.id}&limit=1`, { credentials: 'include' })
+            .then(r => r.json())
+            .then(d => { if (d.quotes?.length > 0) setExistingQuote(d.quotes[0]); })
+            .catch(() => {});
+          return;
+        }
+        throw new Error(data.error || 'Failed to submit quote');
+      }
       if (data.success) {
         setShowQuoteForm(false);
         setQuoteData({ price: '', quantity: '', timeline: '', description: '', terms: '' });
@@ -134,6 +158,18 @@ export default function RFQDetailPage() {
         .finally(() => setQuotesLoading(false));
     }
   }, [rfq, user]);
+
+  // Check if logged-in supplier already submitted a quote for this RFQ
+  useEffect(() => {
+    if (!rfq || !authChecked || !isLoggedIn || !user) return;
+    if (rfq.createdBy === user.id) return; // owner — no need to check
+    setExistingQuoteLoading(true);
+    fetch(`/api/supplier/quotes?rfqId=${rfq.id}&limit=1`, { credentials: 'include' })
+      .then(r => r.json())
+      .then(d => { if (d.quotes?.length > 0) setExistingQuote(d.quotes[0]); })
+      .catch(() => {})
+      .finally(() => setExistingQuoteLoading(false));
+  }, [rfq?.id, authChecked, isLoggedIn, user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleAcceptQuote = async (quoteId: string) => {
     if (!confirm('Accept this quote and create a deal?')) return;
@@ -376,19 +412,50 @@ export default function RFQDetailPage() {
           )}
 
         {/* Sticky CTA Bar */}
-          <div className="px-6 py-4 bg-slate-800/80 border-t border-slate-700/50 md:static fixed-bottom-bar md:border-t md:border-slate-700/50 md:rounded-b-2xl">
-            <div className="flex items-center justify-between gap-4">
-              <div className="hidden md:block text-sm text-slate-400">
-                {isLoggedIn ? 'Ready to submit your quote' : 'Login to submit a quote'}
+          {existingQuote ? (
+            <div className="px-6 py-5 bg-green-900/20 border-t border-green-700/30 md:rounded-b-2xl">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <CheckCircle size={16} className="text-green-400 flex-shrink-0" />
+                    <p className="text-green-300 font-semibold text-sm">Quote Submitted</p>
+                  </div>
+                  <p className="text-white text-sm">
+                    {"You've already quoted on this Requirement. Your quote of "}
+                    <span className="font-bold text-indigo-300">
+                      ₹{Number(existingQuote.price).toLocaleString('en-IN')}
+                    </span>
+                    {' is '}
+                    <span className={`font-semibold ${existingQuote.status === 'ACCEPTED' ? 'text-green-300' : existingQuote.status === 'REJECTED' ? 'text-red-300' : 'text-amber-300'}`}>
+                      {QUOTE_STATUS_LABEL[existingQuote.status] || existingQuote.status}
+                    </span>
+                    .
+                  </p>
+                  <p className="text-slate-400 text-xs mt-1.5">
+                    Submitted {new Date(existingQuote.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                  </p>
+                </div>
+                <span className={`flex-shrink-0 px-3 py-1.5 rounded-full text-sm font-semibold border ${QUOTE_STATUS_STYLE[existingQuote.status] || 'bg-slate-100 text-slate-600 border-slate-200'}`}>
+                  {QUOTE_STATUS_LABEL[existingQuote.status] || existingQuote.status}
+                </span>
               </div>
-              <button
-                onClick={handleQuote}
-                className="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-semibold px-8 py-3 rounded-xl transition-all shadow-lg shadow-indigo-600/25 hover:shadow-indigo-600/40 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-              >
-                {isLoggedIn ? 'Submit Your Quote' : 'Login to Quote'}
-              </button>
             </div>
-          </div>
+          ) : (
+            <div className="px-6 py-4 bg-slate-800/80 border-t border-slate-700/50 md:static fixed-bottom-bar md:border-t md:border-slate-700/50 md:rounded-b-2xl">
+              <div className="flex items-center justify-between gap-4">
+                <div className="hidden md:block text-sm text-slate-400">
+                  {isLoggedIn ? 'Ready to submit your quote' : 'Login to submit a quote'}
+                </div>
+                <button
+                  onClick={handleQuote}
+                  disabled={isLoggedIn && existingQuoteLoading}
+                  className="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-semibold px-8 py-3 rounded-xl transition-all shadow-lg shadow-indigo-600/25 hover:shadow-indigo-600/40 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                >
+                  {isLoggedIn && existingQuoteLoading ? 'Checking...' : isLoggedIn ? 'Submit Your Quote' : 'Login to Quote'}
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Quote Form Modal */}
@@ -516,12 +583,25 @@ export default function RFQDetailPage() {
 
       {/* Mobile sticky CTA overlay */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-slate-900 border-t border-slate-700/50 p-4 shadow-lg z-40">
-        <button
-          onClick={handleQuote}
-          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-xl transition-colors shadow-lg"
-        >
-          {isLoggedIn ? 'Submit Your Quote' : 'Login to Quote'}
-        </button>
+        {existingQuote ? (
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-xs text-slate-400 mb-0.5">Your Quote</p>
+              <p className="text-white font-bold text-lg">₹{Number(existingQuote.price).toLocaleString('en-IN')}</p>
+            </div>
+            <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${QUOTE_STATUS_STYLE[existingQuote.status] || 'bg-slate-100 text-slate-600 border-slate-200'}`}>
+              {QUOTE_STATUS_LABEL[existingQuote.status] || existingQuote.status}
+            </span>
+          </div>
+        ) : (
+          <button
+            onClick={handleQuote}
+            disabled={isLoggedIn && existingQuoteLoading}
+            className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-bold py-4 rounded-xl transition-colors shadow-lg"
+          >
+            {isLoggedIn && existingQuoteLoading ? 'Checking...' : isLoggedIn ? 'Submit Your Quote' : 'Login to Quote'}
+          </button>
+        )}
       </div>
     </div>
   );

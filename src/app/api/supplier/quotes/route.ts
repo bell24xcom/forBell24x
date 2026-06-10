@@ -16,11 +16,13 @@ export async function GET(request: NextRequest) {
     }
 
     const status = request.nextUrl.searchParams.get('status');
+    const rfqId = request.nextUrl.searchParams.get('rfqId');
     const page = parseInt(request.nextUrl.searchParams.get('page') || '1');
     const limit = parseInt(request.nextUrl.searchParams.get('limit') || '20');
 
     const where: any = { supplierId: user.userId };
     if (status) where.status = status;
+    if (rfqId) where.rfqId = rfqId;
 
     const [quotes, total] = await Promise.all([
       prisma.quote.findMany({
