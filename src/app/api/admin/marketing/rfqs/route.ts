@@ -1,33 +1,44 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  const INSFORGE_URL = process.env.INSFORGE_URL;
+  const INSFORGE_URL     = process.env.INSFORGE_URL;
   const INSFORGE_API_KEY = process.env.INSFORGE_API_KEY;
 
   if (!INSFORGE_URL || !INSFORGE_API_KEY) {
-    return NextResponse.json({ error: 'InsForge configuration missing' }, { status: 500 });
+    return NextResponse.json({ rfqs: [], serviceDegraded: true, reason: 'InsForge not configured' });
   }
 
   try {
     const response = await fetch(`${INSFORGE_URL}/rest/v1/rfqs?order=created_at.desc`, {
       method: 'GET',
       headers: {
-        'apikey': INSFORGE_API_KEY,
-        'Authorization': `Bearer ${INSFORGE_API_KEY}`,
-        'Content-Type': 'application/json'
-      }
+        apikey:          INSFORGE_API_KEY,
+        Authorization:   `Bearer ${INSFORGE_API_KEY}`,
+        'Content-Type':  'application/json',
+      },
+      signal: AbortSignal.timeout(5000),
     });
 
     if (!response.ok) {
-      throw new Error(`InsForge API returned ${response.status}`);
+      console.warn(`[Admin RFQ Fetch] InsForge returned ${response.status}`);
+      return NextResponse.json({
+        rfqs: [],
+        serviceDegraded: true,
+        reason: `InsForge returned ${response.status}`,
+      });
     }
 
     const rfqs = await response.json();
-    return NextResponse.json(rfqs);
+    return NextResponse.json(Array.isArray(rfqs) ? rfqs : []);
   } catch (error: any) {
-    console.error('[Admin RFQ Fetch] Error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    const isTimeout = error?.name === 'TimeoutError' || error?.name === 'AbortError';
+    console.error('[Admin RFQ Fetch]', error?.message);
+    return NextResponse.json({
+      rfqs: [],
+      serviceDegraded: true,
+      reason: isTimeout ? 'InsForge timed out (5s)' : error?.message,
+    });
   }
 }

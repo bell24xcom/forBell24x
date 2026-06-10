@@ -47,6 +47,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const body      = await req.json().catch(() => ({}));
+    const dryRun    = body.dryRun === true || req.nextUrl.searchParams.get('dryRun') === 'true';
     const requested = Math.min(Math.max(1, Number(body.count) || DAILY_LIMIT), DAILY_LIMIT);
 
     // ── Daily cap check (IST) ──
@@ -55,7 +56,7 @@ export async function POST(req: NextRequest) {
       where: { role: 'SUPPLIER', lastOutreachAt: { gte: todayStart } },
     });
 
-    if (sentToday >= DAILY_LIMIT) {
+    if (!dryRun && sentToday >= DAILY_LIMIT) {
       return NextResponse.json({
         success: false,
         limitReached: true,
@@ -65,7 +66,7 @@ export async function POST(req: NextRequest) {
       }, { status: 429 });
     }
 
-    const canSend = Math.min(requested, DAILY_LIMIT - sentToday);
+    const canSend = dryRun ? requested : Math.min(requested, DAILY_LIMIT - sentToday);
 
     // ── Fetch eligible suppliers ──
     const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
@@ -119,21 +120,23 @@ export async function POST(req: NextRequest) {
       const rawPhone    = (s.phone || '').replace(/\D/g, '').slice(-10);
       const companyName = s.company || s.name || 'Your Business';
 
-      // Mark as contacted (do this before API call so partial failures are still tracked)
-      await prisma.user.update({
-        where: { id: s.id },
-        data: {
-          claimToken:    token,
-          claimSentAt:   new Date(),
-          outreachCount: { increment: 1 },
-          lastOutreachAt: new Date(),
-        },
-      });
+      // In dry-run mode: skip DB writes and API calls entirely
+      if (!dryRun) {
+        await prisma.user.update({
+          where: { id: s.id },
+          data: {
+            claimToken:     token,
+            claimSentAt:    new Date(),
+            outreachCount:  { increment: 1 },
+            lastOutreachAt: new Date(),
+          },
+        });
+      }
 
       let thisSentViaApi = false;
 
-      // ── Try MSG91 WhatsApp API ──
-      if (useApi && rawPhone.length === 10) {
+      // ── Try MSG91 WhatsApp API (skip in dry-run) ──
+      if (!dryRun && useApi && rawPhone.length === 10) {
         try {
           const res = await fetch(
             'https://api.msg91.com/api/v5/whatsapp/whatsapp-outbound-message/',
@@ -168,6 +171,8 @@ export async function POST(req: NextRequest) {
         } catch {
           apiFailed++;
         }
+      } else if (dryRun && useApi) {
+        console.log(`[bulk-wa dry-run] would send WA to 91${rawPhone} for ${companyName}`);
       }
 
       // Always generate wa.me link as fallback / confirmation
@@ -190,14 +195,16 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      sent:      results.length,
-      apiSent,
-      apiFailed,
+      dryRun,
+      sent:      dryRun ? 0 : results.length,
+      apiSent:   dryRun ? 0 : apiSent,
+      apiFailed: dryRun ? 0 : apiFailed,
       useApi,
-      sentToday: sentToday + results.length,
+      sentToday: dryRun ? sentToday : sentToday + results.length,
       dailyLimit: DAILY_LIMIT,
-      remaining: Math.max(0, DAILY_LIMIT - sentToday - results.length),
+      remaining: Math.max(0, DAILY_LIMIT - sentToday - (dryRun ? 0 : results.length)),
       suppliers: results,
+      ...(dryRun && { message: `Dry-run: ${results.length} message(s) previewed, nothing sent or recorded.` }),
     });
   } catch (error) {
     console.error('[bulk-wa]', error);

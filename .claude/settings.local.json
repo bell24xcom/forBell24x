@@ -62,7 +62,22 @@
       "Bash(rm:*)",
       "Bash(do:*)",
       "Bash(echo:*)",
-      "Bash(cd \"C:/Users/Sanika/Projects/bell24h\" && echo \"--- PENDING ITEMS ---\" && ls src/app/claim 2>/dev/null && echo \"claim dir exists\" || echo \"claim dir MISSING\"\nls \"src/app/claim/[token]/page.tsx\" 2>/dev/null && echo \"claim page EXISTS\" || echo \"claim page MISSING\"\nls src/app/api/admin/outreach/daily-batch/route.ts 2>/dev/null && echo \"outreach batch EXISTS\" || echo \"outreach batch MISSING\"\nls src/app/api/payment/subscribe/route.ts 2>/dev/null && echo \"payment subscribe EXISTS\" || echo \"payment subscribe MISSING\"\ngrep \"claimToken\" prisma/schema.prisma 2>/dev/null && echo \"claimToken in schema\" || echo \"claimToken NOT in schema\"\ngrep \"isClaimed\" prisma/schema.prisma 2>/dev/null | head -3\ngrep -c \"wa.me\\\\|whatsapp\\\\|WhatsApp\" src/app/admin/outreach/page.tsx 2>/dev/null && echo \"WA links in outreach page\" || echo \"NO WA links in outreach\")"
+      "Bash(cd \"C:/Users/Sanika/Projects/bell24h\" && echo \"--- PENDING ITEMS ---\" && ls src/app/claim 2>/dev/null && echo \"claim dir exists\" || echo \"claim dir MISSING\"\nls \"src/app/claim/[token]/page.tsx\" 2>/dev/null && echo \"claim page EXISTS\" || echo \"claim page MISSING\"\nls src/app/api/admin/outreach/daily-batch/route.ts 2>/dev/null && echo \"outreach batch EXISTS\" || echo \"outreach batch MISSING\"\nls src/app/api/payment/subscribe/route.ts 2>/dev/null && echo \"payment subscribe EXISTS\" || echo \"payment subscribe MISSING\"\ngrep \"claimToken\" prisma/schema.prisma 2>/dev/null && echo \"claimToken in schema\" || echo \"claimToken NOT in schema\"\ngrep \"isClaimed\" prisma/schema.prisma 2>/dev/null | head -3\ngrep -c \"wa.me\\\\|whatsapp\\\\|WhatsApp\" src/app/admin/outreach/page.tsx 2>/dev/null && echo \"WA links in outreach page\" || echo \"NO WA links in outreach\")",
+      "PowerShell(git *)",
+      "Bash(npm run *)",
+      "Bash(git checkout *)",
+      "Bash(ls lib/prisma.*)",
+      "Bash(ls src/lib/prisma.*)",
+      "Bash(ls -d lib)",
+      "Bash(git rm *)",
+      "Bash(git merge *)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Sanika\\\\Projects\\\\bell24h\\\\src\\\\app\\\\admin\" -Recurse -Directory)",
+      "Bash(Select-Object FullName)",
+      "PowerShell(New-Item *)",
+      "WebFetch(domain:bell24h-v2.vercel.app)",
+      "PowerShell(gh repo *)",
+      "PowerShell(gh api *)",
+      "PowerShell(cd C:\\\\Users\\\\Sanika\\\\Projects\\\\bell24h; $env:NODE_OPTIONS = \"--max-old-space-size=4096\"; npx tsc --noEmit --skipLibCheck --isolatedModules \"src/app/rfq/[id]/page.tsx\" \"src/app/api/supplier/quotes/route.ts\" 2>&1 | Select-Object -First 30)"
     ]
   },
   "enableAllProjectMcpServers": true,

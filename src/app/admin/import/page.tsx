@@ -48,21 +48,25 @@ export default function ImportSuppliersPage() {
   const [v2Key,        setV2Key]        = useState('');
   const [v2Configured, setV2Configured] = useState(false);
   const [pulling,      setPulling]      = useState(false);
-  const [pullResult,   setPullResult]   = useState<{ imported: number; skipped: number; errors: string[] } | null>(null);
+  const [pullError,    setPullError]    = useState('');
+  const [pullResult,   setPullResult]   = useState<{ imported: number; skipped: number; errors: string[]; rowCount?: number } | null>(null);
 
   useEffect(() => {
     fetch('/api/admin/pull-v2', { credentials: 'include' })
       .then(r => r.json())
       .then(d => {
-        if (d.configured) { setV2Configured(true); setV2Url(d.v2Url || ''); }
+        setV2Configured(!!d.configured);
+        if (d.v2Url) setV2Url(d.v2Url);
       })
       .catch(() => {});
   }, []);
 
   const handlePullV2 = async () => {
-    if (!v2Url.trim()) { alert('Enter the bell24h-v2 URL'); return; }
+    if (!v2Url.trim()) { setPullError('Enter the bell24h-v2 URL'); return; }
+    if (!v2Key.trim()) { setPullError('Enter the Export API Key (BELL24H_V2_EXPORT_KEY / bell24h-v2 ADMIN_API_KEY)'); return; }
     setPulling(true);
     setPullResult(null);
+    setPullError('');
     try {
       const res  = await fetch('/api/admin/pull-v2', {
         method:  'POST',
@@ -71,9 +75,12 @@ export default function ImportSuppliersPage() {
         body:    JSON.stringify({ v2Url: v2Url.trim(), apiKey: v2Key.trim() }),
       });
       const data = await res.json();
-      if (data.success) setPullResult({ imported: data.imported, skipped: data.skipped, errors: data.errors || [] });
-      else alert(data.error || 'Pull failed');
-    } catch { alert('Network error'); }
+      if (data.success) {
+        setPullResult({ imported: data.imported, skipped: data.skipped, errors: data.errors || [], rowCount: data.rowCount });
+      } else {
+        setPullError(data.error || 'Pull failed');
+      }
+    } catch { setPullError('Network error — could not reach /api/admin/pull-v2'); }
     finally { setPulling(false); }
   };
 
@@ -178,12 +185,15 @@ export default function ImportSuppliersPage() {
             />
           </div>
           <div>
-            <label className="block text-xs text-slate-400 mb-1">Export API Key (optional)</label>
+            <label className="block text-xs text-slate-400 mb-1">
+              Export API Key <span className="text-red-400">*</span>
+              <span className="text-slate-600 ml-1">(bell24h-v2 ADMIN_API_KEY)</span>
+            </label>
             <input
               type="password"
               value={v2Key}
               onChange={e => setV2Key(e.target.value)}
-              placeholder="EXPORT_API_KEY value"
+              placeholder="BELL24H_V2_EXPORT_KEY value"
               className="w-full px-3 py-2 bg-slate-900 border border-slate-700 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
@@ -201,13 +211,26 @@ export default function ImportSuppliersPage() {
           )}
         </button>
 
+        {pullError && (
+          <div className="flex items-start gap-2 bg-red-900/30 border border-red-700/50 text-red-300 rounded-lg px-4 py-3 text-sm">
+            <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+            <span>{pullError}</span>
+          </div>
+        )}
+
         {pullResult && (
           <div className="bg-slate-900/60 border border-slate-700 rounded-xl p-4 space-y-3">
             <div className="flex items-center gap-2">
               <CheckCircle className="w-4 h-4 text-green-400" />
               <span className="text-white font-semibold text-sm">Pull Complete</span>
             </div>
-            <div className="grid grid-cols-3 gap-3 text-sm">
+            <div className="grid grid-cols-4 gap-3 text-sm">
+              {pullResult.rowCount != null && (
+                <div className="bg-slate-800 border border-slate-600 rounded-lg p-3 text-center">
+                  <p className="text-slate-200 font-bold text-xl">{pullResult.rowCount}</p>
+                  <p className="text-slate-400 text-xs">In export</p>
+                </div>
+              )}
               <div className="bg-green-900/20 border border-green-700/40 rounded-lg p-3 text-center">
                 <p className="text-green-400 font-bold text-xl">{pullResult.imported}</p>
                 <p className="text-slate-400 text-xs">Imported</p>

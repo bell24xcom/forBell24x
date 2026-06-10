@@ -126,9 +126,10 @@ export default function ControlPanelPage() {
     setLoading(true); setError('');
     try {
       const res  = await fetch('/api/admin/control-panel');
+      if (!res.ok && res.status === 401) { setError('Admin session expired — please log in again.'); return; }
       const json = await res.json();
       if (json.success) setData(json);
-      else setError(json.message || 'Failed to load');
+      else setError(json.message || json.error || `Server error (${res.status})`);
     } catch { setError('Network error'); }
     finally { setLoading(false); }
   }, []);
@@ -175,8 +176,9 @@ export default function ControlPanelPage() {
 
   if (!data) return null;
 
-  const planNames = ['FREE', 'PRO', 'ENTERPRISE'];
-  const maxTrust = Math.max(...Object.values(data.trustDistribution));
+  const planNames = ['FREE', 'PRO', 'ENTERPRISE'] as const;
+  const trustValues = Object.values(data.trustDistribution ?? {});
+  const maxTrust = trustValues.length > 0 ? Math.max(...trustValues, 0) : 0;
 
   return (
     <div className="space-y-6">
@@ -287,7 +289,9 @@ export default function ControlPanelPage() {
                   <td className="px-5 py-3 text-slate-300">{row.label}</td>
                   {planNames.map(p => (
                     <td key={p} className="px-5 py-3 text-center">
-                      {renderValue(data.plans[p][row.key] as number | boolean)}
+                      {data.plans[p] != null
+                        ? renderValue(data.plans[p][row.key] as number | boolean)
+                        : <span className="text-slate-600">—</span>}
                     </td>
                   ))}
                 </tr>
@@ -355,7 +359,7 @@ export default function ControlPanelPage() {
         <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-5">
           <h2 className="text-white font-semibold text-sm mb-4">Trust Score Distribution</h2>
           <div className="space-y-3">
-            {Object.entries(data.trustDistribution).map(([range, count]) => (
+            {Object.entries(data.trustDistribution ?? {}).map(([range, count]) => (
               <TrustBar key={range} label={range} value={count} max={maxTrust || 1} />
             ))}
           </div>
