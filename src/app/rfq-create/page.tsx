@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import ConsentCheckbox from '@/src/components/legal/ConsentCheckbox';
+import Link from 'next/link';
 
 export default function RFQCreatePage() {
   const [formData, setFormData] = useState({
@@ -17,6 +19,7 @@ export default function RFQCreatePage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errors, setErrors] = useState({});
+  const [consentGiven, setConsentGiven] = useState(false);
 
   const categories = [
     { value: '', label: 'Select Category' },
@@ -66,12 +69,24 @@ export default function RFQCreatePage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
-    
+
+    if (!consentGiven) {
+      setErrors((prev) => ({ ...prev, submit: 'Please agree to the Privacy Policy before submitting your Requirement.' }));
+      return;
+    }
+
     setLoading(true);
+
+    // Fire-and-forget consent log
+    fetch('/api/compliance/consent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ purpose: 'rfq_post', method: 'text_form', granted: true }),
+    }).catch(() => {});
     
     try {
       const response = await fetch('/api/rfq/create', {
@@ -297,13 +312,20 @@ export default function RFQCreatePage() {
                   />
                 </div>
 
-                <div className="mt-8">
+                <div className="mt-6">
+                  <ConsentCheckbox id="rfq-consent" checked={consentGiven} onChange={setConsentGiven}>
+                    I consent to VyaparSethu processing the details in this Requirement to match me with verified suppliers, as described in our{' '}
+                    <Link href="/privacy" className="text-indigo-400 hover:underline" target="_blank">Privacy Policy</Link>.
+                  </ConsentCheckbox>
+                </div>
+
+                <div className="mt-4">
                   <button
                     type="submit"
-                    disabled={loading}
+                    disabled={loading || !consentGiven}
                     className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-4 px-6 rounded-lg transition-all shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {loading ? 'Creating RFQ...' : 'Submit RFQ'}
+                    {loading ? 'Creating Requirement...' : 'Submit Requirement'}
                   </button>
                 </div>
               </form>

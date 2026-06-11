@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import ConsentCheckbox from '@/src/components/legal/ConsentCheckbox';
 
 export default function LoginPage() {
   const [phone, setPhone] = useState('');
@@ -12,6 +13,7 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [devOtp, setDevOtp] = useState(''); // shown in dev mode when MSG91 not configured
   const [maskedPhone, setMaskedPhone] = useState('');
+  const [consentGiven, setConsentGiven] = useState(false);
   const router = useRouter();
 
   const handleSendOTP = async (e: React.FormEvent) => {
@@ -52,9 +54,17 @@ export default function LoginPage() {
   const handleVerifyOTP = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!otp || otp.length !== 6) { setError('Please enter the 6-digit OTP'); return; }
+    if (!consentGiven) { setError('Please agree to the Terms of Service and Privacy Policy to continue.'); return; }
 
     setLoading(true);
     setError('');
+
+    // Fire-and-forget consent log — do not block on result
+    fetch('/api/compliance/consent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ purpose: 'account_signup', method: 'otp_verify', granted: true }),
+    }).catch(() => {});
 
     try {
       const res = await fetch('/api/auth/otp/verify', {
@@ -159,6 +169,18 @@ export default function LoginPage() {
                 maxLength={6}
                 className="w-full px-4 py-3 bg-slate-700/60 border border-slate-600/50 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center text-2xl tracking-[0.5em] font-mono"
               />
+            </div>
+          )}
+
+          {step === 'otp' && (
+            <div className="pt-1">
+              <ConsentCheckbox id="login-consent" checked={consentGiven} onChange={setConsentGiven}>
+                I agree to VyaparSethu&apos;s{' '}
+                <Link href="/terms" className="text-indigo-400 hover:underline" target="_blank">Terms of Service</Link>
+                {' '}and{' '}
+                <Link href="/privacy" className="text-indigo-400 hover:underline" target="_blank">Privacy Policy</Link>
+                , and consent to my mobile number being processed for authentication and account services.
+              </ConsentCheckbox>
             </div>
           )}
 

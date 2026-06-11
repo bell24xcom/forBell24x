@@ -2,6 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import ConsentCheckbox from '@/src/components/legal/ConsentCheckbox';
 
 interface VoiceRFQData {
   id: string;
@@ -46,6 +48,7 @@ export default function VoiceRFQPage() {
   const [generatedRFQ, setGeneratedRFQ] = useState<VoiceRFQData | null>(null);
   const [recentRFQs, setRecentRFQs] = useState<VoiceRFQData[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [consentGiven, setConsentGiven] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const streamRef = useRef<MediaStream | null>(null);
@@ -256,6 +259,14 @@ export default function VoiceRFQPage() {
 
   const saveRFQ = async () => {
     if (!generatedRFQ) return;
+    if (!consentGiven) { setError('Please agree to the Privacy Policy before saving your Requirement.'); return; }
+
+    // Fire-and-forget consent log
+    fetch('/api/compliance/consent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ purpose: 'rfq_post', method: 'voice_form', granted: true }),
+    }).catch(() => {});
 
     try {
       // 1. Save to Neon (Core)
@@ -420,13 +431,20 @@ export default function VoiceRFQPage() {
                     )}
                   </div>
                 </div>
-                <div className="flex gap-4 mt-6">
+                <div className="mt-5 mb-2">
+                  <ConsentCheckbox id="voice-rfq-consent" checked={consentGiven} onChange={setConsentGiven}>
+                    I consent to this Requirement being published to VyaparSethu&apos;s Trade Network and processed by verified suppliers, as described in our{' '}
+                    <Link href="/privacy" className="text-indigo-400 hover:underline" target="_blank">Privacy Policy</Link>.
+                  </ConsentCheckbox>
+                </div>
+
+                <div className="flex gap-4 mt-4">
                   <button
                     onClick={saveRFQ}
-                    disabled={!generatedRFQ.category}
+                    disabled={!generatedRFQ.category || !consentGiven}
                     className="bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 active:scale-95 transition-all shadow-lg shadow-emerald-600/20 font-semibold min-h-[44px] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-emerald-600"
                   >
-                    Save RFQ
+                    Save Requirement
                   </button>
                   <button
                     onClick={discardRFQ}
