@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import CookieBanner from '@/src/components/legal/CookieBanner'
 import { DashboardProvider } from '@/contexts/DashboardContext'
 import { AuthProvider } from '@/src/app/contexts/AuthContext'
 import { SITE_URL } from '@/lib/site-url'
@@ -85,7 +86,7 @@ export default function RootLayout({
               },
               "address": {
                 "@type": "PostalAddress",
-                "streetAddress": "Lodha Upper Thane, Sarang Bhiwandi",
+                "streetAddress": "Flat No. 1204, Casa Sereno B1, Mankoli Road, Anjur, Bhiwandi",
                 "addressLocality": "Thane",
                 "postalCode": "421302",
                 "addressRegion": "Maharashtra",
@@ -126,6 +127,7 @@ export default function RootLayout({
               {children}
             </main>
             <Footer />
+            <CookieBanner />
           </DashboardProvider>
         </AuthProvider>
       </body>

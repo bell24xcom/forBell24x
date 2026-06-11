@@ -513,6 +513,66 @@ enum DemandTrend {
   DECLINING
 }
 
+// ─── DPDP Compliance models ───────────────────────────────────────────────────
+// Retain all logs ≥ 1 year (do NOT add auto-purge to these tables)
+
+model ConsentEvent {
+  id                 String   @id @default(cuid())
+  userId             String?  @map("user_id")
+  contactId          String?  @map("contact_id")
+  purpose            String
+  method             String
+  language           String   @default("en")
+  ipHash             String?  @map("ip_hash")
+  consentTextVersion String   @map("consent_text_version")
+  granted            Boolean
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  @@map("consent_events")
+}
+
+model ErasureRequest {
+  id                  String        @id @default(cuid())
+  requesterIdentifier String        @map("requester_identifier")
+  status              ErasureStatus @default(RECEIVED)
+  requestedAt         DateTime      @default(now()) @map("requested_at")
+  completedAt         DateTime?     @map("completed_at")
+  handledBy           String?       @map("handled_by")
+  notes               String?
+  userId              String?       @map("user_id")
+
+  @@map("erasure_requests")
+}
+
+model OutreachConsentLog {
+  id          String    @id @default(cuid())
+  contactId   String    @map("contact_id")
+  channel     String
+  optInSource String    @map("opt_in_source")
+  optOutAt    DateTime? @map("opt_out_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  @@map("outreach_consent_log")
+}
+
+model DataAccessLog {
+  id          String   @id @default(cuid())
+  adminUserId String   @map("admin_user_id")
+  action      String
+  entity      String
+  entityId    String   @map("entity_id")
+  timestamp   DateTime @default(now())
+
+  @@map("data_access_log")
+}
+
+enum ErasureStatus {
+  RECEIVED
+  VERIFYING
+  COMPLETED
+  REJECTED
+}
+
 enum NotificationType {
   INFO
   SUCCESS

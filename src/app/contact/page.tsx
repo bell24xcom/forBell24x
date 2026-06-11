@@ -64,7 +64,7 @@ export default function ContactPage() {
     {
       icon: '📍',
       title: 'Registered Address',
-      details: ['Digitex Studio', 'Lodha Upper Thane, Sarang', 'Bhiwandi, Thane – 421302', 'Maharashtra, India']
+      details: ['Digitex Studio (Proprietorship)', 'Flat No. 1204, 12th Floor, Casa Sereno B1', 'Mankoli Road, Anjur, Bhiwandi, Thane – 421302', 'Maharashtra, India']
     },
     {
       icon: '📞',
@@ -94,11 +94,11 @@ export default function ContactPage() {
         <section className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto text-center">
-              <h1 className="text-4xl font-bold mb-6">Contact Bell24h</h1>
+              <h1 className="text-4xl font-bold mb-6">Contact VyaparSethu</h1>
               <p className="text-xl mb-8">
                 We're here to help with your B2B procurement needs. Reach us via email, phone, or the form below.
               </p>
-              <p className="text-sm text-blue-200">Bell24h is operated by Digitex Studio | GSTIN: 27AAAPP9753F2ZF</p>
+              <p className="text-sm text-blue-200">VyaparSethu is operated by Digitex Studio (Proprietorship) | GSTIN: 27AAAPP9753F2ZF | Proprietor: Vishal Ashok Pendharkar</p>
             </div>
           </div>
         </section>

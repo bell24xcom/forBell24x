@@ -1,5 +1,6 @@
+'use client';
 import Link from 'next/link';
-import { Facebook, Twitter, Linkedin, Instagram, Youtube, Mail, Phone, MapPin } from 'lucide-react';
+import { Facebook, Twitter, Linkedin, Instagram, Youtube, Mail, Phone } from 'lucide-react';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -72,47 +73,36 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Support */}
+          {/* Legal */}
           <div>
-            <h3 className="font-bold text-lg mb-4 text-white">Support</h3>
+            <h3 className="font-bold text-lg mb-4 text-white">Legal</h3>
             <ul className="space-y-2 text-gray-400">
+              <li><Link href="/privacy" className="hover:text-white transition">Privacy Policy</Link></li>
+              <li><Link href="/terms" className="hover:text-white transition">Terms & Conditions</Link></li>
+              <li><Link href="/cookies" className="hover:text-white transition">Cookie Policy</Link></li>
+              <li><Link href="/refund-policy" className="hover:text-white transition">Refund Policy</Link></li>
+              <li><Link href="/shipping" className="hover:text-white transition">Shipping Policy</Link></li>
+              <li><Link href="/data-deletion" className="hover:text-white transition">Data Deletion</Link></li>
+              <li><Link href="/consent" className="hover:text-white transition">Consent Notice</Link></li>
               <li>
-                <Link href="/help/posting" className="hover:text-white transition">
-                  Help Center
-                </Link>
-              </li>
-              <li>
-                <Link href="/help/responding" className="hover:text-white transition">
-                  Responding Guide
-                </Link>
-              </li>
-              <li>
-                <Link href="/legal/privacy" className="hover:text-white transition">
-                  Privacy
-                </Link>
-              </li>
-              <li>
-                <Link href="/legal/terms" className="hover:text-white transition">
-                  Terms
-                </Link>
-              </li>
-              <li>
-                <Link href="/legal/cookie" className="hover:text-white transition">
-                  Cookie Policy
-                </Link>
+                <button
+                  onClick={() => { localStorage.removeItem('vyaparsethu_cookie_consent_v1'); window.location.reload(); }}
+                  className="hover:text-white transition text-left"
+                >
+                  Cookie Settings
+                </button>
               </li>
             </ul>
           </div>
 
           {/* Connect */}
           <div>
-            <div className="text-5xl font-black mb-4">
-              <span className="text-white">BELL</span>
-              <span className="text-cyan-400">24H</span>
+            <div className="text-4xl font-black mb-4">
+              <span className="text-white">Vyapar</span>
+              <span className="text-cyan-400">Sethu</span>
             </div>
-            <p className="text-gray-400 text-sm mb-2">bell24h.com • Made in India</p>
-            <p className="text-gray-400 mb-2">₹500Cr+ in transactions</p>
-            <p className="text-gray-400 mb-4">10,000+ verified suppliers</p>
+            <p className="text-gray-400 text-sm mb-1">vyaparsethu.com • Made in India 🇮🇳</p>
+            <p className="text-gray-500 text-xs mb-3">Formerly Bell24h · Digitex Studio (Proprietorship)</p>
             
             {/* Social Links */}
             <div className="flex gap-3 mt-4">
@@ -137,8 +127,8 @@ export default function Footer() {
             <div className="mt-6 space-y-2">
               <div className="flex items-center gap-2 text-sm text-gray-400">
                 <Mail className="w-4 h-4" />
-                <a href="mailto:support@bell24h.com" className="hover:text-white transition">
-                  support@bell24h.com
+                <a href="mailto:digitex.studio@gmail.com" className="hover:text-white transition">
+                  digitex.studio@gmail.com
                 </a>
               </div>
               <div className="flex items-center gap-2 text-sm text-gray-400">
@@ -163,8 +153,8 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div className="border-t border-white/10 mt-8 pt-8 text-center">
-          <p className="text-gray-400">© {currentYear} BELL Technology Pvt Ltd. Made in India 🇮🇳</p>
-          <p className="text-slate-500 text-xs mt-1">bell24h.com • ₹500Cr+ in transactions • 10,000+ verified suppliers</p>
+          <p className="text-gray-400">© {currentYear} Digitex Studio. Made in India 🇮🇳</p>
+          <p className="text-slate-500 text-xs mt-1">VyaparSethu • Formerly Bell24h • GSTIN 27AAAPP9753F2ZF</p>
         </div>
       </div>
     </footer>
