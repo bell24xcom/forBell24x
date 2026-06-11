@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     siteName: 'VyaparSethu',
     images: [
       {
-        url: '/og-image.svg',
+        url: '/og-image.png',
         width: 1200,
         height: 630,
         alt: 'VyaparSethu - B2B Supplier Marketplace',
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: "VyaparSethu — Protected Trade Infrastructure",
     description: "Verified suppliers, protected payments, faster quotations for Indian MSMEs.",
-    images: ['/og-image.svg'],
+    images: ['/og-image.png'],
   },
   robots: {
     index: true,
@@ -74,8 +74,8 @@ export default function RootLayout({
               "name": "VyaparSethu",
               "alternateName": "Bell24h",
               "url": SITE_URL,
-              "logo": `${SITE_URL}/favicon.svg`,
-              "description": "India's AI-powered B2B RFQ marketplace. Post RFQs by voice, video, or text. Get quotes from verified suppliers in 24 hours.",
+              "logo": `${SITE_URL}/og-image.png`,
+              "description": "Protected Trade Infrastructure for Indian MSMEs — Verified Suppliers, Protected Payments, Faster Quotations.",
               "foundingDate": "2026",
               "contactPoint": {
                 "@type": "ContactPoint",
@@ -86,15 +86,16 @@ export default function RootLayout({
               },
               "address": {
                 "@type": "PostalAddress",
-                "streetAddress": "Flat No. 1204, Casa Sereno B1, Mankoli Road, Anjur, Bhiwandi",
+                "streetAddress": "Flat No. 1204, 12th Floor, Casa Sereno B1, Mankoli Road, Off Mumbai-Nashik Highway, Anjur, Bhiwandi",
                 "addressLocality": "Thane",
                 "postalCode": "421302",
                 "addressRegion": "Maharashtra",
                 "addressCountry": "IN"
               },
               "sameAs": [
-                "https://www.linkedin.com/company/bell24h",
-                "https://twitter.com/bell24h"
+                "https://www.linkedin.com/company/vyaparsethu",
+                "https://twitter.com/vyaparsethu",
+                "https://instagram.com/vyaparsethu"
               ]
             })
           }}

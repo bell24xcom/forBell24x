@@ -5,8 +5,8 @@ import { prisma } from '@/lib/prisma';
 export const revalidate = 300; // cache 5 minutes
 
 export const metadata: Metadata = {
-  title: 'All Categories - Bell24h',
-  description: 'Browse all B2B product and service categories on Bell24h marketplace',
+  title: 'All Trade Categories | VyaparSethu',
+  description: 'Browse all B2B product and service categories on VyaparSethu — India\'s Protected Trade Network',
 };
 
 const FALLBACK_CATEGORIES = [

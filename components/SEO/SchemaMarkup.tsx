@@ -4,31 +4,37 @@ export default function SchemaMarkup() {
   const organization = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'Bell24h',
+    name: 'VyaparSethu',
+    alternateName: 'Bell24h',
     url: SITE_URL,
-    logo: `${SITE_URL}/og-image.jpg`,
-    description: "India's AI-powered B2B procurement marketplace. Post RFQs via voice, video, or text. 450+ categories.",
+    logo: `${SITE_URL}/og-image.png`,
+    description: "Protected Trade Infrastructure for Indian MSMEs — Verified Suppliers, Protected Payments, Faster Quotations.",
     address: {
       '@type': 'PostalAddress',
-      streetAddress: 'Thane',
+      streetAddress: 'Flat No. 1204, 12th Floor, Casa Sereno B1, Mankoli Road, Off Mumbai-Nashik Highway, Anjur, Bhiwandi',
       addressLocality: 'Thane',
       addressRegion: 'Maharashtra',
+      postalCode: '421302',
       addressCountry: 'IN',
     },
     contactPoint: {
       '@type': 'ContactPoint',
       telephone: '+91-9004962871',
       contactType: 'customer service',
-      email: 'bell24h.helpline@gmail.com',
+      email: 'digitex.studio@gmail.com',
       availableLanguage: ['English', 'Hindi'],
     },
-    sameAs: [SITE_URL],
+    sameAs: [
+      'https://twitter.com/vyaparsethu',
+      'https://linkedin.com/company/vyaparsethu',
+      'https://instagram.com/vyaparsethu',
+    ],
   };
 
   const website = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'Bell24h',
+    name: 'VyaparSethu',
     url: SITE_URL,
     potentialAction: {
       '@type': 'SearchAction',
