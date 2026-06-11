@@ -25,10 +25,10 @@ export const metadata: Metadata = {
     siteName: 'VyaparSethu',
     images: [
       {
-        url: '/og-image.png',
+        url: 'https://www.vyaparsethu.com/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'VyaparSethu - B2B Supplier Marketplace',
+        alt: 'VyaparSethu — Protected Trade Infrastructure',
       },
     ],
     locale: 'en_IN',
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: "VyaparSethu — Protected Trade Infrastructure",
     description: "Verified suppliers, protected payments, faster quotations for Indian MSMEs.",
-    images: ['/og-image.png'],
+    images: ['https://www.vyaparsethu.com/og-image.png'],
   },
   robots: {
     index: true,
