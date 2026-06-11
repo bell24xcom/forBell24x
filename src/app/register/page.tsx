@@ -3,8 +3,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -70,33 +68,27 @@ export default function RegisterPage() {
 
   if (success) {
     return (
-      <>
-        <Header />
-        <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center py-12">
-          <div className="max-w-md w-full text-center">
-            <div className="mx-auto h-12 w-12 bg-green-600 rounded-lg flex items-center justify-center mb-4">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <h2 className="text-3xl font-bold text-white mb-4">Registration Successful!</h2>
-            <p className="text-slate-400 mb-6">
-              Your account has been created successfully. You will be redirected to the login page shortly.
-            </p>
-            <Link href="/login" className="btn-primary">
-              Go to Login
-            </Link>
+      <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center py-12">
+        <div className="max-w-md w-full text-center">
+          <div className="mx-auto h-12 w-12 bg-green-600 rounded-lg flex items-center justify-center mb-4">
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
           </div>
+          <h2 className="text-3xl font-bold text-white mb-4">Registration Successful!</h2>
+          <p className="text-slate-400 mb-6">
+            Your account has been created successfully. You will be redirected to the login page shortly.
+          </p>
+          <Link href="/login" className="btn-primary">
+            Go to Login
+          </Link>
         </div>
-        <Footer />
-      </>
+      </div>
     );
   }
 
   return (
-    <>
-      <Header />
-      <div className="min-h-screen bg-[var(--bg-primary)] py-12">
+    <div className="min-h-screen bg-[var(--bg-primary)] py-12">
         <div className="max-w-2xl mx-auto px-4">
           <div className="bg-slate-800/50 rounded-lg border border-slate-700/50 shadow-md p-8">
             <div className="text-center mb-8">
@@ -307,7 +299,5 @@ export default function RegisterPage() {
           </div>
         </div>
       </div>
-      <Footer />
-    </>
   );
 }
