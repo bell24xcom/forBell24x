@@ -6,36 +6,12 @@
   "devCommand": "npm run dev",
   "crons": [
     {
-      "path": "/api/cron/update-insights",
-      "schedule": "0 6 * * *"
-    },
-    {
-      "path": "/api/cron/analyze-behavior",
-      "schedule": "0 2 * * *"
-    },
-    {
-      "path": "/api/cron/demand-loop",
-      "schedule": "0 8 * * *"
-    },
-    {
       "path": "/api/cron/expire-rfqs",
       "schedule": "0 3 * * *"
     },
     {
-      "path": "/api/cron/churn-check",
-      "schedule": "0 9 * * 1"
-    },
-    {
       "path": "/api/cron/weekly-digest",
       "schedule": "0 10 * * 1"
-    },
-    {
-      "path": "/api/cron/follow-up-due",
-      "schedule": "0 7 * * *"
-    },
-    {
-      "path": "/api/cron/supplier-drip",
-      "schedule": "0 9 * * *"
     }
   ],
   "env": {
