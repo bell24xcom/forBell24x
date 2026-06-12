@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { CONSENT_TEXT_VERSION } from '../../../config/legal';
+import { CONSENT_TEXT_VERSION } from '@/src/lib/legal';
 
 export const dynamic = 'force-dynamic';
 

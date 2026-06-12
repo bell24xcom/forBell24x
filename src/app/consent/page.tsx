@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import LegalPage from '@/src/components/legal/LegalPage';
-import { LEGAL_ENTITY, POLICY_LAST_UPDATED, CONSENT_TEXT_VERSION } from '../config/legal';
+import { LEGAL_ENTITY, POLICY_LAST_UPDATED, CONSENT_TEXT_VERSION } from '@/src/lib/legal';
 
 export const metadata: Metadata = {
   title: `Consent Notice | ${LEGAL_ENTITY.platform}`,

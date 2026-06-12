@@ -1,4 +1,4 @@
-import { LEGAL_ENTITY, POLICY_LAST_UPDATED } from '../../app/config/legal';
+import { LEGAL_ENTITY, POLICY_LAST_UPDATED } from '@/src/lib/legal';
 import DraftBanner from './DraftBanner';
 
 interface Props {

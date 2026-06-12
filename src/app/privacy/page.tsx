@@ -1,6 +1,6 @@
-import { Metadata } from 'next';
+﻿import { Metadata } from 'next';
 import LegalPage from '@/src/components/legal/LegalPage';
-import { LEGAL_ENTITY, POLICY_LAST_UPDATED } from '../config/legal';
+import { LEGAL_ENTITY, POLICY_LAST_UPDATED } from '@/src/lib/legal';
 
 export const metadata: Metadata = {
   title: `Privacy Policy | ${LEGAL_ENTITY.platform}`,
