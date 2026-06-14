@@ -32,6 +32,7 @@ import {
 } from 'lucide-react';
 import WhatsAppShare from '@/components/ui/WhatsAppShare';
 import TrustScore from '@/components/ui/TrustScore';
+import WelcomeVideoBanner from '@/src/components/dashboard/WelcomeVideoBanner';
 
 interface LiveFeature {
   id: string;
@@ -234,6 +235,9 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
+      {/* Welcome video — shown once per device, auto-dismisses after 28s */}
+      <WelcomeVideoBanner />
+
       {/* Onboarding Banner — supplier mode, no company set */}
       {needsOnboarding && (
         <div className="bg-indigo-900/30 border border-indigo-700/60 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">

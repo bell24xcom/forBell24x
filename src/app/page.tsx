@@ -8,6 +8,7 @@ import RFQTypeShowcase from '@/components/homepage/RFQTypeShowcase'
 import AIFeaturesSection from '@/components/homepage/AIFeaturesSection'
 import HowItWorks from '@/components/homepage/HowItWorks'
 import FinalCTA from '@/components/homepage/FinalCTA'
+import BrandVideoSection from '@/src/components/marketing/BrandVideoSection'
 
 export default function HomePage() {
   return (
@@ -52,6 +53,9 @@ export default function HomePage() {
 
       {/* How It Works */}
       <HowItWorks />
+
+      {/* Brand Video */}
+      <BrandVideoSection />
 
       {/* Final CTA */}
       <FinalCTA />

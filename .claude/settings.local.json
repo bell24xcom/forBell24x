@@ -92,7 +92,8 @@
       "mcp__claude_ai_Canva__generate-design",
       "PowerShell(if \\($env:MUAPI_API_KEY\\) { \"Key is set: $\\($env:MUAPI_API_KEY.Substring\\(0,8\\)\\)...\" } else { \"MUAPI_API_KEY is NOT set\" })",
       "WebFetch(domain:muapi.ai)",
-      "Bash(git clone *)"
+      "Bash(git clone *)",
+      "Bash(git submodule *)"
     ]
   },
   "enableAllProjectMcpServers": true,
