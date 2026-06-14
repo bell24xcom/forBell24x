@@ -36,8 +36,8 @@ export default function WelcomeVideoBanner() {
             muted
             loop
             playsInline
-            className="w-full h-full object-cover"
-            style={{ aspectRatio: '9/16', maxHeight: '220px' }}
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{ transform: 'scale(1.22) translateY(-7%)', transformOrigin: 'center top' }}
           />
         </div>
 

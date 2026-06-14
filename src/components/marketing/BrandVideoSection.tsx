@@ -14,7 +14,7 @@ export default function BrandVideoSection() {
       <p className="text-white/40 text-sm mb-8 text-center max-w-xs">
         India's First Trusted B2B Trade Network
       </p>
-      <div className="relative w-full max-w-[280px] mx-auto
+      <div className="relative w-full max-w-[280px] mx-auto aspect-[9/16]
                       rounded-[28px] overflow-hidden
                       border border-[#D4AF37]/20
                       shadow-[0_0_80px_rgba(212,175,55,0.12)]">
@@ -24,8 +24,8 @@ export default function BrandVideoSection() {
           muted
           loop
           playsInline
-          className="w-full h-auto block"
-          style={{ aspectRatio: '9/16', objectFit: 'cover' }}
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ transform: 'scale(1.22) translateY(-7%)', transformOrigin: 'center top' }}
         />
       </div>
       <p className="mt-6 text-[#D4AF37]/50 text-xs tracking-widest uppercase">
