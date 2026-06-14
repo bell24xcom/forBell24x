@@ -205,3 +205,64 @@ Goal: rebrand executed + first 30 verified suppliers in pipeline.
 
 Sprint hard stop: if Day 14 has 0 verified suppliers, stop building and do in-person
 Bhiwandi market outreach before any more code work.
+
+---
+
+## AI Persona & Autonomous Studio (from CL4R1T4S integration)
+
+Claude Code operates as an **Autonomous Creative and Operational Studio** for VyaparSethu. Key behavioral directives extracted from CL4R1T4S reference library:
+
+- **Be proactive, not reactive.** When you see a broken file, incomplete type, or missing env var, surface it immediately rather than waiting to be asked.
+- **Codebase-first.** Always read existing components before creating new ones. Never assume a library is available — check `package.json`.
+- **Security-first.** No hardcoded credentials, no fallback plaintext passwords, no localStorage-based admin auth. All secrets via env vars.
+- **Minimal output.** Answer in fewer than 4 lines when possible. No preamble, no postamble, no summaries of what you just did.
+- **Task process**: Search → Implement → Verify → Report only what changed.
+
+### MuAPI / Kling Defaults (for video generation tasks)
+
+```
+model:        kling-v2.1-master-t2v   (text-to-video, cinematic master quality)
+aspect_ratio: 9:16                    (vertical mobile format)
+duration:     5 or 10                 (Kling max per clip; chain clips for 15s)
+endpoint:     POST https://api.muapi.ai/api/v1/kling-v2.1-master-t2v
+auth_header:  x-api-key: $MUAPI_API_KEY
+poll:         GET  https://api.muapi.ai/api/v1/predictions/{request_id}/result
+image_model:  flux-dev-image          (for batch category images)
+output_dir:   public/marketing/       (video), public/assets/ (images)
+```
+
+Account must have credits at muapi.ai (digitex.studio@gmail.com). Current balance: $0 — top up before calling generation endpoints.
+
+### Design System Constraints
+
+- **Primary palette**: Deep Navy `#001f3f` · Brushed Gold `#D4AF37` · White `#FFFFFF`
+- **Spacing system**: 6px grid (6, 12, 18, 24, 36, 48, 72px) — all margins/paddings must be multiples of 6
+- **Typography**: Poppins for headings · Inter for body · Devanagari-compatible fallback for Hindi overlays
+- **No zeros publicly**: Never render 0 counts, 0% rates, or empty metric cards on public-facing pages
+
+### New Files Added (Week 3–4 sprint)
+
+| File | Purpose |
+|------|---------|
+| `src/components/crm/LeadFilters.tsx` | CRM lead search + filter with full optional chaining |
+| `src/data/outreachTemplates.ts` | WhatsApp B2B outreach templates (Steel/Textiles/Packaging, Day 1→14) |
+| `src/app/api/trigger-voice-agent/route.ts` | Bolna.ai + Sarvam STT/TTS qualification call bridge |
+| `src/lib/lead-engine/scraper.ts` | ScrapeGraphAI lead ingestion with Prisma deduplication |
+| `src/lib/muapi/batch-images.ts` | MuAPI flux-dev-image batch generator → public/assets/ |
+| `prisma/migrations/0002_leads_dpdp/migration.sql` | Leads table + DPDP consent log + PII erasure trigger |
+| `CL4R1T4S/` | Reference library of AI system prompts (elder-plinius/CL4R1T4S) |
+
+### Required New Env Vars
+
+```
+BOLNA_API_KEY       # Bolna.ai voice campaign API key
+BOLNA_AGENT_ID      # Bolna.ai agent UUID for Sethu persona
+SCRAPEGRAPH_API_KEY # ScrapeGraphAI API key for lead scraping
+MUAPI_API_KEY       # MuAPI video/image generation (add credits at muapi.ai)
+```
+
+### Database Notes
+
+- Project uses **Neon PostgreSQL + Prisma** — NOT Supabase. Ignore any Supabase/VITE_ variable references in legacy docs.
+- New `leads` table and `consent_audit_log` are in `prisma/migrations/0002_leads_dpdp/migration.sql` — run `prisma migrate deploy` to apply.
+- DPDP erasure trigger fires automatically when a lead's `status` is set to `'opted_out'`.

@@ -81,7 +81,18 @@
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Sanika\\\\Projects\\\\bell24h\" -Directory)",
       "Bash(Select-Object -ExpandProperty Name)",
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Sanika\\\\Projects\\\\bell24h\\\\src\" -Directory)",
-      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Sanika\\\\Projects\\\\bell24h\\\\src\\\\app\" -Directory)"
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Sanika\\\\Projects\\\\bell24h\\\\src\\\\app\" -Directory)",
+      "PowerShell(python --version 2>&1; python -c \"from PIL import Image; print\\('PIL OK'\\)\" 2>&1)",
+      "PowerShell(node -e \"require\\('sharp'\\); console.log\\('sharp OK'\\)\" 2>&1)",
+      "Bash(Select-String \"Error:|error TS|Cannot find|Module not found|Failed to compile\")",
+      "Bash(Select-Object -First 20)",
+      "PowerShell(npm run *)",
+      "PowerShell(cd C:\\\\Users\\\\Sanika\\\\Projects\\\\bell24h && git rm -rf src/app/config/ 2>&1; Write-Host \"exit: $LASTEXITCODE\")",
+      "Bash(claude mcp *)",
+      "mcp__claude_ai_Canva__generate-design",
+      "PowerShell(if \\($env:MUAPI_API_KEY\\) { \"Key is set: $\\($env:MUAPI_API_KEY.Substring\\(0,8\\)\\)...\" } else { \"MUAPI_API_KEY is NOT set\" })",
+      "WebFetch(domain:muapi.ai)",
+      "Bash(git clone *)"
     ]
   },
   "enableAllProjectMcpServers": true,

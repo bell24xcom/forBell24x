@@ -130,6 +130,7 @@ export default function Footer() {
                 <a href="mailto:digitex.studio@gmail.com" className="hover:text-white transition">
                   digitex.studio@gmail.com
                 </a>
+
               </div>
               <div className="flex items-center gap-2 text-sm text-gray-400">
                 <Phone className="w-4 h-4" />

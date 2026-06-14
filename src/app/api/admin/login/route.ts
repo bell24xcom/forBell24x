@@ -7,8 +7,16 @@ export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json();
 
-    const ADMIN_EMAIL    = process.env.ADMIN_EMAIL    || 'admin@bell24h.com';
-    const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Bell@2026';
+    const ADMIN_EMAIL    = process.env.ADMIN_EMAIL;
+    const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+
+    if (!ADMIN_EMAIL || !ADMIN_PASSWORD) {
+      console.error('Admin login: ADMIN_EMAIL or ADMIN_PASSWORD env vars not configured');
+      return NextResponse.json(
+        { success: false, message: 'Admin access not configured' },
+        { status: 503 }
+      );
+    }
 
     if (!email || !password) {
       return NextResponse.json(

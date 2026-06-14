@@ -31,49 +31,9 @@ export class AdminAuthService {
     [this.ADMIN_ROLES.ANALYTICS_ADMIN]: ['analytics', 'reports', 'data_export'],
   };
 
-  // Predefined admin accounts
-  static readonly ADMIN_ACCOUNTS = [
-    {
-      id: 1,
-      email: 'superadmin@bell24h.com',
-      password: 'Bell24h@SuperAdmin2025!',
-      role: this.ADMIN_ROLES.SUPER_ADMIN,
-      name: 'Super Administrator',
-      lastLogin: null,
-      isActive: true,
-      twoFactorEnabled: true,
-    },
-    {
-      id: 2,
-      email: 'admin@bell24h.com',
-      password: 'Bell24h@Admin2025!',
-      role: this.ADMIN_ROLES.PLATFORM_ADMIN,
-      name: 'Platform Administrator',
-      lastLogin: null,
-      isActive: true,
-      twoFactorEnabled: false,
-    },
-    {
-      id: 3,
-      email: 'support@bell24h.com',
-      password: 'Bell24h@Support2025!',
-      role: this.ADMIN_ROLES.SUPPORT_ADMIN,
-      name: 'Support Administrator',
-      lastLogin: null,
-      isActive: true,
-      twoFactorEnabled: false,
-    },
-    {
-      id: 4,
-      email: 'analytics@bell24h.com',
-      password: 'Bell24h@Analytics2025!',
-      role: this.ADMIN_ROLES.ANALYTICS_ADMIN,
-      name: 'Analytics Administrator',
-      lastLogin: null,
-      isActive: true,
-      twoFactorEnabled: false,
-    },
-  ];
+  // NOTE: This class is unused. Real admin auth is handled by lib/admin-auth.ts (requireAdmin).
+  // Credentials must come from ADMIN_EMAIL / ADMIN_PASSWORD environment variables only.
+  static readonly ADMIN_ACCOUNTS: never[] = [];
 
   // Admin login with enhanced security
   static async adminLogin(email: string, password: string, twoFactorCode?: string) {

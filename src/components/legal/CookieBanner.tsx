@@ -11,14 +11,24 @@ const STORAGE_KEY = 'vyaparsethu_cookie_consent_v1';
 
 function loadConsent(): ConsentState | null {
   if (typeof window === 'undefined') return null;
+  // localStorage persists across sessions; sessionStorage covers incognito (tab-scoped)
+  // and browsers that block localStorage in strict privacy mode.
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(STORAGE_KEY) ?? sessionStorage.getItem(STORAGE_KEY);
     return raw ? JSON.parse(raw) : null;
-  } catch { return null; }
+  } catch {
+    try {
+      const raw = sessionStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch { return null; }
+  }
 }
 
 function saveConsent(state: ConsentState) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  const json = JSON.stringify(state);
+  // Write to both: localStorage for persistence, sessionStorage as incognito fallback.
+  try { localStorage.setItem(STORAGE_KEY, json); } catch { /* blocked in strict privacy mode */ }
+  try { sessionStorage.setItem(STORAGE_KEY, json); } catch { /* last resort */ }
   // Persist server-side (fire-and-forget)
   fetch('/api/compliance/consent', {
     method: 'POST',
