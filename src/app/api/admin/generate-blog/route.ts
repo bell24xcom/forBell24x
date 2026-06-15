@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Groq from 'groq-sdk';
 
 // POST /api/admin/generate-blog
 // Body: { category: string, city?: string, slug?: string, adminToken: string }
@@ -28,8 +27,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'GROQ_API_KEY not configured' }, { status: 500 });
     }
 
-    const groq = new Groq({ apiKey });
-
     const locationContext = city ? ` specifically focusing on the ${city} industrial cluster` : '';
     const prompt = `You are a senior B2B trade journalist writing for VyaparSethu, India's B2B Trade Network. Write a comprehensive, SEO-optimised blog article about "${category}" procurement for Indian B2B buyers${locationContext}.
 
@@ -50,15 +47,25 @@ OUTPUT FORMAT (JSON only, no markdown fences):
   "body": "Full article body in plain text with paragraph breaks (\\n\\n between paragraphs). Use **bold** for key terms. Use - bullet list prefix for lists."
 }`;
 
-    const completion = await groq.chat.completions.create({
-      model: 'llama-3.3-70b-versatile',
-      messages: [{ role: 'user', content: prompt }],
-      temperature: 0.7,
-      max_tokens: 2000,
-      response_format: { type: 'json_object' },
+    const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [{ role: 'user', content: prompt }],
+        temperature: 0.7,
+        max_tokens: 2000,
+        response_format: { type: 'json_object' },
+      }),
     });
 
-    const content = completion.choices[0]?.message?.content;
+    if (!groqRes.ok) {
+      const err = await groqRes.text();
+      return NextResponse.json({ error: 'Groq API error', detail: err }, { status: 502 });
+    }
+
+    const groqData = await groqRes.json();
+    const content = groqData.choices?.[0]?.message?.content;
     if (!content) {
       return NextResponse.json({ error: 'Empty response from Groq' }, { status: 500 });
     }
@@ -77,7 +84,7 @@ OUTPUT FORMAT (JSON only, no markdown fences):
       category,
       city: city || null,
       article,
-      tokensUsed: completion.usage?.total_tokens,
+      tokensUsed: groqData.usage?.total_tokens,
     });
 
   } catch (err) {
