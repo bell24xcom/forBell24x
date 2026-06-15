@@ -11,6 +11,20 @@ function normalizePhone(raw: string): string | null {
     return /^\d{10}$/.test(cleaned) ? cleaned : null;
 }
 
+// Per-phone rate limit: max 3 OTPs per phone per 10 minutes
+// Prevents MSG91 cost abuse from a single number being spammed
+const phoneOtpCache = new Map<string, { count: number; start: number }>();
+function isPhoneRateLimited(phone: string): boolean {
+    const now = Date.now();
+    const entry = phoneOtpCache.get(phone);
+    if (!entry || now - entry.start > 10 * 60 * 1000) {
+        phoneOtpCache.set(phone, { count: 1, start: now });
+        return false;
+    }
+    entry.count += 1;
+    return entry.count > 3;
+}
+
 const PILOT_MODE = process.env.PILOT_OTP_IN_RESPONSE === 'true';
 const IS_DEV     = process.env.NODE_ENV === 'development';
 
@@ -25,6 +39,14 @@ export async function POST(request: NextRequest) {
                 { success: false, message: 'Valid 10-digit phone number required' },
                 { status: 400 }
                       );
+      }
+
+      // Per-phone rate limit
+      if (!IS_DEV && !PILOT_MODE && isPhoneRateLimited(phone)) {
+          return NextResponse.json(
+              { success: false, message: 'Too many OTP requests for this number. Please wait 10 minutes.' },
+              { status: 429, headers: { 'Retry-After': '600' } }
+          );
       }
 
       // Generate 6-digit OTP

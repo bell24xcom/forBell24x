@@ -1,12 +1,28 @@
-name = "bell24h-api"
-type = "javascript"
-account_id = "REPLACE_WITH_YOUR_CLOUDFLARE_ACCOUNT_ID"
-zone_id = "REPLACE_WITH_YOUR_ZONE_ID"
-workers_dev = true
-compatibility_date = "2025-11-09"
-main = "dist/worker.js"
-route = "api.bell24h.com/*"
+# wrangler.toml — Cloudflare Workers config (REFERENCE ONLY)
+#
+# Current deployment stack:
+#   App hosting  → Vercel (vyaparsethu.com, bell24h.com via DNS proxy)
+#   Database     → Neon PostgreSQL (ep-super-wind-a1c1ni4n.ap-southeast-1.aws.neon.tech)
+#   DNS/Proxy    → Cloudflare (bell24h.com zone, vyaparsethu.com zone)
+#
+# Cloudflare Workers are NOT deployed. This file exists as a starting point
+# if an edge Worker is needed in the future (e.g., lightweight WAF shim,
+# image optimization, or a geo-routing proxy at api.vyaparsethu.com).
+#
+# To activate: fill in account_id and zone_id from dash.cloudflare.com,
+# then run: npx wrangler deploy
+
+name = "vyaparsethu-edge"
+main = "src/worker/index.ts"   # create this file when needed
+compatibility_date = "2026-06-16"
+workers_dev = false
+
 [env.production]
-route = "api.bell24h.com/*"
+route = { pattern = "api.vyaparsethu.com/*", zone_name = "vyaparsethu.com" }
+
 [env.preview]
-route = "preview.api.bell24h.com/*"
+route = { pattern = "preview.api.vyaparsethu.com/*", zone_name = "vyaparsethu.com" }
+
+# Required secrets (set via: npx wrangler secret put SECRET_NAME)
+# CLOUDFLARE_ACCOUNT_ID — your Cloudflare account ID (dash.cloudflare.com → top-right)
+# CLOUDFLARE_API_TOKEN  — scoped to Workers:Edit + Zone:Read

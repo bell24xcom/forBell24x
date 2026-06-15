@@ -119,6 +119,14 @@ export default function RootLayout({
             })
           }}
         />
+        {/* Cloudflare Web Analytics — cookie-free, DPDP-safe, no consent banner needed */}
+        {process.env.NEXT_PUBLIC_CF_ANALYTICS_TOKEN && (
+          <script
+            defer
+            src="https://static.cloudflareinsights.com/beacon.min.js"
+            data-cf-beacon={`{"token": "${process.env.NEXT_PUBLIC_CF_ANALYTICS_TOKEN}"}`}
+          />
+        )}
       </head>
       <body className="font-sans bg-[#0F172A] text-white antialiased">
         <AuthProvider>
