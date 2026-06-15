@@ -2,6 +2,7 @@ import { MetadataRoute } from 'next'
 import { prisma } from '@/lib/prisma'
 import { SITE_URL } from '@/lib/site-url'
 import { BLOG_POSTS } from '@/src/data/blog-posts'
+import { getAllCityCategoryPairs, CITIES } from '@/src/data/city-category-seo'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 3600
@@ -100,5 +101,31 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // DB unavailable at build time — skip
   }
 
-  return [...staticPages, ...blogPages, ...categoryPages, ...rfqPages, ...supplierPages]
+  // FAQ, compare, tools hub, and individual tool pages
+  const contentPages: MetadataRoute.Sitemap = [
+    { url: `${siteUrl}/faq`,                                              lastModified: new Date(), changeFrequency: 'monthly', priority: 0.75 },
+    { url: `${siteUrl}/compare/vyaparsethu-vs-indiamart`,                 lastModified: new Date(), changeFrequency: 'monthly', priority: 0.80 },
+    { url: `${siteUrl}/tools`,                                            lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.80 },
+    { url: `${siteUrl}/tools/hsn-lookup`,                                 lastModified: new Date(), changeFrequency: 'monthly', priority: 0.85 },
+    { url: `${siteUrl}/tools/gst-calculator`,                             lastModified: new Date(), changeFrequency: 'monthly', priority: 0.85 },
+    { url: `${siteUrl}/tools/packaging-calculator`,                       lastModified: new Date(), changeFrequency: 'monthly', priority: 0.75 },
+  ]
+
+  // City hub pages (/suppliers/[city])
+  const cityPages: MetadataRoute.Sitemap = Object.keys(CITIES).map(citySlug => ({
+    url: `${siteUrl}/suppliers/${citySlug}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.82,
+  }))
+
+  // City×Category landing pages (/suppliers/[city]/[category])
+  const cityCategoryPages: MetadataRoute.Sitemap = getAllCityCategoryPairs().map(({ city, category }) => ({
+    url: `${siteUrl}/suppliers/${city}/${category}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.88,
+  }))
+
+  return [...staticPages, ...blogPages, ...categoryPages, ...contentPages, ...cityPages, ...cityCategoryPages, ...rfqPages, ...supplierPages]
 }
