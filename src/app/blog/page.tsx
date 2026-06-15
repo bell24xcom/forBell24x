@@ -1,86 +1,89 @@
+import { Metadata } from 'next';
 import Link from 'next/link';
+import { BLOG_POSTS, BLOG_CATEGORIES } from '@/src/data/blog-posts';
 
-const POSTS = [
-  {
-    slug: 'how-to-write-effective-rfq',
-    title: 'How to Write an Effective RFQ: A Complete Guide for Indian Manufacturers',
-    excerpt: 'A well-written RFQ saves you days of back-and-forth with suppliers. Learn the 7 fields every RFQ must have, why budget transparency wins better quotes, and how Bell24h\'s AI fills in the gaps automatically.',
-    date: '2026-03-10',
-    category: 'Procurement Tips',
-    readTime: '6 min read',
+export const metadata: Metadata = {
+  title: 'Blog — B2B Procurement Guides for Indian MSMEs',
+  description: 'Practical guides on supplier sourcing, GST compliance, trade credit, protected payment, and building smarter supply chains in India.',
+  keywords: ['B2B procurement India', 'supplier sourcing guide', 'MSME procurement tips', 'GST compliance B2B'],
+  openGraph: {
+    title: 'VyaparSethu Blog — B2B Procurement Guides for Indian MSMEs',
+    description: 'Practical guides on supplier sourcing, GST compliance, trade credit, and building smarter supply chains in India.',
+    url: 'https://www.vyaparsethu.com/blog',
+    siteName: 'VyaparSethu',
   },
-  {
-    slug: 'gst-compliance-b2b-buyers',
-    title: 'GST Compliance for B2B Buyers: What Every Procurement Manager Must Know',
-    excerpt: 'Input tax credit, reverse charge mechanism, e-invoicing — GST adds complexity to every B2B purchase. Here\'s a practical checklist to stay compliant and avoid notices from the department.',
-    date: '2026-03-07',
-    category: 'Compliance',
-    readTime: '8 min read',
-  },
-  {
-    slug: 'voice-rfq-indian-smes',
-    title: 'Voice RFQ: How Indian SMEs Are Revolutionising Procurement',
-    excerpt: 'Typing a detailed RFQ takes 20 minutes. Speaking it takes 90 seconds. Bell24h\'s Voice RFQ uses Groq Whisper to transcribe your requirement in real time — then AI extracts category, budget, and timeline automatically.',
-    date: '2026-03-04',
-    category: 'Product',
-    readTime: '4 min read',
-  },
-  {
-    slug: 'questions-to-ask-suppliers',
-    title: 'Top 10 Questions to Ask a Supplier Before Accepting a Quote',
-    excerpt: 'Price is just one number. Before you accept a quote, ask about lead time, MOQ, payment terms, GST registration, and quality certifications. This checklist has saved Bell24h buyers from 3 bad deals in our first month.',
-    date: '2026-02-28',
-    category: 'Procurement Tips',
-    readTime: '5 min read',
-  },
-  {
-    slug: 'escrow-b2b-transactions-india',
-    title: 'Escrow for B2B Transactions: Why Secure Payments Matter in India',
-    excerpt: 'B2B payment fraud costs Indian businesses ₹1,200 crore annually. Escrow holds the buyer\'s payment until delivery is confirmed — protecting both sides. Here\'s exactly how Bell24h\'s escrow pipeline works.',
-    date: '2026-02-24',
-    category: 'Payments',
-    readTime: '7 min read',
-  },
-];
+  alternates: { canonical: 'https://www.vyaparsethu.com/blog' },
+};
+
+const CATEGORY_COLOURS: Record<string, string> = {
+  'Procurement Tips': 'text-blue-400 bg-blue-400/10',
+  'Compliance':       'text-amber-400 bg-amber-400/10',
+  'Product':          'text-emerald-400 bg-emerald-400/10',
+  'Payments':         'text-purple-400 bg-purple-400/10',
+  'Category Guide':   'text-[#D4AF37] bg-[#D4AF37]/10',
+  'Finance':          'text-rose-400 bg-rose-400/10',
+};
 
 export default function BlogPage() {
+  const sorted = [...BLOG_POSTS].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  const featured = sorted[0];
+  const rest = sorted.slice(1);
+
   return (
     <div className="min-h-screen bg-[#0F172A]">
       <div className="max-w-4xl mx-auto px-4 py-16">
+
         {/* Header */}
-        <div className="mb-12">
-          <h1 className="text-3xl font-bold text-white mb-3">Bell24h Blog</h1>
-          <p className="text-slate-400 text-lg">
-            Practical guides on B2B procurement, supplier sourcing, and building smarter supply chains in India.
+        <div className="mb-10">
+          <h1 className="text-3xl font-bold text-white mb-3">VyaparSethu Blog</h1>
+          <p className="text-slate-400 text-lg max-w-2xl">
+            Practical guides on B2B sourcing, GST compliance, trade credit, and building fraud-proof supply chains in India.
           </p>
         </div>
 
-        {/* Post grid */}
-        <div className="space-y-8">
-          {POSTS.map(post => (
-            <article
-              key={post.slug}
-              className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-6 hover:border-slate-600/60 transition-colors group"
-            >
+        {/* Category filter pills */}
+        <div className="flex flex-wrap gap-2 mb-10">
+          {BLOG_CATEGORIES.map(cat => (
+            <span key={cat} className={`text-xs font-medium px-3 py-1 rounded-full ${CATEGORY_COLOURS[cat] ?? 'text-slate-400 bg-slate-700/50'}`}>
+              {cat}
+            </span>
+          ))}
+        </div>
+
+        {/* Featured post */}
+        <Link href={`/blog/${featured.slug}`} className="block mb-10 bg-[#001f3f] border border-[#D4AF37]/20 rounded-2xl p-8 hover:border-[#D4AF37]/40 transition-colors group">
+          <div className="flex items-center gap-3 mb-3">
+            <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${CATEGORY_COLOURS[featured.category] ?? 'text-slate-400 bg-slate-700/50'}`}>
+              {featured.category}
+            </span>
+            <span className="text-xs text-slate-500">{featured.readTime} read</span>
+            <span className="text-xs text-[#D4AF37]/70 font-medium">Latest</span>
+          </div>
+          <h2 className="text-xl font-bold text-white mb-3 leading-snug group-hover:text-[#D4AF37] transition-colors">
+            {featured.title}
+          </h2>
+          <p className="text-slate-400 text-sm leading-relaxed">{featured.excerpt}</p>
+          <span className="inline-flex items-center gap-1 mt-4 text-sm text-[#D4AF37] font-medium">Read article →</span>
+        </Link>
+
+        {/* Grid */}
+        <div className="space-y-6">
+          {rest.map(post => (
+            <article key={post.slug} className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-6 hover:border-slate-600/60 transition-colors group">
               <div className="flex items-center gap-3 mb-3">
-                <span className="text-xs font-medium text-indigo-400 bg-indigo-400/10 px-2.5 py-1 rounded-full">
+                <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${CATEGORY_COLOURS[post.category] ?? 'text-slate-400 bg-slate-700/50'}`}>
                   {post.category}
                 </span>
-                <span className="text-xs text-slate-500">{post.readTime}</span>
-                <span className="text-xs text-slate-300">
-                  {new Date(post.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
+                <span className="text-xs text-slate-500">{post.readTime} read</span>
+                <span className="text-xs text-slate-400">
+                  {new Date(post.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                 </span>
               </div>
-
-              <h2 className="text-lg font-semibold text-white mb-2 group-hover:text-indigo-300 transition-colors leading-snug">
+              <h2 className="text-base font-semibold text-white mb-2 group-hover:text-[#D4AF37] transition-colors leading-snug">
                 {post.title}
               </h2>
-              <p className="text-slate-400 text-sm leading-relaxed mb-4">{post.excerpt}</p>
-
-              <Link
-                href={`/blog/${post.slug}`}
-                className="inline-flex items-center gap-1.5 text-sm text-indigo-400 hover:text-indigo-300 font-medium transition-colors"
-              >
+              <p className="text-slate-400 text-sm leading-relaxed mb-4 line-clamp-2">{post.excerpt}</p>
+              <Link href={`/blog/${post.slug}`} className="inline-flex items-center gap-1 text-sm text-[#D4AF37] hover:text-[#c4a030] font-medium transition-colors">
                 Read article →
               </Link>
             </article>
@@ -88,14 +91,11 @@ export default function BlogPage() {
         </div>
 
         {/* CTA */}
-        <div className="mt-16 bg-indigo-600/10 border border-indigo-500/20 rounded-xl p-8 text-center">
-          <h3 className="text-white font-semibold text-lg mb-2">Ready to simplify your procurement?</h3>
-          <p className="text-slate-400 text-sm mb-5">Post your first RFQ in 90 seconds — voice, video, or text.</p>
-          <Link
-            href="/rfq/create"
-            className="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors text-sm"
-          >
-            Post an RFQ — Free
+        <div className="mt-16 bg-[#001f3f] border border-[#D4AF37]/20 rounded-xl p-8 text-center">
+          <h3 className="text-white font-semibold text-lg mb-2">Ready to simplify your sourcing?</h3>
+          <p className="text-slate-400 text-sm mb-5">Post your first Requirement in 90 seconds — voice, video, or text. Verified Suppliers quote within 24 hours.</p>
+          <Link href="/rfq/create" className="inline-block bg-[#D4AF37] hover:bg-[#c4a030] text-[#001f3f] font-semibold px-6 py-3 rounded-lg transition-colors text-sm">
+            Post a Requirement — Free
           </Link>
         </div>
       </div>

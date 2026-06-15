@@ -8,6 +8,7 @@ Allow: /voice-rfq/
 Allow: /video-rfq/
 Allow: /rfq/
 Allow: /about/
+Allow: /blog/
 Allow: /contact/
 Allow: /pricing/
 Allow: /help/
@@ -21,4 +22,4 @@ Disallow: /dashboard/
 Disallow: /profile/
 Disallow: /settings/
 
-Sitemap: https://www.bell24h.com/sitemap.xml
+Sitemap: https://www.vyaparsethu.com/sitemap.xml

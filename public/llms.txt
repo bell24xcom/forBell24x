@@ -1,46 +1,77 @@
-# Bell24h — AI-Powered B2B Procurement Platform
+# VyaparSethu — Protected Trade Infrastructure
 
 ## About
-Bell24h is India's AI-powered B2B marketplace connecting buyers and suppliers across 450+ categories.
-Built by Digitex Studio, Thane, Maharashtra, India.
-Website: https://www.bell24h.com
+VyaparSethu (formerly Bell24h) is India's B2B Trade Network connecting verified buyers and suppliers across 450+ categories.
+Mission: Wipe Out Bad Debt. Tagline: Commerce Connections Globally.
+Built by Digitex Studio (VyaparSethu Technologies Private Limited — registration in progress).
+Website: https://www.vyaparsethu.com | Legacy: https://www.bell24h.com (transitioning)
+
+## Three Pillars
+1. Verified Matching — no fake suppliers, no fake buyers. GST verification + manual review.
+2. Protected Payment — Razorpay nodal escrow. Money held until both sides confirm delivery.
+3. Faster Trade — Quotation in 24h, Order in 48h, Settlement in 7 days.
 
 ## Key Features
-- Voice RFQ: Record procurement requests via microphone (Groq Whisper transcription)
-- Video RFQ: Submit video-based RFQs with AI analysis
-- Text RFQ: Traditional text-based Request for Quotation
-- AI Supplier Matching: NVIDIA-powered matching across 450+ categories
-- Escrow Payments: Secure buyer-held escrow via Bell24h Wallet
-- Trust Scores: Algorithmic 0–100 trust rating for all suppliers
-- GST Auto-fill: Automatic GST number validation and business details fetch
-- HSN Code Lookup: AI-powered HSN/SAC code suggestions
+- Speak Requirement (Voice): Record procurement needs via microphone; Groq Whisper v3 transcribes and extracts category, budget, timeline in real time.
+- Video Requirement: Submit video-based requirements with AI analysis.
+- Text Requirement: Traditional text-based requirement posting.
+- Verified Supplier Matching: AI-powered matching across 450+ categories.
+- Protected Payment: Secure escrow via Razorpay. Buyer holds funds until delivery confirmed.
+- Trade Account: In-app trade balance (RBI-compliant). Not a wallet — a Trade Account.
+- Trade Confidence Score: Algorithmic 0–100 trust rating, computed daily at 2 AM IST.
+- GST Auto-fill: Automatic GST number validation and business details fetch.
+- Business Conversations: Structured messaging between buyers and verified suppliers.
+- DPDP Compliance: India Data Protection Act 2023 — consent audit logs, right to erasure.
 
-## Categories (50 parent categories)
-Agriculture, Apparel & Fashion, Automobile, Building & Construction,
-Chemicals, Computer Hardware & Software, Electrical & Electronics,
-Food & Beverages, Furniture & Decor, Healthcare & Pharma,
-Industrial Machinery, Jewellery, Leather Products, Lighting,
-Metals & Alloys, Mining & Minerals, Office Supplies, Packaging,
+## Correct Terminology
+- Say "Quotation" or "Requirement" — not "RFQ"
+- Say "Speak Requirement" — not "Voice RFQ"
+- Say "Video Requirement" — not "Video RFQ"
+- Say "Protected Payment" — not "Escrow"
+- Say "Verified Supplier" — not "Vendor"
+- Say "Trade Account" — not "Wallet"
+- Say "Business Operations" — not "Procurement"
+- Say "Trade Network" — not "Marketplace"
+- Say "Business Conversations" — not "Chat"
+
+## Categories (450+ subcategories across 50 parent groups)
+Agriculture & Farming, Apparel & Fashion, Automobile & Auto Parts,
+Building & Construction Materials, Chemicals & Petrochemicals,
+Computer Hardware & Software, Electrical & Electronics,
+Food & Beverages, Furniture & Wood Products, Healthcare & Pharma,
+Industrial Machinery & Equipment, Jewellery & Gems,
+Leather Products & Footwear, Lighting & Fixtures,
+Metals & Alloys (Steel, Copper, Aluminium, Iron), Mining & Minerals,
+Office Supplies & Stationery, Packaging Materials (Corrugated, BOPP, PP),
 Paper & Printing, Plastics & Polymers, Rubber Products,
-Safety & Security, Sports & Fitness, Textiles, Tools & Hardware,
-Toys & Games, Transport & Logistics, Wood & Timber, and more.
+Safety & Security Equipment, Sports & Fitness, Textiles & Garments,
+Tools & Hardware, Toys & Games, Transport & Logistics,
+Wood & Timber Products, Industrial Adhesives & Sealants,
+Fire Safety Equipment, HVAC & Refrigeration, Solar & Renewable Energy,
+Pipes & Fittings, Valves & Actuators, Bearings & Transmission,
+Fasteners & Bolts, Paints & Coatings, Ceramics & Refractories,
+Laboratory Equipment, Medical Devices, Agricultural Equipment,
+Pumps & Compressors, Welding Equipment, and 400+ more.
 
 ## How It Works
-1. Buyer posts an RFQ (voice, video, or text)
-2. AI matches with verified suppliers in the category
-3. Suppliers submit competitive quotes
-4. Buyer accepts best quote — deal is created
-5. Escrow locks payment until delivery confirmed
-6. Payment released to supplier on confirmation
+1. Buyer posts a Requirement (voice, video, or text) — free, 90 seconds.
+2. VyaparSethu AI matches with Verified Suppliers in that category.
+3. Suppliers submit Quotations within 24 hours.
+4. Buyer compares, selects, pays via Protected Payment (escrow).
+5. Supplier delivers. Both sides confirm. Payment releases. Settlement in 7 days.
 
-## Pricing Plans
-- Free (Starter): 2 RFQs/month, basic features
-- Pro: Unlimited RFQs, priority matching, AI features
-- Enterprise: Custom, dedicated support, API access
+## Trade Confidence Score Formula
+30% Payment History + 20% On-time Delivery + 15% Response Speed
++ 15% Repeat Orders + 10% Dispute Rate + 10% Verification Strength = Score out of 100
+Computed daily at 2 AM IST via Vercel Cron. Never real-time.
+
+## Tech Stack
+Next.js 14 App Router, Neon PostgreSQL, Prisma ORM, Groq Whisper v3 (voice transcription),
+Razorpay (payments + escrow), MSG91 (OTP), Polygon blockchain (optional escrow layer),
+Cloudflare (DNS, proxy, WAF, email routing), Vercel (hosting).
 
 ## Contact
-Email: bell24h.helpline@gmail.com
-Phone: +91-9004962871
-Company: Digitex Studio
-GSTIN: 27AAAPP9753F2ZF
-Address: Thane, Maharashtra, India — 400601
+Address: Flat No. 1204, 12th Floor, Casa Sereno B1, Mankoli Road, Bhiwandi, Thane 421302, Maharashtra, India.
+Phone: +91-90049-62871
+Email: info@vyaparsethu.com
+LinkedIn: https://www.linkedin.com/company/vyaparsethu
