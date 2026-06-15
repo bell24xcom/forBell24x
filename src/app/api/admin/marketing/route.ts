@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getInsforge, isInsforgeConfigured } from '@/lib/insforge';
+import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,31 +11,38 @@ const DEGRADED = (reason: string) =>
     reason,
   });
 
+// InsForge used lowercase status strings ('new','sent','matched').
+// Map those to Prisma RFQStatus enum values.
+function toStatusEnum(s?: string | null): string | undefined {
+  if (!s) return undefined;
+  const map: Record<string, string> = {
+    new: 'ACTIVE', sent: 'QUOTED', matched: 'QUOTED',
+  };
+  return map[s.toLowerCase()] ?? s.toUpperCase();
+}
+
 async function runRuleEngine(rfq: any) {
-  const client = getInsforge();
-  if (!client) return null;
   try {
-    const { data: rules, error } = await client
-      .from('campaign_rules')
-      .select('*')
-      .eq('is_active', true)
-      .eq('category', rfq.category)
-      .eq('urgency', rfq.urgency);
+    const rule = await prisma.campaignRule.findFirst({
+      where: {
+        isActive: true,
+        category: rfq.category,
+        urgency:  String(rfq.urgency ?? '').toUpperCase(),
+      },
+    });
+    if (!rule) return null;
 
-    if (error || !rules || rules.length === 0) return null;
-
-    const rule    = rules[0];
-    const message = rule.template_text
-      .replace('{{category}}', rfq.category || '')
-      .replace('{{urgency}}',  rfq.urgency  || '')
-      .replace('{{text}}',     rfq.rfq_text || '');
+    const message = rule.templateText
+      .replace('{{category}}', rfq.category   || '')
+      .replace('{{urgency}}',  rfq.urgency    || '')
+      .replace('{{text}}',     rfq.description || rfq.requirements || '');
 
     const outreachRes = await fetch(
       `${process.env.NEXTAUTH_URL}/api/admin/marketing/outreach`,
       {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ rfqId: rfq.id, message, type: rule.action_type }),
+        body:    JSON.stringify({ rfqId: rfq.id, message, type: rule.actionType }),
         signal:  AbortSignal.timeout(5000),
       }
     );
@@ -47,11 +54,6 @@ async function runRuleEngine(rfq: any) {
 }
 
 export async function GET(req: NextRequest) {
-  if (!isInsforgeConfigured()) return DEGRADED('InsForge not configured');
-
-  const client = getInsforge();
-  if (!client) return DEGRADED('InsForge client unavailable');
-
   try {
     const { searchParams } = new URL(req.url);
     const page     = parseInt(searchParams.get('page')  || '1');
@@ -60,46 +62,33 @@ export async function GET(req: NextRequest) {
     const category = searchParams.get('category');
     const offset   = (page - 1) * limit;
 
-    const { data: statsData, error: statsError } = await client
-      .from('rfqs')
-      .select('status, category');
+    const where: any = {};
+    if (status)   where.status   = toStatusEnum(status);
+    if (category) where.category = { contains: category, mode: 'insensitive' };
 
-    if (statsError) {
-      console.error('[Marketing GET] stats error:', statsError.message);
-      return DEGRADED(statsError.message);
-    }
+    const [total, rfqs, allRfqs] = await Promise.all([
+      prisma.rFQ.count({ where }),
+      prisma.rFQ.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip: offset,
+        take: limit,
+      }),
+      prisma.rFQ.findMany({ select: { status: true, category: true } }),
+    ]);
 
-    const totalRfqs  = (statsData ?? []).length;
-    const activeRfqs = (statsData ?? []).filter(
-      r => r.status === 'new' || r.status === 'sent' || r.status === 'matched'
-    ).length;
-
-    const categoryTrends = (statsData ?? []).reduce((acc: Record<string, number>, curr: any) => {
-      const key = curr.category || 'Uncategorized';
+    const activeStatuses = new Set(['ACTIVE', 'OPEN', 'QUOTED']);
+    const activeRfqs = allRfqs.filter(r => activeStatuses.has(r.status)).length;
+    const categoryTrends = allRfqs.reduce((acc: Record<string, number>, r) => {
+      const key = r.category || 'Uncategorized';
       acc[key] = (acc[key] || 0) + 1;
       return acc;
     }, {});
 
-    let query = client
-      .from('rfqs')
-      .select('*', { count: 'exact' })
-      .order('created_at', { ascending: false })
-      .range(offset, offset + limit - 1);
-
-    if (status)   query = query.eq('status', status);
-    if (category) query = query.ilike('category', `%${category}%`);
-
-    const { data: rfqs, count, error: rfqsError } = await query;
-
-    if (rfqsError) {
-      console.error('[Marketing GET] rfqs error:', rfqsError.message);
-      return DEGRADED(rfqsError.message);
-    }
-
     return NextResponse.json({
-      rfqs:  rfqs ?? [],
-      stats: { totalRfqs, activeRfqs, categoryTrends },
-      pagination: { page, limit, total: count || 0, pages: Math.ceil((count || 0) / limit) },
+      rfqs,
+      stats: { totalRfqs: total, activeRfqs, categoryTrends },
+      pagination: { page, limit, total, pages: Math.ceil(total / limit) },
     });
   } catch (error: any) {
     console.error('[Marketing GET]', error);
@@ -108,42 +97,44 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  if (!isInsforgeConfigured()) return DEGRADED('InsForge not configured');
-  const client = getInsforge();
-  if (!client) return DEGRADED('InsForge client unavailable');
-
   try {
     const body = await req.json();
-    const { data, error } = await client.from('rfqs').insert([body]).select().single();
-    if (error) throw error;
-    await runRuleEngine(data);
-    return NextResponse.json({ success: true, data });
+    const { rfq_text, status, urgency, category, ...rest } = body;
+
+    const rfq = await prisma.rFQ.create({
+      data: {
+        title:       body.title || (rfq_text ?? '').slice(0, 80) || 'Untitled',
+        description: rfq_text ?? body.description ?? null,
+        category:    category  || 'General',
+        quantity:    body.quantity || '1',
+        status:      (toStatusEnum(status) ?? 'ACTIVE') as any,
+        urgency:     (urgency ? urgency.toUpperCase() : 'NORMAL') as any,
+      },
+    });
+
+    await runRuleEngine(rfq);
+    return NextResponse.json({ success: true, data: rfq });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
 
 export async function PATCH(req: NextRequest) {
-  if (!isInsforgeConfigured()) return DEGRADED('InsForge not configured');
-  const client = getInsforge();
-  if (!client) return DEGRADED('InsForge client unavailable');
-
   try {
     const { id, status, rfq_text, category, urgency } = await req.json();
     if (!id) throw new Error('Missing id');
 
-    const updateData: Record<string, unknown> = {};
-    if (status)   updateData.status   = status;
-    if (rfq_text) updateData.rfq_text = rfq_text;
-    if (category) updateData.category = category;
-    if (urgency)  updateData.urgency  = urgency;
+    const updateData: any = {};
+    if (status)   updateData.status      = toStatusEnum(status);
+    if (rfq_text) updateData.description = rfq_text;
+    if (category) updateData.category    = category;
+    if (urgency)  updateData.urgency     = urgency.toUpperCase();
 
-    const { data, error } = await client.from('rfqs').update(updateData).eq('id', id).select().single();
-    if (error) throw error;
+    const rfq = await prisma.rFQ.update({ where: { id }, data: updateData });
 
-    if (category || urgency) await runRuleEngine(data);
+    if (category || urgency) await runRuleEngine(rfq);
 
-    return NextResponse.json({ success: true, data });
+    return NextResponse.json({ success: true, data: rfq });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

@@ -1,76 +1,39 @@
 /**
  * GET /api/insforge/status
  *
- * Health check — tells you if InsForge is connected.
- * Test: visit https://www.bell24h.com/api/insforge/status
+ * Previously checked InsForge connectivity.
+ * InsForge project was paused (Jun 2026); campaign_rules migrated to Neon.
+ * Now returns Neon/Prisma connectivity status so existing monitoring dashboards
+ * continue to get a useful health signal from this endpoint.
  */
 
 import { NextResponse } from 'next/server';
-import { isInsforgeConfigured } from '@/lib/insforge';
+import { prisma } from '@/lib/prisma';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  if (!isInsforgeConfigured()) {
-    return NextResponse.json(
-      {
-        connected: false,
-        configured: false,
-        message: 'InsForge is NOT configured yet.',
-        fix: 'Open .env.production → paste your ik_ API key as INSFORGE_API_KEY → restart server',
-      },
-      { status: 503 }
-    );
-  }
-
   try {
-    const url = process.env.INSFORGE_URL!;
-    const apiKey = process.env.INSFORGE_API_KEY!;
+    // Lightweight ping — count campaign rules (new table, fast)
+    const ruleCount = await prisma.campaignRule.count();
 
-    // Ping the InsForge server with the API key — any HTTP response means the server is up
-    const response = await fetch(`${url.replace(/\/$/, '')}/health`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'apikey': apiKey,
-        'Content-Type': 'application/json',
-      },
-      signal: AbortSignal.timeout(5000), // 5 second timeout
+    return NextResponse.json({
+      connected:  true,
+      configured: true,
+      provider:   'neon-postgresql',
+      message:    'Marketing automation is running on Neon PostgreSQL (migrated from InsForge Jun 2026).',
+      campaignRules: ruleCount,
     });
-
-    // Any HTTP response (even 404) means the server is reachable
-    const isReachable = response.status < 500;
-    const statusText = `HTTP ${response.status}`;
-
-    if (isReachable) {
-      return NextResponse.json({
-        connected: true,
-        configured: true,
-        message: 'InsForge server is reachable and API key is set.',
-        server_status: statusText,
-        url: url,
-      });
-    }
-
-    return NextResponse.json(
-      {
-        connected: false,
-        configured: true,
-        message: `InsForge server returned ${statusText}`,
-        hint: 'Server may be temporarily down. Try again in a moment.',
-      },
-      { status: 503 }
-    );
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error';
-    const isTimeout = message.includes('timeout') || message.includes('abort');
     return NextResponse.json(
       {
-        connected: false,
+        connected:  false,
         configured: true,
-        message: isTimeout
-          ? 'InsForge server did not respond within 5 seconds (timeout)'
-          : `Connection error: ${message}`,
+        provider:   'neon-postgresql',
+        message:    `Database connection error: ${message}`,
       },
-      { status: 500 }
+      { status: 503 }
     );
   }
 }

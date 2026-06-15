@@ -441,6 +441,19 @@ model Feedback {
   @@map("feedback")
 }
 
+model CampaignRule {
+  id           String   @id @default(cuid())
+  isActive     Boolean  @default(true) @map("is_active")
+  category     String
+  urgency      String
+  templateText String   @map("template_text")
+  actionType   String   @map("action_type")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("campaign_rules")
+}
+
 enum UserRole {
   SUPPLIER
   BUYER
