@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { SITE_URL } from '@/lib/site-url'
 import { BLOG_POSTS } from '@/src/data/blog-posts'
 import { getAllCityCategoryPairs, CITIES } from '@/src/data/city-category-seo'
+import { GLOSSARY_TERMS } from '@/src/data/glossary'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 3600
@@ -111,6 +112,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/tools/packaging-calculator`,                       lastModified: new Date(), changeFrequency: 'monthly', priority: 0.75 },
   ]
 
+  // Glossary index + individual term pages
+  const glossaryPages: MetadataRoute.Sitemap = [
+    { url: `${siteUrl}/glossary`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.80 },
+    ...GLOSSARY_TERMS.map(t => ({
+      url: `${siteUrl}/glossary/${t.slug}`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: 0.78,
+    })),
+  ]
+
   // City hub pages (/suppliers/[city])
   const cityPages: MetadataRoute.Sitemap = Object.keys(CITIES).map(citySlug => ({
     url: `${siteUrl}/suppliers/${citySlug}`,
@@ -127,5 +139,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.88,
   }))
 
-  return [...staticPages, ...blogPages, ...categoryPages, ...contentPages, ...cityPages, ...cityCategoryPages, ...rfqPages, ...supplierPages]
+  return [...staticPages, ...blogPages, ...categoryPages, ...contentPages, ...glossaryPages, ...cityPages, ...cityCategoryPages, ...rfqPages, ...supplierPages]
 }
