@@ -46,9 +46,12 @@ export async function POST(req: NextRequest) {
   if (isErrorResponse(auth)) return auth;
 
   try {
-    const body      = await req.json().catch(() => ({}));
-    const dryRun    = body.dryRun === true || req.nextUrl.searchParams.get('dryRun') === 'true';
-    const requested = Math.min(Math.max(1, Number(body.count) || DAILY_LIMIT), DAILY_LIMIT);
+    const body          = await req.json().catch(() => ({}));
+    const dryRun        = body.dryRun === true || req.nextUrl.searchParams.get('dryRun') === 'true';
+    const requested     = Math.min(Math.max(1, Number(body.count) || DAILY_LIMIT), DAILY_LIMIT);
+    const minTrustScore = Number(body.minTrustScore) || 0;   // e.g. 80 for high-trust contacts
+    const deepCategory  = body.category ? String(body.category) : null;  // deep-link category
+    const deepCity      = body.city      ? String(body.city)     : null;  // deep-link city
 
     // ── Daily cap check (IST) ──
     const todayStart = istDayStart();
@@ -76,6 +79,7 @@ export async function POST(req: NextRequest) {
         isClaimed: false,
         outreachCount: { lt: 3 },
         phone: { not: null },
+        ...(minTrustScore > 0 ? { trustScore: { gte: minTrustScore } } : {}),
         OR: [
           { lastOutreachAt: null },
           { lastOutreachAt: { lt: twoDaysAgo } },
@@ -115,8 +119,11 @@ export async function POST(req: NextRequest) {
     }[] = [];
 
     for (const s of suppliers) {
-      const token       = randomUUID();
-      const claimLink   = `${SITE_URL}/claim/${token}`;
+      const token     = randomUUID();
+      // Use category+city deep-link when provided, otherwise generic claim link
+      const claimLink = deepCategory && deepCity
+        ? `${SITE_URL}/supplier/claim?category=${encodeURIComponent(deepCategory)}&city=${encodeURIComponent(deepCity)}&token=${token}`
+        : `${SITE_URL}/claim/${token}`;
       const rawPhone    = (s.phone || '').replace(/\D/g, '').slice(-10);
       const companyName = s.company || s.name || 'Your Business';
 

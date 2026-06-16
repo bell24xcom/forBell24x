@@ -105,3 +105,28 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Failed to fetch analytics data' }, { status: 500 });
   }
 }
+
+// POST /api/admin/analytics — public (no admin auth), lightweight event tracking
+// Body: { actionType, source, sessionId?, userId?, metadata? }
+// actionType: 'modal_open' | 'otp_sent' | 'registration_complete' | 'intent_gate_click'
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json().catch(() => ({}));
+    const { actionType, source, sessionId, userId, metadata } = body;
+    if (!actionType || typeof actionType !== 'string') {
+      return NextResponse.json({ ok: false }, { status: 400 });
+    }
+    await prisma.interactionMemory.create({
+      data: {
+        actionType: actionType.slice(0, 50),
+        source:     source ? String(source).slice(0, 500) : null,
+        sessionId:  sessionId ? String(sessionId).slice(0, 100) : null,
+        userId:     userId   ? String(userId).slice(0, 100) : null,
+        metadata:   metadata ?? null,
+      },
+    });
+    return NextResponse.json({ ok: true });
+  } catch {
+    return NextResponse.json({ ok: false }, { status: 500 });
+  }
+}

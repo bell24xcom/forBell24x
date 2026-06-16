@@ -19,8 +19,23 @@ export default function PhoneCaptureModal() {
     if (captureModalOpen) {
       setStep('phone'); setPhone(''); setOtp(['','','','','','']); setError(''); setDevOtp('');
       setTimeout(() => phoneRef.current?.focus(), 100);
+      // Fire modal_open analytics event
+      fetch('/api/admin/analytics', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          actionType: 'modal_open',
+          source: window.location.pathname,
+          metadata: {
+            intent: captureIntent?.action,
+            label: captureIntent?.label,
+            category: captureIntent?.category,
+            city: captureIntent?.city,
+          },
+        }),
+      }).catch(() => {});
     }
-  }, [captureModalOpen]);
+  }, [captureModalOpen, captureIntent]);
 
   useEffect(() => {
     if (countdown <= 0) return;
@@ -41,6 +56,11 @@ export default function PhoneCaptureModal() {
       if (res?.devOtp) setDevOtp(res.devOtp);
       setStep('otp');
       setCountdown(45);
+      fetch('/api/admin/analytics', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ actionType: 'otp_sent', source: window.location.pathname, metadata: { category: captureIntent?.category, city: captureIntent?.city } }),
+      }).catch(() => {});
       setTimeout(() => otpRefs.current[0]?.focus(), 100);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Could not send OTP. Try again.');
