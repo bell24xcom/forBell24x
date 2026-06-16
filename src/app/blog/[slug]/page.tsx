@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getPostBySlug, BLOG_POSTS } from '@/src/data/blog-posts';
+import BlogCapture from '@/src/components/capture/BlogCapture';
 
 interface Props {
   params: { slug: string };
@@ -112,7 +113,9 @@ export default function BlogPostPage({ params }: Props) {
 
           {/* Body */}
           <article className="prose-invert max-w-none">
-            {paragraphs}
+            {paragraphs.slice(0, Math.ceil(paragraphs.length * 0.45))}
+            <BlogCapture category={post.category} />
+            {paragraphs.slice(Math.ceil(paragraphs.length * 0.45))}
           </article>
 
           {/* CTA */}

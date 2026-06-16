@@ -1,6 +1,7 @@
 'use client';
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { saveIntent, loadIntent, clearIntent, type CaptureIntent } from '@/src/lib/intent';
 
 interface User {
   id: string;
@@ -19,6 +20,14 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   isAuthenticated: boolean;
   sendOTP: (phone: string) => Promise<{ devOtp?: string }>;
+  // Capture modal
+  captureModalOpen: boolean;
+  captureIntent: CaptureIntent | null;
+  openCaptureModal: (intent?: CaptureIntent) => void;
+  closeCaptureModal: () => void;
+  // Progressive profile
+  updateProfile: (data: { name?: string; role?: 'BUYER' | 'SUPPLIER'; company?: string }) => Promise<void>;
+  needsProfile: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -26,7 +35,11 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [captureModalOpen, setCaptureModalOpen] = useState(false);
+  const [captureIntent, setCaptureIntent] = useState<CaptureIntent | null>(null);
   const router = useRouter();
+
+  const needsProfile = !!user && !user.name;
 
   // Check for existing session on mount
   useEffect(() => {
@@ -90,9 +103,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Store user session — backend returns { success, user, token }
       localStorage.setItem('bell24h_user', JSON.stringify(data.user));
       setUser(data.user);
+      setCaptureModalOpen(false);
 
-      // Redirect to dashboard
-      router.push('/dashboard');
+      // Resume pending intent or go to onboarding if no name
+      const intent = loadIntent();
+      clearIntent();
+      if (intent?.redirectTo) {
+        router.push(intent.redirectTo);
+      } else if (!data.user.name) {
+        router.push('/onboarding');
+      } else {
+        router.push('/dashboard');
+      }
     } catch (error) {
       console.error('Sign in error:', error);
       throw error;
@@ -125,6 +147,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const openCaptureModal = useCallback((intent?: CaptureIntent) => {
+    if (intent) { setCaptureIntent(intent); saveIntent(intent); }
+    setCaptureModalOpen(true);
+  }, []);
+
+  const closeCaptureModal = useCallback(() => {
+    setCaptureModalOpen(false);
+  }, []);
+
+  const updateProfile = async (data: { name?: string; role?: 'BUYER' | 'SUPPLIER'; company?: string }) => {
+    try {
+      const res = await fetch('/api/user/complete-profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+        credentials: 'include',
+      });
+      const json = await res.json();
+      if (json.success && json.user) {
+        const updated = { ...user, ...json.user };
+        localStorage.setItem('bell24h_user', JSON.stringify(updated));
+        setUser(updated as User);
+      }
+    } catch { /* non-critical */ }
+  };
+
   const value: AuthContextType = {
     user,
     loading,
@@ -132,6 +180,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signOut,
     sendOTP,
     isAuthenticated: !!user,
+    captureModalOpen,
+    captureIntent,
+    openCaptureModal,
+    closeCaptureModal,
+    updateProfile,
+    needsProfile,
   };
 
   return (
@@ -144,7 +198,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    // Safe fallback — return empty session instead of crashing
     return {
       user: null,
       loading: false,
@@ -152,6 +205,12 @@ export function useAuth() {
       signOut: async () => {},
       sendOTP: async () => ({ devOtp: undefined }),
       isAuthenticated: false,
+      captureModalOpen: false,
+      captureIntent: null,
+      openCaptureModal: () => {},
+      closeCaptureModal: () => {},
+      updateProfile: async () => {},
+      needsProfile: false,
     };
   }
   return context;

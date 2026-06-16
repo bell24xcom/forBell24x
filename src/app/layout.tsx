@@ -5,6 +5,8 @@ import Footer from '@/components/Footer'
 import CookieBanner from '@/src/components/legal/CookieBanner'
 import { DashboardProvider } from '@/contexts/DashboardContext'
 import { AuthProvider } from '@/src/app/contexts/AuthContext'
+import PhoneCaptureModal from '@/src/components/capture/PhoneCaptureModal'
+import FloatingBar from '@/src/components/capture/FloatingBar'
 import { SITE_URL } from '@/lib/site-url'
 
 export const metadata: Metadata = {
@@ -137,6 +139,8 @@ export default function RootLayout({
             </main>
             <Footer />
             <CookieBanner />
+            <PhoneCaptureModal />
+            <FloatingBar />
           </DashboardProvider>
         </AuthProvider>
       </body>
