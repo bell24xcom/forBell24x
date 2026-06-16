@@ -35,4 +35,4 @@ jobs:
         env:
           # next.config.js still has ignoreBuildErrors:true as a safety net,
           # but the tsc step above is the real type gate.
-          NEXT_PUBLIC_SITE_URL: https://www.bell24h.com
+          NEXT_PUBLIC_SITE_URL: https://www.vyaparsethu.com

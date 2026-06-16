@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "prisma": {
+      "command": "npx",
+      "args": ["-y", "@prisma/mcp-server-prisma", "--schema", "prisma/schema.prisma"],
+      "env": {
+        "DATABASE_URL": "${DATABASE_URL}"
+      }
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+    }
+  }
+}
