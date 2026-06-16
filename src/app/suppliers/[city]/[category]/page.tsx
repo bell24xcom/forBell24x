@@ -35,7 +35,7 @@ export default async function CityCategory({ params }: Props) {
   if (!city || !cat) notFound();
 
   // Pull verified suppliers in this city who match this category
-  let suppliers: { id: string; businessName: string | null; city: string | null; trustScore: number | null }[] = [];
+  let suppliers: { id: string; company: string | null; location: string | null; trustScore: number | null }[] = [];
   try {
     suppliers = await prisma.user.findMany({
       where: {
@@ -43,11 +43,11 @@ export default async function CityCategory({ params }: Props) {
         isActive: true,
         isClaimed: true,
         OR: [
-          { city: { contains: city.name, mode: 'insensitive' } },
-          { state: { contains: city.state, mode: 'insensitive' } },
+          { location: { contains: city.name, mode: 'insensitive' } },
+          { location: { contains: city.state, mode: 'insensitive' } },
         ],
       },
-      select: { id: true, businessName: true, city: true, trustScore: true },
+      select: { id: true, company: true, location: true, trustScore: true },
       orderBy: { trustScore: 'desc' },
       take: 12,
     });
@@ -65,9 +65,9 @@ export default async function CityCategory({ params }: Props) {
       position: i + 1,
       item: {
         '@type': 'LocalBusiness',
-        name: s.businessName || 'Verified Supplier',
+        name: s.company || 'Verified Supplier',
         url: `https://www.vyaparsethu.com/supplier/${s.id}`,
-        address: { '@type': 'PostalAddress', addressLocality: s.city || city.name, addressRegion: city.state, addressCountry: 'IN' },
+        address: { '@type': 'PostalAddress', addressLocality: s.location || city.name, addressRegion: city.state, addressCountry: 'IN' },
       },
     })),
   };
@@ -132,7 +132,7 @@ export default async function CityCategory({ params }: Props) {
                     className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5 hover:border-[#D4AF37]/40 transition-colors group">
                     <div className="flex items-start justify-between mb-3">
                       <div className="w-10 h-10 rounded-lg bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37] font-bold text-sm">
-                        {(s.businessName || 'S').charAt(0)}
+                        {(s.company || 'S').charAt(0)}
                       </div>
                       {s.trustScore && (
                         <span className="text-xs font-medium text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded-full">
@@ -141,9 +141,9 @@ export default async function CityCategory({ params }: Props) {
                       )}
                     </div>
                     <h3 className="text-white font-medium text-sm mb-1 group-hover:text-[#D4AF37] transition-colors">
-                      {s.businessName || 'Verified Supplier'}
+                      {s.company || 'Verified Supplier'}
                     </h3>
-                    <p className="text-slate-500 text-xs">{s.city || city.name}, {city.state}</p>
+                    <p className="text-slate-500 text-xs">{s.location || city.name}, {city.state}</p>
                   </Link>
                 ))}
               </div>
