@@ -1,4 +1,4 @@
-import { VoiceRFQModal, VoiceRFQModal, VoiceRFQModal, VoiceRFQModal, VoiceRFQModal, VoiceRFQModal, VoiceRFQModal, VoiceRFQModal, VoiceRFQModal, VoiceRFQModal, VoiceRFQModal, VoiceRFQModal, VoiceRFQModal } from "lucide-react";\nimport { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import VoiceRFQModal from '../components/VoiceRFQModal';
 
