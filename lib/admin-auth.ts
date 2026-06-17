@@ -10,18 +10,41 @@ export interface AdminPayload extends TokenPayload {
   role: 'ADMIN';
 }
 
+const STATIC_ADMIN_PAYLOAD: AdminPayload = {
+  userId: 'system',
+  phone:  '',
+  role:   'ADMIN',
+};
+
 /**
- * Verifies that the request carries a valid JWT with role=ADMIN.
- * Returns the decoded payload or throws a NextResponse (which the caller returns).
+ * Verifies the request carries a valid JWT with role=ADMIN,
+ * OR a static bearer token matching ADMIN_TOKEN / EXPORT_API_KEY.
+ * The static path allows M2M calls (e.g. bell24h-v2 pushing leads) without a JWT.
  */
 export function requireAdmin(request: NextRequest): AdminPayload | NextResponse {
-  // Accept admin-token (dedicated admin session) OR auth-token (main app session with ADMIN role)
-  const token = extractToken(
+  const incomingToken =
+    request.headers.get('authorization')?.replace('Bearer ', '') ||
+    request.headers.get('x-admin-token') ||
+    null;
+
+  // Static token fast-path for M2M / API key auth
+  const adminToken = process.env.ADMIN_TOKEN;
+  const exportKey  = process.env.EXPORT_API_KEY;
+  if (
+    incomingToken &&
+    ((adminToken && incomingToken === adminToken) ||
+     (exportKey  && incomingToken === exportKey))
+  ) {
+    return STATIC_ADMIN_PAYLOAD;
+  }
+
+  // JWT path for human admin sessions (browser / Vercel dashboard)
+  const jwtToken = extractToken(
     request.headers.get('authorization'),
     request.cookies.get('admin-token')?.value ?? request.cookies.get('auth-token')?.value
   );
 
-  if (!token) {
+  if (!jwtToken) {
     return NextResponse.json(
       { success: false, message: 'Admin authentication required' },
       { status: 401 }
@@ -30,7 +53,7 @@ export function requireAdmin(request: NextRequest): AdminPayload | NextResponse 
 
   let payload: TokenPayload;
   try {
-    payload = verifyToken(token);
+    payload = verifyToken(jwtToken);
   } catch {
     return NextResponse.json(
       { success: false, message: 'Invalid or expired admin session' },
