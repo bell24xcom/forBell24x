@@ -6,20 +6,8 @@
   "devCommand": "npm run dev",
   "crons": [
     {
-      "path": "/api/cron/expire-rfqs",
-      "schedule": "0 3 * * *"
-    },
-    {
-      "path": "/api/cron/weekly-digest",
-      "schedule": "0 10 * * 1"
-    },
-    {
-      "path": "/api/cron/supplier-drip",
+      "path": "/api/cron/daily",
       "schedule": "30 3 * * *"
-    },
-    {
-      "path": "/api/cron/follow-up-due",
-      "schedule": "0 4 * * *"
     }
   ],
   "env": {

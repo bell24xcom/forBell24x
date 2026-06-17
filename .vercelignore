@@ -3,6 +3,8 @@ BELL24H_BACKUP_*
 *_BACKUP_*
 backup/
 backups/
+_archive/
+CL4R1T4S/
 
 # Dependencies
 node_modules/
