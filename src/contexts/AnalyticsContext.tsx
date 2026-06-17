@@ -1,4 +1,4 @@
-import { AnalyticsContextType } from "lucide-react";\n'use client';
+'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 

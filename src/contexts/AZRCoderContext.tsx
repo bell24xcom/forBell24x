@@ -1,4 +1,4 @@
-import { AZRCodeAnalysis, AZRCodeCompletion, AZRTestGeneration, CodeSnippet, AZRCoderContextType, AZRCoderProviderProps, Error, CodeSnippet, CodeSnippet } from "lucide-react";\n'use client';
+'use client';
 
 import React, {
   createContext,

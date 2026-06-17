@@ -1,4 +1,4 @@
-import { PaymentContextType, PaymentMethod } from "lucide-react";\n'use client';
+'use client';
 
 import React, { createContext, useContext, ReactNode, useState, useCallback } from 'react';
 
@@ -71,7 +71,7 @@ export function PaymentProvider({ children }: { children: ReactNode }) {
         console.log(`Payment processed: ${amount} ${currency} via ${selectedMethod.name}`);
         return true;
       } catch (error) {
-        console.error(Payment failed:, error);
+        console.error('Payment failed:', error);
         return false;
       } finally {
         setIsProcessing(false);
