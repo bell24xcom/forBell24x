@@ -513,6 +513,7 @@ export const CATEGORY_DATA: Category[] = [
       'Architecture',
       'Property Development',
       'Civil Engineering',
+      'Industrial & Commercial Real Estate Services',
     ],
     supplierCount: 22847,
     rfqs: generateRFQs('Construction', 25),
