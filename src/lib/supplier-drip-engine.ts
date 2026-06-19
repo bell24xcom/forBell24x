@@ -66,5 +66,32 @@ export async function logDripSent(supplierId: string, dripType: DripType): Promi
   const actionType = `drip_${dripType}`;
   const existing   = await prisma.interactionMemory.findFirst({ where: { userId: supplierId, actionType } });
   if (existing) return;
-  await prisma.interactionMemory.create({ data: { userId: supplierId, actionType, source: 'cron' } });
+  await prisma.interactionMemory.create({
+    data: {
+      userId:     supplierId,
+      actionType,
+      source:     'cron',
+      metadata:   { dripState: dripType, sentAt: new Date().toISOString() },
+    },
+  });
+}
+
+export interface OutreachSummary {
+  activeOutreachCount: number; // suppliers who received ≥1 outreach message
+  claimedCount:        number; // suppliers who successfully claimed their profile
+  conversionRate:      number; // percentage: claimedCount / activeOutreachCount × 100
+}
+
+// Read-only — never mutates. Returns aggregated Customer Discovery traction for admin views.
+export async function getOutreachSummary(): Promise<OutreachSummary> {
+  const [activeOutreachCount, claimedCount] = await Promise.all([
+    prisma.user.count({ where: { role: 'SUPPLIER', outreachCount: { gt: 0 } } }),
+    prisma.user.count({ where: { role: 'SUPPLIER', isClaimed: true } }),
+  ]);
+
+  const conversionRate = activeOutreachCount > 0
+    ? parseFloat(((claimedCount / activeOutreachCount) * 100).toFixed(2))
+    : 0;
+
+  return { activeOutreachCount, claimedCount, conversionRate };
 }
