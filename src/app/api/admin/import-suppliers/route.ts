@@ -3,6 +3,7 @@
  * Bulk import unclaimed supplier profiles for marketplace seeding.
  * Admin only. Max 500 per import.
  */
+import { randomUUID } from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin, isErrorResponse } from '@/lib/admin-auth';
@@ -16,6 +17,7 @@ interface SupplierInput {
   state?: string;
   gstNumber?: string;
   phone?: string;
+  email?: string;
   description?: string;
 }
 
@@ -63,17 +65,19 @@ export async function POST(req: NextRequest) {
             role: 'SUPPLIER',
             location: s.state ? `${s.city.trim()}, ${s.state.trim()}` : s.city.trim(),
             gstNumber: s.gstNumber?.trim() || null,
+            phone: s.phone?.trim() || null,
+            email: s.email?.trim() || null,
             isActive: true,
             isVerified: false,
             isClaimed: false,
+            trustScore: 0,
+            claimToken: randomUUID(),
             importedFrom: 'admin_import',
             preferences: {
               categories: [s.category.trim()],
               description: s.description || null,
               onboardingComplete: false,
             },
-            // Trust score baseline for unclaimed profiles
-            trustScore: s.gstNumber ? 20 : 10,
           },
         });
         imported++;
