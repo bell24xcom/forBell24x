@@ -144,7 +144,7 @@ export default function EmailHealthPage() {
             <div className="space-y-2.5">
               {[
                 { label: 'SPF TXT record added on @ in Cloudflare',                     ok: data.records.spf.status   === 'ok' },
-                { label: 'DKIM TXT record added on mail._domainkey in Cloudflare',      ok: data.records.dkim.status  === 'ok' },
+                { label: 'DKIM CNAME records added on brevo1._domainkey and brevo2._domainkey in Cloudflare', ok: data.records.dkim.status === 'ok' },
                 { label: 'DMARC TXT record added on _dmarc in Cloudflare',              ok: data.records.dmarc.status === 'ok' },
                 { label: 'Brevo → "Verify Domain" button clicked',                      ok: false },
                 { label: 'Test email sent from noreply@bell24h.com — not in spam',      ok: false },
