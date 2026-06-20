@@ -19,6 +19,9 @@
  * first occurrence wins; subsequent entries get phone: null to satisfy unique constraint.
  */
 
+import { config } from 'dotenv';
+config({ path: '.env.local' });   // load Neon credentials before PrismaClient initialises
+
 import { randomUUID } from 'crypto';
 import { PrismaClient } from '@prisma/client';
 

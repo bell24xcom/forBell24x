@@ -18,6 +18,9 @@
  *   Laxmi Metal GST — masked in source; stored null
  */
 
+import { config } from 'dotenv';
+config({ path: '.env.local' });   // load Neon credentials before PrismaClient initialises
+
 import { randomUUID } from 'crypto';
 import { PrismaClient } from '@prisma/client';
 
