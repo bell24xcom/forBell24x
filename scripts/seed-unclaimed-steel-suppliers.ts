@@ -92,7 +92,7 @@ const SUPPLIERS: ShellSupplier[] = [
   },
   {
     company:   'Gopani Metal Industries Pvt Ltd',
-    phone:     null,
+    phone:     '7971405453',              // confirmed: Shri Udya Singh Negi (Prabhadevi office; factory at Taloja — confirm on first call)
     email:     null,
     gstNumber: '27AABCB1392G1ZV',
     location:  'Kalamboli, Navi Mumbai, Maharashtra',
@@ -113,14 +113,31 @@ const SUPPLIERS: ShellSupplier[] = [
   },
   {
     company:   'Anuradha Iron And Steel Private Limited',
-    phone:     null,
+    phone:     '7947137292',             // confirmed via directory lookup
     email:     null,
-    gstNumber: '27AASCA6797P1ZD',      // confirmed via KnowYourGST / government registry
+    gstNumber: '27AASCA6797P1ZD',       // confirmed via KnowYourGST / government registry
     location:  'Kalamboli, Panvel, Maharashtra',
   },
 ];
 
+// Patch confirmed phones onto records that may already exist with phone=null
+async function patchPhones(updates: Array<{ company: string; phone: string }>) {
+  for (const u of updates) {
+    const rec = await prisma.user.findFirst({ where: { company: u.company }, select: { id: true, phone: true } });
+    if (!rec) { console.log(`  [patch] ${u.company} not yet in DB — phone will be set on create`); continue; }
+    if (rec.phone === u.phone) { console.log(`  [patch] ${u.company} phone already current`); continue; }
+    await prisma.user.update({ where: { id: rec.id }, data: { phone: u.phone } });
+    console.log(`  [patch] ${u.company} → phone set to ${u.phone}`);
+  }
+}
+
 async function main() {
+  console.log('\nPhase 0: patching confirmed phones on existing records...');
+  await patchPhones([
+    { company: 'Anuradha Iron And Steel Private Limited', phone: '7947137292' },
+    { company: 'Gopani Metal Industries Pvt Ltd',         phone: '7971405453' },
+  ]);
+
   console.log(`\nSeeding ${SUPPLIERS.length} unclaimed steel supplier profiles...\n`);
 
   let created = 0;
