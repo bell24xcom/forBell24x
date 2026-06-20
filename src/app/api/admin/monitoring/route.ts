@@ -23,6 +23,8 @@ export async function GET(req: NextRequest) {
       pendingNotifications,
       recentRFQs,
       recentQuotes,
+      realRFQCount,
+      acceptedQuotesOnReal,
     ] = await Promise.all([
       // Users
       prisma.user.count(),
@@ -74,6 +76,9 @@ export async function GET(req: NextRequest) {
           supplier: { select: { name: true, company: true } },
         },
       }),
+      // Health score: real (non-seeded) RFQ counts only
+      prisma.rFQ.count({ where: { isSeeded: { not: true } } }),
+      prisma.quote.count({ where: { status: 'ACCEPTED', rfq: { isSeeded: { not: true } } } }),
     ]);
 
     // Escrow / transaction volume
@@ -83,15 +88,15 @@ export async function GET(req: NextRequest) {
     });
     const completedVolume = Number(volumeResult._sum.amount ?? 0);
 
-    // Health score: weighted across key ratios
-    const rfqConversionRate = totalRFQs  > 0 ? (acceptedQuotes  / totalRFQs)  * 100 : 100;
+    // Health score: seeded RFQs excluded so test data doesn't drag down the metric
+    const rfqConversionRate = realRFQCount > 0 ? (acceptedQuotesOnReal / realRFQCount) * 100 : 100;
     const txSuccessRate     = totalTx    > 0 ? (completedTx     / totalTx)    * 100 : 100;
     const userActivityRate  = totalUsers > 0 ? (activeUsers     / totalUsers) * 100 : 100;
     const systemHealth      = Math.round(((rfqConversionRate + txSuccessRate + userActivityRate) / 3) * 10) / 10;
 
     // Auto-alerts from real data
     const alerts: Array<{ type: string; message: string; timestamp: string }> = [];
-    if (systemHealth < 80)        alerts.push({ type: 'warning',  message: 'System health below 80% — check conversion rates', timestamp: now.toISOString() });
+    if (systemHealth < 80)        alerts.push({ type: 'warning',  message: `System health ${systemHealth}% — based on ${realRFQCount} real RFQs (seeded data excluded from score)`, timestamp: now.toISOString() });
     if (cancelledRFQs > totalRFQs * 0.3) alerts.push({ type: 'warning',  message: 'High RFQ cancellation rate (>30%)', timestamp: now.toISOString() });
     if (pendingNotifications > 500)       alerts.push({ type: 'info',     message: `${pendingNotifications} unread notifications pending`, timestamp: now.toISOString() });
 

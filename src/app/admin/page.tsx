@@ -11,8 +11,11 @@ interface Stats {
   trust:        { highTrustSuppliers: number };
   plans:        { FREE: number; PRO: number; ENTERPRISE: number };
   range?:       string;
-  pendingKyc?:  number;
-  unansweredRfqs?: number;
+  pendingKyc?:         number;
+  pendingKycReal?:     number;
+  importedUnverified?: number;
+  unansweredRfqs?:     number;
+  unansweredRealRfqs?: number;
   expiringSoon?: number;
   activity?:    Array<{ type: string; label: string; time: string }>;
 }
@@ -125,11 +128,21 @@ export default function AdminDashboard() {
           className="bg-amber-900/20 border border-amber-700/40 rounded-xl p-4 hover:border-amber-500/60 transition-colors">
           <p className="text-amber-300 text-2xl font-bold">{stats.pendingKyc ?? 0}</p>
           <p className="text-amber-400/80 text-xs mt-1">Pending KYC — needs verification</p>
+          {(stats.importedUnverified ?? 0) > 0 && (
+            <p className="text-amber-700 text-xs mt-1">
+              {stats.pendingKycReal ?? 0} real users · {stats.importedUnverified} imported shells
+            </p>
+          )}
         </a>
         <a href="/admin/rfqs?status=ACTIVE"
           className="bg-blue-900/20 border border-blue-700/40 rounded-xl p-4 hover:border-blue-500/60 transition-colors">
           <p className="text-blue-300 text-2xl font-bold">{stats.unansweredRfqs ?? 0}</p>
           <p className="text-blue-400/80 text-xs mt-1">Unanswered RFQs — 0 quotes so far</p>
+          {stats.unansweredRealRfqs != null && (
+            <p className="text-blue-700 text-xs mt-1">
+              {stats.unansweredRealRfqs} real · {(stats.unansweredRfqs ?? 0) - stats.unansweredRealRfqs} seeded
+            </p>
+          )}
         </a>
         <a href="/admin/rfqs"
           className="bg-rose-900/20 border border-rose-700/40 rounded-xl p-4 hover:border-rose-500/60 transition-colors">

@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 
 const DAILY_LIMIT = 50;
+const DIALER_KEY  = 'vs_dialer_session';
 
 const RANGES = [{ label: '7 Days', value: 7 }, { label: '30 Days', value: 30 }, { label: '90 Days', value: 90 }];
 
@@ -122,11 +123,18 @@ function Dialer({
     setCountdown(null);
   };
 
+  // End session: clear localStorage then close
+  const endSession = useCallback(() => {
+    clearTimer();
+    try { localStorage.removeItem(DIALER_KEY); } catch {}
+    onClose();
+  }, [onClose]);
+
   const advance = useCallback(() => {
     clearTimer();
     if (idx < total - 1) setIdx(i => i + 1);
-    else onClose();
-  }, [idx, total, onClose]);
+    else endSession();
+  }, [idx, total, endSession]);
 
   const startCountdown = useCallback((secs: number) => {
     clearTimer();
@@ -144,6 +152,33 @@ function Dialer({
   }, [advance]);
 
   useEffect(() => () => clearTimer(), []);
+
+  // Restore saved session on mount (same batch = same supplier ID order)
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(DIALER_KEY);
+      if (!raw) return;
+      const saved = JSON.parse(raw) as { ids: string[]; idx: number; sent: number[]; skip: number[] };
+      const currentIds = suppliers.map(s => s.id);
+      if (JSON.stringify(saved.ids) !== JSON.stringify(currentIds)) return;
+      if (typeof saved.idx === 'number')  setIdx(saved.idx);
+      if (Array.isArray(saved.sent))      setSentSet(new Set(saved.sent));
+      if (Array.isArray(saved.skip))      setSkipSet(new Set(saved.skip));
+    } catch {}
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Persist session on every state change
+  useEffect(() => {
+    try {
+      localStorage.setItem(DIALER_KEY, JSON.stringify({
+        suppliers,
+        ids:  suppliers.map(s => s.id),
+        idx,
+        sent: [...sentSet],
+        skip: [...skipSet],
+      }));
+    } catch {}
+  }, [idx, sentSet, skipSet, suppliers]);
 
   // When idx changes, cancel any running countdown
   useEffect(() => { clearTimer(); }, [idx]);
@@ -189,7 +224,7 @@ function Dialer({
                 Cancel
               </button>
             )}
-            <button onClick={onClose} className="text-slate-500 hover:text-white">
+            <button onClick={endSession} className="text-slate-500 hover:text-white">
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -235,7 +270,7 @@ function Dialer({
 
           {/* Message preview */}
           <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-3 mb-4 text-xs text-slate-400 leading-relaxed whitespace-pre-line">
-            {`Namaste! 🙏\n\nYour business "${s.company}" has a verified profile on VyaparSethu — India's B2B Supplier & Buyer Network.\n\nVerified buyers are searching for your products right now.\n\nClaim your FREE profile in 2 minutes:\n[Claim Link]\n\n— Team VyaparSethu`}
+            {`Namaste! 🙏\n\nYour business "${s.company}" has a verified profile on VyaparSethu — India's B2B Supplier & Buyer Network.\n\nVerified buyers are searching for your products right now.\n\nClaim your FREE profile in 2 minutes:\n${s.claimLink}\n\n— Team VyaparSethu`}
           </div>
 
           {/* Countdown hint */}
@@ -292,7 +327,7 @@ function Dialer({
         {/* Footer stats */}
         <div className="px-5 py-3 bg-slate-950/50 border-t border-slate-800 flex items-center justify-between text-xs text-slate-500">
           <span>✓ {sentSet.size} sent  ·  ↷ {skipSet.size} skipped  ·  {total - idx - 1} remaining</span>
-          <button onClick={onClose} className="text-slate-600 hover:text-slate-400 transition-colors">
+          <button onClick={endSession} className="text-slate-600 hover:text-slate-400 transition-colors">
             End Session
           </button>
         </div>
@@ -322,6 +357,7 @@ export default function OutreachPage() {
   // Dialer
   const [dialerSuppliers, setDialerSuppliers] = useState<Supplier[]>([]);
   const [dialerOpen,      setDialerOpen]      = useState(false);
+  const [savedSession,    setSavedSession]    = useState<Supplier[] | null>(null);
 
   // ── Fetch campaign stats ──
   const fetchData = useCallback(async () => {
@@ -351,6 +387,18 @@ export default function OutreachPage() {
   }, []);
 
   useEffect(() => { fetchData(); fetchDaily(); }, [fetchData, fetchDaily]);
+
+  // Restore saved dialer session across page refreshes
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(DIALER_KEY);
+      if (!raw) return;
+      const saved = JSON.parse(raw) as { suppliers?: Supplier[] };
+      if (Array.isArray(saved.suppliers) && saved.suppliers.length > 0) {
+        setSavedSession(saved.suppliers);
+      }
+    } catch {}
+  }, []);
 
   // ── Bulk send / generate batch ──
   const handleBulkSend = async () => {
@@ -528,6 +576,30 @@ export default function OutreachPage() {
           </div>
         )}
       </div>
+
+      {/* Resume banner — shown when a dialer session survived a page refresh */}
+      {savedSession && !dialerOpen && (
+        <div className="bg-amber-900/20 border border-amber-700/40 rounded-xl px-4 py-3 flex items-center justify-between gap-4">
+          <div>
+            <p className="text-amber-300 text-sm font-semibold">Unfinished dialer session found</p>
+            <p className="text-amber-700 text-xs mt-0.5">{savedSession.length} contacts — resume where you left off</p>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={() => { setDialerSuppliers(savedSession); setDialerOpen(true); }}
+              className="bg-amber-600 hover:bg-amber-700 text-white font-semibold px-3 py-1.5 rounded-lg text-sm transition-colors"
+            >
+              Resume
+            </button>
+            <button
+              onClick={() => { try { localStorage.removeItem(DIALER_KEY); } catch {} setSavedSession(null); }}
+              className="text-amber-800 hover:text-amber-600 text-xs transition-colors"
+            >
+              Discard
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ═══════════════════════════════════════ */}
       {/*  OUTREACH CAMPAIGN STATS (existing)    */}
@@ -709,7 +781,7 @@ export default function OutreachPage() {
       {dialerOpen && dialerSuppliers.length > 0 && (
         <Dialer
           suppliers={dialerSuppliers}
-          onClose={() => { setDialerOpen(false); fetchDaily(); }}
+          onClose={() => { setDialerOpen(false); setSavedSession(null); fetchDaily(); }}
         />
       )}
     </div>

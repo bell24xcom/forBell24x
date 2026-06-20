@@ -64,9 +64,11 @@ export async function GET(request: NextRequest) {
       prisma.rFQ.count({ where: { status: 'ACTIVE', expiresAt: { lte: threeDays, gt: now } } }),
     ]);
 
-    const [seededRfqs, realRfqs] = await Promise.all([
+    const [seededRfqs, realRfqs, importedUnverified, unansweredRealRfqs] = await Promise.all([
       prisma.rFQ.count({ where: { isSeeded: true } }),
       prisma.rFQ.count({ where: { isSeeded: false } }),
+      prisma.user.count({ where: { isVerified: false, isActive: true, importedFrom: { not: null } } }),
+      prisma.rFQ.count({ where: { status: 'ACTIVE', quotes: { none: {} }, isSeeded: { not: true } } }),
     ]);
 
     const volumeResult = await prisma.transaction.aggregate({
@@ -127,7 +129,10 @@ export async function GET(request: NextRequest) {
         trust: { highTrustSuppliers },
         plans: { FREE: plans['FREE'] ?? 0, PRO: plans['PRO'] ?? 0, ENTERPRISE: plans['ENTERPRISE'] ?? 0 },
         pendingKyc,
+        pendingKycReal: Math.max(0, pendingKyc - importedUnverified),
+        importedUnverified,
         unansweredRfqs,
+        unansweredRealRfqs,
         expiringSoon,
         activity,
       },

@@ -1,47 +1,94 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 const STEPS = [
   // Buyer flow
-  { id: 1,  group: 'Buyer Flow',          text: 'Logged out — visit homepage. Voice demo widget works (no login required).' },
-  { id: 2,  group: 'Buyer Flow',          text: 'Register as a new buyer account (use a test email or phone).' },
-  { id: 3,  group: 'Buyer Flow',          text: 'Post a Text RFQ: "Need 500 units cotton fabric, Mumbai, ₹2L budget".' },
-  { id: 4,  group: 'Buyer Flow',          text: 'Confirm RFQ appears on /rfq browse page with correct human-readable slug URL.' },
-  { id: 5,  group: 'Buyer Flow',          text: 'Copy the RFQ link — open in incognito — page loads correctly (no 404).' },
+  { id: 1,  group: 'Buyer Flow',           text: 'Logged out — visit homepage. Voice demo widget works (no login required).' },
+  { id: 2,  group: 'Buyer Flow',           text: 'Register as a new buyer account (use a test email or phone).' },
+  { id: 3,  group: 'Buyer Flow',           text: 'Post a Text RFQ: "Need 500 units cotton fabric, Mumbai, ₹2L budget".' },
+  { id: 4,  group: 'Buyer Flow',           text: 'Confirm RFQ appears on /rfq browse page with correct human-readable slug URL.' },
+  { id: 5,  group: 'Buyer Flow',           text: 'Copy the RFQ link — open in incognito — page loads correctly (no 404).' },
   // Supplier flow
-  { id: 6,  group: 'Supplier Flow',       text: 'Register as a new supplier account (use a different test email).' },
-  { id: 7,  group: 'Supplier Flow',       text: 'Browse /rfq — find the RFQ just posted by the buyer account.' },
-  { id: 8,  group: 'Supplier Flow',       text: 'Click "View & Quote →" — RFQ detail page loads without errors.' },
-  { id: 9,  group: 'Supplier Flow',       text: 'Click "Submit Your Quote" — fill in: Price ₹1,80,000 | Qty 500 | Timeline 14 days | Description "ISI certified, immediate stock".' },
-  { id: 10, group: 'Supplier Flow',       text: 'Submit quote — confirm success message appears.' },
+  { id: 6,  group: 'Supplier Flow',        text: 'Register as a new supplier account (use a different test email).' },
+  { id: 7,  group: 'Supplier Flow',        text: 'Browse /rfq — find the RFQ just posted by the buyer account.' },
+  { id: 8,  group: 'Supplier Flow',        text: 'Click "View & Quote →" — RFQ detail page loads without errors.' },
+  { id: 9,  group: 'Supplier Flow',        text: 'Click "Submit Your Quote" — fill in: Price ₹1,80,000 | Qty 500 | Timeline 14 days | Description "ISI certified, immediate stock".' },
+  { id: 10, group: 'Supplier Flow',        text: 'Submit quote — confirm success message appears.' },
   // Buyer receives quote
   { id: 11, group: 'Buyer Receives Quote', text: 'Log back in as buyer — go to Dashboard → Quotes Inbox.' },
   { id: 12, group: 'Buyer Receives Quote', text: 'Confirm quote appears in inbox with correct price and supplier name.' },
   { id: 13, group: 'Buyer Receives Quote', text: 'Click "Accept Quote" (or equivalent action) — no errors.' },
   { id: 14, group: 'Buyer Receives Quote', text: 'Confirm deal moves to Active Deals for both buyer and supplier accounts.' },
   // Email
-  { id: 15, group: 'Email',               text: 'Check test email inbox — confirm quote notification email arrived (not in spam). If in spam → fix DNS records in Email Health page first.' },
+  { id: 15, group: 'Email',                text: 'Check test email inbox — confirm quote notification email arrived (not in spam). If in spam → fix DNS records in Email Health page first.' },
 ];
 
 const GROUP_COLORS: Record<string, string> = {
-  'Buyer Flow':          'text-blue-400',
-  'Supplier Flow':       'text-purple-400',
+  'Buyer Flow':           'text-blue-400',
+  'Supplier Flow':        'text-purple-400',
   'Buyer Receives Quote': 'text-emerald-400',
-  'Email':               'text-orange-400',
+  'Email':                'text-orange-400',
 };
 
 export default function FlowTestPage() {
   const [checked, setChecked] = useState<Record<number, boolean>>({});
+  const [saving,  setSaving]  = useState(false);
+  const [loaded,  setLoaded]  = useState(false);
 
-  const toggle = (id: number) => setChecked(prev => ({ ...prev, [id]: !prev[id] }));
-  const reset  = () => setChecked({});
+  // Load persisted state from server on mount
+  useEffect(() => {
+    fetch('/api/admin/flow-test', { credentials: 'include' })
+      .then(r => r.json())
+      .then(d => {
+        if (d.success && d.state && typeof d.state === 'object') {
+          const parsed: Record<number, boolean> = {};
+          for (const [k, v] of Object.entries(d.state)) parsed[Number(k)] = Boolean(v);
+          setChecked(parsed);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoaded(true));
+  }, []);
+
+  const saveState = useCallback((nextState: Record<number, boolean>) => {
+    setSaving(true);
+    fetch('/api/admin/flow-test', {
+      method:      'PATCH',
+      credentials: 'include',
+      headers:     { 'Content-Type': 'application/json' },
+      body:        JSON.stringify({ state: nextState }),
+    })
+      .catch(() => {})
+      .finally(() => setSaving(false));
+  }, []);
+
+  const toggle = (id: number) => {
+    setChecked(prev => {
+      const next = { ...prev, [id]: !prev[id] };
+      saveState(next);
+      return next;
+    });
+  };
+
+  const reset = () => {
+    const empty: Record<number, boolean> = {};
+    setChecked(empty);
+    saveState(empty);
+  };
 
   const done  = Object.values(checked).filter(Boolean).length;
   const total = STEPS.length;
   const pct   = Math.round((done / total) * 100);
-
   const groups = [...new Set(STEPS.map(s => s.group))];
+
+  if (!loaded) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 max-w-3xl">
@@ -53,12 +100,15 @@ export default function FlowTestPage() {
             Complete all 15 steps before outreach. If any step fails, fix it before sending emails or WhatsApp messages.
           </p>
         </div>
-        <button
-          onClick={reset}
-          className="text-xs text-slate-500 hover:text-slate-300 transition-colors px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg shrink-0"
-        >
-          Reset
-        </button>
+        <div className="flex items-center gap-2 shrink-0">
+          {saving && <span className="text-xs text-slate-600 animate-pulse">Saving…</span>}
+          <button
+            onClick={reset}
+            className="text-xs text-slate-500 hover:text-slate-300 transition-colors px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg"
+          >
+            Reset
+          </button>
+        </div>
       </div>
 
       {/* Progress bar */}
@@ -121,8 +171,8 @@ export default function FlowTestPage() {
       })}
 
       <div className="bg-slate-800/40 border border-slate-700/30 rounded-xl p-4 text-xs text-slate-500">
-        <strong className="text-slate-400">Note:</strong> Checkbox state is not saved — refresh resets the list.
-        Run this test on production (bell24h.com), not localhost. Use real email addresses to verify email delivery.
+        <strong className="text-slate-400">Note:</strong> Progress is saved to the database — refresh-safe.
+        Run this test on production (vyaparsethu.com), not localhost. Use real email addresses to verify email delivery.
       </div>
     </div>
   );
