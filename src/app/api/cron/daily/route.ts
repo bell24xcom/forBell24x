@@ -31,8 +31,14 @@ async function run(req: NextRequest) {
   const isMonday = new Date().getUTCDay() === 1;
 
   const jobs: string[] = ['/api/cron/expire-rfqs'];
-  if (isMonday) jobs.push('/api/cron/weekly-digest');
-  jobs.push('/api/cron/supplier-drip', '/api/cron/follow-up-due');
+  if (isMonday) jobs.push('/api/cron/weekly-digest', '/api/cron/churn-check');
+  jobs.push(
+    '/api/cron/supplier-drip',
+    '/api/cron/follow-up-due',
+    '/api/cron/demand-loop',
+    '/api/cron/analyze-behavior',
+    '/api/cron/update-insights',
+  );
 
   // Run sequentially so DB load is spread and logs are ordered
   const results: { path: string; ok: boolean; body: unknown }[] = [];

@@ -29,6 +29,7 @@ const NAV: NavItem[] = [
   { href: '/admin/monitoring',       label: 'Monitoring',       icon: '🔍' },
   { href: '/admin/security',         label: 'Security',         icon: '🔒' },
   { href: '/admin/errors',           label: 'Error Logs',       icon: '🐛' },
+  { href: '/admin/compliance',       label: 'Compliance',       icon: '🛡️' },
   // Data
   { href: '/admin/import',           label: 'Import Suppliers', icon: '📥', group: 'Data' },
   { href: '/admin/seed-rfqs',        label: 'Seed RFQs',        icon: '🌱' },
