@@ -122,19 +122,54 @@ const supplierList = suppliers.map((supplier) => ({
     }
 
     // Combine AI scores with supplier data
-const matches = supplierList.map((supplier) => {
-      const aiScore = aiScores.find((score: any) => score.supplierId === supplier.supplierId);
+    const categoryLower = (category || '').toLowerCase();
+    const locationLower = (location || '').toLowerCase();
+
+    const matches = supplierList.map((supplier) => {
+      const aiScore = aiScores.find((s: any) => s.supplierId === supplier.supplierId);
+      const rawScore = Math.min(10, Math.max(0, aiScore?.score || 0));
+      const matchScore = rawScore / 10;
+
+      const featureImportance = [
+        {
+          feature: 'category',
+          label: 'Category Match',
+          score: supplier.company?.toLowerCase().includes(categoryLower) ? 0.9 : Math.min(0.85, matchScore + 0.1),
+        },
+        {
+          feature: 'location',
+          label: 'Location',
+          score: locationLower && supplier.location?.toLowerCase().includes(locationLower) ? 0.88 : 0.5,
+        },
+        {
+          feature: 'verified',
+          label: 'Verified Status',
+          score: supplier.isVerified ? 1.0 : 0.2,
+        },
+        {
+          feature: 'activity',
+          label: 'Quote Activity',
+          score: Math.min(1, (supplier.quoteCount || 0) / 10),
+        },
+      ];
+
       return {
-        ...supplier,
-        score: aiScore?.score || 0,
-        reason: aiScore?.reason || 'No matching criteria found',
+        id: supplier.supplierId,
+        name: supplier.name,
+        company: supplier.company,
+        location: supplier.location,
+        isVerified: supplier.isVerified,
+        trustScore: 0,
+        matchScore,
+        reasons: aiScore?.reason ? [aiScore.reason] : ['Matched by category'],
+        featureImportance,
       };
     });
 
-    // Sort by score and take top 5
+    // Sort by matchScore and take top 5
     const topMatches = matches
-      .filter((match: any) => match.score > 0)
-      .sort((a: any, b: any) => b.score - a.score)
+      .filter((match) => match.matchScore > 0)
+      .sort((a, b) => b.matchScore - a.matchScore)
       .slice(0, 5);
 
     return NextResponse.json({

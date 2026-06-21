@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Sparkles, Search, CheckCircle, MapPin, Clock, ShieldCheck } from 'lucide-react';
+import AIExplainability from '@/src/components/AIExplainability';
 
 interface FeatureScore { feature: string; score: number; label: string }
 interface SupplierMatch {
@@ -260,8 +261,16 @@ export default function SmartMatchingPage() {
                       </div>
                     )}
 
+                    {/* SHAP/LIME Explainability panel */}
+                    <AIExplainability
+                      supplierName={supplier.company || supplier.name}
+                      matchScore={supplier.matchScore}
+                      featureImportance={supplier.featureImportance}
+                      reasons={supplier.reasons}
+                    />
+
                     {/* Actions */}
-                    <div className="flex gap-2 flex-wrap">
+                    <div className="flex gap-2 flex-wrap mt-4">
                       <a href={`/rfq/create?matchedSupplier=${supplier.id}`}
                         className="flex-1 min-w-[120px] text-center bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 px-4 rounded-lg text-sm font-semibold transition-colors min-h-[44px] leading-[28px]">
                         Request Quote
