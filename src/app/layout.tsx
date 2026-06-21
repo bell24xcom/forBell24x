@@ -109,6 +109,36 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
+              "@type": "LocalBusiness",
+              "name": "VyaparSethu",
+              "legalName": "Digitex Studio",
+              "taxID": "27AAAPP9753F2ZF",
+              "url": SITE_URL,
+              "telephone": "+91-90049-62871",
+              "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "Lodha Upper Thane",
+                "addressLocality": "Bhiwandi",
+                "addressRegion": "Maharashtra",
+                "postalCode": "421302",
+                "addressCountry": "IN"
+              },
+              "geo": {
+                "@type": "GeoCoordinates",
+                "latitude": "19.2813",
+                "longitude": "73.0660"
+              },
+              "openingHours": "Mo-Sa 09:00-18:00",
+              "priceRange": "₹₹",
+              "description": "B2B supplier marketplace for Indian MSMEs — verified suppliers, protected payments, 24-hour quotations."
+            })
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
               "@type": "WebSite",
               "name": "VyaparSethu",
               "url": SITE_URL,

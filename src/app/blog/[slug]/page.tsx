@@ -37,19 +37,54 @@ export default function BlogPostPage({ params }: Props) {
 
   const related = BLOG_POSTS.filter(p => p.category === post.category && p.slug !== post.slug).slice(0, 3);
 
-  // Convert newlines + bold markdown to basic HTML paragraphs
-  const paragraphs = post.body.split('\n\n').map((block, i) => {
-    const isHeading = block.startsWith('**') && block.endsWith('**') && !block.slice(2).includes('**');
-    const isListItem = block.trim().startsWith('- ') || block.trim().startsWith('- [ ]');
-    const hasTable = block.includes('| ');
+  const parseCells = (row: string) => row.split('|').map(c => c.trim()).filter(Boolean);
+  const isSeparatorRow = (row: string) => /^\|[\s\-:|]+\|$/.test(row.trim());
 
-    if (hasTable) {
-      return <pre key={i} className="text-sm text-slate-300 overflow-x-auto bg-slate-800/60 rounded-lg p-4 mb-4 whitespace-pre-wrap">{block}</pre>;
-    }
-    if (isListItem) {
-      const items = block.split('\n').filter(Boolean);
+  const paragraphs = post.body.split('\n\n').map((block, i) => {
+    const trimmed = block.trim();
+
+    // Standalone bold heading: **Heading text** — whole block is one bold span
+    if (/^\*\*[^*]+\*\*$/.test(trimmed)) {
       return (
-        <ul key={i} className="list-disc list-inside space-y-1 text-slate-300 mb-4 ml-2">
+        <h2 key={i} className="text-white font-bold text-lg mt-8 mb-3 leading-snug">
+          {trimmed.slice(2, -2)}
+        </h2>
+      );
+    }
+
+    // Markdown table
+    if (trimmed.includes('| ')) {
+      const rows = trimmed.split('\n').filter(r => r.trim() && !isSeparatorRow(r));
+      const [headerRow, ...bodyRows] = rows;
+      return (
+        <div key={i} className="overflow-x-auto mb-6">
+          <table className="w-full text-sm border-collapse">
+            <thead>
+              <tr>
+                {parseCells(headerRow).map((cell, j) => (
+                  <th key={j} className="text-left text-xs text-[#D4AF37] font-semibold uppercase tracking-wider border-b border-slate-700 py-2 pr-6">{cell}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {bodyRows.map((row, j) => (
+                <tr key={j} className="border-b border-slate-800/60">
+                  {parseCells(row).map((cell, k) => (
+                    <td key={k} className="text-slate-300 py-2.5 pr-6">{cell}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+
+    // Checklist / bullet list
+    if (trimmed.startsWith('- ') || trimmed.startsWith('- [ ]')) {
+      const items = trimmed.split('\n').filter(Boolean);
+      return (
+        <ul key={i} className="list-disc list-inside space-y-1.5 text-slate-300 mb-4 ml-2">
           {items.map((item, j) => (
             <li key={j}>{item.replace(/^-\s(\[.\]\s)?/, '')}</li>
           ))}
@@ -57,8 +92,8 @@ export default function BlogPostPage({ params }: Props) {
       );
     }
 
-    // Render bold inline
-    const html = block.replace(/\*\*(.+?)\*\*/g, '<strong class="text-white">$1</strong>');
+    // Default: inline bold rendering
+    const html = trimmed.replace(/\*\*(.+?)\*\*/g, '<strong class="text-white">$1</strong>');
     return (
       <p key={i} className="text-slate-300 leading-relaxed mb-4" dangerouslySetInnerHTML={{ __html: html }} />
     );
@@ -81,9 +116,20 @@ export default function BlogPostPage({ params }: Props) {
     keywords: post.keywords.join(', '),
   };
 
+  const breadcrumbLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.vyaparsethu.com' },
+      { '@type': 'ListItem', position: 2, name: 'Blog', item: 'https://www.vyaparsethu.com/blog' },
+      { '@type': 'ListItem', position: 3, name: post.title, item: `https://www.vyaparsethu.com/blog/${post.slug}` },
+    ],
+  };
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
       <div className="min-h-screen bg-[#0F172A]">
         <div className="max-w-3xl mx-auto px-4 py-16">
 

@@ -16,9 +16,57 @@ import HowItWorks from '@/components/homepage/HowItWorks'
 import FinalCTA from '@/components/homepage/FinalCTA'
 import BrandVideoSection from '@/src/components/marketing/BrandVideoSection'
 
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'How do I post a requirement on VyaparSethu?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'You can post a requirement in text, voice, or video format directly from your dashboard. AI-matched supplier quotes arrive within 24 hours.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Can I submit requirements by voice or video?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Yes. VyaparSethu supports Text Requirement, Speak Requirement (voice), and Video Requirement formats. Our AI transcribes and processes all three.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How does AI supplier matching work?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'After you post a requirement, our AI analyses your category, location, and budget to rank verified suppliers by match score and surfaces the best-fit options for you to compare.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How do suppliers submit quotes on VyaparSethu?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Verified suppliers browse active requirements in their product categories and submit competitive quotes with pricing and delivery terms directly on the platform.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'Is VyaparSethu free to use?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Yes, the Free plan lets you post up to 2 requirements per month and receive up to 5 quotes per requirement at no cost. Pro and Enterprise plans unlock unlimited quotes, AI matching, and contact unlocks.',
+      },
+    },
+  ],
+};
+
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-[#0a1128]">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
       {/* 1. Hero Section - Interactive RFQ Demo */}
       <HeroRFQDemo />
 
