@@ -20,8 +20,8 @@ export async function GET(req: NextRequest) {
   const auth = requireAdmin(req);
   if (isErrorResponse(auth)) return auth;
 
-  const sentToday = await prisma.user.count({
-    where: { role: 'SUPPLIER', lastOutreachAt: { gte: istDayStart() } },
+  const sentToday = await prisma.interactionMemory.count({
+    where: { actionType: 'day1_wa_sent', createdAt: { gte: istDayStart() } },
   });
 
   const remaining  = Math.max(0, DAILY_LIMIT - sentToday);
@@ -55,8 +55,8 @@ export async function POST(req: NextRequest) {
 
     // ── Daily cap check (IST) ──
     const todayStart = istDayStart();
-    const sentToday  = await prisma.user.count({
-      where: { role: 'SUPPLIER', lastOutreachAt: { gte: todayStart } },
+    const sentToday  = await prisma.interactionMemory.count({
+      where: { actionType: 'day1_wa_sent', createdAt: { gte: todayStart } },
     });
 
     if (!dryRun && sentToday >= DAILY_LIMIT) {
@@ -248,9 +248,9 @@ export async function PATCH(req: NextRequest) {
   const userId = String(body.userId ?? '');
   if (!userId) return NextResponse.json({ success: false, error: 'userId required' }, { status: 400 });
 
-  // Idempotent — safe to call multiple times
+  // Idempotent within today (IST) — resets each day so same contact can be reached again
   const existing = await prisma.interactionMemory.findFirst({
-    where: { userId, actionType: 'day1_wa_sent' },
+    where: { userId, actionType: 'day1_wa_sent', createdAt: { gte: istDayStart() } },
   });
   if (!existing) {
     await prisma.interactionMemory.create({
