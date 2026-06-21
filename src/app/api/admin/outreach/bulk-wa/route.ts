@@ -127,7 +127,7 @@ export async function POST(req: NextRequest) {
         ? `${SITE_URL}/supplier/claim?category=${encodeURIComponent(deepCategory)}&city=${encodeURIComponent(deepCity)}&token=${token}`
         : `${SITE_URL}/claim/${token}`;
       const rawPhone    = (s.phone || '').replace(/\D/g, '').slice(-10);
-      const companyName = s.company || s.name || 'Your Business';
+      const companyName = (s.company && s.company.trim()) ? s.company : 'your business';
 
       // In dry-run mode: skip DB writes and API calls entirely
       if (!dryRun) {

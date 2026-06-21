@@ -47,7 +47,7 @@ export async function getDripsDue(): Promise<DripDue[]> {
 
     for (const s of suppliers) {
       const claimLink   = s.claimToken ? `${SITE_URL}/claim/${s.claimToken}` : SITE_URL;
-      const companyName = s.company || s.name || 'Supplier';
+      const companyName = (s.company && s.company.trim()) ? s.company : 'your business';
       const rawPhone    = (s.phone || '').replace(/\D/g, '').slice(-10);
       const message     = DRIP_MESSAGES[dripType](companyName, claimLink);
       const waLink      = rawPhone.length === 10

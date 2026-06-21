@@ -287,7 +287,7 @@ function Dialer({
 
           {/* Message preview */}
           <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-3 mb-4 text-xs text-slate-400 leading-relaxed whitespace-pre-line">
-            {`Namaste! 🙏\n\nYour business "${s.company}" has a verified profile on VyaparSethu — India's B2B Supplier & Buyer Network.\n\nVerified buyers are searching for your products right now.\n\nClaim your FREE profile in 2 minutes:\n${s.claimLink}\n\n— Team VyaparSethu`}
+            {`Namaste! 🙏\n\nYour business "${(s.company && s.company.trim()) ? s.company : 'your business'}" has a verified profile on VyaparSethu — India's B2B Supplier & Buyer Network.\n\nVerified buyers are searching for your products right now.\n\nClaim your FREE profile in 2 minutes:\n${s.claimLink}\n\n— Team VyaparSethu`}
           </div>
 
           {/* Countdown hint */}
