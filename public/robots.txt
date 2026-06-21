@@ -1,25 +1,11 @@
 User-agent: *
 Allow: /
-Allow: /_next/static/
-Allow: /categories/
-Allow: /suppliers/
-Allow: /marketplace/
-Allow: /voice-rfq/
-Allow: /video-rfq/
-Allow: /rfq/
-Allow: /about/
-Allow: /blog/
-Allow: /contact/
-Allow: /pricing/
-Allow: /help/
-Allow: /services/
-Allow: /legal/
 
-Disallow: /_next/
 Disallow: /admin/
 Disallow: /api/
 Disallow: /dashboard/
 Disallow: /profile/
 Disallow: /settings/
+Disallow: /supplier/profile/edit
 
 Sitemap: https://www.vyaparsethu.com/sitemap.xml

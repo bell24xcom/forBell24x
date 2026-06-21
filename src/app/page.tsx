@@ -1,4 +1,10 @@
+import { Metadata } from 'next';
 import HeroRFQDemo from '@/components/homepage/HeroRFQDemo'
+
+export const metadata: Metadata = {
+  description: "VyaparSethu — India's verified B2B marketplace. Post requirements via voice, video or text. GST & Udyam verified suppliers. Protected payments. 24h quotations.",
+  alternates: { canonical: 'https://www.vyaparsethu.com' },
+};
 import TrustIndicators from '@/components/homepage/TrustIndicators'
 import CategorySidebar from '@/src/components/homepage/CategorySidebar'
 import LiveRFQFeedCompact from '@/src/components/homepage/LiveRFQFeedCompact'

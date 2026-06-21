@@ -74,7 +74,9 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "Organization",
               "name": "VyaparSethu",
+              "legalName": "Digitex Studio",
               "alternateName": "Bell24h",
+              "taxID": "27AAAPP9753F2ZF",
               "url": SITE_URL,
               "logo": `${SITE_URL}/og-image.png`,
               "description": "Protected Trade Infrastructure for Indian MSMEs — Verified Suppliers, Protected Payments, Faster Quotations.",
@@ -88,10 +90,10 @@ export default function RootLayout({
               },
               "address": {
                 "@type": "PostalAddress",
-                "streetAddress": "Flat No. 1204, 12th Floor, Casa Sereno B1, Mankoli Road, Off Mumbai-Nashik Highway, Anjur, Bhiwandi",
-                "addressLocality": "Thane",
-                "postalCode": "421302",
+                "streetAddress": "Lodha Upper Thane",
+                "addressLocality": "Bhiwandi",
                 "addressRegion": "Maharashtra",
+                "postalCode": "421302",
                 "addressCountry": "IN"
               },
               "sameAs": [
