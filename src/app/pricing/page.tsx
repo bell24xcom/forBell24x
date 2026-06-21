@@ -3,807 +3,228 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import DynamicPricingCalculator from '@/components/DynamicPricingCalculator';
+import { CheckCircle, XCircle } from 'lucide-react';
+import { PLANS, formatLimit } from '@/lib/plans';
+
+// ── FLAGS: the following features exist in lib/plans.ts but have no
+// human-readable marketing descriptions — copy below uses field-derived labels.
+// Add marketing copy to lib/plans.ts before using this in production.
+//
+// REMOVED from previous version (were invented, not in lib/plans.ts):
+//   - "Verified Supplier" tier at ₹999 — not in PLANS
+//   - "Professional" tier at ₹2,999 with 50 RFQs — PLANS.PRO has 20 RFQs, not 50
+//   - Add-ons section (₹50/RFQ, ₹999 analytics, ₹1,999 API, ₹4,999 white-label)
+//   - Yearly billing toggle (no annual pricing in lib/plans.ts)
+//   - Mobile app, Hindi support, white-label, dedicated manager, custom domain
+//   - "14-day free trial" claim — not in PLANS
+//   - DynamicPricingCalculator component (not confirmed to exist)
 
 function loadRazorpayScript(): Promise<boolean> {
   return new Promise((resolve) => {
-    if (typeof window !== 'undefined' && (window as any).Razorpay) {
-      resolve(true);
-      return;
-    }
+    if (typeof window !== 'undefined' && (window as any).Razorpay) { resolve(true); return; }
     const script = document.createElement('script');
     script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-    script.onload = () => resolve(true);
+    script.onload  = () => resolve(true);
     script.onerror = () => resolve(false);
     document.body.appendChild(script);
   });
 }
 
-interface PricingTier {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  originalPrice?: number;
-  currency: string;
-  period: string;
-  features: string[];
-  limitations: string[];
-  color: string;
-  popular?: boolean;
-  buttonText: string;
-  buttonVariant: 'primary' | 'secondary' | 'outline';
-  maxRFQs: number;
-  maxSuppliers: number;
-  aiFeatures: boolean;
-  prioritySupport: boolean;
-  customDomain: boolean;
-  apiAccess: boolean;
-  analytics: boolean;
-  escrowProtection: boolean;
-  voiceRFQ: boolean;
-  videoRFQ: boolean;
-  hindiSupport: boolean;
-  gstVerification: boolean;
-  trustScoring: boolean;
-  mobileApp: boolean;
-  whiteLabel: boolean;
-  dedicatedManager: boolean;
-  customIntegrations: boolean;
-  sla: string;
-  uptime: string;
+const FEATURE_ROWS: { label: string; key: keyof typeof PLANS['FREE'] }[] = [
+  { label: 'Requirements per month',   key: 'maxRFQsPerMonth' },
+  { label: 'Quotes per requirement',   key: 'maxQuotesPerRFQ' },
+  { label: 'Protected Payment',        key: 'canUseEscrow' },
+  { label: 'AI Supplier Matching',     key: 'canUseAIMatching' },
+  { label: 'Contact unlocks / month',  key: 'contactUnlocksPerMonth' },
+  { label: 'Priority support',         key: 'prioritySupport' },
+  { label: 'Analytics access',         key: 'analyticsAccess' },
+  { label: 'API access',               key: 'apiAccess' },
+];
+
+function renderValue(val: boolean | number | string) {
+  if (typeof val === 'boolean') {
+    return val
+      ? <CheckCircle className="w-5 h-5 text-green-400 mx-auto" />
+      : <XCircle    className="w-5 h-5 text-slate-600 mx-auto" />;
+  }
+  const num = Number(val);
+  return <span className="text-slate-300 text-sm">{formatLimit(num)}</span>;
 }
-
-const pricingTiers: PricingTier[] = [
-  {
-    id: 'free',
-    name: 'Starter',
-    description: 'Perfect for small businesses getting started',
-    price: 0,
-    currency: '₹',
-    period: 'month',
-    features: [
-      'Up to 2 RFQs per month',
-      'Basic supplier matching',
-      'Email support',
-      'Mobile app access',
-      'Basic analytics',
-      'GST verification',
-      'Text RFQ only'
-    ],
-    limitations: [
-      'Limited AI features',
-      'No priority support',
-      'Basic reporting only'
-    ],
-    color: 'gray',
-    buttonText: 'Get Started Free',
-    buttonVariant: 'outline',
-    maxRFQs: 2,
-    maxSuppliers: 50,
-    aiFeatures: false,
-    prioritySupport: false,
-    customDomain: false,
-    apiAccess: false,
-    analytics: true,
-    escrowProtection: false,
-    voiceRFQ: false,
-    videoRFQ: false,
-    hindiSupport: false,
-    gstVerification: true,
-    trustScoring: false,
-    mobileApp: true,
-    whiteLabel: false,
-    dedicatedManager: false,
-    customIntegrations: false,
-    sla: '24 hours',
-    uptime: '99.5%'
-  },
-  {
-    id: 'verified',
-    name: 'Verified Supplier',
-    description: 'Get the Verified badge and move to the top of every buyer\'s shortlist.',
-    price: 999,
-    currency: '₹',
-    period: 'month',
-    features: [
-      'Verified Supplier badge — buyers filter for this first',
-      'Priority AI matching — appear before unverified suppliers',
-      'Unlimited RFQ notifications in your category',
-      'GST verified + phone confirmed trust signals shown to buyers',
-      'Direct message access to matched buyers',
-      'Monthly performance report — quotes, views, response rate',
-    ],
-    limitations: [],
-    color: 'blue',
-    popular: true,
-    buttonText: 'Get Verified →',
-    buttonVariant: 'primary',
-    maxRFQs: -1,
-    maxSuppliers: -1,
-    aiFeatures: true,
-    prioritySupport: false,
-    customDomain: false,
-    apiAccess: false,
-    analytics: true,
-    escrowProtection: false,
-    voiceRFQ: true,
-    videoRFQ: false,
-    hindiSupport: true,
-    gstVerification: true,
-    trustScoring: true,
-    mobileApp: true,
-    whiteLabel: false,
-    dedicatedManager: false,
-    customIntegrations: false,
-    sla: '24h',
-    uptime: '99.9%',
-  },
-  {
-    id: 'professional',
-    name: 'Professional',
-    description: 'Ideal for growing businesses with higher volume needs',
-    price: 2999,
-    originalPrice: 4999,
-    currency: '₹',
-    period: 'month',
-    features: [
-      'Up to 50 RFQs per month',
-      'Advanced AI matching',
-      'Voice & Video RFQs',
-      'Priority support',
-      'Advanced analytics',
-      'Escrow protection',
-      'Hindi language support',
-      'Trust scoring',
-      'API access',
-      'Custom integrations'
-    ],
-    limitations: [
-      'Limited custom branding',
-      'Standard SLA'
-    ],
-    color: 'blue',
-    popular: false,
-    buttonText: 'Start Professional',
-    buttonVariant: 'primary',
-    maxRFQs: 50,
-    maxSuppliers: 500,
-    aiFeatures: true,
-    prioritySupport: true,
-    customDomain: false,
-    apiAccess: true,
-    analytics: true,
-    escrowProtection: true,
-    voiceRFQ: true,
-    videoRFQ: true,
-    hindiSupport: true,
-    gstVerification: true,
-    trustScoring: true,
-    mobileApp: true,
-    whiteLabel: false,
-    dedicatedManager: false,
-    customIntegrations: true,
-    sla: '12 hours',
-    uptime: '99.9%'
-  },
-  {
-    id: 'enterprise',
-    name: 'Enterprise',
-    description: 'For large organizations with complex requirements',
-    price: 9999,
-    originalPrice: 14999,
-    currency: '₹',
-    period: 'month',
-    features: [
-      'Unlimited RFQs',
-      'Full AI suite with SHAP/LIME',
-      'White-label solution',
-      'Dedicated account manager',
-      'Custom domain',
-      'Advanced reporting',
-      'Full escrow protection',
-      'Multi-language support',
-      'Custom integrations',
-      'SLA guarantee',
-      'Training & onboarding',
-      '24/7 phone support'
-    ],
-    limitations: [],
-    color: 'purple',
-    buttonText: 'Contact Sales',
-    buttonVariant: 'secondary',
-    maxRFQs: -1, // Unlimited
-    maxSuppliers: -1, // Unlimited
-    aiFeatures: true,
-    prioritySupport: true,
-    customDomain: true,
-    apiAccess: true,
-    analytics: true,
-    escrowProtection: true,
-    voiceRFQ: true,
-    videoRFQ: true,
-    hindiSupport: true,
-    gstVerification: true,
-    trustScoring: true,
-    mobileApp: true,
-    whiteLabel: true,
-    dedicatedManager: true,
-    customIntegrations: true,
-    sla: '4 hours',
-    uptime: '99.99%'
-  }
-];
-
-const addOns = [
-  {
-    name: 'Additional RFQs',
-    description: 'Extra RFQs beyond your plan limit',
-    price: 50,
-    currency: '₹',
-    unit: 'per RFQ',
-    features: ['Same quality matching', 'Priority processing']
-  },
-  {
-    name: 'Advanced Analytics',
-    description: 'Enhanced reporting and insights',
-    price: 999,
-    currency: '₹',
-    unit: 'per month',
-    features: ['Custom dashboards', 'Export capabilities', 'Advanced metrics']
-  },
-  {
-    name: 'API Access',
-    description: 'Full API access for integrations',
-    price: 1999,
-    currency: '₹',
-    unit: 'per month',
-    features: ['REST API', 'Webhooks', 'Documentation', 'Support']
-  },
-  {
-    name: 'White Label',
-    description: 'Custom branding and domain',
-    price: 4999,
-    currency: '₹',
-    unit: 'per month',
-    features: ['Custom domain', 'Your branding', 'Custom colors', 'Logo integration']
-  }
-];
 
 export default function PricingPage() {
   const router = useRouter();
-  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
-  const [selectedTier, setSelectedTier] = useState<string | null>(null);
-  const [showComparison, setShowComparison] = useState(false);
-  const [showCalculator, setShowCalculator] = useState(false);
-  const [checkoutLoading, setCheckoutLoading] = useState(false);
-  const [paymentError, setPaymentError] = useState<string | null>(null);
+  const [loading, setLoading]   = useState<'PRO' | 'ENTERPRISE' | null>(null);
+  const [error,   setError]     = useState('');
 
-  const handleTierSelect = async (tierId: string) => {
-    const tier = pricingTiers.find(t => t.id === tierId);
-    if (!tier) return;
-    setSelectedTier(tierId);
-    setPaymentError(null);
-
-    if (tier.price === 0) {
-      router.push('/auth/phone-email?redirect=/pricing');
-      return;
-    }
-    if (tier.id === 'enterprise') {
-      router.push('/contact');
-      return;
-    }
-
-    // Check auth before opening Razorpay
+  const handleProCheckout = async () => {
+    setError('');
     const stored = typeof window !== 'undefined' ? localStorage.getItem('bell24h_user') : null;
-    if (!stored) {
-      router.push('/auth/phone-email?redirect=/pricing');
-      return;
-    }
+    if (!stored) { router.push('/auth/phone-email?redirect=/pricing'); return; }
 
-    // Route subscription plans to subscribe endpoint
-    if (tier.id === 'verified') {
-      await handleSubscribe('VERIFIED');
-      return;
-    }
-
-    await initiateRazorpayCheckout(tier);
-  };
-
-  const handleSubscribe = async (plan: string) => {
-    setCheckoutLoading(true);
+    setLoading('PRO');
     try {
       const res = await fetch('/api/payment/subscribe', {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan }),
+        body: JSON.stringify({ plan: 'PRO' }),
       });
-
-      if (res.status === 401) {
-        router.push('/auth/phone-email?redirect=/pricing');
-        return;
-      }
-
-      if (!res.ok) {
-        setPaymentError('Unable to start payment. Please try again.');
-        return;
-      }
+      if (res.status === 401) { router.push('/auth/phone-email?redirect=/pricing'); return; }
+      if (!res.ok) { setError('Unable to start payment. Please try again.'); return; }
 
       const { orderId, amount, keyId } = await res.json();
-
-      if (!keyId) {
-        setPaymentError('Payment system not configured. Please contact bell24h.helpline@gmail.com');
-        return;
-      }
+      if (!keyId) { setError('Payment system not configured. Contact support.'); return; }
 
       const loaded = await loadRazorpayScript();
-      if (!loaded) throw new Error('Razorpay could not be loaded. Please try again.');
+      if (!loaded) { setError('Could not load payment page. Please try again.'); return; }
 
-      const userData = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('bell24h_user') || '{}') : {};
-      const rzp = new (window as any).Razorpay({
-        key: keyId,
+      const user = JSON.parse(stored);
+      const rzp  = new (window as any).Razorpay({
+        key:        keyId,
         amount,
-        currency: 'INR',
-        order_id: orderId,
-        name: 'Bell24h',
-        description: plan === 'VERIFIED' ? 'Verified Supplier — ₹999/month' : 'Professional — ₹2,999/month',
-        prefill: {
-          name: userData.name || '',
-          email: userData.email || '',
-          contact: userData.phone ? `+91${userData.phone}` : '',
-        },
-        theme: { color: '#2563EB' },
-        handler: () => {
-          router.push('/dashboard?payment=success&plan=' + plan);
-        },
+        currency:   'INR',
+        order_id:   orderId,
+        name:       'VyaparSethu',
+        description:'Pro Plan — ₹2,999/month',
+        prefill:    { name: user.name || '', email: user.email || '', contact: user.phone ? `+91${user.phone}` : '' },
+        theme:      { color: '#001f3f' },
+        handler:    () => router.push('/dashboard?payment=success&plan=PRO'),
       });
       rzp.open();
-    } catch (err) {
-      setPaymentError(err instanceof Error ? err.message : 'Payment error. Please try again.');
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Payment error. Please try again.');
     } finally {
-      setCheckoutLoading(false);
+      setLoading(null);
     }
-  };
-
-  const initiateRazorpayCheckout = async (tier: PricingTier) => {
-    setCheckoutLoading(true);
-    try {
-      const amount = billingPeriod === 'yearly' ? getDiscountedPrice(tier) : tier.price;
-      const userData = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('bell24h_user') || '{}') : {};
-
-      const res = await fetch('/api/payment/create-order', {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          amount,
-          currency: 'INR',
-          description: `Bell24h ${tier.name} Plan (${billingPeriod})`,
-          customerName: userData.name || 'Bell24h User',
-          customerEmail: userData.email || 'user@bell24h.com',
-          customerPhone: userData.phone || '',
-        }),
-      });
-
-      const data = await res.json();
-      if (!data.success) throw new Error(data.error || 'Failed to create order');
-
-      const loaded = await loadRazorpayScript();
-      if (!loaded) throw new Error('Razorpay checkout could not be loaded. Please try again.');
-
-      const options = {
-        key: data.key,
-        amount: data.amount,
-        currency: data.currency,
-        name: 'Bell24h',
-        description: `${tier.name} Plan`,
-        order_id: data.orderId,
-        prefill: {
-          name: userData.name || '',
-          email: userData.email || '',
-          contact: userData.phone ? `+91${userData.phone}` : '',
-        },
-        theme: { color: '#4F46E5' },
-        handler: async (response: any) => {
-          const verifyRes = await fetch('/api/payment/create-order', {
-            method: 'PUT',
-            credentials: 'include',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-            }),
-          });
-          const verifyData = await verifyRes.json();
-          if (verifyData.success) {
-            router.push('/dashboard/subscription?success=true&plan=' + tier.id);
-          } else {
-            setPaymentError('Payment verification failed. Contact support.');
-          }
-        },
-        modal: {
-          ondismiss: () => setCheckoutLoading(false),
-        },
-      };
-
-      const rzp = new (window as any).Razorpay(options);
-      rzp.open();
-    } catch (err) {
-      setPaymentError(err instanceof Error ? err.message : 'Payment initiation failed. Please try again.');
-      setCheckoutLoading(false);
-    }
-  };
-
-  const getDiscountedPrice = (tier: PricingTier) => {
-    if (billingPeriod === 'yearly') {
-      return Math.round(tier.price * 10); // 2 months free
-    }
-    return tier.price;
-  };
-
-  const getSavings = (tier: PricingTier) => {
-    if (billingPeriod === 'yearly' && tier.price > 0) {
-      return Math.round(tier.price * 2); // 2 months savings
-    }
-    return 0;
   };
 
   return (
     <div className="min-h-screen bg-[#0F172A]">
       {/* Header */}
-      <div className="bg-[#0F172A] border-b border-slate-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-white text-center mb-2">
-              Choose Your Perfect Plan
-            </h1>
-            <p className="text-slate-400 text-lg text-center mb-8">
-              Scale your B2B operations with our flexible pricing plans
-            </p>
-            
-            {/* Billing Toggle */}
-            <div className="flex items-center justify-center space-x-4 mb-8">
-              <span className={`text-sm font-medium ${billingPeriod === 'monthly' ? 'text-white' : 'text-slate-400'}`}>
-                Monthly
-              </span>
-              <button
-                onClick={() => setBillingPeriod(billingPeriod === 'monthly' ? 'yearly' : 'monthly')}
-                className="relative inline-flex h-6 w-11 items-center rounded-full bg-indigo-600 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    billingPeriod === 'yearly' ? 'translate-x-6' : 'translate-x-1'
-                  }`}
-                />
-              </button>
-              <span className={`text-sm font-medium ${billingPeriod === 'yearly' ? 'text-white' : 'text-slate-400'}`}>
-                Yearly
-              </span>
-              {billingPeriod === 'yearly' && (
-                <span className="bg-green-900/40 text-green-400 text-xs font-medium px-2 py-1 rounded-full">
-                  Save 17%
-                </span>
-              )}
-            </div>
+      <div className="max-w-5xl mx-auto px-4 pt-16 pb-12 text-center">
+        <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">Simple, transparent pricing</h1>
+        <p className="text-slate-400 text-lg">Verified suppliers, protected payments, faster trade — at every size.</p>
+      </div>
 
-            {/* Dynamic Pricing Calculator Toggle */}
-            <div className="flex justify-center mb-8">
-              <button
-                onClick={() => setShowCalculator(!showCalculator)}
-                className={`px-8 py-3 rounded-lg font-medium transition-colors ${
-                  showCalculator
-                    ? 'bg-green-600 text-white hover:bg-green-700'
-                    : 'bg-purple-600 text-white hover:bg-purple-700'
-                }`}
-              >
-                {showCalculator ? 'Hide Calculator' : '🎯 Dynamic Pricing Calculator'}
-              </button>
-            </div>
+      {/* Plan cards */}
+      <div className="max-w-5xl mx-auto px-4 pb-16 grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* FREE */}
+        <div className="bg-slate-800/60 border border-slate-700 rounded-2xl p-7 flex flex-col">
+          <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-3">Free</p>
+          <div className="mb-6">
+            <span className="text-4xl font-bold text-white">₹0</span>
+            <span className="text-slate-500 ml-1">/month</span>
           </div>
+          <ul className="space-y-3 mb-8 flex-1">
+            <li className="text-slate-300 text-sm"><span className="text-[#D4AF37] mr-2">▸</span>2 requirements/month</li>
+            <li className="text-slate-300 text-sm"><span className="text-[#D4AF37] mr-2">▸</span>Up to 5 quotes per requirement</li>
+            <li className="text-slate-400 text-sm"><span className="text-slate-600 mr-2">✗</span>Protected Payment</li>
+            <li className="text-slate-400 text-sm"><span className="text-slate-600 mr-2">✗</span>AI Supplier Matching</li>
+            <li className="text-slate-400 text-sm"><span className="text-slate-600 mr-2">✗</span>Contact unlocks</li>
+            <li className="text-slate-400 text-sm"><span className="text-slate-600 mr-2">✗</span>Analytics</li>
+          </ul>
+          <Link href="/auth/phone-email"
+            className="block text-center border border-slate-600 text-slate-300 hover:border-white hover:text-white py-2.5 px-4 rounded-lg font-semibold text-sm transition-colors min-h-[44px] leading-[28px]">
+            Get started free
+          </Link>
+        </div>
+
+        {/* PRO */}
+        <div className="bg-[#001f3f] border-2 border-[#D4AF37]/60 rounded-2xl p-7 flex flex-col relative">
+          <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#D4AF37] text-[#001f3f] text-xs font-bold px-4 py-1 rounded-full">
+            Most Popular
+          </span>
+          <p className="text-xs font-semibold uppercase tracking-widest text-[#D4AF37] mb-3">Pro</p>
+          <div className="mb-6">
+            <span className="text-4xl font-bold text-white">₹2,999</span>
+            <span className="text-slate-400 ml-1">/month</span>
+          </div>
+          <ul className="space-y-3 mb-8 flex-1">
+            <li className="text-slate-200 text-sm"><span className="text-[#D4AF37] mr-2">▸</span>20 requirements/month</li>
+            <li className="text-slate-200 text-sm"><span className="text-[#D4AF37] mr-2">▸</span>Unlimited quotes per requirement</li>
+            <li className="text-slate-200 text-sm"><span className="text-[#D4AF37] mr-2">▸</span>Protected Payment</li>
+            <li className="text-slate-200 text-sm"><span className="text-[#D4AF37] mr-2">▸</span>AI Supplier Matching</li>
+            <li className="text-slate-200 text-sm"><span className="text-[#D4AF37] mr-2">▸</span>20 contact unlocks/month</li>
+            <li className="text-slate-200 text-sm"><span className="text-[#D4AF37] mr-2">▸</span>Priority support</li>
+            <li className="text-slate-200 text-sm"><span className="text-[#D4AF37] mr-2">▸</span>Analytics access</li>
+          </ul>
+          {error && <p className="text-red-400 text-xs mb-3">{error}</p>}
+          <button
+            onClick={handleProCheckout}
+            disabled={loading === 'PRO'}
+            className="block text-center bg-[#D4AF37] hover:bg-yellow-400 text-[#001f3f] py-2.5 px-4 rounded-lg font-bold text-sm transition-colors min-h-[44px] leading-[28px] disabled:opacity-60">
+            {loading === 'PRO' ? 'Opening payment…' : 'Upgrade to Pro'}
+          </button>
+        </div>
+
+        {/* ENTERPRISE */}
+        <div className="bg-slate-800/60 border border-slate-700 rounded-2xl p-7 flex flex-col">
+          <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-3">Enterprise</p>
+          <div className="mb-6">
+            <span className="text-4xl font-bold text-white">₹9,999</span>
+            <span className="text-slate-500 ml-1">/month</span>
+          </div>
+          <ul className="space-y-3 mb-8 flex-1">
+            <li className="text-slate-300 text-sm"><span className="text-[#D4AF37] mr-2">▸</span>Unlimited requirements</li>
+            <li className="text-slate-300 text-sm"><span className="text-[#D4AF37] mr-2">▸</span>Unlimited quotes per requirement</li>
+            <li className="text-slate-300 text-sm"><span className="text-[#D4AF37] mr-2">▸</span>Protected Payment</li>
+            <li className="text-slate-300 text-sm"><span className="text-[#D4AF37] mr-2">▸</span>AI Supplier Matching</li>
+            <li className="text-slate-300 text-sm"><span className="text-[#D4AF37] mr-2">▸</span>Unlimited contact unlocks</li>
+            <li className="text-slate-300 text-sm"><span className="text-[#D4AF37] mr-2">▸</span>Priority support</li>
+            <li className="text-slate-300 text-sm"><span className="text-[#D4AF37] mr-2">▸</span>Analytics access</li>
+            <li className="text-slate-300 text-sm"><span className="text-[#D4AF37] mr-2">▸</span>API access</li>
+          </ul>
+          <Link href="/contact"
+            className="block text-center bg-slate-700 hover:bg-slate-600 text-white py-2.5 px-4 rounded-lg font-semibold text-sm transition-colors min-h-[44px] leading-[28px]">
+            Contact sales
+          </Link>
         </div>
       </div>
 
-      {/* Pricing Cards */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {pricingTiers.map((tier) => (
-            <div
-              key={tier.id}
-              className={`relative bg-slate-800 border border-slate-700 rounded-2xl p-8 ${
-                tier.popular ? 'ring-2 ring-indigo-500 transform scale-105' : ''
-              }`}
-            >
-              {tier.popular && (
-                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                  <span className="bg-indigo-500 text-white text-sm font-medium px-4 py-2 rounded-full">
-                    Most Popular
-                  </span>
-                </div>
-              )}
-
-              <div className="mb-6">
-                <h3 className="text-2xl font-bold text-white mb-2">{tier.name}</h3>
-                <p className="text-slate-300 mb-6">{tier.description}</p>
-                
-                <div className="mb-4">
-                  <span className="text-5xl font-bold text-white">
-                    {tier.price === 0 ? 'Free' : `${tier.currency}${getDiscountedPrice(tier).toLocaleString()}`}
-                  </span>
-                  {tier.price > 0 && (
-                    <span className="text-slate-400 ml-2">/{billingPeriod === 'yearly' ? 'year' : 'month'}</span>
-                  )}
-                </div>
-                
-                {tier.originalPrice && billingPeriod === 'yearly' && getSavings(tier) > 0 && (
-                  <div className="flex items-center justify-center space-x-2 mb-4">
-                    <span className="text-lg text-slate-400 line-through">
-                      {tier.currency}{(tier.originalPrice * 12).toLocaleString()}
-                    </span>
-                    <span className="bg-red-900/40 text-red-400 text-sm font-medium px-2 py-1 rounded">
-                      Save {tier.currency}{getSavings(tier).toLocaleString()}
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              {/* Features */}
-              <div className="space-y-4 mb-8">
-                {tier.features.map((feature, index) => (
-                  <div key={index} className="flex items-start">
-                    <span className="text-green-500 mr-3 mt-1">✓</span>
-                    <span className="text-slate-400">{feature}</span>
-                  </div>
+      {/* Comparison table */}
+      <div className="max-w-5xl mx-auto px-4 pb-20">
+        <h2 className="text-xl font-bold text-white text-center mb-8">Full feature comparison</h2>
+        <div className="bg-slate-800/40 border border-slate-700 rounded-2xl overflow-hidden">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-slate-700">
+                <th className="px-5 py-4 text-left text-slate-400 font-medium w-1/2">Feature</th>
+                {(['FREE', 'PRO', 'ENTERPRISE'] as const).map(p => (
+                  <th key={p} className="px-5 py-4 text-center text-white font-semibold">{PLANS[p].label}</th>
                 ))}
-              </div>
-
-              {/* Limitations */}
-              {tier.limitations.length > 0 && (
-                <div className="space-y-2 mb-8">
-                  <h4 className="text-sm font-medium text-slate-400 uppercase tracking-wide">Limitations</h4>
-                  {tier.limitations.map((limitation, index) => (
-                    <div key={index} className="flex items-start">
-                      <span className="text-gray-400 mr-3 mt-1">✗</span>
-                      <span className="text-slate-400 text-sm">{limitation}</span>
-                    </div>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-700/60">
+              {FEATURE_ROWS.map(row => (
+                <tr key={row.key}>
+                  <td className="px-5 py-3.5 text-slate-300">{row.label}</td>
+                  {(['FREE', 'PRO', 'ENTERPRISE'] as const).map(p => (
+                    <td key={p} className="px-5 py-3.5 text-center">
+                      {renderValue(PLANS[p][row.key] as boolean | number)}
+                    </td>
                   ))}
-                </div>
-              )}
-
-              {/* CTA Button */}
-              <button
-                onClick={() => handleTierSelect(tier.id)}
-                disabled={checkoutLoading && selectedTier === tier.id}
-                className={`w-full py-3 px-6 rounded-lg font-semibold text-lg transition-colors disabled:opacity-60 disabled:cursor-wait ${
-                  tier.buttonVariant === 'primary'
-                    ? 'bg-indigo-600 text-white hover:bg-indigo-700'
-                    : tier.buttonVariant === 'secondary'
-                    ? 'bg-purple-600 text-white hover:bg-purple-700'
-                    : 'border-2 border-indigo-600 text-indigo-400 hover:bg-indigo-900/30'
-                }`}
-              >
-                {checkoutLoading && selectedTier === tier.id ? 'Processing...' : tier.buttonText}
-              </button>
-              {paymentError && selectedTier === tier.id && (
-                <p className="mt-2 text-sm text-red-600 text-center">{paymentError}</p>
-              )}
-            </div>
-          ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
+        <p className="text-slate-600 text-xs text-center mt-4">
+          {/* FLAG: add marketing feature descriptions to lib/plans.ts for richer table copy */}
+          Prices in INR, exclusive of GST. Billed monthly.
+        </p>
       </div>
 
-      {/* Feature Comparison */}
-      <div className="bg-slate-900 py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl font-bold text-white mb-2">
-              Compare All Features
-            </h2>
-            <p className="text-slate-400 text-base">
-              See what's included in each plan
-            </p>
-          </div>
-
-          <div className="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-slate-900">
-                  <tr>
-                    <th className="px-6 py-4 text-left text-sm font-medium text-slate-400 uppercase tracking-wide">
-                      Features
-                    </th>
-                    {pricingTiers.map((tier) => (
-                      <th key={tier.id} className="px-6 py-4 text-center text-sm font-medium text-white">
-                        {tier.name}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-700">
-                  <tr>
-                    <td className="px-6 py-4 text-sm font-medium text-white">Monthly RFQs</td>
-                    {pricingTiers.map((tier) => (
-                      <td key={tier.id} className="px-6 py-4 text-center text-sm text-slate-400">
-                        {tier.maxRFQs === -1 ? 'Unlimited' : tier.maxRFQs}
-                      </td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <td className="px-6 py-4 text-sm font-medium text-white">AI Matching</td>
-                    {pricingTiers.map((tier) => (
-                      <td key={tier.id} className="px-6 py-4 text-center text-sm text-slate-400">
-                        {tier.aiFeatures ? '✓' : '✗'}
-                      </td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <td className="px-6 py-4 text-sm font-medium text-white">Voice RFQ</td>
-                    {pricingTiers.map((tier) => (
-                      <td key={tier.id} className="px-6 py-4 text-center text-sm text-slate-400">
-                        {tier.voiceRFQ ? '✓' : '✗'}
-                      </td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <td className="px-6 py-4 text-sm font-medium text-white">Video RFQ</td>
-                    {pricingTiers.map((tier) => (
-                      <td key={tier.id} className="px-6 py-4 text-center text-sm text-slate-400">
-                        {tier.videoRFQ ? '✓' : '✗'}
-                      </td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <td className="px-6 py-4 text-sm font-medium text-white">Escrow Protection</td>
-                    {pricingTiers.map((tier) => (
-                      <td key={tier.id} className="px-6 py-4 text-center text-sm text-slate-400">
-                        {tier.escrowProtection ? '✓' : '✗'}
-                      </td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <td className="px-6 py-4 text-sm font-medium text-white">API Access</td>
-                    {pricingTiers.map((tier) => (
-                      <td key={tier.id} className="px-6 py-4 text-center text-sm text-slate-400">
-                        {tier.apiAccess ? '✓' : '✗'}
-                      </td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <td className="px-6 py-4 text-sm font-medium text-white">White Label</td>
-                    {pricingTiers.map((tier) => (
-                      <td key={tier.id} className="px-6 py-4 text-center text-sm text-slate-400">
-                        {tier.whiteLabel ? '✓' : '✗'}
-                      </td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <td className="px-6 py-4 text-sm font-medium text-white">Dedicated Manager</td>
-                    {pricingTiers.map((tier) => (
-                      <td key={tier.id} className="px-6 py-4 text-center text-sm text-slate-400">
-                        {tier.dedicatedManager ? '✓' : '✗'}
-                      </td>
-                    ))}
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Dynamic Pricing Calculator */}
-      {showCalculator && (
-        <div className="py-16 bg-slate-900">
-          <DynamicPricingCalculator 
-            onPlanSelect={handleTierSelect}
-            showRevenueProjection={true}
-          />
-        </div>
-      )}
-
-      {/* Add-ons */}
-      <div className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl font-bold text-white mb-2">
-              Add-ons & Extensions
-            </h2>
-            <p className="text-slate-400 text-base">
-              Enhance your plan with additional features
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {addOns.map((addon, index) => (
-              <div key={index} className="bg-slate-800 border border-slate-700 rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-white mb-2">{addon.name}</h3>
-                <p className="text-slate-400 text-sm mb-4">{addon.description}</p>
-                <div className="mb-4">
-                  <span className="text-2xl font-bold text-white">
-                    {addon.currency}{addon.price.toLocaleString()}
-                  </span>
-                  <span className="text-slate-400 ml-1">{addon.unit}</span>
-                </div>
-                <ul className="space-y-2">
-                  {addon.features.map((feature, featureIndex) => (
-                    <li key={featureIndex} className="flex items-start">
-                      <span className="text-green-400 mr-2 mt-1">✓</span>
-                      <span className="text-sm text-slate-400">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-                <button className="w-full mt-4 bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition-colors">
-                  Add to Plan
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* FAQ */}
-      <div className="bg-slate-900 py-16">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl font-bold text-white mb-2">
-              Frequently Asked Questions
-            </h2>
-          </div>
-
-          <div className="space-y-8">
-            <div>
-              <h3 className="text-lg font-semibold text-white mb-2">
-                Can I change my plan anytime?
-              </h3>
-              <p className="text-slate-300">
-                Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately, and we'll prorate any billing differences.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="text-lg font-semibold text-white mb-2">
-                What happens if I exceed my RFQ limit?
-              </h3>
-              <p className="text-slate-300">
-                You can purchase additional RFQs as add-ons, or upgrade to a higher plan. We'll notify you when you're approaching your limit.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="text-lg font-semibold text-white mb-2">
-                Is there a free trial?
-              </h3>
-              <p className="text-slate-300">
-                Yes, all paid plans come with a 14-day free trial. No credit card required to start.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="text-lg font-semibold text-white mb-2">
-                What payment methods do you accept?
-              </h3>
-              <p className="text-slate-300">
-                We accept all major credit cards, UPI, net banking, and Razorpay. Enterprise customers can also pay via bank transfer.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* CTA Section */}
-      <div className="bg-[#0F172A] py-16">
-        <div className="max-w-4xl mx-auto text-center px-4">
-          <h2 className="text-3xl font-bold text-white mb-4">Ready to Get Started?</h2>
-          <p className="text-xl text-slate-300 mb-8">Join thousands of businesses already using Bell24h</p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/auth/phone-email?redirect=/pricing" className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-lg font-semibold min-h-[44px] flex items-center justify-center transition-colors">
-              Start Free Trial
-            </Link>
-            <Link href="/contact" className="bg-transparent border-2 border-slate-600 text-slate-300 px-8 py-3 rounded-lg font-semibold hover:bg-slate-800 hover:text-white min-h-[44px] flex items-center justify-center transition-colors">
-              Contact Sales
-            </Link>
-          </div>
+      {/* CTA */}
+      <div className="border-t border-slate-800 py-16 text-center">
+        <h2 className="text-2xl font-bold text-white mb-3">Questions before you sign up?</h2>
+        <p className="text-slate-400 mb-8">Our team is reachable at <a href="mailto:digitex.studio@gmail.com" className="text-[#D4AF37] hover:underline">digitex.studio@gmail.com</a></p>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link href="/auth/phone-email" className="bg-[#D4AF37] hover:bg-yellow-400 text-[#001f3f] px-8 py-3 rounded-lg font-bold text-sm min-h-[44px] flex items-center justify-center transition-colors">
+            Start for free
+          </Link>
+          <Link href="/contact" className="border border-slate-600 text-slate-300 hover:border-white hover:text-white px-8 py-3 rounded-lg font-semibold text-sm min-h-[44px] flex items-center justify-center transition-colors">
+            Talk to sales
+          </Link>
         </div>
       </div>
     </div>
