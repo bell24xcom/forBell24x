@@ -120,11 +120,11 @@ export async function GET(request: NextRequest) {
         quotes:       { total: totalQuotes, accepted: acceptedQuotes, pending: pendingQuotes },
         transactions: { total: totalTx, completed: completedTx, completedVolume },
         funnel: {
-          rfqsCreated:     totalRFQs,
+          rfqsCreated:     realRfqs,
           quotesSubmitted: totalQuotes,
           quotesAccepted:  acceptedQuotes,
           dealsCompleted:  completedTx,
-          conversionRate:  totalRFQs > 0 ? ((completedTx / totalRFQs) * 100).toFixed(1) : '0',
+          conversionRate:  realRfqs > 0 ? ((completedTx / realRfqs) * 100).toFixed(1) : '0',
         },
         trust: { highTrustSuppliers },
         plans: { FREE: plans['FREE'] ?? 0, PRO: plans['PRO'] ?? 0, ENTERPRISE: plans['ENTERPRISE'] ?? 0 },
