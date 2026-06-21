@@ -363,9 +363,9 @@ export default function RFQDetailPage() {
                             <p className="text-white font-semibold">
                               {quote.supplier?.company || quote.supplier?.name || 'Supplier'}
                             </p>
-                            {quote.supplier?.trustScore != null && (
-                              <span className="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">
-                                Trust: {quote.supplier.trustScore}/100
+                            {quote.supplier?.isVerified && (
+                              <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+                                Verified ✓
                               </span>
                             )}
                           </div>

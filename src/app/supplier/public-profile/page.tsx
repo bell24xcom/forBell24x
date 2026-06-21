@@ -161,10 +161,10 @@ export default function PublicProfilePreview() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4 text-center">
             <div className="flex items-center justify-center mb-2">
-              <Star className="w-5 h-5 text-amber-400" />
+              <Shield className="w-5 h-5 text-indigo-400" />
             </div>
-            <p className="text-2xl font-bold text-white">{quoteStats.trustScore || trustScore}</p>
-            <p className="text-slate-400 text-xs">Trust Score</p>
+            <p className="text-sm font-bold text-white">{profile.gstVerified ? 'GST Verified' : 'Verification Pending'}</p>
+            <p className="text-slate-400 text-xs">Identity Status</p>
           </div>
           <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4 text-center">
             <div className="flex items-center justify-center mb-2">

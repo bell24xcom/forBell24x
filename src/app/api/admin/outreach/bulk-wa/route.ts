@@ -90,6 +90,7 @@ export async function POST(req: NextRequest) {
       select: {
         id: true, name: true, company: true, phone: true,
         email: true, location: true, trustScore: true,
+        gstNumber: true, udyamNumber: true,
       },
     });
 
@@ -115,7 +116,8 @@ export async function POST(req: NextRequest) {
     let apiFailed = 0;
     const results: {
       id: string; company: string; phone: string | null; location: string | null;
-      trustScore: number; claimLink: string; waLink: string | null; apiSent: boolean;
+      trustScore: number; gstVerified: boolean; udyamVerified: boolean;
+      claimLink: string; waLink: string | null; apiSent: boolean;
     }[] = [];
 
     for (const s of suppliers) {
@@ -193,9 +195,22 @@ export async function POST(req: NextRequest) {
       );
       const waLink = rawPhone.length === 10 ? `https://wa.me/91${rawPhone}?text=${msg}` : null;
 
+      // Log day1 send to InteractionMemory for API-sent messages so drip engine tracks correctly
+      if (thisSentViaApi && !dryRun) {
+        prisma.interactionMemory.create({
+          data: {
+            userId:     s.id,
+            actionType: 'day1_wa_sent',
+            source:     'api',
+            metadata:   { sentAt: new Date().toISOString(), method: 'msg91_api' },
+          },
+        }).catch(() => {});
+      }
+
       results.push({
         id: s.id, company: companyName, phone: s.phone,
         location: s.location, trustScore: s.trustScore,
+        gstVerified: !!s.gstNumber, udyamVerified: !!s.udyamNumber,
         claimLink, waLink, apiSent: thisSentViaApi,
       });
     }
@@ -220,4 +235,33 @@ export async function POST(req: NextRequest) {
       { status: 500 },
     );
   }
+}
+
+// Called by the dialer when the operator opens WhatsApp for a contact.
+// This fires BEFORE the 5s auto-advance countdown, so the DB record exists
+// regardless of whether the operator clicks "Mark Sent" or lets the timer fire.
+export async function PATCH(req: NextRequest) {
+  const auth = requireAdmin(req);
+  if (isErrorResponse(auth)) return auth;
+
+  const body   = await req.json().catch(() => ({}));
+  const userId = String(body.userId ?? '');
+  if (!userId) return NextResponse.json({ success: false, error: 'userId required' }, { status: 400 });
+
+  // Idempotent — safe to call multiple times
+  const existing = await prisma.interactionMemory.findFirst({
+    where: { userId, actionType: 'day1_wa_sent' },
+  });
+  if (!existing) {
+    await prisma.interactionMemory.create({
+      data: {
+        userId,
+        actionType: 'day1_wa_sent',
+        source:     'dialer',
+        metadata:   { sentAt: new Date().toISOString(), method: 'whatsapp_dialer' },
+      },
+    });
+  }
+
+  return NextResponse.json({ success: true });
 }

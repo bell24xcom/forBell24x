@@ -225,9 +225,9 @@ export default function SmartMatchingPage() {
                       <div className="text-right flex-shrink-0">
                         <div className="text-2xl font-bold text-indigo-400">{Math.round(supplier.matchScore * 100)}%</div>
                         <div className="text-xs text-slate-400">Match</div>
-                        <div className={`text-xs font-semibold mt-1 ${trustColor(supplier.trustScore)}`}>
-                          Trust {supplier.trustScore}
-                        </div>
+                        {supplier.isVerified && (
+                          <div className="text-xs font-semibold mt-1 text-green-400">Verified ✓</div>
+                        )}
                       </div>
                     </div>
 

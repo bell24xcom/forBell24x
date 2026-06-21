@@ -17,7 +17,8 @@ export default async function ClaimPage({ params }: PageProps) {
       name: true,
       company: true,
       location: true,
-      trustScore: true,
+      gstNumber: true,
+      udyamNumber: true,
       isClaimed: true,
       claimedAt: true,
     },
@@ -74,10 +75,16 @@ export default async function ClaimPage({ params }: PageProps) {
                         {supplier.location}
                       </p>
                     )}
-                    {supplier.trustScore > 0 && (
-                      <p className="text-amber-400 text-xs flex items-center gap-1 mt-0.5">
-                        <Star className="w-3 h-3 fill-current" />
-                        Trust Score: {supplier.trustScore}/100
+                    {supplier.gstNumber && (
+                      <p className="text-green-400 text-xs flex items-center gap-1 mt-0.5">
+                        <CheckCircle className="w-3 h-3" />
+                        GST Registered
+                      </p>
+                    )}
+                    {supplier.udyamNumber && (
+                      <p className="text-blue-400 text-xs flex items-center gap-1 mt-0.5">
+                        <CheckCircle className="w-3 h-3" />
+                        Udyam Registered
                       </p>
                     )}
                   </div>

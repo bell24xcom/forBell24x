@@ -55,6 +55,8 @@ interface Supplier {
   email: string | null;
   location: string | null;
   trustScore: number;
+  gstVerified?: boolean;
+  udyamVerified?: boolean;
   claimLink: string;
   waLink: string | null;
   apiSent?: boolean;
@@ -183,7 +185,18 @@ function Dialer({
   // When idx changes, cancel any running countdown
   useEffect(() => { clearTimer(); }, [idx]);
 
+  const logDialerSent = (userId: string) => {
+    fetch('/api/admin/outreach/bulk-wa', {
+      method:      'PATCH',
+      credentials: 'include',
+      headers:     { 'Content-Type': 'application/json' },
+      body:        JSON.stringify({ userId }),
+    }).catch(() => {});
+  };
+
   const handleOpenWA = () => {
+    // Log to DB immediately — before the 5s timer fires — so auto-advance is covered
+    logDialerSent(s.id);
     setSentSet(prev => new Set([...prev, idx]));
     startCountdown(5);
   };
@@ -256,9 +269,13 @@ function Dialer({
                 <span className="text-xs text-slate-500 font-mono">
                   {s.phone ? `+91 ${s.phone.replace(/\D/g, '').slice(-10).replace(/(\d{5})(\d{5})/, '$1 $2')}` : 'No phone'}
                 </span>
-                <span className="text-xs bg-slate-800 border border-slate-700 text-slate-400 px-1.5 py-0.5 rounded">
-                  Trust {s.trustScore}
-                </span>
+                {s.gstVerified ? (
+                  <span className="text-xs bg-green-900/40 border border-green-700/50 text-green-400 px-1.5 py-0.5 rounded">GST ✓</span>
+                ) : s.udyamVerified ? (
+                  <span className="text-xs bg-blue-900/40 border border-blue-700/50 text-blue-400 px-1.5 py-0.5 rounded">Udyam ✓</span>
+                ) : (
+                  <span className="text-xs bg-slate-800 border border-slate-700 text-slate-500 px-1.5 py-0.5 rounded">Awaiting KYC</span>
+                )}
                 {s.apiSent && (
                   <span className="text-xs bg-green-900/40 border border-green-700/50 text-green-400 px-1.5 py-0.5 rounded">
                     ✓ Sent via API

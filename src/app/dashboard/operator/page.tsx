@@ -233,7 +233,7 @@ export default function OperatorDashboard() {
                           {f.followUpType === 'day2' ? 'Day 2' : 'Day 5 — Final'}
                         </span>
                       </div>
-                      <p className="text-slate-400 text-xs">{f.name} · Trust: {f.trustScore} · {f.rfqCategory}</p>
+                      <p className="text-slate-400 text-xs">{f.name} · {f.rfqCategory}</p>
                       <p className="text-slate-500 text-xs mt-0.5">RFQ: {f.rfqTitle}</p>
                     </div>
                     {f.waLink && (
@@ -397,7 +397,7 @@ export default function OperatorDashboard() {
                     <div className="flex items-start justify-between gap-2">
                       <div>
                         <p className="font-medium text-white text-sm">{s.company}</p>
-                        <p className="text-slate-400 text-xs">{s.name} {s.location ? `· ${s.location}` : ''} · Trust: {s.trustScore}</p>
+                        <p className="text-slate-400 text-xs">{s.name} {s.location ? `· ${s.location}` : ''}</p>
                       </div>
                       <div className="flex gap-2 shrink-0">
                         {s.waLink && (
