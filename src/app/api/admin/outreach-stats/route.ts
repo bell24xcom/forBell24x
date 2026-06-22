@@ -10,7 +10,8 @@ import { requireAdmin, isErrorResponse } from '@/lib/admin-auth';
 export const dynamic = 'force-dynamic';
 
 const OUTREACH_ACTIONS = [
-  'outreach_sent',
+  'day1_wa_sent',       // written by dialer PATCH + API bulk send (canonical key)
+  'outreach_sent',      // legacy key — kept for backward compat; may have 0 rows
   'follow_up_1_sent',
   'follow_up_2_sent',
   'drip_day3_sent',
@@ -51,9 +52,9 @@ export async function GET(req: NextRequest) {
         take: 30,
       }),
 
-      // Unique suppliers reached via outreach_sent
+      // Unique suppliers reached via any day-1 outreach (both keys for backward compat)
       prisma.interactionMemory.findMany({
-        where: { actionType: 'outreach_sent', createdAt: { gte: since } },
+        where: { actionType: { in: ['day1_wa_sent', 'outreach_sent'] }, createdAt: { gte: since } },
         select: { userId: true },
         distinct: ['userId'],
       }),
@@ -74,7 +75,8 @@ export async function GET(req: NextRequest) {
     );
 
     // Conversion funnel (period)
-    const outreachSent      = countMap['outreach_sent']        ?? 0;
+    // day1_wa_sent is the canonical key; outreach_sent kept for backward compat
+    const outreachSent      = (countMap['day1_wa_sent'] ?? 0) + (countMap['outreach_sent'] ?? 0);
     const followUp1         = countMap['follow_up_1_sent']     ?? 0;
     const followUp2         = countMap['follow_up_2_sent']     ?? 0;
     const drip3             = countMap['drip_day3_sent']       ?? 0;
@@ -103,7 +105,7 @@ export async function GET(req: NextRequest) {
         conversionRate,
       },
       allTime: {
-        outreachSent:   allTimeMap['outreach_sent']           ?? 0,
+        outreachSent:   (allTimeMap['day1_wa_sent'] ?? 0) + (allTimeMap['outreach_sent'] ?? 0),
         followUp1:      allTimeMap['follow_up_1_sent']        ?? 0,
         followUp2:      allTimeMap['follow_up_2_sent']        ?? 0,
         drip3:          allTimeMap['drip_day3_sent']          ?? 0,
