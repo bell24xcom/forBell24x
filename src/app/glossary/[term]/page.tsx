@@ -13,7 +13,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const term = getTermBySlug(params.term);
   if (!term) return { title: 'Not Found' };
 
-  const title       = `${term.title} | VyaparSethu B2B Glossary`;
+  const termLabel   = term.title.length > 35 ? term.title.slice(0, 32) + '...' : term.title;
+  const title       = { absolute: `${termLabel} | VyaparSethu Glossary` };
   const description = term.shortDef;
   const canonical   = `https://www.vyaparsethu.com/glossary/${term.slug}`;
 

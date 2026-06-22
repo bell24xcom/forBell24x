@@ -12,10 +12,10 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const city = CITIES[params.city];
   if (!city) return { title: 'Not Found' };
-  const title = `B2B Suppliers in ${city.fullName} — Verified Industrial Sourcing`;
+  const seoTitle = `B2B Suppliers in ${city.name} | VyaparSethu`;
   const description = `Find verified B2B suppliers and manufacturers in ${city.fullName}. ${city.description} Post your Requirement free on VyaparSethu.`;
   return {
-    title, description,
+    title: { absolute: seoTitle }, description,
     keywords: [`suppliers in ${city.name}`, `${city.name} manufacturers`, `B2B sourcing ${city.name}`, `industrial suppliers ${city.name} ${city.state}`],
     openGraph: { title, description, url: `https://www.vyaparsethu.com/suppliers/${params.city}`, siteName: 'VyaparSethu' },
     alternates: { canonical: `https://www.vyaparsethu.com/suppliers/${params.city}` },

@@ -15,8 +15,9 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const post = getPostBySlug(params.slug);
   if (!post) return { title: 'Post Not Found' };
+  const titleStr = post.title.length > 45 ? post.title.slice(0, 42) + '...' : post.title;
   return {
-    title: post.title,
+    title: { absolute: `${titleStr} | VyaparSethu` },
     description: post.excerpt,
     keywords: post.keywords,
     openGraph: {

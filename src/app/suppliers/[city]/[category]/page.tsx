@@ -15,11 +15,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const cat  = CATEGORY_META[params.category];
   if (!city || !cat) return { title: 'Not Found' };
 
-  const title       = `${cat.name} Suppliers in ${city.fullName} — Verified B2B Sourcing`;
+  const rawTitle    = `${cat.name} Suppliers in ${city.name}`;
+  const seoTitle    = rawTitle.length > 45 ? rawTitle.slice(0, 42) + '...' : rawTitle;
   const description = `Find verified ${cat.name.toLowerCase()} suppliers in ${city.fullName}. ${city.description} Get 3+ quotes within 24 hours via VyaparSethu's Protected Payment platform.`;
 
   return {
-    title,
+    title: { absolute: `${seoTitle} | VyaparSethu` },
     description,
     keywords: [...cat.keywords, `suppliers in ${city.name}`, `${city.name} ${cat.name.toLowerCase()}`],
     openGraph: { title, description, url: `https://www.vyaparsethu.com/suppliers/${params.city}/${params.category}`, siteName: 'VyaparSethu' },
