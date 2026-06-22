@@ -84,8 +84,8 @@ export default function RegisterPage() {
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <div className="w-12 h-12 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-2xl">B</div>
-            <span className="text-3xl font-bold text-white">Bell24h</span>
+            <div className="w-12 h-12 rounded-lg flex items-center justify-center font-bold text-2xl" style={{ backgroundColor: '#0B1F45', color: '#D4AF37' }}>V</div>
+            <span className="text-3xl font-bold text-white">VyaparSethu</span>
           </div>
           <h1 className="text-3xl font-bold text-white">Create Your Account</h1>
           <p className="mt-2 text-slate-400">Join India&apos;s fastest B2B marketplace</p>
