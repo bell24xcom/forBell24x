@@ -66,7 +66,7 @@ export default function HeroRFQDemo() {
             onClick={() => setActiveType('voice')}
             className={`flex items-center gap-2 px-8 py-5 rounded-2xl font-bold text-lg transition-all ${
               activeType === 'voice'
-                ? 'bg-cyan-500 border-2 border-cyan-500 text-white shadow-2xl shadow-cyan-500/30 scale-105'
+                ? 'bg-cyan-700 border-2 border-cyan-700 text-white shadow-2xl shadow-cyan-700/30 scale-105'
                 : 'bg-slate-900/60 border-2 border-slate-700 text-slate-300 hover:border-cyan-500/50 hover:text-white backdrop-blur'
             }`}
           >
@@ -77,7 +77,7 @@ export default function HeroRFQDemo() {
             onClick={() => setActiveType('video')}
             className={`flex items-center gap-2 px-8 py-5 rounded-2xl font-bold text-lg transition-all ${
               activeType === 'video'
-                ? 'bg-cyan-500 border-2 border-cyan-500 text-white shadow-2xl shadow-cyan-500/30 scale-105'
+                ? 'bg-cyan-700 border-2 border-cyan-700 text-white shadow-2xl shadow-cyan-700/30 scale-105'
                 : 'bg-slate-900/60 border-2 border-slate-700 text-slate-300 hover:border-cyan-500/50 hover:text-white backdrop-blur'
             }`}
           >
@@ -88,7 +88,7 @@ export default function HeroRFQDemo() {
             onClick={() => setActiveType('text')}
             className={`flex items-center gap-2 px-8 py-5 rounded-2xl font-bold text-lg transition-all ${
               activeType === 'text'
-                ? 'bg-cyan-500 border-2 border-cyan-500 text-white shadow-2xl shadow-cyan-500/30 scale-105'
+                ? 'bg-cyan-700 border-2 border-cyan-700 text-white shadow-2xl shadow-cyan-700/30 scale-105'
                 : 'bg-slate-900/60 border-2 border-slate-700 text-slate-300 hover:border-cyan-500/50 hover:text-white backdrop-blur'
             }`}
           >
@@ -219,7 +219,7 @@ export default function HeroRFQDemo() {
               or Sign up for free →
             </Link>
           </p>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-400">
             No credit card required • Free to start • Cancel anytime
           </p>
         </div>

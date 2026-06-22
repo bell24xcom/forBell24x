@@ -20,10 +20,10 @@ export default function Footer() {
               </div>
             </div>
             <p className="text-blue-300 text-xs mb-1">Commerce Connections Globally</p>
-            <p className="text-slate-500 text-sm leading-relaxed mb-3">
+            <p className="text-slate-400 text-sm leading-relaxed mb-3">
               India&apos;s B2B trade network. AI-powered supplier matching with voice, video, and text requirements.
             </p>
-            <p className="text-slate-600 text-xs leading-relaxed mb-4">
+            <p className="text-slate-400 text-xs leading-relaxed mb-4">
               By Digitex Studio<br />
               Lodha Upper Thane, Bhiwandi<br />
               Thane, Maharashtra — 421302<br />
@@ -49,10 +49,10 @@ export default function Footer() {
           <div>
             <h3 className="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-4">Product</h3>
             <ul className="space-y-2.5">
-              <li><Link href="/rfq/create" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">Post Requirement</Link></li>
-              <li><Link href="/suppliers" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">Find Suppliers</Link></li>
-              <li><Link href="/categories" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">Browse Categories</Link></li>
-              <li><Link href="/pricing" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">Pricing</Link></li>
+              <li><Link href="/rfq/create" className="text-slate-400 hover:text-slate-200 text-sm transition-colors">Post Requirement</Link></li>
+              <li><Link href="/suppliers" className="text-slate-400 hover:text-slate-200 text-sm transition-colors">Find Suppliers</Link></li>
+              <li><Link href="/categories" className="text-slate-400 hover:text-slate-200 text-sm transition-colors">Browse Categories</Link></li>
+              <li><Link href="/pricing" className="text-slate-400 hover:text-slate-200 text-sm transition-colors">Pricing</Link></li>
             </ul>
           </div>
 
@@ -60,9 +60,9 @@ export default function Footer() {
           <div>
             <h3 className="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-4">Company</h3>
             <ul className="space-y-2.5">
-              <li><Link href="/about" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">About Us</Link></li>
-              <li><Link href="/contact" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">Contact</Link></li>
-              <li><Link href="/help" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">Help Center</Link></li>
+              <li><Link href="/about" className="text-slate-400 hover:text-slate-200 text-sm transition-colors">About Us</Link></li>
+              <li><Link href="/contact" className="text-slate-400 hover:text-slate-200 text-sm transition-colors">Contact</Link></li>
+              <li><Link href="/help" className="text-slate-400 hover:text-slate-200 text-sm transition-colors">Help Center</Link></li>
             </ul>
           </div>
 
@@ -70,11 +70,11 @@ export default function Footer() {
           <div>
             <h3 className="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-4">Legal</h3>
             <ul className="space-y-2.5">
-              <li><Link href="/privacy" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">Privacy Policy</Link></li>
-              <li><Link href="/terms" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">Terms of Service</Link></li>
-              <li><Link href="/refund-policy" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">Refund Policy</Link></li>
-              <li><Link href="/shipping" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">Shipping Policy</Link></li>
-              <li><Link href="/cookies" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">Cookie Policy</Link></li>
+              <li><Link href="/privacy" className="text-slate-400 hover:text-slate-200 text-sm transition-colors">Privacy Policy</Link></li>
+              <li><Link href="/terms" className="text-slate-400 hover:text-slate-200 text-sm transition-colors">Terms of Service</Link></li>
+              <li><Link href="/refund-policy" className="text-slate-400 hover:text-slate-200 text-sm transition-colors">Refund Policy</Link></li>
+              <li><Link href="/shipping" className="text-slate-400 hover:text-slate-200 text-sm transition-colors">Shipping Policy</Link></li>
+              <li><Link href="/cookies" className="text-slate-400 hover:text-slate-200 text-sm transition-colors">Cookie Policy</Link></li>
             </ul>
           </div>
         </div>
@@ -84,10 +84,10 @@ export default function Footer() {
       <div className="border-t border-slate-800/50">
         <div className="max-w-6xl mx-auto px-4 py-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
-            <p className="text-slate-600 text-xs">
+            <p className="text-slate-400 text-xs">
               &copy; {new Date().getFullYear()} VyaparSethu. Operated by Digitex Studio. All rights reserved. Made in India 🇮🇳
             </p>
-            <p className="text-slate-600 text-xs">
+            <p className="text-slate-400 text-xs">
               GSTIN: 27AAAPP9753F2ZF | <a href="mailto:digitex.studio@gmail.com" className="hover:text-slate-400 transition-colors">digitex.studio@gmail.com</a>
             </p>
           </div>

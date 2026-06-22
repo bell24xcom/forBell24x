@@ -11,7 +11,7 @@ export default function BrandVideoSection() {
       <h2 className="text-2xl font-bold text-white mb-2 text-center">
         Bad Debt Khatam
       </h2>
-      <p className="text-white/40 text-sm mb-8 text-center max-w-xs">
+      <p className="text-white/70 text-sm mb-8 text-center max-w-xs">
         India's First Trusted B2B Trade Network
       </p>
       <div className="relative w-full max-w-[280px] mx-auto aspect-[9/16]
@@ -24,13 +24,14 @@ export default function BrandVideoSection() {
           muted
           loop
           playsInline
+          preload="none"
           className="absolute inset-0 w-full h-full object-cover"
           style={{ transform: 'scale(1.22) translateY(-7%)', transformOrigin: 'center top' }}
         >
           <track kind="captions" src="" label="No dialogue" srcLang="en" default />
         </video>
       </div>
-      <p className="mt-6 text-[#D4AF37]/50 text-xs tracking-widest uppercase">
+      <p className="mt-6 text-[#D4AF37] text-xs tracking-widest uppercase">
         vyaparsethu.com
       </p>
     </section>

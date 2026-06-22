@@ -82,7 +82,7 @@ export default function LiveRFQFeedCompact() {
               <div className="flex-1 min-w-0">
                 <h3 className="font-semibold text-white mb-1 truncate">{rfq.title}</h3>
                 <p className="text-sm text-slate-400 mb-2 line-clamp-2">{rfq.description}</p>
-                <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
+                <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400">
                   <span className="flex items-center gap-1">
                     <MapPin className="w-3 h-3" />
                     {rfq.location}

@@ -166,7 +166,7 @@ export default function Header() {
                 <div className="flex items-center gap-3">
                   <Link
                     href="/rfq/create"
-                    className="bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
+                    className="bg-[#D4AF37] hover:bg-[#c4a030] text-[#001f3f] text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
                   >
                     Post Requirement
                   </Link>
@@ -218,7 +218,7 @@ export default function Header() {
               ) : (
                 <>
                   <Link href="/pricing" className="block text-slate-300 hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Pricing</Link>
-                  <Link href="/rfq/create" className="block bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors text-center" onClick={() => setIsMenuOpen(false)}>Post Requirement</Link>
+                  <Link href="/rfq/create" className="block bg-[#D4AF37] hover:bg-[#c4a030] text-[#001f3f] text-sm font-semibold px-4 py-2.5 rounded-lg transition-colors text-center" onClick={() => setIsMenuOpen(false)}>Post Requirement</Link>
                   <button onClick={() => { handleLogin(); setIsMenuOpen(false); }} className="w-full border border-slate-600 text-slate-300 hover:text-white text-sm font-medium px-4 py-2.5 rounded-lg transition-colors">
                     Login / Register
                   </button>
