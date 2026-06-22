@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: { absolute: seoTitle }, description,
     keywords: [`suppliers in ${city.name}`, `${city.name} manufacturers`, `B2B sourcing ${city.name}`, `industrial suppliers ${city.name} ${city.state}`],
-    openGraph: { title, description, url: `https://www.vyaparsethu.com/suppliers/${params.city}`, siteName: 'VyaparSethu' },
+    openGraph: { title: seoTitle, description, url: `https://www.vyaparsethu.com/suppliers/${params.city}`, siteName: 'VyaparSethu' },
     alternates: { canonical: `https://www.vyaparsethu.com/suppliers/${params.city}` },
   };
 }

@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: { absolute: `${seoTitle} | VyaparSethu` },
     description,
     keywords: [...cat.keywords, `suppliers in ${city.name}`, `${city.name} ${cat.name.toLowerCase()}`],
-    openGraph: { title, description, url: `https://www.vyaparsethu.com/suppliers/${params.city}/${params.category}`, siteName: 'VyaparSethu' },
+    openGraph: { title: seoTitle, description, url: `https://www.vyaparsethu.com/suppliers/${params.city}/${params.category}`, siteName: 'VyaparSethu' },
     alternates: { canonical: `https://www.vyaparsethu.com/suppliers/${params.city}/${params.category}` },
   };
 }
