@@ -125,6 +125,7 @@ export default function MarketplaceClient({ initialRfqs, initialTotal }: Props) 
               <input
                 type="text"
                 placeholder="Search RFQs by keyword…"
+                aria-label="Search active RFQs"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500"
@@ -244,7 +245,9 @@ export default function MarketplaceClient({ initialRfqs, initialTotal }: Props) 
 
                       <div className="text-right flex-shrink-0">
                         <div className="font-semibold text-indigo-300 text-sm">
-                          {rfq.quotesCount ?? rfq._count?.quotes ?? 0} quote{(rfq.quotesCount ?? rfq._count?.quotes ?? 0) !== 1 ? 's' : ''}
+                          {(rfq.quotesCount ?? rfq._count?.quotes ?? 0) === 0
+                            ? 'Be the first to quote →'
+                            : `${rfq.quotesCount ?? rfq._count?.quotes ?? 0} quote${(rfq.quotesCount ?? rfq._count?.quotes ?? 0) !== 1 ? 's' : ''}`}
                         </div>
                         <div className="text-slate-500 text-xs mt-1">
                           {new Date(rfq.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}

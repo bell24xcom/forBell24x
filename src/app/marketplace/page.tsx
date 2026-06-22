@@ -1,6 +1,20 @@
 import { Suspense } from 'react';
+import { Metadata } from 'next';
 import { prisma } from '@/lib/prisma';
+import { SITE_URL } from '@/lib/site-url';
 import MarketplaceClient from './MarketplaceClient';
+
+export const metadata: Metadata = {
+  title: 'B2B Marketplace',
+  description: "Browse active B2B requirements from verified Indian buyers. Submit quotes on Steel, Textiles, Chemicals, Machinery and more. Win new business on VyaparSethu.",
+  alternates: { canonical: `${SITE_URL}/marketplace` },
+  openGraph: {
+    title: 'B2B Marketplace | VyaparSethu',
+    description: "Browse active B2B requirements from verified Indian buyers. Submit quotes on Steel, Textiles, Chemicals, Machinery and more. Win new business on VyaparSethu.",
+    url: `${SITE_URL}/marketplace`,
+    images: [{ url: `${SITE_URL}/og-image.png`, width: 1200, height: 630, alt: 'B2B Marketplace | VyaparSethu' }],
+  },
+};
 
 // Revalidate server-rendered content every 60 seconds (ISR)
 export const revalidate = 60;
@@ -53,7 +67,33 @@ async function getInitialRFQs() {
 export default async function MarketplacePage() {
   const { rfqs, total } = await getInitialRFQs();
 
+  const breadcrumbLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
+      { '@type': 'ListItem', position: 2, name: 'Marketplace', item: `${SITE_URL}/marketplace` },
+    ],
+  };
+
+  const itemListLd = rfqs.length > 0 ? {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Active B2B Requirements',
+    itemListElement: rfqs.slice(0, 20).map((rfq, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: rfq.title,
+      url: `${SITE_URL}/rfq/${rfq.id}`,
+    })),
+  } : null;
+
   return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
+      {itemListLd && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListLd) }} />
+      )}
     <Suspense fallback={
       <div className="min-h-screen bg-[#0F172A] flex items-center justify-center">
         <div className="text-center">
@@ -64,5 +104,6 @@ export default async function MarketplacePage() {
     }>
       <MarketplaceClient initialRfqs={rfqs} initialTotal={total} />
     </Suspense>
+    </>
   );
 }
