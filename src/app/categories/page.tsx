@@ -1,12 +1,20 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
+import { SITE_URL } from '@/lib/site-url';
 
 export const revalidate = 300; // cache 5 minutes
 
 export const metadata: Metadata = {
-  title: 'All Trade Categories | VyaparSethu',
-  description: 'Browse all B2B product and service categories on VyaparSethu — India\'s Protected Trade Network',
+  title: 'All Trade Categories',
+  description: "Explore 450+ B2B trade categories — Metals, Textiles, Chemicals, Packaging, Electronics, Machinery and more. Find verified Indian suppliers on VyaparSethu. Post free.",
+  alternates: { canonical: `${SITE_URL}/categories` },
+  openGraph: {
+    title: 'All Trade Categories | VyaparSethu',
+    description: "Explore 450+ B2B trade categories — Metals, Textiles, Chemicals, Packaging, Electronics, Machinery and more. Find verified Indian suppliers on VyaparSethu. Post free.",
+    url: `${SITE_URL}/categories`,
+    images: [{ url: `${SITE_URL}/og-image.png`, width: 1200, height: 630, alt: 'All Trade Categories | VyaparSethu' }],
+  },
 };
 
 const FALLBACK_CATEGORIES = [
@@ -79,8 +87,32 @@ export default async function CategoriesPage({
       )
     : allCategories;
 
+  const breadcrumbLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
+      { '@type': 'ListItem', position: 2, name: 'All Categories', item: `${SITE_URL}/categories` },
+    ],
+  };
+
+  const itemListLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'B2B Trade Categories',
+    itemListElement: categories.map((cat, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: cat.title,
+      url: `${SITE_URL}/categories/${cat.slug}`,
+    })),
+  };
+
   return (
     <div className="min-h-screen bg-[var(--bg-primary)]">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListLd) }} />
+
       <div className="max-w-6xl mx-auto px-4 py-12">
         <div className="text-center mb-10">
           <h1 className="text-3xl font-bold text-white mb-3">All Categories</h1>
@@ -96,6 +128,7 @@ export default async function CategoriesPage({
             name="q"
             defaultValue={searchParams?.q ?? ''}
             placeholder="Search categories..."
+            aria-label="Search trade categories"
             className="w-full px-4 py-3 bg-slate-800 border border-slate-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-slate-500"
           />
         </form>
@@ -119,7 +152,7 @@ export default async function CategoriesPage({
                 {cat.title}
               </h3>
               <p className="text-slate-500 text-sm mt-1">
-                {cat.suppliers > 0 ? `${cat.suppliers.toLocaleString()}+ suppliers` : 'Suppliers joining'}
+                {cat.suppliers > 0 ? `${cat.suppliers.toLocaleString()}+ suppliers` : 'Be the first supplier →'}
               </p>
             </Link>
           ))}
