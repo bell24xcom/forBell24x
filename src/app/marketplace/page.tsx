@@ -105,7 +105,56 @@ export default async function MarketplacePage() {
       <MarketplaceClient initialRfqs={rfqs} initialTotal={total} />
     </Suspense>
 
-    {/* Server-rendered — always visible to crawlers */}
+    {/* How the marketplace works — server-rendered, always visible to crawlers */}
+    <section className="max-w-4xl mx-auto px-4 pt-10 pb-8">
+      <h2 className="text-xl font-bold text-white mb-6">How VyaparSethu B2B Marketplace Works</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+        <div className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-6">
+          <h3 className="text-white font-semibold mb-3">For Buyers</h3>
+          <p className="text-slate-400 text-sm leading-relaxed">
+            Browse categories, post your requirement with specifications and budget, receive responses
+            from multiple verified suppliers, compare bids side by side, and pay securely through
+            Razorpay-protected payments. Funds are held until you confirm delivery and quality. No
+            middlemen, no platform commission.
+          </p>
+        </div>
+        <div className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-6">
+          <h3 className="text-white font-semibold mb-3">For Suppliers</h3>
+          <p className="text-slate-400 text-sm leading-relaxed">
+            Create a GST-verified profile, showcase your products and certifications, receive
+            requirements from active buyers in your category, submit competitive quotes, and get paid
+            securely with no payment delays or buyer defaults.
+          </p>
+        </div>
+      </div>
+
+      <h2 className="text-xl font-bold text-white mb-4">Why Choose VyaparSethu</h2>
+      <ul className="space-y-2 text-slate-400 text-sm leading-relaxed list-disc list-inside mb-8">
+        <li>GST-verified suppliers only — no self-reported listings, every profile is manually reviewed.</li>
+        <li>Razorpay-protected payments — buyer funds are secured until delivery is confirmed.</li>
+        <li>Zero fees for buyers — free to browse, post requirements, and connect with suppliers.</li>
+        <li>Pan-India reach — suppliers from Mumbai, Bhiwandi, Kalamboli, Thane, Pune, Delhi, and 500+ cities.</li>
+        <li>24-hour response — most verified suppliers respond to requirements within one business day.</li>
+      </ul>
+
+      <h2 className="text-xl font-bold text-white mb-4">Industries Served</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {[
+          { title: 'Construction and Real Estate', desc: 'Cement, steel, bricks, tiles, pipes, and finishing materials from verified dealers across India.' },
+          { title: 'Manufacturing and Industrial', desc: 'Machinery, raw materials, components, and packaging from registered manufacturers.' },
+          { title: 'Chemicals and Petrochemicals', desc: 'Industrial chemicals from MIDC-based suppliers in Taloja, Ambernath, and Dombivli.' },
+          { title: 'Textiles and Apparel', desc: 'Fabrics, dyes, trims, and finished garments from verified mills and exporters.' },
+          { title: 'Food and Beverage', desc: 'Ingredients, processing equipment, and packaging from FSSAI-registered vendors.' },
+        ].map(item => (
+          <div key={item.title} className="bg-slate-800/30 border border-slate-700/40 rounded-lg p-4">
+            <p className="text-white text-sm font-semibold mb-1">{item.title}</p>
+            <p className="text-slate-400 text-xs leading-relaxed">{item.desc}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    {/* How it works — step-by-step */}
     <section className="max-w-4xl mx-auto px-4 pt-2 pb-14 border-t border-slate-800 mt-4">
       <h2 className="text-lg font-bold text-white mb-3">How the VyaparSethu Trade Network Works</h2>
       <p className="text-slate-400 text-sm leading-relaxed mb-3">

@@ -168,10 +168,80 @@ export default async function CategoriesPage({
         <div className="text-center mt-10">
           <Link
             href="/rfq/create"
-            className="inline-block bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 px-8 rounded-lg transition-colors"
+            className="inline-block bg-[#D4AF37] hover:bg-[#c4a030] text-[#001f3f] font-medium py-3 px-8 rounded-lg transition-colors"
           >
-            Post Your RFQ Free
+            Post Your Requirement Free
           </Link>
+        </div>
+
+        {/* SEO prose — visible to crawlers and readers */}
+        <div className="mt-16 border-t border-slate-800 pt-12 space-y-10">
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-4">Find Verified Suppliers by Industry</h2>
+            <p className="text-slate-400 leading-relaxed">
+              Every category on VyaparSethu is populated with manually verified suppliers who have completed
+              GST registration and passed our quality checks. Whether you need construction material
+              suppliers in Mumbai, cosmetic raw material manufacturers, or industrial equipment dealers in
+              Delhi — browse by category and request quotes directly through our built-in requirement
+              system. All responses arrive within 24 hours and every transaction is covered by
+              Razorpay-protected payments.
+            </p>
+          </div>
+
+          <div>
+            <h2 className="text-xl font-bold text-white mb-5">Popular B2B Categories</h2>
+            <div className="space-y-5">
+              <div>
+                <h3 className="text-white font-semibold mb-1">Construction and Building Materials</h3>
+                <p className="text-slate-400 text-sm leading-relaxed">
+                  Cement, steel, bricks, tiles, pipes, and finishing materials from verified dealers across
+                  India. Ideal for contractors, builders, and infrastructure projects looking for
+                  competitive bulk pricing.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-white font-semibold mb-1">Industrial Machinery and Equipment</h3>
+                <p className="text-slate-400 text-sm leading-relaxed">
+                  Manufacturing machines, packaging equipment, CNC tools, and heavy machinery from
+                  certified suppliers. Compare specifications and prices before you buy.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-white font-semibold mb-1">Chemicals and Petrochemicals</h3>
+                <p className="text-slate-400 text-sm leading-relaxed">
+                  Industrial chemicals, solvents, lubricants, and specialty chemicals from
+                  MSME-registered suppliers across the Mumbai-Thane-Bhiwandi industrial cluster.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-white font-semibold mb-1">Packaging Materials</h3>
+                <p className="text-slate-400 text-sm leading-relaxed">
+                  Corrugated boxes, BOPP films, PP woven bags, and custom packaging from manufacturers
+                  across Maharashtra and Gujarat.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h2 className="text-xl font-bold text-white mb-3">How Category Browsing Works</h2>
+            <p className="text-slate-400 text-sm leading-relaxed">
+              Select a category from the grid above or use the search bar to find specific products.
+              Filter by location, supplier rating, and GST verification status. View supplier profiles
+              with product catalogues and certifications. Send a requirement to one or multiple suppliers
+              and compare responses — no middlemen, no hidden commissions.
+            </p>
+          </div>
+
+          <div>
+            <h2 className="text-xl font-bold text-white mb-3">Why Buyers Use VyaparSethu</h2>
+            <ul className="space-y-2 text-slate-400 text-sm leading-relaxed list-disc list-inside">
+              <li>GST-verified suppliers only — every profile is manually reviewed before going live.</li>
+              <li>Pan-India coverage with suppliers from Mumbai, Bhiwandi, Kalamboli, Pune, and 500+ cities.</li>
+              <li>Free for buyers — no subscription, no commission on orders.</li>
+              <li>Dispute resolution support on every transaction via Razorpay-protected payments.</li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>

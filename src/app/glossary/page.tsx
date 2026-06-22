@@ -75,6 +75,70 @@ export default function GlossaryIndex() {
             </p>
           </div>
 
+          {/* Why terminology matters + key term definitions */}
+          <div className="mb-12 bg-slate-800/30 border border-slate-700/50 rounded-2xl p-8">
+            <h2 className="text-white font-bold text-xl mb-4">Why B2B Terminology Matters</h2>
+            <p className="text-slate-400 text-sm leading-relaxed mb-3">
+              Misunderstanding terms like FOB, CIF, or credit period can cost lakhs in bad deals. A buyer
+              who does not know the difference between EXW and DDP may end up paying unexpected freight
+              and customs charges. A supplier who misquotes MOQ may lose a large order. Use this glossary
+              to compare quotes accurately, set clear payment terms, and protect your business with
+              legally sound agreements.
+            </p>
+            <p className="text-slate-400 text-sm leading-relaxed">
+              India&apos;s B2B trade landscape carries specific legal and financial meaning in every term —
+              from how GST input tax credit flows between registered businesses to how Udyam numbers
+              determine MSME lending eligibility. Understanding these terms before your first transaction
+              protects small-scale MSME owners from payment defaults, bad debts, and non-compliance
+              penalties under the Indian DPDP Act, 2023.
+            </p>
+          </div>
+
+          {/* Core term definitions — inline for SEO and readers */}
+          <div className="mb-12 space-y-6">
+            <h2 className="text-white font-semibold text-sm uppercase tracking-widest flex items-center gap-3">
+              <span className="h-px flex-1 bg-slate-800" />Essential Terms<span className="h-px flex-1 bg-slate-800" />
+            </h2>
+
+            <div className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-5">
+              <h3 className="text-white font-semibold mb-2">GST — Goods and Services Tax</h3>
+              <p className="text-slate-400 text-sm leading-relaxed">
+                India&apos;s unified indirect tax system replacing VAT, excise, and service tax. B2B
+                transactions between registered businesses allow input tax credit claims — meaning the
+                tax you pay on purchases can be offset against the tax you collect on sales. Always
+                confirm your supplier&apos;s GSTIN before placing a large order.
+              </p>
+            </div>
+
+            <div className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-5">
+              <h3 className="text-white font-semibold mb-2">Udyam Registration</h3>
+              <p className="text-slate-400 text-sm leading-relaxed">
+                The Indian government&apos;s official MSME registration system replacing the old Udyog
+                Aadhaar. Suppliers with a valid Udyam number are legally registered businesses. On
+                VyaparSethu, we verify Udyam numbers against the government database before a supplier
+                profile goes live.
+              </p>
+            </div>
+
+            <div className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-5">
+              <h3 className="text-white font-semibold mb-2">Credit Period</h3>
+              <p className="text-slate-400 text-sm leading-relaxed">
+                The time a supplier allows a buyer to pay after receiving goods. Common credit periods
+                in Indian B2B trade range from 15 to 90 days. Always confirm credit terms in writing
+                before you place an order to avoid disputes later.
+              </p>
+            </div>
+
+            <div className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-5">
+              <h3 className="text-white font-semibold mb-2">Lead Time</h3>
+              <p className="text-slate-400 text-sm leading-relaxed">
+                The total time between placing an order and receiving goods, including manufacturing,
+                packaging, and shipping. Always confirm lead time before committing to a supplier,
+                especially for custom-made products.
+              </p>
+            </div>
+          </div>
+
           {/* Categories */}
           {byCategory.map(({ cat, terms }) => (
             <section key={cat} className="mb-10">

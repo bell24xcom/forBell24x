@@ -73,6 +73,45 @@ export default function ToolsPage() {
           </p>
         </div>
 
+        {/* Tool descriptions — SEO prose, always visible */}
+        <div className="mb-12 space-y-5">
+          <h2 className="text-xl font-bold text-white mb-2">Free B2B Tools for Indian SMEs</h2>
+          <p className="text-slate-400 text-sm leading-relaxed">
+            VyaparSethu offers free tools designed to help Indian businesses buy smarter, stay
+            tax-compliant, and source more efficiently. Use these tools before you send a requirement,
+            negotiate a deal, or prepare a quotation. No registration required.
+          </p>
+
+          <div className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-5">
+            <h3 className="text-white font-semibold mb-2">GST Calculator</h3>
+            <p className="text-slate-400 text-sm leading-relaxed">
+              Calculate GST-inclusive and GST-exclusive prices instantly. Supports all major tax
+              slabs — 5%, 12%, 18%, and 28% — with CGST, SGST, and IGST breakdowns. Essential for
+              buyers comparing quotes and suppliers preparing invoices. Updated with the latest
+              GST rates.
+            </p>
+          </div>
+
+          <div className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-5">
+            <h3 className="text-white font-semibold mb-2">HSN Code Lookup</h3>
+            <p className="text-slate-400 text-sm leading-relaxed">
+              Find the correct Harmonised System of Nomenclature code for any product. HSN codes
+              determine the GST rate applicable to your goods and are mandatory on all B2B invoices
+              above the prescribed threshold. Use this tool before you raise an invoice or compare
+              supplier quotes.
+            </p>
+          </div>
+
+          <div className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-5">
+            <h3 className="text-white font-semibold mb-2">Packaging Calculator</h3>
+            <p className="text-slate-400 text-sm leading-relaxed">
+              Estimate packaging requirements for bulk orders. Calculate the number of boxes, weight
+              per carton, and total shipping volume for standard packaging configurations. Useful for
+              suppliers preparing quotations and buyers estimating freight costs.
+            </p>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-14">
           {TOOLS.map(tool => (
             <Link key={tool.href} href={tool.href}
