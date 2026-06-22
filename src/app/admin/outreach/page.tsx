@@ -208,6 +208,7 @@ function Dialer({
   };
 
   const handleMarkDone = () => {
+    logDialerSent(s.id); // idempotent — PATCH is a no-op if already recorded today
     setSentSet(prev => new Set([...prev, idx]));
     advance();
   };
