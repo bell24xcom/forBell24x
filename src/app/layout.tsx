@@ -79,6 +79,7 @@ export default function RootLayout({
               "taxID": "27AAAPP9753F2ZF",
               "url": SITE_URL,
               "logo": `${SITE_URL}/og-image.png`,
+              "image": `${SITE_URL}/og-image.png`,
               "description": "Protected Trade Infrastructure for Indian MSMEs — Verified Suppliers, Protected Payments, Faster Quotations.",
               "foundingDate": "2026",
               "contactPoint": {
@@ -114,6 +115,7 @@ export default function RootLayout({
               "legalName": "Digitex Studio",
               "taxID": "27AAAPP9753F2ZF",
               "url": SITE_URL,
+              "image": `${SITE_URL}/og-image.png`,
               "telephone": "+91-90049-62871",
               "address": {
                 "@type": "PostalAddress",

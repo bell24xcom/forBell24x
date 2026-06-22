@@ -1,6 +1,6 @@
 'use client';
 
-import { Rocket, MapPin } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import Link from 'next/link';
 
 export default function StatsSidebar() {
@@ -9,12 +9,11 @@ export default function StatsSidebar() {
       {/* Launch status (replaces pre-launch seeded counts) */}
       <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-4">
         <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-cyan-500/10 border border-cyan-400/30 rounded-full text-cyan-300 text-xs font-bold mb-3">
-          <Rocket className="w-3.5 h-3.5" />
-          Launching Soon — Reserve your category
+          <MapPin className="w-3.5 h-3.5" />
+          Live in Mumbai · Bhiwandi · Kalamboli
         </div>
-        <p className="flex items-center gap-2 text-sm text-slate-400">
-          <MapPin className="w-4 h-4 text-cyan-400 shrink-0" />
-          Currently onboarding: Mumbai-Kalamboli-Bhiwandi cluster
+        <p className="text-sm text-slate-400">
+          Verified suppliers now accepting requirements across Maharashtra
         </p>
       </div>
 

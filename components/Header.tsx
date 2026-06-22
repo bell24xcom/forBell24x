@@ -128,11 +128,13 @@ export default function Header() {
                   <Link href="/rfq/create" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Post Requirement</Link>
                   <Link href="/marketplace" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Marketplace</Link>
                   <Link href="/suppliers" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Suppliers</Link>
+                  <Link href="/blog" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Blog</Link>
                 </>
               ) : (
                 <>
                   <Link href="/marketplace" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Marketplace</Link>
                   <Link href="/suppliers" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Suppliers</Link>
+                  <Link href="/blog" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Blog</Link>
                   <Link href="/pricing" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Pricing</Link>
                 </>
               )}
@@ -204,6 +206,7 @@ export default function Header() {
 
               <Link href="/marketplace" className="block text-slate-300 hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Marketplace</Link>
               <Link href="/suppliers" className="block text-slate-300 hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Suppliers</Link>
+              <Link href="/blog" className="block text-slate-300 hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Blog</Link>
               {isLoggedIn ? (
                 <>
                   <Link href="/rfq/create" className="block text-slate-300 hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Post Requirement</Link>

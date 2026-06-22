@@ -2,8 +2,15 @@ import { Metadata } from 'next';
 import HeroRFQDemo from '@/components/homepage/HeroRFQDemo'
 
 export const metadata: Metadata = {
+  title: { absolute: "VyaparSethu — India's B2B Marketplace" },
   description: "VyaparSethu — India's verified B2B marketplace. Post requirements via voice, video or text. GST & Udyam verified suppliers. Protected payments. 24h quotations.",
   alternates: { canonical: 'https://www.vyaparsethu.com' },
+  openGraph: {
+    title: "VyaparSethu — India's B2B Marketplace",
+    description: "VyaparSethu — India's verified B2B marketplace. Post requirements via voice, video or text. GST & Udyam verified suppliers. Protected payments. 24h quotations.",
+    url: 'https://www.vyaparsethu.com',
+    images: [{ url: 'https://www.vyaparsethu.com/og-image.png', width: 1200, height: 630, alt: "VyaparSethu — India's B2B Marketplace" }],
+  },
 };
 import TrustIndicators from '@/components/homepage/TrustIndicators'
 import CategorySidebar from '@/src/components/homepage/CategorySidebar'
