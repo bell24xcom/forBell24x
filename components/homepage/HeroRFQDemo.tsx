@@ -215,7 +215,7 @@ export default function HeroRFQDemo() {
         {/* CTA Section */}
         <div className="mt-12 text-center">
           <p className="text-lg text-gray-400 mb-4">
-            <Link href="/auth/login-otp" className="text-cyan-400 hover:text-cyan-300 underline font-semibold">
+            <Link href="/auth/phone-email" className="text-cyan-400 hover:text-cyan-300 underline font-semibold">
               or Sign up for free →
             </Link>
           </p>
