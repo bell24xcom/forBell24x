@@ -104,6 +104,37 @@ export default async function MarketplacePage() {
     }>
       <MarketplaceClient initialRfqs={rfqs} initialTotal={total} />
     </Suspense>
+
+    {/* Server-rendered — always visible to crawlers */}
+    <section className="max-w-4xl mx-auto px-4 pt-2 pb-14 border-t border-slate-800 mt-4">
+      <h2 className="text-lg font-bold text-white mb-3">How the VyaparSethu Trade Network Works</h2>
+      <p className="text-slate-400 text-sm leading-relaxed mb-3">
+        VyaparSethu connects verified Indian buyers and suppliers across Steel, Textiles, Chemicals,
+        Packaging, Machinery, and 450+ other B2B categories. Buyers post their Requirements — specifying
+        quantity, timeline, and quality standards — and receive competitive quotes from verified suppliers
+        within 24 hours.
+      </p>
+      <p className="text-slate-400 text-sm leading-relaxed mb-5">
+        Every deal on VyaparSethu includes Protected Payment: funds are held securely and released only
+        after both buyer and supplier confirm delivery. This eliminates the risk of bad debt that costs
+        Indian MSMEs crores every year. Our Trade Confidence Score helps you evaluate each supplier's
+        payment history, on-time delivery rate, and dispute track record before you commit to an order.
+      </p>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        <div>
+          <p className="text-white text-sm font-semibold mb-1">1. Post a Requirement</p>
+          <p className="text-slate-500 text-xs leading-relaxed">Describe what you need by voice, video, or text. Takes under 90 seconds for most Requirements. No account needed to browse.</p>
+        </div>
+        <div>
+          <p className="text-white text-sm font-semibold mb-1">2. Receive Verified Quotes</p>
+          <p className="text-slate-500 text-xs leading-relaxed">Verified suppliers submit competitive quotes. Compare Trade Confidence Scores, delivery timelines, and per-unit pricing before choosing.</p>
+        </div>
+        <div>
+          <p className="text-white text-sm font-semibold mb-1">3. Trade with Protection</p>
+          <p className="text-slate-500 text-xs leading-relaxed">Accept a quote, pay via Protected Payment, and track delivery status. Funds release only after confirmed receipt — zero bad-debt risk.</p>
+        </div>
+      </div>
+    </section>
     </>
   );
 }

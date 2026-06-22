@@ -57,9 +57,21 @@ export default function GlossaryIndex() {
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-4 leading-tight">
               B2B Trade Glossary
             </h1>
-            <p className="text-slate-400 text-lg max-w-2xl leading-relaxed">
+            <p className="text-slate-400 text-lg max-w-2xl leading-relaxed mb-4">
               Every Indian B2B buyer and supplier should understand these terms before their first transaction.
               Plain language, no jargon.
+            </p>
+            <p className="text-slate-500 text-sm max-w-2xl leading-relaxed mb-3">
+              India&apos;s B2B trade landscape uses terminology drawn from GST compliance, MSME policy,
+              banking regulations, and international trade law. Terms like HSN codes, IGST, Letter of
+              Credit, and Purchase Order carry specific legal and financial meaning that directly affects
+              how deals are structured, how taxes are filed, and how disputes are resolved.
+            </p>
+            <p className="text-slate-500 text-sm max-w-2xl leading-relaxed">
+              This glossary covers the vocabulary every buyer and supplier on the VyaparSethu Trade Network
+              encounters — from posting a Requirement and receiving quotes to completing a deal under
+              Protected Payment. Each definition links to a full explanation with examples, common mistakes,
+              and how the term applies to MSME transactions specifically.
             </p>
           </div>
 

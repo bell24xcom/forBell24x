@@ -115,9 +115,16 @@ export default async function CategoriesPage({
 
       <div className="max-w-6xl mx-auto px-4 py-12">
         <div className="text-center mb-10">
-          <h1 className="text-3xl font-bold text-white mb-3">All Categories</h1>
-          <p className="text-slate-400 max-w-2xl mx-auto">
+          <h1 className="text-3xl font-bold text-white mb-3">All Trade Categories</h1>
+          <p className="text-slate-400 max-w-2xl mx-auto mb-4">
             Browse {allCategories.length < 30 ? '450+' : `${allCategories.length}+`} product and service categories. Find verified suppliers across India.
+          </p>
+          <p className="text-slate-500 text-sm max-w-2xl mx-auto leading-relaxed">
+            VyaparSethu&apos;s B2B Trade Network covers every major industrial and commercial category active
+            in Indian markets — from Metals &amp; Steel sourced in Kalamboli to Corrugated Packaging from
+            Bhiwandi, Industrial Adhesives from Navi Mumbai, and Textiles &amp; Garments from Surat.
+            Select a category below to browse verified suppliers, view active Requirements, and post your
+            own Requirement free. Quotes arrive within 24 hours. All transactions include Protected Payment.
           </p>
         </div>
 

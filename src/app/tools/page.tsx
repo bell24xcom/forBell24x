@@ -58,7 +58,19 @@ export default function ToolsPage() {
             Free for all users
           </div>
           <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">B2B Trade Tools</h1>
-          <p className="text-slate-400 text-lg max-w-2xl">Free calculators and lookup tools for Indian B2B buyers and suppliers. No signup required.</p>
+          <p className="text-slate-400 text-lg max-w-2xl mb-4">Free calculators and lookup tools for Indian B2B buyers and suppliers. No signup required.</p>
+          <p className="text-slate-500 text-sm max-w-2xl leading-relaxed mb-3">
+            Indian B2B transactions involve multiple compliance layers: GST invoicing with the correct
+            CGST/SGST or IGST split, HSN code classification for every product line, and packaging cost
+            estimation before finalising shipment quantities. Errors at any of these steps cause invoice
+            rejections, delayed ITC claims, and disputes with suppliers.
+          </p>
+          <p className="text-slate-500 text-sm max-w-2xl leading-relaxed">
+            The tools below help buyers and suppliers on VyaparSethu — and any Indian MSME — get these
+            calculations right the first time. Use the HSN Code Lookup before raising a purchase order,
+            run the GST Calculator to confirm your invoice breakup, and use the Packaging Cost Estimator
+            to price corrugated or HDPE shipments accurately before submitting a quote.
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-14">
