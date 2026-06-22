@@ -11,8 +11,8 @@ export default function SchemaMarkup() {
     description: "Protected Trade Infrastructure for Indian MSMEs — Verified Suppliers, Protected Payments, Faster Quotations.",
     address: {
       '@type': 'PostalAddress',
-      streetAddress: 'Flat No. 1204, 12th Floor, Casa Sereno B1, Mankoli Road, Off Mumbai-Nashik Highway, Anjur, Bhiwandi',
-      addressLocality: 'Thane',
+      streetAddress: 'Lodha Upper Thane, Bhiwandi',
+      addressLocality: 'Bhiwandi',
       addressRegion: 'Maharashtra',
       postalCode: '421302',
       addressCountry: 'IN',

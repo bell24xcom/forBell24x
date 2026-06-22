@@ -20,13 +20,12 @@ export default function Footer() {
               </div>
             </div>
             <p className="text-blue-300 text-xs mb-1">Commerce Connections Globally</p>
-            <p className="text-slate-600 text-xs mb-3">Formerly Bell24h</p>
             <p className="text-slate-500 text-sm leading-relaxed mb-3">
               India&apos;s B2B trade network. AI-powered supplier matching with voice, video, and text requirements.
             </p>
             <p className="text-slate-600 text-xs leading-relaxed mb-4">
               By Digitex Studio<br />
-              Casa Sereno B1, Anjur, Bhiwandi<br />
+              Lodha Upper Thane, Bhiwandi<br />
               Thane, Maharashtra — 421302<br />
               +91 9004962871
             </p>
@@ -48,7 +47,7 @@ export default function Footer() {
 
           {/* Product */}
           <div>
-            <h4 className="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-4">Product</h4>
+            <h3 className="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-4">Product</h3>
             <ul className="space-y-2.5">
               <li><Link href="/rfq/create" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">Post Requirement</Link></li>
               <li><Link href="/suppliers" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">Find Suppliers</Link></li>
@@ -59,7 +58,7 @@ export default function Footer() {
 
           {/* Company */}
           <div>
-            <h4 className="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-4">Company</h4>
+            <h3 className="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-4">Company</h3>
             <ul className="space-y-2.5">
               <li><Link href="/about" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">About Us</Link></li>
               <li><Link href="/contact" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">Contact</Link></li>
@@ -69,7 +68,7 @@ export default function Footer() {
 
           {/* Legal - Required for Razorpay/Stripe */}
           <div>
-            <h4 className="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-4">Legal</h4>
+            <h3 className="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-4">Legal</h3>
             <ul className="space-y-2.5">
               <li><Link href="/privacy" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">Privacy Policy</Link></li>
               <li><Link href="/terms" className="text-slate-500 hover:text-slate-300 text-sm transition-colors">Terms of Service</Link></li>
