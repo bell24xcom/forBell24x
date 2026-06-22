@@ -87,7 +87,7 @@ export default function RegisterPage() {
             <div className="w-12 h-12 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-2xl">B</div>
             <span className="text-3xl font-bold text-white">Bell24h</span>
           </div>
-          <h2 className="text-3xl font-bold text-white">Create Your Account</h2>
+          <h1 className="text-3xl font-bold text-white">Create Your Account</h1>
           <p className="mt-2 text-slate-400">Join India&apos;s fastest B2B marketplace</p>
         </div>
 
