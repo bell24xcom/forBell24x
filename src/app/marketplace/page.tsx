@@ -5,7 +5,7 @@ import { SITE_URL } from '@/lib/site-url';
 import MarketplaceClient from './MarketplaceClient';
 
 export const metadata: Metadata = {
-  title: 'B2B Marketplace',
+  title: 'B2B Marketplace — Verified Indian Suppliers',
   description: "Browse active B2B requirements from verified Indian buyers. Submit quotes on Steel, Textiles, Chemicals, Machinery and more. Win new business on VyaparSethu.",
   alternates: { canonical: `${SITE_URL}/marketplace` },
   openGraph: {
