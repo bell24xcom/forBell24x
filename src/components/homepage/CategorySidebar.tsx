@@ -107,7 +107,7 @@ export default function CategorySidebar() {
 
           <div>
             <label className="text-sm font-medium text-slate-300 mb-2 block">Location</label>
-            <select className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-sm text-white focus:border-blue-500 focus:outline-none">
+            <select aria-label="Filter by location" className="w-full px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-sm text-white focus:border-blue-500 focus:outline-none">
               <option>All Locations</option>
               <option>Mumbai</option>
               <option>Delhi</option>

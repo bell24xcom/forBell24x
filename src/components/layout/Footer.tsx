@@ -102,7 +102,7 @@ export default function Footer() {
               <span className="text-cyan-400">Sethu</span>
             </div>
             <p className="text-gray-400 text-sm mb-1">vyaparsethu.com • Made in India 🇮🇳</p>
-            <p className="text-gray-500 text-xs mb-3">Formerly Bell24h · Digitex Studio (Proprietorship)</p>
+            <p className="text-gray-500 text-xs mb-3">Digitex Studio (Proprietorship)</p>
             
             {/* Social Links */}
             <div className="flex gap-3 mt-4">
@@ -155,7 +155,7 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="border-t border-white/10 mt-8 pt-8 text-center">
           <p className="text-gray-400">© {currentYear} Digitex Studio. Made in India 🇮🇳</p>
-          <p className="text-slate-500 text-xs mt-1">VyaparSethu • Formerly Bell24h • GSTIN 27AAAPP9753F2ZF</p>
+          <p className="text-slate-500 text-xs mt-1">VyaparSethu • GSTIN 27AAAPP9753F2ZF</p>
         </div>
       </div>
     </footer>

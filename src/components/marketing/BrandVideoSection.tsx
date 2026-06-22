@@ -26,7 +26,9 @@ export default function BrandVideoSection() {
           playsInline
           className="absolute inset-0 w-full h-full object-cover"
           style={{ transform: 'scale(1.22) translateY(-7%)', transformOrigin: 'center top' }}
-        />
+        >
+          <track kind="captions" src="" label="No dialogue" srcLang="en" default />
+        </video>
       </div>
       <p className="mt-6 text-[#D4AF37]/50 text-xs tracking-widest uppercase">
         vyaparsethu.com

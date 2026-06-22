@@ -100,7 +100,7 @@ export default function HeroRFQDemo() {
         {/* Demo Content */}
         <div className="max-w-4xl mx-auto">
           <div className="bg-gray-900/80 backdrop-blur-md rounded-2xl p-8 shadow-2xl border border-white/10">
-            <h3 className="text-2xl font-bold mb-2 text-white">{demoContent[activeType].title}</h3>
+            <h2 className="text-2xl font-bold mb-2 text-white">{demoContent[activeType].title}</h2>
             <p className="text-gray-300 mb-6">{demoContent[activeType].description}</p>
 
             {/* Text Demo */}

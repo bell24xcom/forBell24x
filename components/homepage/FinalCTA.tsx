@@ -15,24 +15,27 @@ export default function FinalCTA() {
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center flex-wrap">
-          <Link 
+          <Link
             href="/rfq/create"
+            aria-label="Post a requirement using voice — Speak Requirement"
             className="px-8 py-4 bg-white text-blue-600 rounded-lg font-bold hover:bg-gray-100 inline-flex items-center gap-2 transition-colors shadow-lg"
           >
             <Mic className="w-5 h-5" />
             Try Speak Requirement
           </Link>
-          
-          <Link 
+
+          <Link
             href="/rfq/create"
+            aria-label="Post a requirement using video — Video Requirement"
             className="px-8 py-4 bg-white/10 text-white border-2 border-white rounded-lg font-bold hover:bg-white/20 inline-flex items-center gap-2 transition-colors backdrop-blur-sm"
           >
             <Video className="w-5 h-5" />
             Try Video Requirement
           </Link>
-          
-          <Link 
+
+          <Link
             href="/rfq/create"
+            aria-label="Post a requirement using text form — Text Requirement"
             className="px-8 py-4 bg-white/10 text-white border-2 border-white rounded-lg font-bold hover:bg-white/20 inline-flex items-center gap-2 transition-colors backdrop-blur-sm"
           >
             <FileText className="w-5 h-5" />
