@@ -70,10 +70,22 @@ const faqLd = {
   ],
 };
 
+const speakableLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  'url': 'https://www.vyaparsethu.com',
+  'name': "VyaparSethu — India's B2B Marketplace",
+  'speakable': {
+    '@type': 'SpeakableSpecification',
+    'cssSelector': ['h1', 'h2'],
+  },
+};
+
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-[#0a1128]">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(speakableLd) }} />
       {/* 1. Hero Section - Interactive RFQ Demo */}
       <HeroRFQDemo />
 

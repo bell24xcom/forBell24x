@@ -11,8 +11,8 @@ export default function Footer() {
           {/* Company Info */}
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <div className="w-7 h-7 bg-blue-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xs">V</span>
+              <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#0B1F45' }}>
+                <span className="font-bold text-xs" style={{ color: '#D4AF37' }}>V</span>
               </div>
               <div className="flex items-baseline gap-0.5">
                 <span className="text-base font-bold text-white">Vyapar</span>

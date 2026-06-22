@@ -79,7 +79,7 @@ export default function RootLayout({
               "alternateName": "Bell24h",
               "taxID": "27AAAPP9753F2ZF",
               "url": SITE_URL,
-              "logo": `${SITE_URL}/og-image.png`,
+              "logo": `${SITE_URL}/apple-touch-icon.png`,
               "image": `${SITE_URL}/og-image.png`,
               "description": "Protected Trade Infrastructure for Indian MSMEs — Verified Suppliers, Protected Payments, Faster Quotations.",
               "foundingDate": "2026",
