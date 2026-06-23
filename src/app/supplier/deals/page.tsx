@@ -1,6 +1,5 @@
-import { redirect } from 'next/navigation';
+import { permanentRedirect } from 'next/navigation';
 
-// Supplier deals redirect to the unified deals page
 export default function SupplierDealsRedirect() {
-  redirect('/dashboard/deals');
+  permanentRedirect('/dashboard/deals');
 }

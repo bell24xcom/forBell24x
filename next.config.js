@@ -12,11 +12,15 @@ const nextConfig = {
     ignoreBuildErrors: true
   },
   experimental: {
-    serverComponentsExternalPackages: ['@prisma/client']
+    serverComponentsExternalPackages: ['@prisma/client'],
+    optimizePackageImports: ['lucide-react', 'react-icons', 'date-fns'],
   },
   images: {
-    unoptimized: true
+    unoptimized: false,
+    formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 86400,
   },
+  compress: true,
   output: 'standalone',
   webpack: (config) => {
     config.resolve.alias = {
