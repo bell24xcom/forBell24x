@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: vyaparsethu-ai
+    runtime: python
+    region: singapore
+    plan: free
+    rootDir: ai-explainability-service
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_ENV
+        value: production
+      - key: LOG_LEVEL
+        value: INFO
