@@ -1,14 +1,15 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { SITE_URL } from '@/lib/site-url';
+import WaitlistForm from '@/src/components/features/WaitlistForm';
 
 export const metadata: Metadata = {
   title: 'B2B Procurement in Hindi and Indian Regional Languages | VyaparSethu',
-  description: 'VyaparSethu supports Hindi-language B2B procurement via voice input — the first B2B marketplace designed for Tier 2 and Tier 3 city SMEs who operate in their regional language.',
+  description: 'VyaparSethu supports Hindi-language B2B procurement via voice input — the first B2B Trade Network designed for Tier 2 and Tier 3 city SMEs who operate in their regional language. Coming Soon.',
   keywords: ['hindi b2b marketplace', 'regional language b2b india', 'hindi procurement platform', 'b2b in hindi india', 'tier 2 city b2b supplier india'],
   openGraph: {
     title: 'B2B Procurement in Hindi | VyaparSethu',
-    description: 'First B2B marketplace with Hindi voice input. Post requirements in Hindi — verified suppliers respond in 24 hours.',
+    description: 'Hindi voice input for B2B requirements. Post requirements in Hindi — verified suppliers respond in 24 hours. Beta — Coming Soon.',
     url: `${SITE_URL}/features/regional-languages`,
     siteName: 'VyaparSethu',
   },
@@ -22,12 +23,12 @@ const faqLd = {
     {
       '@type': 'Question',
       name: 'क्या VyaparSethu Hindi में काम करता है?',
-      acceptedAnswer: { '@type': 'Answer', text: 'हाँ। VyaparSethu का Speak Requirement Feature Hindi में Voice Input Support करता है। आप Hindi में बोलकर अपनी Requirement Post कर सकते हैं — AI automatically सब कुछ structure कर देता है।' },
+      acceptedAnswer: { '@type': 'Answer', text: 'VyaparSethu का Speak Requirement Feature Hindi में Voice Input Support करेगा। यह feature अभी Beta में है और जल्द launch होगा। आप waitlist join कर सकते हैं।' },
     },
     {
       '@type': 'Question',
       name: 'Which B2B platform in India supports Hindi language?',
-      acceptedAnswer: { '@type': 'Answer', text: 'VyaparSethu is the only B2B procurement platform in India that supports Hindi voice input for requirement posting. Buyers can speak their requirements in Hindi and the platform\'s AI transcribes and structures them automatically. Most other B2B portals (IndiaMART, TradeIndia) are English-only in their procurement workflow.' },
+      acceptedAnswer: { '@type': 'Answer', text: 'VyaparSethu is building Hindi voice input for requirement posting. Buyers will be able to speak their requirements in Hindi and the platform\'s AI will transcribe and structure them automatically. This feature is in Beta and launching soon. Most other B2B portals (IndiaMART, TradeIndia) are English-only in their procurement workflow.' },
     },
     {
       '@type': 'Question',
@@ -37,7 +38,7 @@ const faqLd = {
     {
       '@type': 'Question',
       name: 'Can I find Hindi-speaking suppliers on VyaparSethu?',
-      acceptedAnswer: { '@type': 'Answer', text: 'Yes. Many VyaparSethu suppliers are based in Hindi-speaking regions including Mumbai, Bhiwandi, Pune, Delhi, and industrial clusters across Uttar Pradesh and Rajasthan. Buyers can post requirements in Hindi and receive quotes from suppliers familiar with Hindi communication.' },
+      acceptedAnswer: { '@type': 'Answer', text: 'Yes. Many VyaparSethu suppliers are based in Hindi-speaking regions including Mumbai, Bhiwandi, Pune, Delhi, and industrial clusters across Uttar Pradesh and Rajasthan. Buyers can post requirements in text today and will soon be able to post in Hindi voice.' },
     },
   ],
 };
@@ -57,8 +58,8 @@ export default function RegionalLanguagesPage() {
 
           {/* Hero */}
           <div className="mb-14">
-            <div className="inline-flex items-center gap-2 bg-[#D4AF37]/10 border border-[#D4AF37]/20 rounded-full px-4 py-1.5 text-xs text-[#D4AF37] font-medium mb-4">
-              Hindi-First B2B Procurement
+            <div className="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 rounded-full px-4 py-1.5 text-xs text-amber-400 font-semibold mb-4">
+              🚧 Beta — Coming Soon
             </div>
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-4 leading-snug">
               B2B Procurement<br className="hidden sm:block" /> in Hindi and Indian Languages
@@ -66,15 +67,15 @@ export default function RegionalLanguagesPage() {
             <p className="text-slate-400 text-lg max-w-2xl mb-3 leading-relaxed">
               India&apos;s 63 million MSMEs operate in Hindi, Tamil, Telugu, Marathi, Gujarati, and dozens of other languages. Most B2B platforms are English-only.
             </p>
-            <p className="text-white text-lg font-semibold mb-6">VyaparSethu is different.</p>
-            <div className="flex flex-wrap gap-3">
-              <Link href="/voice-rfq" className="inline-block bg-[#D4AF37] hover:bg-[#c4a030] text-[#001f3f] font-semibold px-6 py-3 rounded-lg text-sm transition-colors">
-                🎤 बोलकर Requirement पोस्ट करें
-              </Link>
-              <Link href="/rfq/create" className="inline-block border border-slate-600 hover:border-slate-400 text-slate-300 hover:text-white px-6 py-3 rounded-lg text-sm transition-colors">
-                Post in English
+            <p className="text-white text-lg font-semibold mb-6">VyaparSethu is changing this — Hindi voice input is coming soon.</p>
+            <div className="flex flex-wrap gap-3 mb-6">
+              <Link href="/rfq/create" className="inline-block bg-[#D4AF37] hover:bg-[#c4a030] text-[#001f3f] font-semibold px-6 py-3 rounded-lg text-sm transition-colors">
+                Post in Text (Available Now)
               </Link>
             </div>
+
+            {/* Waitlist form */}
+            <WaitlistForm feature="Hindi Voice Requirement" />
           </div>
 
           {/* The problem */}
@@ -87,20 +88,20 @@ export default function RegionalLanguagesPage() {
               </div>
               <div className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-6">
                 <p className="text-4xl font-bold text-white mb-2">0</p>
-                <p className="text-slate-400 text-sm">Major B2B procurement platforms with Hindi voice input — until VyaparSethu. Most platforms are English-only in their core procurement workflow.</p>
+                <p className="text-slate-400 text-sm">Major B2B procurement platforms with Hindi voice input today. Most platforms are English-only in their core procurement workflow. VyaparSethu is building this.</p>
               </div>
             </div>
           </section>
 
-          {/* Hindi demo */}
+          {/* Hindi demo — how it will work */}
           <section className="mb-14 bg-[#001f3f] border border-[#D4AF37]/20 rounded-2xl p-8">
-            <h2 className="text-white font-bold text-xl mb-2">Hindi में Requirement कैसे Post करें</h2>
-            <p className="text-slate-400 text-sm mb-6">Step-by-step process for Hindi-language procurement on VyaparSethu:</p>
+            <h2 className="text-white font-bold text-xl mb-2">Hindi में Requirement कैसे Post करेंगे</h2>
+            <p className="text-slate-400 text-sm mb-6">Step-by-step process for Hindi-language procurement on VyaparSethu (launching soon):</p>
             <div className="space-y-4">
               {[
-                { step: '1', hindi: 'Speak Requirement पर जाएं', eng: 'Go to /voice-rfq or click "Speak Requirement" from the homepage' },
+                { step: '1', hindi: 'Speak Requirement पर जाएं', eng: 'Go to Speak Requirement from the homepage (coming soon — join waitlist above)' },
                 { step: '2', hindi: 'Hindi में बोलें', eng: 'Speak your requirement in Hindi: "मुझे 500 किलो HR Coil Steel चाहिए, Grade E250, Bhiwandi delivery, 15 July से पहले"' },
-                { step: '3', hindi: 'AI समझता है', eng: 'AI transcribes and extracts: product = HR Coil Steel E250, quantity = 500 kg, location = Bhiwandi, deadline = 15 July' },
+                { step: '3', hindi: 'AI समझेगा', eng: 'AI will transcribe and extract: product = HR Coil Steel E250, quantity = 500 kg, location = Bhiwandi, deadline = 15 July' },
                 { step: '4', hindi: 'Review करें और Post करें', eng: 'Review extracted fields, edit if needed, and post your Requirement to verified suppliers' },
                 { step: '5', hindi: 'Suppliers 24 घंटे में Quote देंगे', eng: 'Verified suppliers receive notification and submit competitive quotes within 24 hours' },
               ].map(item => (
@@ -168,13 +169,8 @@ export default function RegionalLanguagesPage() {
             </div>
           </section>
 
-          <div className="bg-[#001f3f] border border-[#D4AF37]/20 rounded-xl p-8 text-center">
-            <h3 className="text-white font-semibold text-lg mb-2">अपनी Requirement Hindi में Post करें</h3>
-            <p className="text-slate-400 text-sm mb-5">बोलकर 90 seconds में Requirement post करें। Verified suppliers 24 घंटे में quote देंगे।</p>
-            <Link href="/voice-rfq" className="inline-block bg-[#D4AF37] hover:bg-[#c4a030] text-[#001f3f] font-semibold px-6 py-3 rounded-lg text-sm transition-colors">
-              🎤 Speak Requirement — Free
-            </Link>
-          </div>
+          {/* Bottom waitlist */}
+          <WaitlistForm feature="Hindi Voice Requirement" />
 
         </div>
       </div>

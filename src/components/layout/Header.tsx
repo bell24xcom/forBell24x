@@ -25,18 +25,21 @@ export default function Header() {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-10">
-            <Link href="/rfq/demo/all" className="text-gray-300 hover:text-cyan-400 transition font-medium">
-              Demo RFQs
+          <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
+            <Link href="/how-it-works" className="text-gray-300 hover:text-cyan-400 transition font-medium text-sm">
+              How It Works
             </Link>
-            <Link href="/rfq/create" className="text-gray-300 hover:text-cyan-400 transition font-medium">
-              Post RFQ
+            <Link href="/rfq/create" className="text-gray-300 hover:text-cyan-400 transition font-medium text-sm">
+              Post Requirement
             </Link>
-            <Link href="/rfq" className="text-gray-300 hover:text-cyan-400 transition font-medium">
-              Browse RFQs
+            <Link href="/rfq" className="text-gray-300 hover:text-cyan-400 transition font-medium text-sm">
+              Browse
             </Link>
-            <Link href="/suppliers" className="text-gray-300 hover:text-cyan-400 transition font-medium">
+            <Link href="/suppliers" className="text-gray-300 hover:text-cyan-400 transition font-medium text-sm">
               Suppliers
+            </Link>
+            <Link href="/founding-suppliers" className="text-[#D4AF37] hover:text-yellow-300 transition font-semibold text-sm">
+              For Suppliers
             </Link>
           </nav>
 
@@ -89,25 +92,25 @@ export default function Header() {
           <div className="md:hidden border-t border-white/10 py-4">
             <nav className="flex flex-col space-y-4">
               <Link
-                href="/rfq/demo/all"
+                href="/how-it-works"
                 className="text-gray-300 hover:text-white transition px-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Demo RFQs
+                How It Works
               </Link>
               <Link
                 href="/rfq/create"
                 className="text-gray-300 hover:text-white transition px-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Post RFQ
+                Post Requirement
               </Link>
               <Link
                 href="/rfq"
                 className="text-gray-300 hover:text-white transition px-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Browse RFQs
+                Browse
               </Link>
               <Link
                 href="/suppliers"
@@ -115,6 +118,13 @@ export default function Header() {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Suppliers
+              </Link>
+              <Link
+                href="/founding-suppliers"
+                className="text-[#D4AF37] hover:text-yellow-300 transition px-2 font-semibold"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                For Suppliers
               </Link>
               <div className="flex flex-col space-y-2 mt-4 px-2">
                 {isAuthenticated ? (

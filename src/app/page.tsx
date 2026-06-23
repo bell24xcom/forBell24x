@@ -22,6 +22,7 @@ import AIFeaturesSection from '@/components/homepage/AIFeaturesSection'
 import HowItWorks from '@/components/homepage/HowItWorks'
 import FinalCTA from '@/components/homepage/FinalCTA'
 import BrandVideoSection from '@/src/components/marketing/BrandVideoSection'
+import WhyVyaparSethu from '@/src/components/homepage/WhyVyaparSethu'
 
 const faqLd = {
   '@context': 'https://schema.org',
@@ -115,6 +116,9 @@ export default function HomePage() {
           </aside>
         </div>
       </div>
+
+      {/* Why VyaparSethu — comparison section */}
+      <WhyVyaparSethu />
 
       {/* RFQ Type Showcase */}
       <RFQTypeShowcase />

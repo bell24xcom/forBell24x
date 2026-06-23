@@ -8,7 +8,7 @@ export default function Footer() {
   return (
     <footer className="bg-black/50 backdrop-blur-xl border-t border-white/10 mt-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
           {/* Product */}
           <div>
             <h3 className="font-bold text-lg mb-4 text-white">Product</h3>
@@ -38,6 +38,19 @@ export default function Footer() {
                   How It Works
                 </Link>
               </li>
+            </ul>
+          </div>
+
+          {/* Platform */}
+          <div>
+            <h3 className="font-bold text-lg mb-4 text-white">Platform</h3>
+            <ul className="space-y-2 text-gray-400">
+              <li><Link href="/how-it-works" className="hover:text-white transition">How It Works</Link></li>
+              <li><Link href="/how-payment-works" className="hover:text-white transition">Payment Protection</Link></li>
+              <li><Link href="/how-verification-works" className="hover:text-white transition">Supplier Verification</Link></li>
+              <li><Link href="/founding-suppliers" className="hover:text-white transition">Founding Suppliers</Link></li>
+              <li><Link href="/features/voice-rfq" className="hover:text-white transition">Speak Requirement <span className="text-xs text-amber-400">(Beta)</span></Link></li>
+              <li><Link href="/features/regional-languages" className="hover:text-white transition">Video Requirement <span className="text-xs text-amber-400">(Beta)</span></Link></li>
             </ul>
           </div>
 
