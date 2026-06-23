@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Script from 'next/script'
 import './globals.css'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
@@ -156,14 +157,6 @@ export default function RootLayout({
             })
           }}
         />
-        {/* Cloudflare Web Analytics — cookie-free, DPDP-safe, no consent banner needed */}
-        {process.env.NEXT_PUBLIC_CF_ANALYTICS_TOKEN && (
-          <script
-            defer
-            src="https://static.cloudflareinsights.com/beacon.min.js"
-            data-cf-beacon={`{"token": "${process.env.NEXT_PUBLIC_CF_ANALYTICS_TOKEN}"}`}
-          />
-        )}
       </head>
       <body className="font-sans bg-[#0F172A] text-white antialiased">
         <AuthProvider>
@@ -178,6 +171,14 @@ export default function RootLayout({
             <FloatingBar />
           </DashboardProvider>
         </AuthProvider>
+        {/* Cloudflare Web Analytics — cookie-free, DPDP-safe, loads after interactive */}
+        {process.env.NEXT_PUBLIC_CF_ANALYTICS_TOKEN && (
+          <Script
+            strategy="afterInteractive"
+            src="https://static.cloudflareinsights.com/beacon.min.js"
+            data-cf-beacon={`{"token": "${process.env.NEXT_PUBLIC_CF_ANALYTICS_TOKEN}"}`}
+          />
+        )}
       </body>
     </html>
   )

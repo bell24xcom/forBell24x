@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { SITE_URL } from '@/lib/site-url';
 
 export const metadata: Metadata = {
   title: 'Free B2B Tools — HSN Lookup, GST Calculator & More | VyaparSethu',
@@ -43,8 +44,31 @@ const COMING_SOON = [
   { title: 'LC (Letter of Credit) Guide', description: 'Interactive LC type selector and documentary requirements checklist for B2B trade finance.', icon: '🏦' },
 ];
 
+const softwareAppLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'VyaparSethu B2B Trade Tools',
+  applicationCategory: 'BusinessApplication',
+  operatingSystem: 'Web',
+  url: `${SITE_URL}/tools`,
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'INR' },
+  description: 'Free B2B trade tools for Indian MSMEs: HSN code lookup, GST calculator (CGST/SGST/IGST), and packaging cost estimator. No signup required.',
+  featureList: [
+    'HSN Code Lookup with GST rates',
+    'B2B GST Calculator — CGST, SGST, IGST',
+    'Packaging Cost Estimator',
+  ],
+  publisher: {
+    '@type': 'Organization',
+    name: 'VyaparSethu',
+    url: SITE_URL,
+  },
+};
+
 export default function ToolsPage() {
   return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareAppLd) }} />
     <div className="min-h-screen bg-[#0F172A]">
       <div className="max-w-5xl mx-auto px-4 py-14">
 
@@ -259,5 +283,6 @@ export default function ToolsPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }
