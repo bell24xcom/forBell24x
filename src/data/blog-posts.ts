@@ -8,6 +8,7 @@ export interface BlogPost {
   readTime: string;
   keywords: string[];
   schema?: 'howto' | 'faq' | 'article';
+  image?: string;
 }
 
 export const BLOG_POSTS: BlogPost[] = [
@@ -550,6 +551,213 @@ Post your annual packaging requirement on VyaparSethu with full specs. Invite 5+
 
 **7. Pay in advance for 20% discount**
 For a trusted supplier, 30–45 day advance payment often unlocks a 5–8% discount. If your working capital allows, this ROI beats most bank deposit rates.`,
+  },
+  {
+    slug: 'vyaparsethu-vs-indiamart',
+    title: 'VyaparSethu vs IndiaMART: कौन सा Platform आपके Business के लिए सही है?',
+    excerpt: 'IndiaMART पर लाखों Suppliers हैं — लेकिन Verified कितने हैं? VyaparSethu और IndiaMART के बीच का real फ़र्क जानें: Verification, Protected Payment, और Quote Quality के आधार पर।',
+    date: '2026-06-20',
+    category: 'Procurement Tips',
+    readTime: '7 min',
+    keywords: ['VyaparSethu vs IndiaMART', 'B2B marketplace India comparison', 'IndiaMART alternative India', 'verified supplier platform India', 'B2B sourcing India'],
+    image: '/images/blog/vyaparsethu-vs-indiamart.png',
+    body: `IndiaMART भारत का सबसे बड़ा B2B Directory है — लेकिन Directory और Trade Network में बड़ा फ़र्क होता है।
+
+**IndiaMART क्या है?**
+
+IndiaMART एक Supplier Directory है। आप Supplier को Search करते हैं, उनसे Contact करते हैं, और बाकी Process — Quotation, Negotiation, Payment — WhatsApp या Phone पर होती है। Platform इसमें कोई Role नहीं निभाता।
+
+इसका फायदा यह है कि Supplier की संख्या बहुत ज़्यादा है। नुकसान यह है कि Verification नहीं होती — कोई भी Listing बना सकता है। Fake Suppliers, Middlemen जो खुद को Manufacturer बताते हैं, और पुरानी Listings — ये सब आम हैं।
+
+**VyaparSethu क्या अलग करता है?**
+
+VyaparSethu एक Trade Network है, Directory नहीं। तीन मुख्य फ़र्क:
+
+**1. Verified Supplier Only**
+हर Supplier का GSTIN Government Database से Verify होता है। Business Identity Confirm होती है। Category Self-Declaration होती है। बिना Verification के Profile Live नहीं होती।
+
+**2. Protected Payment**
+VyaparSethu पर हर Transaction में Razorpay-backed Protected Payment होती है। Buyer का पैसा तब तक Hold रहता है जब तक Delivery Confirm नहीं हो जाती। IndiaMART पर Payment की कोई Protection नहीं — Advance Fraud India में B2B का सबसे बड़ा Risk है।
+
+**3. Competitive Quoting**
+IndiaMART पर आपको हर Supplier को अलग-अलग Contact करना होता है। VyaparSethu पर आप एक Requirement Post करते हैं और Multiple Verified Suppliers Quote करते हैं — आप Compare करके Best चुनते हैं।
+
+| Feature | IndiaMART | VyaparSethu |
+| --- | --- | --- |
+| Supplier Count | बहुत ज़्यादा (Unverified भी) | कम लेकिन 100% GST Verified |
+| Payment Protection | नहीं | हाँ — Razorpay Protected |
+| Quoting System | Manual Contact | Competitive Quotes एक जगह |
+| Fake Supplier Risk | ज़्यादा | बहुत कम |
+| Buyer Fee | Free (Lead Charges Supplier) | Free |
+
+**कब IndiaMART Use करें**
+
+IndiaMART उपयोगी है जब आप नए Supplier Categories Discover कर रहे हों, छोटे Orders कर रहे हों, या किसी Niche Product के लिए Long-List बना रहे हों। यह एक Yellow Pages की तरह है — शुरुआत के लिए ठीक है।
+
+**कब VyaparSethu Use करें**
+
+VyaparSethu सही है जब आप Large या First-Time Orders कर रहे हों जहाँ Payment Risk हो, Verified Supplier चाहिए हो, या Multiple Competitive Quotes Compare करना हो। जहाँ पैसे का Risk है, वहाँ Platform की Guarantee ज़रूरी है।
+
+**Practical Approach**
+
+Discover on IndiaMART → Shortlist 3-5 Suppliers → VyaparSethu पर Requirement Post करें → Protected Payment से Order Confirm करें → Relationship बनने के बाद Direct Trade करें।
+
+दोनों Platforms को Competition की तरह मत देखें। IndiaMART Discovery Tool है; VyaparSethu Transaction Platform है। Smart Buyers दोनों का Use करते हैं — सही जगह पर।`,
+  },
+  {
+    slug: 'rfq-kya-hota-hai',
+    title: 'RFQ Kya Hota Hai? भारतीय SMEs के लिए Complete Guide (2026)',
+    excerpt: 'RFQ यानी Request for Quotation — B2B Procurement का सबसे ज़रूरी Document। जानें RFQ क्या होता है, इसे कैसे लिखें, और VyaparSethu पर 90 seconds में Requirement कैसे Post करें।',
+    date: '2026-06-18',
+    category: 'Procurement Tips',
+    readTime: '6 min',
+    keywords: ['RFQ kya hota hai', 'Request for Quotation India', 'RFQ kaise likhein', 'B2B procurement India Hindi', 'supplier quotation India'],
+    image: '/images/blog/rfq-kya-hota-hai.png',
+    body: `RFQ का मतलब है **Request for Quotation** — यानी एक Buyer द्वारा Multiple Suppliers को भेजा गया वह Document जिसमें वह Price, Lead Time, और Payment Terms माँगता है।
+
+RFQ B2B Procurement का पहला Step है। बिना RFQ के आप Suppliers से Random Quotes लेते हैं — Compare करना मुश्किल होता है, और अच्छा Deal मिलना मुश्किल होता है।
+
+**RFQ और Purchase Order में क्या फ़र्क है?**
+
+RFQ एक Request है — आप कह रहे हैं "मुझे यह चाहिए, आप कितने में देंगे?" यह Commitment नहीं है।
+
+Purchase Order एक Commitment है — आप कह रहे हैं "मैं यह ख़रीदता हूँ, इस Price पर, इस Date तक।"
+
+RFQ पहले आता है। PO बाद में।
+
+**एक अच्छे RFQ में क्या होना चाहिए?**
+
+**1. Product का Exact Specification**
+"Steel चाहिए" नहीं — "HR Coil Steel IS 2062 Grade E250, 2mm thickness, 5 MT" लिखें। जितना Specific, उतना Better Quote।
+
+**2. Quantity और Unit**
+"100 units" नहीं — "100 MT" या "500 pieces, 250g each" लिखें।
+
+**3. Delivery Location**
+City या PIN Code ज़रूर बताएं। Freight Cost Location से बदलता है।
+
+**4. Required Date**
+Deadline बताएं — "15 July तक चाहिए।" इससे जो Suppliers Deliver नहीं कर सकते वे खुद Filter हो जाते हैं।
+
+**5. Budget Range (Optional लेकिन Helpful)**
+Budget Share करने से 40% ज़्यादा Quotes मिलते हैं। Suppliers जानते हैं कि वे Compete कर सकते हैं या नहीं।
+
+**6. Quality Standards**
+ISI Mark, BIS Certification, ISO, FSSAI — जो भी ज़रूरी हो, लिखें।
+
+**7. Payment Terms**
+Advance, Net 30, LC — अपना Preferred Term बताएं।
+
+**VyaparSethu पर Requirement कैसे Post करें**
+
+VyaparSethu पर RFQ को "Requirement" कहते हैं। तीन तरीके हैं:
+
+- **Speak Requirement**: बोलकर बताएं — AI 90 seconds में Structured Requirement बना देता है।
+- **Video Requirement**: Product दिखाते हुए Video Record करें।
+- **Text Requirement**: Form भरें।
+
+Requirement Post होते ही Verified Suppliers को Notification जाती है। 24 घंटे में Competitive Quotes आते हैं।
+
+**RFQ के Common Mistakes जो Avoid करें**
+
+- Vague Specification: "अच्छी Quality का Steel" — इससे कोई Useful Quote नहीं आएगा।
+- No Quantity: Suppliers MOQ नहीं समझ पाते।
+- No Location: Freight Cost Unknown रहता है।
+- No Deadline: Suppliers Urgency नहीं समझते।
+- एक ही Supplier को भेजना: Competitive Pressure नहीं रहता।
+
+**निष्कर्ष**
+
+RFQ लिखना एक Skill है — और जो Buyers अच्छे RFQ लिखते हैं, उन्हें बेहतर Quotes, तेज़ Responses, और ज़्यादा Supplier Options मिलते हैं। VyaparSethu का Speak Requirement Feature इस Process को 90 Seconds तक compress कर देता है — आपको Form भरने की ज़रूरत नहीं।`,
+  },
+  {
+    slug: 'verified-supplier-kaise-dhundhein',
+    title: 'Verified Supplier Kaise Dhundhein? भारत में सही Supplier खोजने की Step-by-Step Guide',
+    excerpt: 'Fake Supplier से बचें, Advance Fraud से बचें। यह Guide आपको बताती है कि India में GST-Verified, Trustworthy Supplier कैसे Find करें — किसी भी Category के लिए।',
+    date: '2026-06-15',
+    category: 'Procurement Tips',
+    readTime: '8 min',
+    keywords: ['verified supplier kaise dhundhein', 'supplier verification India', 'GST verified supplier India', 'B2B supplier find India', 'supplier check India'],
+    image: '/images/blog/verified-supplier-guide.png',
+    body: `भारत में B2B Trade का सबसे बड़ा Risk है Fake Supplier। Advance Payment दिया, Goods नहीं आए — यह Story हर Procurement Manager ने कभी न कभी सुनी है।
+
+Verified Supplier ढूंढना एक Process है, न कि एक Click। यहाँ है वह Step-by-Step Process जो Indian MSMEs के लिए काम करती है।
+
+**Step 1: GSTIN Verify करें**
+
+किसी भी Supplier का GSTIN Government के GST Portal पर Verify करें: search.gst.gov.in
+
+यहाँ आपको मिलेगा:
+- Business का Legal Name
+- Registration Status (Active/Cancelled)
+- Principal Place of Business
+- Business Type (Proprietor, Pvt Ltd, etc.)
+
+अगर GSTIN Verify नहीं होता — तुरंत हटें। Fake Supplier का पहला Sign है Invalid या Cancelled GSTIN।
+
+**Step 2: Udyam Registration Check करें**
+
+MSME Suppliers के लिए Udyam Registration Number Verify करें: udyamregistration.gov.in
+
+Udyam Number से पता चलता है:
+- Business MSME Registered है (Government Database में है)
+- Category: Micro, Small, या Medium
+- Legal Entity Type
+
+यह Free Verification है और 2 Minutes लेती है।
+
+**Step 3: Sample Order से शुरू करें**
+
+कोई भी नया Supplier हो, पहली बार Small Sample Order करें — Full Order नहीं। ₹5,000–15,000 का Sample जो आप Test कर सकें।
+
+Sample Order से आप Check करते हैं:
+- Quality Consistent है या नहीं
+- Packaging Proper है
+- Lead Time वादे के अनुसार है
+- Communication Professional है
+
+Sample Order में जो Risk है, वह Full Order के Risk से बहुत कम है।
+
+**Step 4: Bank Account में Payment करें — Cash नहीं**
+
+Legitimate Supplier हमेशा Bank Transfer Accept करता है — Business Account में। Personal Account में Payment माँगना Red Flag है।
+
+NEFT/RTGS से Payment करने पर Bank Record रहता है। Cash में Payment का कोई Proof नहीं होता।
+
+**Step 5: Invoice ठीक से Check करें**
+
+GST Invoice में होना चाहिए:
+- Supplier का GSTIN
+- आपका GSTIN
+- HSN Code
+- CGST + SGST या IGST clearly mentioned
+- Invoice Number और Date
+- Supplier का Business Name (GST Registration से Match होना चाहिए)
+
+गलत Invoice से आपका ITC Claim Reject हो सकता है।
+
+**Step 6: VyaparSethu पर Verified Supplier Profile देखें**
+
+VyaparSethu पर हर Supplier का:
+- GSTIN Government Database से Verify होता है
+- Business Identity Confirm होती है
+- Trade Confidence Score होता है जो Payment History, Delivery Record, और Dispute Rate दिखाता है
+
+यहाँ आप Score देखकर पहले से जान सकते हैं कि कौन Supplier Reliable है।
+
+**Common Red Flags जो Ignore न करें**
+
+- Suspiciously Low Price: Market Rate से 30%+ कम — Quality या Genuineness पर शक करें।
+- No GST Invoice: Tax नहीं देना मतलब Compliance नहीं।
+- WhatsApp पर सिर्फ Photo — No Physical Verification: Factory Visit या Video Call माँगें।
+- Payment Advance Only, No PO: बिना Purchase Order के Advance मत दीजिए।
+- No Reference: Existing Customers के Contact नहीं दे सकते — Why?
+
+**निष्कर्ष**
+
+Verified Supplier ढूंढना एक 6-Step Process है: GSTIN Verify → Udyam Check → Sample Order → Bank Payment → Proper Invoice → Track Record देखें। VyaparSethu इन steps को Automate करता है — हर Listed Supplier पहले से Verified होता है।
+
+पहली बार किसी नए Supplier से खरीदते समय हमेशा Protected Payment Use करें — पैसे तब निकलते हैं जब Delivery Confirm हो जाए।`,
   },
 ];
 

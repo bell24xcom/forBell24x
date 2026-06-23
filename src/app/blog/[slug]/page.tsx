@@ -27,6 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       publishedTime: post.date,
       url: `https://www.vyaparsethu.com/blog/${post.slug}`,
       siteName: 'VyaparSethu',
+      ...(post.image && { images: [{ url: `https://www.vyaparsethu.com${post.image}`, width: 1200, height: 630, alt: post.title }] }),
     },
     alternates: { canonical: `https://www.vyaparsethu.com/blog/${post.slug}` },
   };
