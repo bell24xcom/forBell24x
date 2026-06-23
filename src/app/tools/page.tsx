@@ -150,6 +150,101 @@ export default function ToolsPage() {
           </div>
         </div>
 
+        {/* Extended tool guidance */}
+        <div className="mb-12 space-y-6">
+          <h2 className="text-xl font-bold text-white mb-4">How to Use These Tools Effectively</h2>
+
+          <div>
+            <h3 className="text-white font-semibold mb-2">Before Posting a Requirement</h3>
+            <p className="text-slate-400 text-sm leading-relaxed">
+              Use the HSN Code Lookup to identify the correct product classification code before you
+              write your Requirement. Suppliers will quote more accurately when your Requirement
+              includes the HSN code — it removes ambiguity about which grade or specification of a
+              product you need, and ensures all quotes have the same GST rate applied so you can
+              compare them on a like-for-like basis.
+            </p>
+          </div>
+
+          <div>
+            <h3 className="text-white font-semibold mb-2">Before Accepting a Supplier Quote</h3>
+            <p className="text-slate-400 text-sm leading-relaxed">
+              Use the GST Calculator to verify the tax breakup on any quote you receive. Enter the
+              base price and GST rate from the supplier&apos;s quote to instantly see the CGST + SGST
+              (intra-state) or IGST (inter-state) split, the total invoice value, and your ITC
+              (Input Tax Credit) eligibility. This prevents surprises where the quoted price looks
+              low but the GST-inclusive price is higher than a competitor&apos;s quote.
+            </p>
+          </div>
+
+          <div>
+            <h3 className="text-white font-semibold mb-2">Before Preparing a Shipment Quote</h3>
+            <p className="text-slate-400 text-sm leading-relaxed">
+              Suppliers preparing quotations for bulk orders should use the Packaging Calculator to
+              estimate total packaging requirements. Enter the product dimensions, individual unit
+              weight, and total order quantity to get the number of cartons needed, gross weight per
+              carton, and total shipment volume. This allows accurate freight cost estimation and
+              prevents under-packaging (which causes damage claims) or over-packaging (which wastes
+              material cost).
+            </p>
+          </div>
+
+          <div>
+            <h3 className="text-white font-semibold mb-2">Who Should Use These Tools</h3>
+            <p className="text-slate-400 text-sm leading-relaxed">
+              These tools are designed for Indian MSMEs, procurement managers, and sourcing teams
+              who regularly deal with B2B transactions, GST invoicing, and bulk shipments. They are
+              particularly useful for construction companies sourcing materials, manufacturing firms
+              procuring raw materials, traders preparing export or domestic supply quotations, and
+              small businesses verifying whether a supplier&apos;s GST invoice is correctly formatted
+              before claiming ITC.
+            </p>
+          </div>
+        </div>
+
+        {/* FAQ section */}
+        <div className="mb-12 bg-slate-800/30 border border-slate-700/50 rounded-2xl p-8">
+          <h2 className="text-xl font-bold text-white mb-6">Tools — Frequently Asked Questions</h2>
+          <div className="space-y-5">
+            <div>
+              <h3 className="text-white font-semibold text-sm mb-1">Are the VyaparSethu tools free to use?</h3>
+              <p className="text-slate-400 text-sm leading-relaxed">
+                Yes, all three tools — GST Calculator, HSN Code Lookup, and Packaging Calculator —
+                are completely free to use. No account or registration is required. They are available
+                to any Indian business, whether or not you use VyaparSethu for sourcing.
+              </p>
+            </div>
+            <div>
+              <h3 className="text-white font-semibold text-sm mb-1">How accurate is the GST Calculator?</h3>
+              <p className="text-slate-400 text-sm leading-relaxed">
+                The GST Calculator uses the current official GST rates as notified by the GST Council.
+                It correctly calculates CGST + SGST for intra-state supply and IGST for inter-state
+                supply across all standard slabs (5%, 12%, 18%, 28%) and special rates. For composite
+                or exempt goods, always verify against the product&apos;s specific HSN code on the CBIC
+                portal.
+              </p>
+            </div>
+            <div>
+              <h3 className="text-white font-semibold text-sm mb-1">What if I cannot find my product in the HSN Lookup?</h3>
+              <p className="text-slate-400 text-sm leading-relaxed">
+                Try searching by a broader product description or the general material type. For
+                example, if &ldquo;3-ply corrugated cardboard sheet&rdquo; does not return a result, try
+                &ldquo;cardboard&rdquo; or &ldquo;paper packaging&rdquo;. For specialised products or new product
+                classifications, the authoritative source is the CBIC&apos;s GST rate schedule on
+                cbic.gov.in, which covers all 8-digit HSN codes.
+              </p>
+            </div>
+            <div>
+              <h3 className="text-white font-semibold text-sm mb-1">Does the Packaging Calculator account for GST on packaging materials?</h3>
+              <p className="text-slate-400 text-sm leading-relaxed">
+                Yes. The Packaging Calculator includes a GST component in its cost output, using the
+                standard GST rate applicable to corrugated boxes (18% GST under HSN 4819) and HDPE
+                bags (18% GST under HSN 3923). The output shows both the base cost and the
+                GST-inclusive total, making it directly usable for quotation preparation.
+              </p>
+            </div>
+          </div>
+        </div>
+
         <div className="bg-[#001f3f] border border-[#D4AF37]/20 rounded-2xl p-8">
           <h2 className="text-white font-bold text-xl mb-3">Ready to Source Smarter?</h2>
           <p className="text-slate-400 text-sm mb-6 max-w-xl">Post your Requirement in 90 seconds using our Speak Requirement feature. Verified suppliers quote within 24 hours. Protected Payment keeps your funds safe.</p>

@@ -87,6 +87,17 @@ export default async function CategoriesPage({
       )
     : allCategories;
 
+  const faqLd = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      { '@type': 'Question', name: 'What categories are available on VyaparSethu?', acceptedAnswer: { '@type': 'Answer', text: 'VyaparSethu covers 450+ B2B product and service categories spanning metals, textiles, chemicals, packaging, machinery, agricultural commodities, IT hardware, construction materials, food processing, and more.' } },
+      { '@type': 'Question', name: 'How can suppliers list their business on VyaparSethu?', acceptedAnswer: { '@type': 'Answer', text: 'Suppliers register with their GSTIN at vyaparsethu.com/supplier/registration. After identity verification they select product categories and go live. Listing is free — suppliers pay commission only on completed deals.' } },
+      { '@type': 'Question', name: 'How do buyers find the right supplier in a category?', acceptedAnswer: { '@type': 'Answer', text: 'Browse a category page directly to see active suppliers, or post a Requirement specifying product, quantity, location, and budget. Verified suppliers respond within 24 hours.' } },
+      { '@type': 'Question', name: 'Can I post Requirements across multiple categories?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. Buyers can post separate Requirements in different categories simultaneously. Each Requirement is matched to suppliers in the relevant category independently.' } },
+    ],
+  };
+
   const breadcrumbLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -110,6 +121,7 @@ export default async function CategoriesPage({
 
   return (
     <div className="min-h-screen bg-[var(--bg-primary)]">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListLd) }} />
 
@@ -241,6 +253,118 @@ export default async function CategoriesPage({
               <li>Free for buyers — no subscription, no commission on orders.</li>
               <li>Dispute resolution support on every transaction via Razorpay-protected payments.</li>
             </ul>
+          </div>
+
+          <div>
+            <h2 className="text-xl font-bold text-white mb-5">More B2B Categories on VyaparSethu</h2>
+            <div className="space-y-5">
+              <div>
+                <h3 className="text-white font-semibold mb-1">Textiles and Garments</h3>
+                <p className="text-slate-400 text-sm leading-relaxed">
+                  Cotton fabrics, synthetic yarns, knitted garments, and woven textiles from mills in Surat,
+                  Bhiwandi, Tiruppur, and Ludhiana. VyaparSethu connects garment exporters and domestic
+                  brands directly with verified fabric suppliers, dye houses, and trims manufacturers.
+                  Post your fabric Requirement and receive quotes from multiple mills within 24 hours.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-white font-semibold mb-1">Agricultural Products and Commodities</h3>
+                <p className="text-slate-400 text-sm leading-relaxed">
+                  Pulses, spices, rice, wheat, edible oils, and agri-commodities from APMC-registered
+                  traders and farmer producer organisations (FPOs). Food manufacturers, traders, and
+                  exporters use VyaparSethu to source bulk commodities with transparent pricing and
+                  verified origin certificates.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-white font-semibold mb-1">Automotive Parts and Components</h3>
+                <p className="text-slate-400 text-sm leading-relaxed">
+                  OEM and aftermarket automotive components including engine parts, electrical systems,
+                  brake assemblies, and body panels from Tier-1 and Tier-2 suppliers in Pune, Chennai,
+                  Gurugram, and Manesar. Verified parts suppliers with IS/BIS certification for
+                  compliance-critical procurement.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-white font-semibold mb-1">Food Processing Equipment and Ingredients</h3>
+                <p className="text-slate-400 text-sm leading-relaxed">
+                  Processed food ingredients, additives, flavours, and food-grade packaging from
+                  FSSAI-registered suppliers. Also includes food processing machinery — mixers, conveyors,
+                  pasteurisers, and packaging lines — from manufacturers across Maharashtra and Gujarat.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-white font-semibold mb-1">IT Hardware and Electronics</h3>
+                <p className="text-slate-400 text-sm leading-relaxed">
+                  Servers, networking equipment, CCTV systems, solar panels, LED lighting, and
+                  electronic components from authorised distributors and OEM partners. B2B pricing
+                  with GST invoices and warranty documentation — no grey-market stock.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h2 className="text-xl font-bold text-white mb-4">How Supplier Verification Works on VyaparSethu</h2>
+            <p className="text-slate-400 text-sm leading-relaxed mb-3">
+              VyaparSethu is not an open directory. Every supplier who wishes to appear in any category
+              must complete a three-step verification before their profile is visible to buyers.
+            </p>
+            <p className="text-slate-400 text-sm leading-relaxed mb-3">
+              First, GST verification: the supplier's GSTIN is checked against the government GST portal
+              to confirm active registration status, legal business name, and state of registration.
+              Suppliers with suspended or cancelled GSTINs are not listed. Second, business identity
+              check: the supplier's PAN, Udyam number (if an MSME), and registered address are
+              cross-verified. Third, category self-declaration: suppliers specify which product categories
+              they actively supply, and our team reviews their catalogue for basic quality and completeness.
+            </p>
+            <p className="text-slate-400 text-sm leading-relaxed">
+              Buyers browsing any category see a "GST Verified" or "MSME Verified" badge on supplier
+              profiles. This reduces time wasted on unqualified suppliers and protects buyers from
+              fraudulent listings — a common problem on open B2B directories.
+            </p>
+          </div>
+
+          <div>
+            <h2 className="text-xl font-bold text-white mb-4">VyaparSethu Categories — Frequently Asked Questions</h2>
+            <div className="space-y-5">
+              <div>
+                <h3 className="text-white font-semibold text-sm mb-1">What categories are available on VyaparSethu?</h3>
+                <p className="text-slate-400 text-sm leading-relaxed">
+                  VyaparSethu covers 450+ B2B product and service categories spanning metals, textiles,
+                  chemicals, packaging, machinery, agricultural commodities, IT hardware, construction
+                  materials, food processing, and more. New categories are added monthly based on buyer
+                  demand and supplier availability.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-white font-semibold text-sm mb-1">How can suppliers list their business on VyaparSethu?</h3>
+                <p className="text-slate-400 text-sm leading-relaxed">
+                  Suppliers register with their GSTIN and business details at vyaparsethu.com/supplier/registration.
+                  After identity verification, they select their product categories, upload a catalogue,
+                  and their profile goes live. Listing is free. Suppliers only pay a commission on
+                  successfully completed deals — no upfront or subscription fees.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-white font-semibold text-sm mb-1">How do buyers find the right supplier in a category?</h3>
+                <p className="text-slate-400 text-sm leading-relaxed">
+                  Buyers can browse a category page directly to see active suppliers, or post a Requirement
+                  specifying their product, quantity, location, and budget. VyaparSethu's matching system
+                  notifies relevant verified suppliers, who respond with competitive quotes within 24 hours.
+                  Buyers then compare quotes side by side and select the best offer.
+                </p>
+              </div>
+              <div>
+                <h3 className="text-white font-semibold text-sm mb-1">Can I post Requirements across multiple categories?</h3>
+                <p className="text-slate-400 text-sm leading-relaxed">
+                  Yes. Buyers can post separate Requirements in different categories simultaneously. For
+                  example, a construction company can post one Requirement for cement, another for steel
+                  rebars, and a third for waterproofing chemicals — each Requirement is matched to
+                  suppliers in the relevant category independently.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
