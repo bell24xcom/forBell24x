@@ -1,0 +1,149 @@
+'use client';
+
+import Link from 'next/link';
+import {
+  LIGHTHOUSE_DESKTOP,
+  GSC_PERFORMANCE,
+  INDEXING_STATUS,
+  SEO_CHECKLIST,
+  EXTERNAL_LINKS,
+  SITE_CANONICAL,
+} from '@/src/data/seo-dashboard';
+import { SeoScoreCard, StatusBadge } from '@/src/components/admin/seo/SeoScoreCard';
+
+export default function SeoOverviewPage() {
+  const lh = LIGHTHOUSE_DESKTOP;
+  const pending = SEO_CHECKLIST.filter(i => i.status === 'pending').length;
+  const indexed = INDEXING_STATUS.filter(i => i.status === 'indexed').length;
+
+  return (
+    <div className="space-y-6">
+      {/* Lighthouse summary */}
+      <section className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-5">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <div>
+            <h2 className="text-white font-semibold">PageSpeed Insights — Desktop</h2>
+            <p className="text-slate-500 text-xs mt-0.5">
+              {lh.url} · {new Date(lh.capturedAt).toLocaleString('en-IN')} · Lighthouse {lh.lighthouseVersion}
+            </p>
+          </div>
+          <Link href="/admin/seo/lighthouse" className="text-xs text-indigo-400 hover:text-indigo-300">
+            Full report →
+          </Link>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          <SeoScoreCard label="Performance" value={lh.scores.performance} />
+          <SeoScoreCard label="Accessibility" value={lh.scores.accessibility} />
+          <SeoScoreCard label="Best Practices" value={lh.scores.bestPractices} />
+          <SeoScoreCard label="SEO" value={lh.scores.seo} />
+          <SeoScoreCard label="Agentic Browsing" value={lh.scores.agenticBrowsing} />
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mt-4">
+          {Object.entries(lh.metrics).map(([k, v]) => (
+            <div key={k} className="bg-slate-900/50 rounded-lg px-3 py-2 text-center">
+              <p className="text-[10px] text-slate-500 uppercase">{k}</p>
+              <p className="text-white font-mono text-sm font-semibold">{v}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <div className="grid md:grid-cols-2 gap-6">
+        {/* GSC snapshot */}
+        <section className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-5">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-white font-semibold">Search Console</h2>
+            <Link href="/admin/seo/search-console" className="text-xs text-indigo-400 hover:text-indigo-300">
+              Queries →
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            <div className="bg-slate-900/50 rounded-lg p-3">
+              <p className="text-slate-500 text-xs">Clicks</p>
+              <p className="text-2xl font-bold text-white">{GSC_PERFORMANCE.totals.clicks}</p>
+            </div>
+            <div className="bg-slate-900/50 rounded-lg p-3">
+              <p className="text-slate-500 text-xs">Impressions</p>
+              <p className="text-2xl font-bold text-amber-400">{GSC_PERFORMANCE.totals.impressions}</p>
+            </div>
+            <div className="bg-slate-900/50 rounded-lg p-3">
+              <p className="text-slate-500 text-xs">Avg CTR</p>
+              <p className="text-2xl font-bold text-white">{GSC_PERFORMANCE.totals.ctr}</p>
+            </div>
+            <div className="bg-slate-900/50 rounded-lg p-3">
+              <p className="text-slate-500 text-xs">Avg Position</p>
+              <p className="text-2xl font-bold text-red-400">{GSC_PERFORMANCE.totals.avgPosition}</p>
+            </div>
+          </div>
+          <p className="text-slate-500 text-xs">
+            Top queries are glossary/GST long-tail — not core B2B marketplace terms yet.
+          </p>
+        </section>
+
+        {/* Indexing snapshot */}
+        <section className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-5">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-white font-semibold">Indexing</h2>
+            <Link href="/admin/seo/indexing" className="text-xs text-indigo-400 hover:text-indigo-300">
+              All URLs →
+            </Link>
+          </div>
+          <p className="text-3xl font-bold text-emerald-400 mb-1">{indexed} / {INDEXING_STATUS.length}</p>
+          <p className="text-slate-500 text-xs mb-4">Key URLs indexed or on Google</p>
+          <ul className="space-y-2">
+            {INDEXING_STATUS.slice(0, 4).map(row => (
+              <li key={row.path} className="flex items-center justify-between text-sm">
+                <span className="text-slate-300 truncate">{row.label}</span>
+                <StatusBadge status={row.status} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      </div>
+
+      {/* Pending checklist */}
+      <section className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-5">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-white font-semibold">Pending Actions ({pending})</h2>
+          <Link href="/admin/seo/checklist" className="text-xs text-indigo-400 hover:text-indigo-300">
+            Full checklist →
+          </Link>
+        </div>
+        <ul className="space-y-2">
+          {SEO_CHECKLIST.filter(i => i.status === 'pending').slice(0, 5).map(item => (
+            <li key={item.id} className="flex items-start gap-3 text-sm">
+              <span className="text-amber-400 shrink-0">○</span>
+              <span className="text-slate-300">{item.task}</span>
+              <span className="text-[10px] text-slate-600 uppercase ml-auto shrink-0">{item.owner}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/* External tools */}
+      <section className="flex flex-wrap gap-3">
+        {[
+          { label: 'PageSpeed', href: EXTERNAL_LINKS.pagespeed },
+          { label: 'Search Console', href: EXTERNAL_LINKS.searchConsole },
+          { label: 'Rich Results Test', href: EXTERNAL_LINKS.richResults },
+          { label: 'Sitemap', href: EXTERNAL_LINKS.sitemap },
+          { label: 'llms.txt', href: EXTERNAL_LINKS.llmsTxt },
+        ].map(link => (
+          <a
+            key={link.label}
+            href={link.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-xs text-slate-300 hover:text-white hover:border-indigo-500/50 transition-colors"
+          >
+            {link.label} ↗
+          </a>
+        ))}
+      </section>
+
+      <p className="text-slate-600 text-xs">
+        Canonical: {SITE_CANONICAL} · Update snapshots in <code className="text-slate-500">src/data/seo-dashboard.ts</code>
+      </p>
+    </div>
+  );
+}

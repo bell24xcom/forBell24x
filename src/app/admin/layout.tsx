@@ -21,6 +21,8 @@ const NAV: NavItem[] = [
   // Operations
   { href: '/admin/rfqs',             label: 'RFQs',             icon: '📋', group: 'Operations' },
   { href: '/admin/marketing',        label: 'Marketing',        icon: '📣' },
+  { href: '/admin/seo',              label: 'SEO Cockpit',      icon: '🔎' },
+  { href: '/admin/directories',      label: 'Directories',      icon: '🔗' },
   { href: '/admin/outreach',         label: 'Outreach',         icon: '📢' },
   { href: '/admin/control-panel',    label: 'Control Panel',    icon: '⚙️' },
   { href: '/admin/feature-flags',    label: 'Feature Flags',    icon: '🚩' },
