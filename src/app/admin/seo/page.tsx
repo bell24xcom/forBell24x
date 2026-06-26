@@ -101,6 +101,21 @@ export default function SeoOverviewPage() {
         </section>
       </div>
 
+      <div className="grid md:grid-cols-3 gap-4">
+        <Link href="/admin/seo/opportunities" className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-4 hover:border-indigo-500/40 transition-colors block">
+          <p className="text-white font-semibold text-sm">SEO Opportunities</p>
+          <p className="text-slate-500 text-xs mt-1">10 tasks — broken links, comparison content, local pages</p>
+        </Link>
+        <Link href="/admin/seo/rankings" className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-4 hover:border-indigo-500/40 transition-colors block">
+          <p className="text-white font-semibold text-sm">Keyword Rankings</p>
+          <p className="text-slate-500 text-xs mt-1">18 B2B keywords — manual GSC updates, no paid tools</p>
+        </Link>
+        <Link href="/admin/seo/competitors" className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-4 hover:border-indigo-500/40 transition-colors block">
+          <p className="text-white font-semibold text-sm">Competitor gaps</p>
+          <p className="text-slate-500 text-xs mt-1">IndiaMART backlink targets for VyaparSethu</p>
+        </Link>
+      </div>
+
       {/* Pending backlinks — highest SEO impact */}
       <section className="bg-[#001f3f] border border-[#D4AF37]/30 rounded-xl p-5">
         <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
