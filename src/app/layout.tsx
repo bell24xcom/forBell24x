@@ -59,6 +59,9 @@ export const metadata: Metadata = {
     shortcut: '/favicon.svg',
     apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
   },
+  other: {
+    'facebook-domain-verification': 'y8q67320hapeedp1jjzabxh4irilx1',
+  },
 }
 
 export default function RootLayout({
@@ -69,7 +72,6 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth dark">
       <head>
-        <meta name="facebook-domain-verification" content="y8q67320hapeedp1jjzabxh4irilx1" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
