@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// Oracle VM or local Python microservice
-const PYTHON_EXPLAINER_URL = process.env.PYTHON_EXPLAINER_URL || 'http://localhost:8008';
+// Oracle VM, Render.com, or local Python microservice
+const PYTHON_EXPLAINER_URL =
+  process.env.PYTHON_EXPLAINER_URL ||
+  (process.env.NODE_ENV === 'production' ? 'https://vyaparsethu-ai.onrender.com' : 'http://localhost:8008');
 
 export const dynamic = 'force-dynamic';
 

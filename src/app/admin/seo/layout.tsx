@@ -7,6 +7,8 @@ const TABS = [
   { href: '/admin/seo', label: 'Overview', icon: '📊' },
   { href: '/admin/seo/lighthouse', label: 'Lighthouse', icon: '⚡' },
   { href: '/admin/seo/search-console', label: 'Search Console', icon: '🔍' },
+  { href: '/admin/seo/crawl', label: 'Link Crawler', icon: '🕷️' },
+  { href: '/admin/seo/on-page', label: 'On-Page', icon: '📐' },
   { href: '/admin/seo/indexing', label: 'Indexing', icon: '🗂️' },
   { href: '/admin/seo/content', label: 'Content', icon: '📄' },
   { href: '/admin/seo/ai-visibility', label: 'AI Visibility', icon: '🤖' },

@@ -1,14 +1,31 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SEO_TOOLS, SEO_TOOL_CATEGORIES, type SeoToolCategory } from '@/src/data/seo-tools';
 import { trackSeoEvent, openGscInspect, openRichResultsTest } from '@/lib/seo-analytics';
 
 const SAMPLE_PATHS = ['/', '/how-it-works', '/how-payment-works', '/voice-rfq', '/founding-suppliers'];
 
+interface ExplainHealth {
+  success: boolean;
+  serviceUrl: string;
+  configuredInVercel: boolean;
+  health?: { status?: string; models_loaded?: boolean; explainers_ready?: boolean };
+  hint?: string;
+  error?: string;
+}
+
 export default function SeoToolsPage() {
   const [category, setCategory] = useState<SeoToolCategory | 'all'>('all');
   const [inspectPath, setInspectPath] = useState('/how-payment-works');
+  const [explainHealth, setExplainHealth] = useState<ExplainHealth | null>(null);
+
+  useEffect(() => {
+    fetch('/api/admin/ai/explain-health', { credentials: 'include' })
+      .then(r => r.json())
+      .then(setExplainHealth)
+      .catch(() => setExplainHealth(null));
+  }, []);
 
   const tools = category === 'all' ? SEO_TOOLS : SEO_TOOLS.filter(t => t.category === category);
 
@@ -114,6 +131,28 @@ export default function SeoToolsPage() {
           </div>
         ))}
       </div>
+
+      <section className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-5 text-sm">
+        <h2 className="text-white font-semibold mb-2">SHAP/LIME (Render.com)</h2>
+        {explainHealth === null ? (
+          <p className="text-slate-500 text-xs">Checking explainability service…</p>
+        ) : (
+          <div className="space-y-2 text-xs">
+            <p>
+              Status:{' '}
+              <span className={explainHealth.success ? 'text-emerald-400' : 'text-amber-400'}>
+                {explainHealth.success ? 'Healthy' : 'Unavailable'}
+              </span>
+              {explainHealth.health?.models_loaded && explainHealth.health?.explainers_ready && ' · SHAP + LIME ready'}
+            </p>
+            <p className="text-slate-500 break-all">{explainHealth.serviceUrl}</p>
+            {!explainHealth.configuredInVercel && (
+              <p className="text-amber-400/90">{explainHealth.hint}</p>
+            )}
+            {explainHealth.error && <p className="text-red-400">{explainHealth.error}</p>}
+          </div>
+        )}
+      </section>
 
       <section className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-5 text-sm text-slate-400">
         <h2 className="text-white font-semibold mb-2">Google Analytics setup</h2>
