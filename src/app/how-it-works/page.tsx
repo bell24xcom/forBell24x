@@ -177,30 +177,30 @@ export default function HowItWorksPage() {
           {/* Comparison Table */}
           <section className="mb-16">
             <h2 className="text-2xl font-bold text-white mb-6">VyaparSethu vs Other B2B Platforms</h2>
-            <p className="text-xs text-slate-500 italic mb-2 sm:hidden">← Scroll to compare →</p>
+            <p className="text-xs text-slate-400 italic mb-2 sm:hidden">← Scroll to compare →</p>
             <div className="overflow-x-auto rounded-xl border border-slate-700/50">
               <table className="w-full min-w-[580px] text-sm">
                 <thead>
                   <tr className="bg-[#001f3f] border-b border-slate-700">
                     <th className="text-left text-[#D4AF37] font-semibold px-4 py-3 text-xs uppercase tracking-wider">Feature</th>
                     <th className="text-left text-[#D4AF37] font-semibold px-4 py-3 text-xs uppercase tracking-wider">VyaparSethu</th>
-                    <th className="text-left text-slate-400 font-medium px-4 py-3 text-xs uppercase tracking-wider">IndiaMART</th>
-                    <th className="text-left text-slate-400 font-medium px-4 py-3 text-xs uppercase tracking-wider">TradeIndia</th>
+                    <th className="text-left text-slate-300 font-medium px-4 py-3 text-xs uppercase tracking-wider">IndiaMART</th>
+                    <th className="text-left text-slate-300 font-medium px-4 py-3 text-xs uppercase tracking-wider">TradeIndia</th>
                   </tr>
                 </thead>
                 <tbody>
                   {comparisonRows.map((row, i) => (
                     <tr key={row.feature} className={i % 2 === 0 ? 'bg-slate-800/30' : 'bg-slate-800/10'}>
-                      <td className="px-4 py-3 text-slate-400 text-xs font-medium">{row.feature}</td>
+                      <td className="px-4 py-3 text-slate-300 text-xs font-medium">{row.feature}</td>
                       <td className="px-4 py-3 text-white text-xs font-semibold">{row.vs}</td>
-                      <td className="px-4 py-3 text-slate-500 text-xs">{row.indiamart}</td>
-                      <td className="px-4 py-3 text-slate-500 text-xs">{row.tradeindia}</td>
+                      <td className="px-4 py-3 text-slate-300 text-xs">{row.indiamart}</td>
+                      <td className="px-4 py-3 text-slate-300 text-xs">{row.tradeindia}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-            <p className="text-slate-600 text-xs mt-2 italic">
+            <p className="text-slate-400 text-xs mt-2 italic">
               * IndiaMART and TradeIndia pricing is approximate based on publicly available information. Verify current pricing on their websites.
             </p>
           </section>
