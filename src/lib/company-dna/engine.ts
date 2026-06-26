@@ -5,6 +5,8 @@
 import { prisma } from '@/lib/prisma';
 import { getMarketInsights } from '@/lib/memory-engine';
 import { normalizeProducts, type SupplierPreferences } from '@/lib/supplier-products';
+import { projectBomFromLifeEvents, mergeLayersFromProjection } from '@/lib/bom/projections';
+import { recordLifeEventAsync } from '@/lib/bom/life-events';
 import { buildDnaGraph } from './graph-builder';
 import {
   DNA_LAYERS,
@@ -245,9 +247,25 @@ async function buildLayersFromUser(userId: string): Promise<{ layers: CompanyDna
 }
 
 export async function syncCompanyDna(userId: string, useDemo = false): Promise<CompanyDnaProfileView> {
-  const { layers, companyName } = useDemo
+  const { layers: baseLayers, companyName } = useDemo
     ? { layers: buildDigitexDemoLayers(), companyName: 'Digitex Studio' }
     : await buildLayersFromUser(userId);
+
+  let layers = baseLayers;
+  let lifeTimeline: { year: number; label: string; eventType: string }[] = [];
+
+  if (!useDemo) {
+    const projection = await projectBomFromLifeEvents(userId);
+    layers = mergeLayersFromProjection(baseLayers, projection);
+    lifeTimeline = projection.timeline;
+    recordLifeEventAsync({
+      companyId: userId,
+      eventType: 'dna_synced',
+      actorId: userId,
+      metadata: { eventCount: projection.eventCount, completeness: computeCompleteness(computeLayerScores(layers)) },
+      source: 'company-dna',
+    });
+  }
 
   const layerScores = computeLayerScores(layers);
   const completeness = computeCompleteness(layerScores);
@@ -260,9 +278,9 @@ export async function syncCompanyDna(userId: string, useDemo = false): Promise<C
         { year: 2024, label: 'New Factory Bhiwandi', eventType: 'expansion' },
         { year: 2026, label: 'Joined VyaparSethu', eventType: 'platform' },
       ]
-    : userId
-      ? [{ year: new Date().getFullYear(), label: 'DNA profile synced', eventType: 'sync' }]
-      : [];
+    : lifeTimeline.length > 0
+      ? lifeTimeline.map(t => ({ year: t.year, label: t.label, eventType: t.eventType }))
+      : [{ year: new Date().getFullYear(), label: 'DNA profile synced', eventType: 'sync' }];
 
   const profile = await prisma.companyDnaProfile.upsert({
     where: { userId },

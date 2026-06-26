@@ -100,7 +100,7 @@ export async function PUT(request: NextRequest) {
     // Merge into existing preferences — never wipe fields not sent in this request
     const existing = await prisma.user.findUnique({
       where: { id: userId },
-      select: { preferences: true },
+      select: { company: true, gstNumber: true, udyamNumber: true, preferences: true },
     });
     const existingPrefs = (existing?.preferences as SupplierPreferences) ?? {};
 
@@ -136,6 +136,27 @@ export async function PUT(request: NextRequest) {
         location: true,
       },
     });
+
+    const { recordProfileLifeEvents } = await import('@/lib/bom/profile-events');
+    recordProfileLifeEvents(
+      userId,
+      {
+        company: existing?.company,
+        gstNumber: existing?.gstNumber,
+        udyamNumber: existing?.udyamNumber,
+        preferences: existingPrefs,
+      },
+      {
+        company: companyName ?? existing?.company,
+        gstNumber: gstNumber ?? existing?.gstNumber,
+        udyamNumber: udyamNumber ?? existing?.udyamNumber,
+        preferences: {
+          ...existingPrefs,
+          ...(categories !== undefined && { categories }),
+          ...(products !== undefined && { products: normalizeProducts(products) }),
+        },
+      },
+    );
 
     const { refreshCompanyDnaFromRfq } = await import('@/lib/memory-engine');
     refreshCompanyDnaFromRfq(userId).catch(() => {});

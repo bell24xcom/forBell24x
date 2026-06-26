@@ -196,7 +196,11 @@ JSON (all fields required, use null if not mentioned):
           maxBudget: savedRFQ.maxBudget,
           minBudget: null,
         });
-        storeRFQ(meta).catch((e) => console.error('[VideoRFQ] storeRFQ error:', e));
+        storeRFQ({
+          ...meta,
+          companyId: userId ?? undefined,
+          metadata: { ...meta.metadata, via: 'video', source: 'video_rfq' },
+        }).catch((e) => console.error('[VideoRFQ] storeRFQ error:', e));
         agentZero({ ...savedRFQ, urgency: savedRFQ.urgency as string }).catch((e) =>
           console.error('[VideoRFQ] agentZero error:', e),
         );

@@ -52,6 +52,8 @@ model User {
   supplierTransactions Transaction[]  @relation("SupplierTransactions")
   wallet               Wallet?
   companyDnaProfile    CompanyDnaProfile?
+  lifeEvents           BusinessLifeEvent[] @relation("CompanyLifeEvents")
+  lifeEventsAsActor    BusinessLifeEvent[] @relation("ActorLifeEvents")
 
   @@map("users")
 }
@@ -457,6 +459,32 @@ model DnaMemoryEvent {
   @@index([profileId])
   @@index([layer])
   @@map("dna_memory_events")
+}
+
+// ─── Business Operating Memory — universal event stream ────────────────────────
+// Center of architecture: Business Life. Company DNA / graphs / briefs project from here.
+
+model BusinessLifeEvent {
+  id          String   @id @default(cuid())
+  companyId   String   @map("company_id")
+  eventType   String   @map("event_type")
+  actorId     String?  @map("actor_id")
+  category    String?
+  intent      String?
+  decision    String?
+  outcome     String?
+  metadata    Json?
+  attachments Json?
+  confidence  Float?
+  source      String   @default("system")
+  createdAt   DateTime @default(now()) @map("created_at")
+  company     User     @relation("CompanyLifeEvents", fields: [companyId], references: [id], onDelete: Cascade)
+  actor       User?    @relation("ActorLifeEvents", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([companyId, createdAt])
+  @@index([eventType])
+  @@index([companyId, eventType])
+  @@map("business_life_events")
 }
 
 model ExternalLead {

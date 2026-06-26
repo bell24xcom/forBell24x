@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { onRFQCreated } from '@/lib/orchestration';
 import { getAuthenticatedUser, hasRole } from '@/src/lib/auth-helpers';
+import { storeRFQ, extractRFQMeta } from '@/lib/memory-engine';
 import { z } from 'zod';
 
 const CreateRFQSchema = z.object({
@@ -87,6 +88,27 @@ export async function POST(req: NextRequest) {
       } catch (orchErr) {
         console.error('[RFQ Create] onRFQCreated failed:', orchErr);
       }
+    }
+
+    // Elephant Memory + Business Life Event
+    try {
+      const meta = extractRFQMeta({
+        id: rfq.id,
+        title: rfq.title,
+        category: rfq.category,
+        description: rfq.description,
+        quantity: rfq.quantity,
+        location: rfq.location,
+        maxBudget: rfq.maxBudget,
+        minBudget: rfq.minBudget,
+      });
+      await storeRFQ({
+        ...meta,
+        companyId: user.id,
+        metadata: { ...meta.metadata, via: 'text', source: 'rfq_create' },
+      });
+    } catch (memErr) {
+      console.error('[RFQ Create] memory error:', memErr);
     }
 
     return NextResponse.json({ success: true, rfq }, { status: 201 });

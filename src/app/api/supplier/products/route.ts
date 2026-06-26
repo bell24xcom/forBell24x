@@ -76,6 +76,9 @@ export async function POST(request: NextRequest) {
     const { refreshCompanyDnaFromRfq } = await import('@/lib/memory-engine');
     refreshCompanyDnaFromRfq(userId).catch(() => {});
 
+    const { recordProductLifeEvent } = await import('@/lib/bom/profile-events');
+    recordProductLifeEvent(userId, 'product_added', product);
+
     return NextResponse.json({ success: true, product, message: 'Product created' });
   } catch (error) {
     console.error('Error creating product:', error);

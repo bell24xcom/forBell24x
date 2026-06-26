@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { authenticate } from '@/lib/jwt';
 import { voiceProcessingService } from '@/lib/ai/voice-processing';
 import { prisma } from '@/lib/prisma';
+import { storeRFQ, extractRFQMeta } from '@/lib/memory-engine';
 
 export const dynamic = 'force-dynamic';
 
@@ -60,6 +61,26 @@ export async function POST(request: NextRequest) {
         status: 'PENDING',
       },
     });
+
+    try {
+      const meta = extractRFQMeta({
+        id: rfq.id,
+        title: rfq.title,
+        category: rfq.category,
+        description: rfq.description,
+        quantity: String(rfq.quantity),
+        location: null,
+        maxBudget: null,
+        minBudget: null,
+      });
+      await storeRFQ({
+        ...meta,
+        companyId: user.userId,
+        metadata: { ...meta.metadata, via: 'voice', source: 'rfq_voice' },
+      });
+    } catch {
+      /* non-blocking */
+    }
 
     return NextResponse.json({
       success: true,

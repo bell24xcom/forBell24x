@@ -91,7 +91,11 @@ export async function POST(request: NextRequest) {
         maxBudget: savedRFQ.maxBudget,
         minBudget: savedRFQ.minBudget,
       });
-      await storeRFQ(meta);
+      await storeRFQ({
+        ...meta,
+        companyId: payload.userId,
+        metadata: { ...meta.metadata, via: 'voice', source: 'voice_rfq' },
+      });
     } catch (memErr) {
       console.error('[Memory] storeRFQ error:', memErr);
     }

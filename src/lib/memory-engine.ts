@@ -21,6 +21,7 @@ export interface RFQMeta {
   rfqId: string;
   title: string;
   category: string;
+  companyId?: string;
   product?: string;
   intent?: string;
   priceRange?: string;
@@ -108,6 +109,29 @@ export async function storeRFQ(meta: RFQMeta): Promise<void> {
       create: { category: meta.category, rfqCount: 1, quoteCount: 0 },
     });
   });
+
+  const companyId = meta.companyId ?? (meta.metadata?.companyId as string | undefined);
+  if (companyId) {
+    const via = meta.metadata?.via as string | undefined;
+    const eventType = via === 'voice' ? 'voice_rfq' : via === 'video' ? 'video_rfq' : 'rfq_created';
+    const { recordLifeEventAsync } = await import('@/lib/bom/life-events');
+    recordLifeEventAsync({
+      companyId,
+      eventType,
+      actorId: companyId,
+      category: meta.category,
+      intent: meta.intent,
+      metadata: {
+        rfqId: meta.rfqId,
+        title: meta.title,
+        quantity: meta.quantity,
+        location: meta.location,
+        priceRange: meta.priceRange,
+      },
+      source: String(meta.metadata?.source ?? 'rfq'),
+      confidence: 1,
+    });
+  }
 }
 
 /**
@@ -148,7 +172,7 @@ export async function storeQuote(meta: QuoteMeta): Promise<void> {
     // Update market_insights with price signals
     const rfq = await tx.rFQ.findUnique({
       where: { id: rfqId },
-      select: { category: true },
+      select: { category: true, title: true, createdBy: true },
     });
 
     if (rfq) {
@@ -181,6 +205,34 @@ export async function storeQuote(meta: QuoteMeta): Promise<void> {
       }
     }
   });
+
+  const rfq = await prisma.rFQ.findUnique({
+    where: { id: rfqId },
+    select: { category: true, title: true, createdBy: true },
+  });
+
+  const { recordLifeEventAsync } = await import('@/lib/bom/life-events');
+  const quoteMeta = { rfqId, price, quantity, title: rfq?.title };
+
+  recordLifeEventAsync({
+    companyId: supplierId,
+    eventType: 'quote_received',
+    actorId: supplierId,
+    category: rfq?.category,
+    metadata: { ...quoteMeta, role: 'supplier' },
+    source: 'quote',
+  });
+
+  if (rfq?.createdBy) {
+    recordLifeEventAsync({
+      companyId: rfq.createdBy,
+      eventType: 'quote_received',
+      actorId: supplierId,
+      category: rfq.category,
+      metadata: { ...quoteMeta, supplierId, role: 'buyer' },
+      source: 'quote',
+    });
+  }
 }
 
 // ─── Layer 2: Semantic Memory ────────────────────────────────────────────────

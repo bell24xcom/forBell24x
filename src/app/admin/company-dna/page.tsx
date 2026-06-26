@@ -22,6 +22,7 @@ export default function CompanyDnaAdminPage() {
   const [selectedNode, setSelectedNode] = useState<DnaGraphNode | null>(null);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
+  const [lifeEventTotal, setLifeEventTotal] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const loadList = useCallback(async () => {
@@ -45,6 +46,13 @@ export default function CompanyDnaAdminPage() {
       setProfile(pJson.profile);
       setGraph(gJson.graph);
       setSelectedUserId(userId);
+
+      fetch(`/api/admin/company-dna/events?userId=${userId}`, { credentials: 'include' })
+        .then(r => r.json())
+        .then(d => {
+          if (d.success) setLifeEventTotal(d.total);
+        })
+        .catch(() => setLifeEventTotal(null));
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Load failed');
       setProfile(null);
@@ -109,9 +117,8 @@ export default function CompanyDnaAdminPage() {
         <div>
           <h1 className="text-xl font-bold text-white">Company DNA Graph</h1>
           <p className="text-slate-400 text-sm mt-1 max-w-2xl">
-            Business Operating Memory — 15 layers from Identity to AI Memory. Extends{' '}
-            <strong className="text-slate-300">Elephant Memory</strong> into full MSME DNA.
-            Graph UI inspired by knowledge-graph tools (original VyaparSethu implementation).
+            Business Operating Memory (BOM) — <strong className="text-slate-300">Business Life Events</strong> are the
+            source of truth. Company DNA graph is one projection. Elephant Memory feeds procurement module.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -172,6 +179,7 @@ export default function CompanyDnaAdminPage() {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <Stat label="DNA completeness" value={`${Math.round(profile.completeness)}%`} valueClass={completenessColor} />
               <Stat label="Timeline events" value={String(profile.timeline.length)} />
+              <Stat label="Life events (BOM)" value={lifeEventTotal != null ? String(lifeEventTotal) : '—'} />
               <Stat label="Memory events" value={String(profile.memoryEventCount)} />
               <Stat label="Graph nodes" value={graph ? String(graph.meta.nodeCount) : '—'} />
             </div>
