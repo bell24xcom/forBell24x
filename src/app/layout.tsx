@@ -69,6 +69,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth dark">
       <head>
+        <meta name="facebook-domain-verification" content="y8q67320hapeedp1jjzabxh4irilx1" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

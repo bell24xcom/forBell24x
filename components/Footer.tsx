@@ -7,7 +7,7 @@ export default function Footer() {
     <footer className="bg-[#0A0F1E] border-t border-slate-800">
       {/* Main Footer */}
       <div className="max-w-6xl mx-auto px-4 py-10">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
           {/* Company Info */}
           <div>
             <div className="flex items-center gap-2 mb-2">
@@ -53,6 +53,17 @@ export default function Footer() {
               <li><Link href="/suppliers" className="text-slate-400 hover:text-slate-200 text-sm transition-colors">Find Suppliers</Link></li>
               <li><Link href="/categories" className="text-slate-400 hover:text-slate-200 text-sm transition-colors">Browse Categories</Link></li>
               <li><Link href="/pricing" className="text-slate-400 hover:text-slate-200 text-sm transition-colors">Pricing</Link></li>
+            </ul>
+          </div>
+
+          {/* Platform — SEO trust pages */}
+          <div>
+            <h3 className="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-4">Platform</h3>
+            <ul className="space-y-2.5">
+              <li><Link href="/how-it-works" className="text-slate-400 hover:text-slate-200 text-sm transition-colors">How It Works</Link></li>
+              <li><Link href="/how-payment-works" className="text-slate-400 hover:text-slate-200 text-sm transition-colors">Payment Protection</Link></li>
+              <li><Link href="/how-verification-works" className="text-slate-400 hover:text-slate-200 text-sm transition-colors">Supplier Verification</Link></li>
+              <li><Link href="/founding-suppliers" className="text-slate-400 hover:text-slate-200 text-sm transition-colors">Founding Suppliers</Link></li>
             </ul>
           </div>
 

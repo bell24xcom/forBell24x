@@ -126,16 +126,18 @@ export default function Header() {
               {isLoggedIn ? (
                 <>
                   <Link href="/rfq/create" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Post Requirement</Link>
+                  <Link href="/how-it-works" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">How It Works</Link>
                   <Link href="/marketplace" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Marketplace</Link>
                   <Link href="/suppliers" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Suppliers</Link>
-                  <Link href="/blog" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Blog</Link>
+                  <Link href="/founding-suppliers" className="text-[#D4AF37] hover:text-[#e8c547] text-sm font-semibold transition-colors">For Suppliers</Link>
                 </>
               ) : (
                 <>
+                  <Link href="/how-it-works" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">How It Works</Link>
                   <Link href="/marketplace" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Marketplace</Link>
                   <Link href="/suppliers" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Suppliers</Link>
                   <Link href="/blog" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Blog</Link>
-                  <Link href="/pricing" className="text-slate-300 hover:text-white text-sm font-medium transition-colors">Pricing</Link>
+                  <Link href="/founding-suppliers" className="text-[#D4AF37] hover:text-[#e8c547] text-sm font-semibold transition-colors">For Suppliers</Link>
                 </>
               )}
 
@@ -204,9 +206,13 @@ export default function Header() {
                 />
               </form>
 
+              <Link href="/how-it-works" className="block text-slate-300 hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>How It Works</Link>
               <Link href="/marketplace" className="block text-slate-300 hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Marketplace</Link>
               <Link href="/suppliers" className="block text-slate-300 hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Suppliers</Link>
               <Link href="/blog" className="block text-slate-300 hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Blog</Link>
+              <Link href="/founding-suppliers" className="block text-[#D4AF37] hover:text-[#e8c547] font-semibold transition-colors" onClick={() => setIsMenuOpen(false)}>For Suppliers</Link>
+              <Link href="/how-payment-works" className="block text-slate-400 hover:text-white text-sm transition-colors" onClick={() => setIsMenuOpen(false)}>Payment Protection</Link>
+              <Link href="/how-verification-works" className="block text-slate-400 hover:text-white text-sm transition-colors" onClick={() => setIsMenuOpen(false)}>Supplier Verification</Link>
               {isLoggedIn ? (
                 <>
                   <Link href="/rfq/create" className="block text-slate-300 hover:text-white transition-colors" onClick={() => setIsMenuOpen(false)}>Post Requirement</Link>
