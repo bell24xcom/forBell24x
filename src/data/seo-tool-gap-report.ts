@@ -1,363 +1,676 @@
 /**
- * SEO platform feature gap analysis — VyaparSethu Cockpit vs paid tools.
- * Sources: Semrush KB, Ahrefs FAQ, Ubersuggest Zendesk, Moz Pro docs (2025–2026).
- * Last reviewed: 2026-06-26
+ * SEO platform gap analysis — features extracted from official HOME PAGES (Jun 2026).
+ * Not live API crawls — marketing/feature names only. VyaparSethu Cockpit comparison.
+ *
+ * Sources fetched:
+ * - semrush.com, semrush.com/features
+ * - ahrefs.com
+ * - similarweb.com
+ * - neilpatel.com/ubersuggest
+ * - moz.com
+ * - majestic.com
  */
 
 export type GapStatus = 'have' | 'partial' | 'missing' | 'free_alt' | 'not_needed';
+export type PlatformId =
+  | 'semrush'
+  | 'ahrefs'
+  | 'ubersuggest'
+  | 'moz'
+  | 'similarweb'
+  | 'majestic'
+  | 'seranking'
+  | 'vyaparsethu';
+
+export interface PlatformMeta {
+  id: PlatformId;
+  name: string;
+  url: string;
+  price: string;
+  homepageFetched: string;
+}
 
 export interface PlatformTool {
   id: string;
   name: string;
   category: string;
   description: string;
+  source: 'homepage' | 'features_page';
 }
 
 export interface GapRow {
   id: string;
   feature: string;
   category: string;
-  semrush: boolean;
-  ahrefs: boolean;
-  ubersuggest: boolean;
-  moz: boolean;
+  /** Which paid platforms list this on their homepage/feature pages */
+  platforms: Partial<Record<Exclude<PlatformId, 'vyaparsethu'>, boolean>>;
   vyaparsethu: GapStatus;
   vyaparsethuPage?: string;
   howToAdd: string;
   priority: 'critical' | 'high' | 'medium' | 'low';
-  buildCost: 'free' | 'low' | 'medium' | 'high' | 'paid_api';
+  buildCost: 'free' | 'low' | 'medium' | 'high' | 'paid_api' | 'n/a';
 }
 
-export const COMPARED_PLATFORMS = [
-  { id: 'semrush', name: 'Semrush', url: 'https://www.semrush.com', price: '~$130/mo' },
-  { id: 'ahrefs', name: 'Ahrefs', url: 'https://ahrefs.com', price: '~$129/mo' },
-  { id: 'ubersuggest', name: 'Ubersuggest', url: 'https://neilpatel.com/ubersuggest', price: '~$29/mo or lifetime' },
-  { id: 'moz', name: 'Moz Pro', url: 'https://moz.com/products/pro', price: '~$99/mo' },
-  { id: 'vyaparsethu', name: 'VyaparSethu SEO Cockpit', url: '/admin/seo', price: 'Free (built-in)' },
-] as const;
+export const COMPARED_PLATFORMS: PlatformMeta[] = [
+  { id: 'semrush', name: 'Semrush', url: 'https://www.semrush.com', price: '~$130/mo', homepageFetched: '2026-06-26' },
+  { id: 'ahrefs', name: 'Ahrefs', url: 'https://ahrefs.com', price: '~$129/mo', homepageFetched: '2026-06-26' },
+  { id: 'similarweb', name: 'Similarweb', url: 'https://www.similarweb.com', price: 'Enterprise / trial', homepageFetched: '2026-06-26' },
+  { id: 'ubersuggest', name: 'Ubersuggest', url: 'https://neilpatel.com/ubersuggest', price: '~$29/mo or lifetime', homepageFetched: '2026-06-26' },
+  { id: 'moz', name: 'Moz', url: 'https://moz.com', price: '~$99/mo', homepageFetched: '2026-06-26' },
+  { id: 'majestic', name: 'Majestic', url: 'https://majestic.com', price: '~$49/mo', homepageFetched: '2026-06-26' },
+  { id: 'seranking', name: 'SE Ranking', url: 'https://seranking.com', price: '~$65/mo', homepageFetched: '2026-06-26' },
+  { id: 'vyaparsethu', name: 'VyaparSethu SEO Cockpit', url: '/admin/seo', price: 'Free (built-in)', homepageFetched: '2026-06-26' },
+];
 
+/** semrush.com + semrush.com/features — Jun 2026 */
 export const SEMRUSH_TOOLS: PlatformTool[] = [
-  { id: 'kw-magic', name: 'Keyword Magic Tool', category: 'Keywords', description: '25B+ keyword database, intent, difficulty, SERP features' },
-  { id: 'position-tracking', name: 'Position Tracking', category: 'Rankings', description: 'Daily rank tracking, SERP features, AI Overview tracking' },
-  { id: 'site-audit', name: 'Site Audit', category: 'Technical', description: '140+ checks, Core Web Vitals, crawl up to 100k pages' },
-  { id: 'backlink-analytics', name: 'Backlink Analytics', category: 'Links', description: '43T link index, toxic link audit' },
-  { id: 'link-building', name: 'Link Building Tool', category: 'Links', description: 'Outreach workflow + prospect lists' },
-  { id: 'on-page-seo', name: 'On-Page SEO Checker', category: 'Content', description: 'Page-level optimization vs competitors' },
-  { id: 'content-marketing', name: 'Content Marketing Toolkit', category: 'Content', description: 'Topic research, SEO writing assistant' },
-  { id: 'ai-visibility', name: 'AI Visibility Toolkit', category: 'AI', description: 'Brand mentions in ChatGPT/Gemini, prompt research' },
-  { id: 'domain-overview', name: 'Domain Overview', category: 'Competitive', description: 'Traffic, keywords, backlinks snapshot' },
-  { id: 'keyword-gap', name: 'Keyword Gap', category: 'Competitive', description: 'Keywords competitors rank for, you don\'t' },
-  { id: 'local-seo', name: 'Listing Management', category: 'Local', description: 'GBP, citations, NAP consistency' },
-  { id: 'brand-monitoring', name: 'Brand Monitoring', category: 'PR', description: 'Mentions, press, web alerts' },
+  { id: 'semrush-one', name: 'Semrush One', category: 'Platform', description: 'Unified SEO + AI visibility dashboard', source: 'homepage' },
+  { id: 'ai-seo', name: 'AI SEO', category: 'AI', description: 'Visibility in ChatGPT, Google AI Mode', source: 'features_page' },
+  { id: 'ai-visibility', name: 'AI Visibility Toolkit', category: 'AI', description: 'LLM citations, 289M+ prompt database', source: 'homepage' },
+  { id: 'keyword-research', name: 'Keyword Research', category: 'Keywords', description: '6 tools — Magic Tool, 28B keywords', source: 'features_page' },
+  { id: 'rank-tracking', name: 'Rank Tracking', category: 'Rankings', description: '4 tools — positions, SERP features, AI Overviews', source: 'features_page' },
+  { id: 'technical-seo', name: 'Technical SEO / Site Audit', category: 'Technical', description: '3 tools — 140+ checks, CWV', source: 'features_page' },
+  { id: 'link-building', name: 'Link Building', category: 'Links', description: '6 tools — 43T backlink index', source: 'features_page' },
+  { id: 'content-optimization', name: 'Content Optimization', category: 'Content', description: '3 tools — SEO writing assistant', source: 'features_page' },
+  { id: 'content-marketing', name: 'Content Marketing', category: 'Content', description: '4 tools — topic research, AI content', source: 'features_page' },
+  { id: 'competitor-seo', name: 'Competitor SEO Analysis', category: 'Competitive', description: '8 tools — keyword gap, domain comparison', source: 'features_page' },
+  { id: 'market-traffic', name: 'Market Analysis & Traffic', category: 'Traffic', description: '808M domain profiles, audience insights', source: 'features_page' },
+  { id: 'local-seo', name: 'Local SEO', category: 'Local', description: '6 tools — listings, map pack', source: 'features_page' },
+  { id: 'advertising', name: 'Advertising / PPC', category: 'Paid', description: '3 tools — paid search intelligence', source: 'features_page' },
+  { id: 'ai-pr', name: 'AI PR', category: 'PR', description: 'Earned press cited by AI', source: 'homepage' },
+  { id: 'social-media', name: 'Social Media', category: 'Social', description: '4 tools — schedule, analytics', source: 'features_page' },
+  { id: 'enterprise', name: 'Enterprise SEO', category: 'Enterprise', description: 'Multi-domain, API, SSO', source: 'features_page' },
+  { id: 'semrush-mcp', name: 'Semrush MCP for AI', category: 'AI', description: 'Semrush data inside ChatGPT/AI assistants', source: 'homepage' },
+  { id: 'brand-visibility', name: 'Brand Visibility (Adobe)', category: 'AI', description: 'GEO — generative engine optimization', source: 'homepage' },
 ];
 
+/** ahrefs.com homepage — Jun 2026 */
 export const AHREFS_TOOLS: PlatformTool[] = [
-  { id: 'site-explorer', name: 'Site Explorer', category: 'Competitive', description: 'Competitor traffic, top pages, keywords, backlinks' },
-  { id: 'keywords-explorer', name: 'Keywords Explorer', category: 'Keywords', description: '20B+ keywords, KD, traffic potential, AI clustering' },
-  { id: 'site-audit', name: 'Site Audit', category: 'Technical', description: 'Crawl technical issues, health score' },
-  { id: 'rank-tracker', name: 'Rank Tracker', category: 'Rankings', description: '190+ countries, desktop/mobile, share of voice' },
-  { id: 'content-explorer', name: 'Content Explorer', category: 'Content', description: 'Top-performing content by niche' },
-  { id: 'content-gap', name: 'Content Gap', category: 'Competitive', description: 'Topics competitors cover, you don\'t' },
-  { id: 'brand-radar', name: 'Brand Radar', category: 'AI', description: 'AI chatbot mentions and citations' },
-  { id: 'ai-content-helper', name: 'AI Content Helper', category: 'Content', description: 'Draft briefs, grade content vs SERP' },
-  { id: 'broken-backlinks', name: 'Broken Backlinks', category: 'Links', description: 'Find broken links for outreach' },
-  { id: 'batch-analysis', name: 'Batch Analysis', category: 'Competitive', description: 'Compare many domains at once' },
+  { id: 'brand-radar', name: 'Brand Radar', category: 'AI', description: 'AI chatbot mentions, citations, sentiment', source: 'homepage' },
+  { id: 'rank-tracker', name: 'Rank Tracker', category: 'Rankings', description: '217+ countries, share of voice', source: 'homepage' },
+  { id: 'site-explorer', name: 'Site Explorer', category: 'Competitive', description: 'Traffic, keywords, backlinks, PPC', source: 'homepage' },
+  { id: 'keywords-explorer', name: 'Keywords Explorer', category: 'Keywords', description: '110B discovered, 28.7B filtered keywords', source: 'homepage' },
+  { id: 'content-explorer', name: 'Content Explorer', category: 'Content', description: 'Top content by niche', source: 'homepage' },
+  { id: 'ai-content-helper', name: 'AI Content Helper', category: 'Content', description: 'AI drafts aligned to SERP', source: 'homepage' },
+  { id: 'ai-content-grader', name: 'AI Content Grader', category: 'Content', description: 'Grade content vs competitors', source: 'homepage' },
+  { id: 'site-audit', name: 'Site Audit', category: 'Technical', description: '24/7 site health monitoring', source: 'homepage' },
+  { id: 'web-analytics', name: 'Web Analytics', category: 'Analytics', description: 'Real-time visitor tracking (free tier)', source: 'homepage' },
+  { id: 'bot-analytics', name: 'Bot Analytics', category: 'AI', description: 'Which AI bots crawl your site', source: 'homepage' },
+  { id: 'ai-tech-seo', name: 'AI Tech SEO', category: 'Technical', description: 'Deploy technical fixes without devs', source: 'homepage' },
+  { id: 'gbp-monitor', name: 'GBP Monitor', category: 'Local', description: 'Google Business Profile optimization', source: 'homepage' },
+  { id: 'social-media-manager', name: 'Social Media Manager', category: 'Social', description: 'Publish, schedule, brand mentions', source: 'homepage' },
+  { id: 'dashboard', name: 'Dashboard', category: 'Reporting', description: 'High-level website overview', source: 'homepage' },
+  { id: 'portfolios', name: 'Portfolios', category: 'Reporting', description: 'Multi-site grouping', source: 'homepage' },
+  { id: 'report-builder', name: 'Report Builder', category: 'Reporting', description: 'Custom Ahrefs reports', source: 'homepage' },
+  { id: 'agent-a', name: 'Agent A', category: 'AI', description: 'AI marketing agent with full Ahrefs data', source: 'homepage' },
+  { id: 'ai-localization', name: 'AI Localization', category: 'Content', description: 'Global market content optimization', source: 'homepage' },
+  { id: 'api', name: 'API (100+ endpoints)', category: 'Enterprise', description: 'Custom dashboards, automation', source: 'homepage' },
 ];
 
+/** similarweb.com homepage — Jun 2026 */
+export const SIMILARWEB_TOOLS: PlatformTool[] = [
+  { id: 'web-intelligence', name: 'Web Intelligence', category: 'Market', description: '100M+ websites, market research, competitor analysis', source: 'homepage' },
+  { id: 'ai-search-intelligence', name: 'AI Search Intelligence', category: 'AI', description: 'AI brand visibility, citations, sentiment, AI traffic', source: 'homepage' },
+  { id: 'keyword-research', name: 'Keyword Research', category: 'Keywords', description: '5B search terms database', source: 'homepage' },
+  { id: 'rank-tracking', name: 'Rank Tracking', category: 'Rankings', description: 'SEO rank monitoring', source: 'homepage' },
+  { id: 'site-audit', name: 'Site Audit', category: 'Technical', description: 'Technical SEO audits', source: 'homepage' },
+  { id: 'aeo', name: 'SEO & AEO', category: 'AI', description: 'Answer Engine Optimization suite', source: 'homepage' },
+  { id: 'sales-intelligence', name: 'Sales Intelligence', category: 'Sales', description: 'Lead gen, contact data, CRM enrichment, AI sales assistant', source: 'homepage' },
+  { id: 'app-intelligence', name: 'App Intelligence', category: 'Apps', description: 'App performance, ratings, audience', source: 'homepage' },
+  { id: 'retail-intelligence', name: 'Retail Intelligence', category: 'Ecommerce', description: 'Amazon marketing, consumer demand, retail media', source: 'homepage' },
+  { id: 'audience-analysis', name: 'Audience Analysis', category: 'Market', description: 'Audience loyalty and demographics', source: 'homepage' },
+  { id: 'demand-analysis', name: 'Demand Analysis', category: 'Market', description: 'Market size and trend shifts', source: 'homepage' },
+  { id: 'paid-search-intel', name: 'Paid Search Intelligence', category: 'Paid', description: 'Competitor ad spend across channels', source: 'homepage' },
+  { id: 'display-ads', name: 'Display Ad Intelligence', category: 'Paid', description: '250M display ads tracked', source: 'homepage' },
+  { id: 'data-api', name: 'Data-as-a-Service API', category: 'Enterprise', description: 'Digital insights at scale', source: 'homepage' },
+  { id: 'visibility-traffic-efficiency', name: 'Visibility + Traffic + Efficiency', category: 'Platform', description: 'Holistic digital channel view', source: 'homepage' },
+];
+
+/** neilpatel.com/ubersuggest homepage — Jun 2026 */
 export const UBERSUGGEST_TOOLS: PlatformTool[] = [
-  { id: 'keyword-research', name: 'Keyword Overview / Ideas', category: 'Keywords', description: 'Volume, SD, CPC, related/questions/comparisons' },
-  { id: 'content-ideas', name: 'Content Ideas', category: 'Content', description: 'Top pages for keyword + social shares' },
-  { id: 'site-audit', name: 'Site Audit', category: 'Technical', description: 'On-page score, 100-page sample audit' },
-  { id: 'rank-tracking', name: 'Rank Tracking', category: 'Rankings', description: 'Position history, visibility distribution' },
-  { id: 'backlinks', name: 'Backlinks Report', category: 'Links', description: 'DA, referring domains, anchor text' },
-  { id: 'traffic-analyzer', name: 'Traffic Analyzer', category: 'Competitive', description: 'Est. organic traffic + top keywords' },
-  { id: 'ai-visibility', name: 'AI Search Visibility', category: 'AI', description: 'Prompts, brands, sentiment in LLMs' },
-  { id: 'ai-prompt-ideas', name: 'AI Prompt Ideas', category: 'AI', description: 'AI-powered content angles per keyword' },
-  { id: 'competitor-analysis', name: 'Competitor Analysis', category: 'Competitive', description: 'Side-by-side traffic/keyword/backlink' },
-  { id: 'seo-opportunities', name: 'SEO Opportunities', category: 'Audit', description: 'Automated issue + content suggestions' },
+  { id: 'ai-keyword-research', name: 'AI Keyword Research', category: 'Keywords', description: '100M keywords, AI ideas, brands mentioned by AI', source: 'homepage' },
+  { id: 'predictive-analytics', name: 'Predictive Analytics', category: 'Keywords', description: 'Keywords that will drive traffic before you rank', source: 'homepage' },
+  { id: 'competitive-intelligence', name: 'Competitive Intelligence', category: 'Competitive', description: 'SERP analysis, traffic estimation, top content', source: 'homepage' },
+  { id: 'competitor-analysis', name: 'Competitor Analysis', category: 'Competitive', description: 'Reverse-engineer competitor strategies', source: 'homepage' },
+  { id: 'site-audit', name: 'Site Audit', category: 'Technical', description: 'SEO + code issues', source: 'homepage' },
+  { id: 'content-gap', name: 'Content Gap Analysis', category: 'Content', description: 'What content to create next', source: 'homepage' },
+  { id: 'rank-tracking', name: 'Ranking Tracking', category: 'Rankings', description: 'Daily rank monitoring', source: 'homepage' },
+  { id: 'backlink-opportunities', name: 'Backlink Opportunities', category: 'Links', description: 'Link prospects from competitive intel', source: 'homepage' },
+  { id: 'ai-visibility', name: 'AI Visibility / AI Writer', category: 'AI', description: 'Brand mentioned on Google and Gemini', source: 'homepage' },
+  { id: 'ai-search-optimization', name: 'AI Search Optimization', category: 'AI', description: 'NP Digital AI citation audit', source: 'homepage' },
 ];
 
+/** moz.com homepage — Jun 2026 */
 export const MOZ_TOOLS: PlatformTool[] = [
-  { id: 'keyword-explorer', name: 'Keyword Explorer', category: 'Keywords', description: 'Priority score, intent groups, SERP analysis' },
-  { id: 'link-explorer', name: 'Link Explorer', category: 'Links', description: 'DA, PA, spam score, link gap' },
-  { id: 'site-crawl', name: 'Site Crawl', category: 'Technical', description: '~50 checks, weekly scheduled crawls' },
-  { id: 'rank-tracker', name: 'Rank Tracker', category: 'Rankings', description: 'Google/Bing, local by city' },
-  { id: 'domain-overview', name: 'Domain Overview', category: 'Competitive', description: 'Search visibility score snapshot' },
-  { id: 'on-page-grader', name: 'On-Page Grader', category: 'Content', description: 'Single-page optimization score' },
-  { id: 'mozbar', name: 'MozBar (extension)', category: 'Browser', description: 'DA/PA in SERP while browsing' },
-  { id: 'brand-authority', name: 'Brand Authority', category: 'Brand', description: 'Brand-level authority metric' },
+  { id: 'keyword-research', name: 'Keyword Research', category: 'Keywords', description: 'Volume, difficulty, SERP analysis', source: 'homepage' },
+  { id: 'competitive-research', name: 'Competitive Research Suite', category: 'Competitive', description: 'Keyword gaps, AI answer benchmarking', source: 'homepage' },
+  { id: 'link-research', name: 'Link Research', category: 'Links', description: 'DA, anchor text, linking domains', source: 'homepage' },
+  { id: 'rank-tracking', name: 'Rank Tracking', category: 'Rankings', description: '170+ search engines', source: 'homepage' },
+  { id: 'domain-overview', name: 'Domain Overview', category: 'Competitive', description: 'Brand Authority + DA snapshot', source: 'homepage' },
+  { id: 'site-crawl', name: 'Site Crawl', category: 'Technical', description: 'Technical SEO audit + recommendations', source: 'homepage' },
+  { id: 'stat', name: 'STAT', category: 'Rankings', description: 'Large-scale daily SERP tracking (100 results)', source: 'homepage' },
+  { id: 'moz-local', name: 'Moz Local', category: 'Local', description: 'GBP, reviews, listings management', source: 'homepage' },
+  { id: 'moz-api', name: 'Moz API', category: 'Enterprise', description: 'DA, PA, Spam Score, Brand Authority', source: 'homepage' },
+  { id: 'ai-tracking', name: 'AI Presence Tracking', category: 'AI', description: 'Google AI Mode, ChatGPT, Gemini in one dashboard', source: 'homepage' },
 ];
 
-/** Master gap matrix — VyaparSethu vs industry standard tools */
+/** majestic.com homepage — Jun 2026 */
+export const MAJESTIC_TOOLS: PlatformTool[] = [
+  { id: 'trust-flow', name: 'Trust Flow', category: 'Links', description: 'Link quality metric', source: 'homepage' },
+  { id: 'citation-flow', name: 'Citation Flow', category: 'Links', description: 'Link quantity metric', source: 'homepage' },
+  { id: 'topical-trust-flow', name: 'Topical Trust Flow', category: 'Links', description: '800+ category topical relevance', source: 'homepage' },
+  { id: 'visibility-flow', name: 'Visibility Flow', category: 'Links', description: 'Editorial vs directory link quality', source: 'homepage' },
+  { id: 'backlink-checker', name: 'Backlink Checker', category: 'Links', description: 'Ref domains, backlinks, anchor text', source: 'homepage' },
+  { id: 'link-context', name: 'Link Context', category: 'Links', description: 'Surrounding content of links', source: 'homepage' },
+  { id: 'clique-hunter', name: 'Clique Hunter', category: 'Links', description: 'Find sites linking to competitors not you', source: 'homepage' },
+  { id: 'author-explorer', name: 'Author Explorer', category: 'Links', description: 'Author-level link attribution (beta)', source: 'homepage' },
+  { id: 'backlink-history', name: 'Backlink History', category: 'Links', description: 'New/lost links over time', source: 'homepage' },
+];
+
+/** seranking.com — feature categories from site positioning */
+export const SERANKING_TOOLS: PlatformTool[] = [
+  { id: 'keyword-research', name: 'Keyword Research', category: 'Keywords', description: 'Keyword suggestions and grouping', source: 'homepage' },
+  { id: 'rank-tracker', name: 'Rank Tracker', category: 'Rankings', description: 'Keyword position monitoring', source: 'homepage' },
+  { id: 'backlink-checker', name: 'Backlink Checker', category: 'Links', description: 'Backlink monitoring and analysis', source: 'homepage' },
+  { id: 'website-audit', name: 'Website Audit', category: 'Technical', description: 'On-page and technical SEO audit', source: 'homepage' },
+  { id: 'competitor-research', name: 'Competitor Research', category: 'Competitive', description: 'Competitor keyword and traffic analysis', source: 'homepage' },
+  { id: 'ai-visibility', name: 'AI Visibility', category: 'AI', description: 'AI SEO positioning (2026 site messaging)', source: 'homepage' },
+];
+
+const P = {
+  semrush: 'semrush' as const,
+  ahrefs: 'ahrefs' as const,
+  ubersuggest: 'ubersuggest' as const,
+  moz: 'moz' as const,
+  similarweb: 'similarweb' as const,
+  majestic: 'majestic' as const,
+  seranking: 'seranking' as const,
+};
+
+/** Unified gap matrix — each row = one capability type across all platforms */
 export const SEO_GAP_MATRIX: GapRow[] = [
-  // Keywords & rankings
+  // ── Keywords & rankings ──
   {
     id: 'kw-database',
-    feature: 'Keyword database (billions of keywords + volume/SD)',
+    feature: 'Keyword database (volume, difficulty, intent)',
     category: 'Keywords',
-    semrush: true, ahrefs: true, ubersuggest: true, moz: true,
+    platforms: { [P.semrush]: true, [P.ahrefs]: true, [P.ubersuggest]: true, [P.moz]: true, [P.similarweb]: true, [P.seranking]: true },
     vyaparsethu: 'partial',
     vyaparsethuPage: '/admin/seo/rankings',
-    howToAdd: 'Cannot replicate free at scale. Use GSC exports + manual CSV → /admin/seo/analyze. Optional: Google Keyword Planner API (limited) or Ahrefs free webmaster tools for your domain only.',
+    howToAdd: 'GSC Performance CSV → /admin/seo/analyze. Manual updates in seo-opportunities.ts. Free: Google Keyword Planner.',
     priority: 'high', buildCost: 'paid_api',
   },
   {
-    id: 'rank-tracker-daily',
-    feature: 'Automated daily rank tracking (SERP API)',
+    id: 'rank-tracker',
+    feature: 'Rank tracking (positions over time)',
     category: 'Rankings',
-    semrush: true, ahrefs: true, ubersuggest: true, moz: true,
+    platforms: { [P.semrush]: true, [P.ahrefs]: true, [P.ubersuggest]: true, [P.moz]: true, [P.similarweb]: true, [P.seranking]: true },
     vyaparsethu: 'partial',
     vyaparsethuPage: '/admin/seo/rankings',
-    howToAdd: 'Phase 1: weekly GSC CSV import cron. Phase 2: SerpApi/DataForSEO (~$50/mo) for 50 keywords. Wire to Neon table `keyword_ranks`.',
+    howToAdd: 'GSC API cron or SerpApi ($50/mo) → Neon keyword_ranks table.',
     priority: 'high', buildCost: 'paid_api',
-  },
-  {
-    id: 'keyword-gap',
-    feature: 'Keyword gap vs competitors',
-    category: 'Competitive',
-    semrush: true, ahrefs: true, ubersuggest: false, moz: true,
-    vyaparsethu: 'partial',
-    vyaparsethuPage: '/admin/seo/category-ranks',
-    howToAdd: 'Export IndiaMART GSC queries (if available) or manual SERP checks. Build `/admin/seo/keyword-gap` comparing TRACKED_KEYWORDS vs competitor sitemap keywords via NVIDIA LLM clustering.',
-    priority: 'high', buildCost: 'low',
   },
   {
     id: 'category-ranks',
-    feature: 'Per-category / per-supplier keyword ranks',
+    feature: 'Per-category / supplier / product rank comparison',
     category: 'Rankings',
-    semrush: false, ahrefs: false, ubersuggest: false, moz: false,
+    platforms: {},
     vyaparsethu: 'have',
     vyaparsethuPage: '/admin/seo/category-ranks',
-    howToAdd: 'Already built — 400+ rows. Update positions from GSC; add SerpApi for automation.',
+    howToAdd: 'Built — 400+ rows. Unique to VyaparSethu; none of the paid tools offer B2B category panels.',
     priority: 'medium', buildCost: 'free',
   },
-  // Technical SEO
   {
-    id: 'site-audit-crawl',
-    feature: 'Full site crawl audit (broken links, meta, redirects)',
+    id: 'predictive-kw',
+    feature: 'Predictive keyword analytics',
+    category: 'Keywords',
+    platforms: { [P.ubersuggest]: true, [P.semrush]: true },
+    vyaparsethu: 'missing',
+    howToAdd: 'NVIDIA LLM on GSC trend data — flag rising queries before competitors.',
+    priority: 'low', buildCost: 'low',
+  },
+  // ── Technical SEO ──
+  {
+    id: 'site-audit',
+    feature: 'Site audit / technical crawl',
     category: 'Technical',
-    semrush: true, ahrefs: true, ubersuggest: true, moz: true,
+    platforms: { [P.semrush]: true, [P.ahrefs]: true, [P.ubersuggest]: true, [P.moz]: true, [P.similarweb]: true, [P.seranking]: true },
     vyaparsethu: 'partial',
     vyaparsethuPage: '/admin/seo/lighthouse',
-    howToAdd: 'Add `/api/admin/seo/crawl` using `cheerio` + sitemap.xml parser on Vercel cron (free, 500 URLs). Or Screaming Frog export → analyze page. Lighthouse covers perf not crawl.',
+    howToAdd: 'Build /api/admin/seo/crawl — sitemap.xml + cheerio. Screaming Frog CSV → analyze.',
     priority: 'critical', buildCost: 'low',
   },
   {
     id: 'core-web-vitals',
-    feature: 'Core Web Vitals monitoring',
+    feature: 'Core Web Vitals / performance',
     category: 'Technical',
-    semrush: true, ahrefs: true, ubersuggest: true, moz: true,
+    platforms: { [P.semrush]: true, [P.ahrefs]: true, [P.ubersuggest]: true },
     vyaparsethu: 'have',
     vyaparsethuPage: '/admin/seo/lighthouse',
-    howToAdd: 'Already in Lighthouse tab. Add weekly cron calling PageSpeed Insights API (free quota).',
+    howToAdd: 'Done. Add weekly PageSpeed Insights API cron.',
     priority: 'medium', buildCost: 'free',
   },
   {
-    id: 'schema-validation',
-    feature: 'Schema / rich results validation',
+    id: 'ai-tech-seo',
+    feature: 'AI crawler / bot analytics (GPTBot, ClaudeBot)',
     category: 'Technical',
-    semrush: true, ahrefs: false, ubersuggest: false, moz: false,
-    vyaparsethu: 'free_alt',
+    platforms: { [P.ahrefs]: true, [P.semrush]: true },
+    vyaparsethu: 'partial',
     vyaparsethuPage: '/admin/seo/tools',
-    howToAdd: 'Deep links to Rich Results Test already in Tools hub. Build automated check: fetch key URLs, validate JSON-LD with schema-dts.',
+    howToAdd: 'Validate robots.txt allows AI bots. Check /llms.txt. New /admin/seo/ai-crawlers page.',
     priority: 'medium', buildCost: 'low',
   },
-  // Backlinks
+  {
+    id: 'on-page-checker',
+    feature: 'On-page SEO checker per URL',
+    category: 'Technical',
+    platforms: { [P.semrush]: true, [P.ahrefs]: true, [P.ubersuggest]: true, [P.moz]: true, [P.seranking]: true },
+    vyaparsethu: 'missing',
+    howToAdd: 'New /admin/seo/on-page — fetch URL, score title/H1/meta with Groq.',
+    priority: 'high', buildCost: 'low',
+  },
+  // ── Links & authority ──
   {
     id: 'backlink-index',
-    feature: 'Live backlink index (trillions of links)',
+    feature: 'Live backlink index (billions/trillions)',
     category: 'Links',
-    semrush: true, ahrefs: true, ubersuggest: true, moz: true,
+    platforms: { [P.semrush]: true, [P.ahrefs]: true, [P.ubersuggest]: true, [P.moz]: true, [P.majestic]: true, [P.seranking]: true },
     vyaparsethu: 'missing',
-    howToAdd: 'Cannot build free. Use GSC Links report + manual ref domain CSV (you have 500 rows). Ahrefs free tier for your verified domain only.',
+    howToAdd: 'Cannot replicate. GSC Links export + ref-domain CSV. Majestic free plan for limited checks.',
     priority: 'high', buildCost: 'paid_api',
   },
   {
-    id: 'backlink-gap',
-    feature: 'Competitor backlink gap / outreach targets',
+    id: 'trust-flow',
+    feature: 'Link quality metrics (Trust Flow / DA / AS)',
     category: 'Links',
-    semrush: true, ahrefs: true, ubersuggest: true, moz: true,
+    platforms: { [P.majestic]: true, [P.moz]: true, [P.semrush]: true, [P.ahrefs]: true },
     vyaparsethu: 'partial',
     vyaparsethuPage: '/admin/seo/competitors',
-    howToAdd: 'Expand COMPETITOR_BACKLINK_GAPS from CSV uploads. Add status tracking in `/admin/seo/backlinks` (Crunchbase/G2 workflow exists).',
+    howToAdd: 'Manual DA from CSV. Show static DA in competitor table — not live Moz API.',
+    priority: 'medium', buildCost: 'paid_api',
+  },
+  {
+    id: 'clique-hunter',
+    feature: 'Link gap — sites linking to competitors not you',
+    category: 'Links',
+    platforms: { [P.majestic]: true, [P.ahrefs]: true, [P.semrush]: true, [P.ubersuggest]: true },
+    vyaparsethu: 'partial',
+    vyaparsethuPage: '/admin/seo/backlinks',
+    howToAdd: 'Your refDomains CSV (500 rows) is this. Expand via analyze upload + directory workflow.',
     priority: 'high', buildCost: 'free',
   },
   {
     id: 'toxic-links',
     feature: 'Toxic / spam backlink audit',
     category: 'Links',
-    semrush: true, ahrefs: false, ubersuggest: false, moz: true,
+    platforms: { [P.semrush]: true, [P.moz]: true },
     vyaparsethu: 'missing',
-    howToAdd: 'Low priority for new domain. Use Moz Spam Score free check or GSC disavow only if manual spam appears.',
+    howToAdd: 'Low priority for new domain. Moz Spam Score free check if needed.',
     priority: 'low', buildCost: 'paid_api',
   },
-  // Content & competitive
+  // ── Content & competitive ──
   {
     id: 'content-ideas',
-    feature: 'Competitor content ideas for seed keyword',
+    feature: 'Content ideas (top pages for keyword)',
     category: 'Content',
-    semrush: true, ahrefs: true, ubersuggest: true, moz: false,
+    platforms: { [P.ubersuggest]: true, [P.ahrefs]: true, [P.semrush]: true },
     vyaparsethu: 'have',
     vyaparsethuPage: '/admin/seo/content-ideas',
-    howToAdd: 'Already built from your CSV. Add more seeds in seo-content-ideas.ts or upload via analyze.',
+    howToAdd: 'Done — 7 pages from your CSV. Add seeds in seo-content-ideas.ts.',
     priority: 'medium', buildCost: 'free',
   },
   {
     id: 'content-gap',
-    feature: 'Content gap analysis (topics competitors have)',
+    feature: 'Content gap analysis',
     category: 'Content',
-    semrush: true, ahrefs: true, ubersuggest: false, moz: false,
+    platforms: { [P.ubersuggest]: true, [P.ahrefs]: true, [P.semrush]: true, [P.moz]: true },
     vyaparsethu: 'partial',
     vyaparsethuPage: '/admin/seo/opportunities',
-    howToAdd: 'Crawl competitor sitemaps (indiamart.com/blog) + diff against your sitemap. NVIDIA LLM summarizes gaps → opportunities list.',
+    howToAdd: 'Diff competitor sitemaps vs yours → NVIDIA LLM → opportunities list.',
     priority: 'high', buildCost: 'low',
   },
   {
-    id: 'on-page-optimizer',
-    feature: 'On-page SEO checker per URL',
+    id: 'ai-content-writer',
+    feature: 'AI content helper / grader / writer',
     category: 'Content',
-    semrush: true, ahrefs: true, ubersuggest: true, moz: true,
+    platforms: { [P.ahrefs]: true, [P.semrush]: true, [P.ubersuggest]: true },
     vyaparsethu: 'partial',
-    vyaparsethuPage: '/admin/seo/content',
-    howToAdd: 'Build `/admin/seo/on-page` — input URL, extract title/meta/H1/word count, score vs target keyword using Groq.',
-    priority: 'medium', buildCost: 'low',
+    vyaparsethuPage: '/api/ai/sparkle',
+    howToAdd: 'Sparkle API exists for product copy. Extend to SEO blog briefs in /admin/seo/analyze.',
+    priority: 'medium', buildCost: 'free',
   },
   {
     id: 'serp-analyzer',
-    feature: 'SERP analyzer (top 10 breakdown per keyword)',
+    feature: 'SERP analyzer (top 10 breakdown)',
     category: 'Competitive',
-    semrush: true, ahrefs: true, ubersuggest: true, moz: true,
+    platforms: { [P.ubersuggest]: true, [P.ahrefs]: true, [P.semrush]: true, [P.moz]: true },
     vyaparsethu: 'missing',
-    howToAdd: 'SerpApi Google Search API (~$0.01/search) or manual paste SERP HTML → NVIDIA extract. Page: `/admin/seo/serp`.',
+    howToAdd: 'SerpApi or manual SERP paste → /admin/seo/serp page.',
     priority: 'medium', buildCost: 'paid_api',
   },
-  // AI visibility
+  {
+    id: 'competitor-traffic',
+    feature: 'Competitor traffic estimation',
+    category: 'Traffic',
+    platforms: { [P.similarweb]: true, [P.semrush]: true, [P.ahrefs]: true, [P.ubersuggest]: true },
+    vyaparsethu: 'missing',
+    howToAdd: 'Similarweb/Semrush paid only. Use GSC for YOUR traffic; ignore competitor estimates.',
+    priority: 'low', buildCost: 'paid_api',
+  },
+  {
+    id: 'domain-overview',
+    feature: 'Domain overview dashboard',
+    category: 'Competitive',
+    platforms: { [P.semrush]: true, [P.ahrefs]: true, [P.moz]: true, [P.similarweb]: true },
+    vyaparsethu: 'partial',
+    vyaparsethuPage: '/admin/seo',
+    howToAdd: 'GSC totals on overview. Competitor domain stats need paid API.',
+    priority: 'medium', buildCost: 'paid_api',
+  },
+  // ── AI visibility (AEO/GEO) ──
   {
     id: 'ai-visibility',
     feature: 'AI search visibility (ChatGPT/Gemini brand mentions)',
     category: 'AI',
-    semrush: true, ahrefs: true, ubersuggest: true, moz: false,
+    platforms: { [P.semrush]: true, [P.ahrefs]: true, [P.ubersuggest]: true, [P.moz]: true, [P.similarweb]: true, [P.seranking]: true },
     vyaparsethu: 'have',
     vyaparsethuPage: '/admin/seo/ai-visibility',
-    howToAdd: 'Manual quarterly refresh. Automate: weekly cron calls OpenAI/Gemini with your 9 prompts, parse brand mentions → update seo-ai-visibility.ts.',
+    howToAdd: 'Done — 9 prompts, 0% visibility. Automate quarterly cron with Groq/Gemini API.',
     priority: 'high', buildCost: 'low',
+  },
+  {
+    id: 'ai-citations',
+    feature: 'AI citation analysis',
+    category: 'AI',
+    platforms: { [P.similarweb]: true, [P.ubersuggest]: true, [P.semrush]: true },
+    vyaparsethu: 'partial',
+    vyaparsethuPage: '/admin/seo/ai-visibility',
+    howToAdd: 'Track which pages get cited — manual prompt checks. Add citation log table.',
+    priority: 'medium', buildCost: 'low',
   },
   {
     id: 'ai-prompt-research',
     feature: 'AI prompt research database',
     category: 'AI',
-    semrush: true, ahrefs: false, ubersuggest: true, moz: false,
+    platforms: { [P.semrush]: true, [P.ubersuggest]: true, [P.similarweb]: true },
     vyaparsethu: 'partial',
     vyaparsethuPage: '/admin/seo/ai-visibility',
-    howToAdd: 'Expand AI_VISIBILITY_PROMPTS from customer interviews + AlsoAsked free tier. Store in Neon, display in AI tab.',
+    howToAdd: 'Expand AI_VISIBILITY_PROMPTS. AlsoAsked.com free tier for question keywords.',
     priority: 'medium', buildCost: 'free',
   },
   {
-    id: 'ai-readiness-audit',
-    feature: 'AI crawler readiness (robots.txt, llms.txt)',
+    id: 'aeo',
+    feature: 'AEO / Answer Engine Optimization suite',
     category: 'AI',
-    semrush: true, ahrefs: false, ubersuggest: false, moz: false,
+    platforms: { [P.similarweb]: true, [P.semrush]: true },
     vyaparsethu: 'partial',
-    vyaparsethuPage: '/admin/seo/tools',
-    howToAdd: 'Check robots.txt allows GPTBot, ClaudeBot, PerplexityBot. You have /llms.txt — add checker page validating blocks.',
-    priority: 'medium', buildCost: 'low',
+    vyaparsethuPage: '/admin/seo/ai-visibility',
+    howToAdd: 'FAQ schema on /how-payment-works, /how-verification-works. llms.txt on site.',
+    priority: 'high', buildCost: 'free',
   },
-  // Analytics & reporting
+  // ── Market & traffic (Similarweb-specific) ──
   {
-    id: 'gsc-integration',
-    feature: 'Google Search Console data',
-    category: 'Analytics',
-    semrush: true, ahrefs: true, ubersuggest: true, moz: true,
-    vyaparsethu: 'partial',
-    vyaparsethuPage: '/admin/seo/search-console',
-    howToAdd: 'Phase 2: GSC API OAuth → live queries in cockpit. Phase 1: CSV upload (current).',
-    priority: 'critical', buildCost: 'medium',
-  },
-  {
-    id: 'ga4-integration',
-    feature: 'Google Analytics 4 dashboards',
-    category: 'Analytics',
-    semrush: false, ahrefs: false, ubersuggest: false, moz: false,
-    vyaparsethu: 'partial',
-    vyaparsethuPage: '/admin/seo/tools',
-    howToAdd: 'Set NEXT_PUBLIC_GA_ID. Add GA4 Data API read for landing pages + conversions in `/admin/seo/analytics`.',
-    priority: 'high', buildCost: 'medium',
+    id: 'market-research',
+    feature: 'Market research / audience analysis',
+    category: 'Market',
+    platforms: { [P.similarweb]: true, [P.semrush]: true },
+    vyaparsethu: 'missing',
+    howToAdd: 'Not core for B2B marketplace SEO. Skip unless investor deck needs TAM data.',
+    priority: 'low', buildCost: 'paid_api',
   },
   {
-    id: 'domain-overview',
-    feature: 'Domain overview (traffic est., top keywords)',
-    category: 'Competitive',
-    semrush: true, ahrefs: true, ubersuggest: true, moz: true,
-    vyaparsethu: 'partial',
-    vyaparsethuPage: '/admin/seo',
-    howToAdd: 'GSC gives real traffic (not estimates). Competitor traffic needs Ahrefs/Semrush paid. Show GSC totals on overview (already partial).',
-    priority: 'medium', buildCost: 'paid_api',
+    id: 'paid-ad-intel',
+    feature: 'Paid search / display ad intelligence',
+    category: 'Paid',
+    platforms: { [P.similarweb]: true, [P.semrush]: true, [P.ahrefs]: true },
+    vyaparsethu: 'not_needed',
+    howToAdd: 'Out of scope — organic SEO focus. Link to Google Ads if needed.',
+    priority: 'low', buildCost: 'n/a',
   },
-  // Local & directories
+  {
+    id: 'app-intelligence',
+    feature: 'App intelligence',
+    category: 'Apps',
+    platforms: { [P.similarweb]: true },
+    vyaparsethu: 'not_needed',
+    howToAdd: 'N/A — web marketplace only.',
+    priority: 'low', buildCost: 'n/a',
+  },
+  {
+    id: 'retail-intelligence',
+    feature: 'Retail / Amazon intelligence',
+    category: 'Ecommerce',
+    platforms: { [P.similarweb]: true },
+    vyaparsethu: 'not_needed',
+    howToAdd: 'N/A unless you add Amazon Business integration.',
+    priority: 'low', buildCost: 'n/a',
+  },
+  {
+    id: 'sales-intelligence',
+    feature: 'Sales intelligence / lead gen',
+    category: 'Sales',
+    platforms: { [P.similarweb]: true },
+    vyaparsethu: 'partial',
+    vyaparsethuPage: '/admin/outreach',
+    howToAdd: 'WhatsApp outreach dialer exists — not SEO. Keep separate from SEO Cockpit.',
+    priority: 'low', buildCost: 'free',
+  },
+  // ── Local & social ──
   {
     id: 'local-seo',
     feature: 'Local SEO / GBP management',
     category: 'Local',
-    semrush: true, ahrefs: false, ubersuggest: false, moz: true,
+    platforms: { [P.semrush]: true, [P.ahrefs]: true, [P.moz]: true },
     vyaparsethu: 'partial',
     vyaparsethuPage: '/suppliers',
-    howToAdd: 'City+category pages exist. Add Google Business Profile link + NAP schema on supplier pages. Moz Local is paid — use manual GBP.',
+    howToAdd: 'City+category pages exist. Add GBP links on supplier profiles.',
     priority: 'medium', buildCost: 'free',
   },
   {
-    id: 'directory-submissions',
-    feature: 'Directory / listing submission workflow',
-    category: 'Links',
-    semrush: false, ahrefs: false, ubersuggest: false, moz: false,
-    vyaparsethu: 'have',
-    vyaparsethuPage: '/admin/directories/submit',
-    howToAdd: 'Already built (Crunchbase/G2/Startup India). Add more directories from ref domain CSV.',
-    priority: 'high', buildCost: 'free',
+    id: 'social-media',
+    feature: 'Social media management',
+    category: 'Social',
+    platforms: { [P.semrush]: true, [P.ahrefs]: true },
+    vyaparsethu: 'partial',
+    vyaparsethuPage: '/admin/social',
+    howToAdd: 'Social calendar exists in admin — separate from SEO Cockpit.',
+    priority: 'low', buildCost: 'free',
   },
-  // Automation
+  // ── Analytics & reporting ──
   {
-    id: 'csv-ai-analyze',
-    feature: 'CSV import + AI opportunity extraction',
-    category: 'Automation',
-    semrush: false, ahrefs: false, ubersuggest: false, moz: false,
-    vyaparsethu: 'have',
-    vyaparsethuPage: '/admin/seo/analyze',
-    howToAdd: 'Already built (Groq/NVIDIA). Add save-to-DB button to persist analysis results.',
+    id: 'gsc',
+    feature: 'Google Search Console integration',
+    category: 'Analytics',
+    platforms: { [P.semrush]: true, [P.ahrefs]: true, [P.ubersuggest]: true, [P.moz]: true },
+    vyaparsethu: 'partial',
+    vyaparsethuPage: '/admin/seo/search-console',
+    howToAdd: 'GSC API OAuth — live query sync. CSV upload works today.',
+    priority: 'critical', buildCost: 'medium',
+  },
+  {
+    id: 'ga4',
+    feature: 'Google Analytics 4',
+    category: 'Analytics',
+    platforms: { [P.ahrefs]: true },
+    vyaparsethu: 'partial',
+    vyaparsethuPage: '/admin/seo/tools',
+    howToAdd: 'NEXT_PUBLIC_GA_ID + GA4 Data API for landing page report.',
+    priority: 'high', buildCost: 'medium',
+  },
+  {
+    id: 'web-analytics',
+    feature: 'First-party web analytics',
+    category: 'Analytics',
+    platforms: { [P.ahrefs]: true, [P.similarweb]: true },
+    vyaparsethu: 'partial',
+    vyaparsethuPage: '/admin/analytics',
+    howToAdd: 'GA4 covers this. Ahrefs Web Analytics is their own product.',
     priority: 'medium', buildCost: 'free',
   },
   {
-    id: 'scheduled-reports',
-    feature: 'Scheduled email/PDF SEO reports',
+    id: 'report-builder',
+    feature: 'Custom report builder / PDF export',
     category: 'Reporting',
-    semrush: true, ahrefs: true, ubersuggest: false, moz: true,
-    vyaparsethu: 'missing',
-    howToAdd: 'Vercel cron weekly → generate JSON summary → MSG91 email or Resend. Use seo-dashboard.ts snapshot.',
+    platforms: { [P.ahrefs]: true, [P.semrush]: true, [P.moz]: true },
+    vyaparsethu: 'partial',
+    vyaparsethuPage: '/admin/seo/gap-report',
+    howToAdd: 'CSV export on gap report + category ranks. Add weekly email via MSG91.',
     priority: 'low', buildCost: 'low',
   },
   {
-    id: 'browser-extension',
-    feature: 'Browser extension (DA/keywords in SERP)',
-    category: 'Browser',
-    semrush: true, ahrefs: true, ubersuggest: true, moz: true,
+    id: 'api-access',
+    feature: 'SEO data API',
+    category: 'Enterprise',
+    platforms: { [P.ahrefs]: true, [P.semrush]: true, [P.moz]: true, [P.similarweb]: true },
+    vyaparsethu: 'partial',
+    vyaparsethuPage: '/api/seo/ranks',
+    howToAdd: '/api/seo/ranks exists for internal panels. Document for admin use only.',
+    priority: 'low', buildCost: 'free',
+  },
+  // ── VyaparSethu-only ──
+  {
+    id: 'csv-ai-analyze',
+    feature: 'CSV import + AI extraction (Groq/NVIDIA)',
+    category: 'Automation',
+    platforms: {},
+    vyaparsethu: 'have',
+    vyaparsethuPage: '/admin/seo/analyze',
+    howToAdd: 'Unique feature — no paid tool equivalent in one admin.',
+    priority: 'medium', buildCost: 'free',
+  },
+  {
+    id: 'directory-workflow',
+    feature: 'Directory submission workflow (Crunchbase/G2)',
+    category: 'Links',
+    platforms: {},
+    vyaparsethu: 'have',
+    vyaparsethuPage: '/admin/seo/backlinks',
+    howToAdd: 'Done — manual guides with localStorage tracking.',
+    priority: 'high', buildCost: 'free',
+  },
+  {
+    id: 'seo-opportunities',
+    feature: 'SEO opportunities list',
+    category: 'Audit',
+    platforms: { [P.ubersuggest]: true, [P.semrush]: true },
+    vyaparsethu: 'have',
+    vyaparsethuPage: '/admin/seo/opportunities',
+    howToAdd: 'Done — 10 tasks from your Ubersuggest export.',
+    priority: 'medium', buildCost: 'free',
+  },
+  {
+    id: 'free-tools-hub',
+    feature: 'Free SEO tools hub (GSC, GA4, PageSpeed deep links)',
+    category: 'Tools',
+    platforms: {},
+    vyaparsethu: 'have',
+    vyaparsethuPage: '/admin/seo/tools',
+    howToAdd: 'Done — 15 free tools with GA4 events.',
+    priority: 'medium', buildCost: 'free',
+  },
+  {
+    id: 'ai-agent',
+    feature: 'AI marketing agent with SEO data',
+    category: 'AI',
+    platforms: { [P.ahrefs]: true, [P.semrush]: true },
     vyaparsethu: 'missing',
-    howToAdd: 'Not needed — use MozBar/Ahrefs extension free while browsing. Building Chrome ext is high effort.',
+    howToAdd: 'Future: MCP server exposing /api/seo/ranks + GSC to Cursor/ChatGPT. Semrush MCP model.',
     priority: 'low', buildCost: 'high',
+  },
+  {
+    id: 'semrush-mcp',
+    feature: 'MCP / ChatGPT plugin for SEO data',
+    category: 'AI',
+    platforms: { [P.semrush]: true },
+    vyaparsethu: 'missing',
+    howToAdd: 'Build vyaparsethu-seo-mcp exposing ranks + opportunities to AI assistants.',
+    priority: 'low', buildCost: 'medium',
   },
 ];
 
+export const PLATFORM_TOOL_COUNTS: Record<Exclude<PlatformId, 'vyaparsethu'>, number> = {
+  semrush: SEMRUSH_TOOLS.length,
+  ahrefs: AHREFS_TOOLS.length,
+  similarweb: SIMILARWEB_TOOLS.length,
+  ubersuggest: UBERSUGGEST_TOOLS.length,
+  moz: MOZ_TOOLS.length,
+  majestic: MAJESTIC_TOOLS.length,
+  seranking: SERANKING_TOOLS.length,
+};
+
+export const ALL_PLATFORM_TOOLS: Record<Exclude<PlatformId, 'vyaparsethu'>, PlatformTool[]> = {
+  semrush: SEMRUSH_TOOLS,
+  ahrefs: AHREFS_TOOLS,
+  similarweb: SIMILARWEB_TOOLS,
+  ubersuggest: UBERSUGGEST_TOOLS,
+  moz: MOZ_TOOLS,
+  majestic: MAJESTIC_TOOLS,
+  seranking: SERANKING_TOOLS,
+};
+
 export function getGapSummary() {
-  const total = SEO_GAP_MATRIX.length;
-  const have = SEO_GAP_MATRIX.filter(r => r.vyaparsethu === 'have').length;
-  const partial = SEO_GAP_MATRIX.filter(r => r.vyaparsethu === 'partial').length;
-  const missing = SEO_GAP_MATRIX.filter(r => r.vyaparsethu === 'missing').length;
-  const freeAlt = SEO_GAP_MATRIX.filter(r => r.vyaparsethu === 'free_alt').length;
-  const criticalMissing = SEO_GAP_MATRIX.filter(r => r.vyaparsethu === 'missing' && r.priority === 'critical').length;
+  const rows = SEO_GAP_MATRIX.filter(r => r.vyaparsethu !== 'not_needed');
+  const total = rows.length;
+  const have = rows.filter(r => r.vyaparsethu === 'have').length;
+  const partial = rows.filter(r => r.vyaparsethu === 'partial').length;
+  const missing = rows.filter(r => r.vyaparsethu === 'missing').length;
+  const freeAlt = rows.filter(r => r.vyaparsethu === 'free_alt').length;
+  const criticalMissing = rows.filter(r => r.vyaparsethu === 'missing' && r.priority === 'critical').length;
+  const paidToolFeatures = new Set<string>();
+  for (const row of SEO_GAP_MATRIX) {
+    if (Object.values(row.platforms).some(Boolean)) paidToolFeatures.add(row.id);
+  }
   const coveragePct = Math.round(((have + partial * 0.5 + freeAlt * 0.75) / total) * 100);
-  return { total, have, partial, missing, freeAlt, criticalMissing, coveragePct };
+  const uniqueToUs = rows.filter(r => r.vyaparsethu === 'have' && !Object.values(r.platforms).some(Boolean)).length;
+  return { total, have, partial, missing, freeAlt, criticalMissing, coveragePct, uniqueToUs, paidPlatformsCompared: 7 };
 }
 
 export const BUILD_ROADMAP = [
-  { phase: 'Week 1–2 (free)', items: ['GSC API OAuth live queries', 'Sitemap crawler → broken links', 'On-page checker page', 'AI visibility cron (9 prompts)'] },
-  { phase: 'Week 3–4 (low cost)', items: ['SerpApi for 20 head keywords', 'Content gap from competitor sitemaps', 'Weekly Lighthouse cron', 'GA4 Data API landing pages'] },
-  { phase: 'Month 2+ (optional paid)', items: ['DataForSEO for 450 category keywords', 'Ahrefs API for backlink gap', 'Looker Studio auto-dashboard'] },
+  {
+    phase: 'Week 1–2 (free)',
+    items: [
+      'GSC API OAuth → live queries in Search Console tab',
+      'Sitemap crawler → broken links (fixes your 7-page audit)',
+      'On-page checker (/admin/seo/on-page)',
+      'AI crawler robots.txt validator',
+    ],
+  },
+  {
+    phase: 'Week 3–4 (low cost)',
+    items: [
+      'SerpApi for 20 B2B head keywords',
+      'Content gap from IndiaMART/TradeIndia sitemaps',
+      'AI visibility weekly cron (9 prompts)',
+      'GA4 Data API landing pages',
+    ],
+  },
+  {
+    phase: 'Month 2+ (optional)',
+    items: [
+      'DataForSEO for 450 category keywords',
+      'Similarweb-style traffic charts (GSC only — real data)',
+      'vyaparsethu-seo-mcp for ChatGPT integration',
+      'Weekly SEO email report',
+    ],
+  },
 ];
+
+/** Features on paid homepages that VyaparSethu is completely missing */
+export const MISSING_FEATURES_REPORT = SEO_GAP_MATRIX.filter(
+  r => r.vyaparsethu === 'missing' && r.priority !== 'low',
+).map(r => ({
+  feature: r.feature,
+  category: r.category,
+  offeredBy: Object.entries(r.platforms)
+    .filter(([, v]) => v)
+    .map(([k]) => k)
+    .join(', '),
+  howToAdd: r.howToAdd,
+  priority: r.priority,
+  buildCost: r.buildCost,
+}));
+
+/** Features VyaparSethu has that paid tools don't bundle */
+export const UNIQUE_VYAPARSETHU_FEATURES = SEO_GAP_MATRIX.filter(
+  r => r.vyaparsethu === 'have' && !Object.values(r.platforms).some(Boolean),
+).map(r => ({ feature: r.feature, page: r.vyaparsethuPage }));
