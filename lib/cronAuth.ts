@@ -6,8 +6,11 @@ import { NextRequest } from 'next/server';
  */
 export function verifyCronSecret(request: NextRequest): boolean {
   const cronSecret = process.env.CRON_SECRET;
-  // If no CRON_SECRET is configured, allow requests (for local dev)
-  if (!cronSecret) return true;
+  // Require CRON_SECRET in production - never allow unauthenticated requests
+  if (!cronSecret) {
+    console.error('[CRON_AUTH] CRON_SECRET not configured');
+    return false;
+  }
 
   const authHeader = request.headers.get('authorization');
   return authHeader === `Bearer ${cronSecret}`;
