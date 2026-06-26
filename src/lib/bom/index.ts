@@ -1,4 +1,9 @@
-export { BOM_MODULES, getEnabledModules, modulesForEventType, type BomMemoryModule } from './modules';
+export {
+  BOM_MODULES,
+  getEnabledModules,
+  modulesForEventType,
+  type BomMemoryModule,
+} from './modules';
 export {
   LIFE_EVENT_TYPES,
   recordLifeEvent,
@@ -15,3 +20,5 @@ export {
   mergeLayersFromProjection,
   type BomProjection,
 } from './projections';
+export { computeBusinessGenome, type BusinessGenome } from './genome-score';
+export { generateMorningBrief, type MorningBrief, type BriefInsight } from './morning-brief';

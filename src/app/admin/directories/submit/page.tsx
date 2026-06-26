@@ -68,13 +68,13 @@ Formerly Bell24h. Operating entity: VyaparSethu Technologies Pvt Ltd (registrati
   {
     id: 'g2',
     name: 'G2',
-    url: 'https://sell.g2.com/free-listing',
+    url: 'https://www.g2.com/products/new',
     da: 85,
     estimatedTime: '20 min',
     category: 'SEO/Backlink + Reviews — DA 85',
     steps: [
-      'Go to sell.g2.com/free-listing',
-      'Click "Get Listed for Free" → create vendor account',
+      'Go to g2.com → Sign in → Products → Add new product',
+      'Do NOT use sell.g2.com/free-listing — that URL returns 404 (as of Jun 2026)',
       'Search if VyaparSethu already exists → if not, click "Add a Product"',
       'Set Primary Category = "B2B Marketplace" + Secondary = "Procurement Software"',
       'Fill all fields below',

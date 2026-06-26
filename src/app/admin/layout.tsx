@@ -10,6 +10,7 @@ const NAV: NavItem[] = [
   // Core
   { href: '/admin',                  label: 'Dashboard',        icon: '▤',  group: 'Intelligence' },
   { href: '/admin/company-dna',      label: 'Company DNA',      icon: '🧬' },
+  { href: '/admin/morning-brief',    label: 'Morning Brief',    icon: '☀️' },
   { href: '/admin/kpi',              label: 'KPI',              icon: '📈' },
   { href: '/admin/analytics',        label: 'Analytics',        icon: '📊' },
   { href: '/admin/heatmap',          label: 'Heatmap',          icon: '🔥' },

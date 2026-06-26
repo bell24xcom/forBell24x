@@ -158,6 +158,14 @@ export const BOM_MODULES: BomMemoryModule[] = [
     eventTypes: ['rfq_created', 'payment_completed'],
     enabled: true,
   },
+  {
+    id: 'economic',
+    label: 'Economic Memory',
+    description: 'Input costs, freight, linked commodities (PVC/oil etc.)',
+    color: '#0ea5e9',
+    eventTypes: ['price_alert', 'rfq_created', 'payment_completed'],
+    enabled: true,
+  },
 ];
 
 export function getEnabledModules(): BomMemoryModule[] {
