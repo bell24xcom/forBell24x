@@ -51,6 +51,7 @@ model User {
   buyerTransactions    Transaction[]  @relation("BuyerTransactions")
   supplierTransactions Transaction[]  @relation("SupplierTransactions")
   wallet               Wallet?
+  companyDnaProfile    CompanyDnaProfile?
 
   @@map("users")
 }
@@ -391,6 +392,71 @@ model MarketInsight {
   metadata       Json?
 
   @@map("market_insights")
+}
+
+// ─── Company DNA (Business Operating Memory) ─────────────────────────────────
+
+model CompanyDnaProfile {
+  id                String             @id @default(cuid())
+  userId            String             @unique @map("user_id")
+  companyName       String?            @map("company_name")
+  completeness      Float              @default(0)
+  layerScores       Json?              @map("layer_scores")
+  identity          Json?
+  business          Json?
+  procurement       Json?
+  suppliers         Json?
+  customers         Json?
+  financial         Json?
+  market            Json?
+  risk              Json?
+  trust             Json?
+  relationships     Json?
+  procurementMemory Json?              @map("procurement_memory")
+  decisions         Json?
+  opportunities     Json?
+  aiMemory          Json?              @map("ai_memory")
+  graphSnapshot     Json?              @map("graph_snapshot")
+  lastSyncedAt      DateTime           @default(now()) @map("last_synced_at")
+  createdAt         DateTime           @default(now()) @map("created_at")
+  updatedAt         DateTime           @updatedAt @map("updated_at")
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  timeline          DnaTimelineEvent[]
+  memoryEvents      DnaMemoryEvent[]
+
+  @@map("company_dna_profiles")
+}
+
+model DnaTimelineEvent {
+  id        String            @id @default(cuid())
+  profileId String            @map("profile_id")
+  year      Int
+  label     String
+  eventType String            @map("event_type")
+  source    String            @default("system")
+  metadata  Json?
+  createdAt DateTime          @default(now()) @map("created_at")
+  profile   CompanyDnaProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId])
+  @@map("dna_timeline_events")
+}
+
+model DnaMemoryEvent {
+  id          String            @id @default(cuid())
+  profileId   String            @map("profile_id")
+  layer       String
+  eventType   String            @map("event_type")
+  decision    String?
+  outcome     String?
+  impactScore Float?            @map("impact_score")
+  metadata    Json?
+  createdAt   DateTime          @default(now()) @map("created_at")
+  profile     CompanyDnaProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId])
+  @@index([layer])
+  @@map("dna_memory_events")
 }
 
 model ExternalLead {

@@ -445,3 +445,13 @@ export async function dailyInsightsCron(): Promise<{ updated: number; errors: nu
 
   return { updated, errors };
 }
+
+/** Non-blocking Company DNA sync after Elephant Memory write (Layer 11). */
+export async function refreshCompanyDnaFromRfq(userId: string): Promise<void> {
+  try {
+    const { syncCompanyDna } = await import('@/lib/company-dna/engine');
+    await syncCompanyDna(userId, false);
+  } catch {
+    /* DNA tables may not exist until migration runs */
+  }
+}
