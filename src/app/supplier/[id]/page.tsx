@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Building2, MapPin, Shield, Package, Calendar, Award, Star, CheckCircle } from 'lucide-react';
 import TrustScore from '@/components/ui/TrustScore';
 import WhatsAppShare from '@/components/ui/WhatsAppShare';
+import { SupplierSeoRankLoader } from '@/components/seo/SupplierSeoRankLoader';
 
 interface SupplierData {
   id: string;
@@ -188,6 +189,11 @@ export default function PublicSupplierPage({ params }: { params: { id: string } 
             </div>
           </div>
         )}
+
+        <SupplierSeoRankLoader
+          categories={supplier.preferences.categories}
+          companyName={displayName}
+        />
 
         {/* Delivery Locations */}
         {supplier.preferences.cities.length > 0 && (

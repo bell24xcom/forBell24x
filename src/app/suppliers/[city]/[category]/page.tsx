@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { CITIES, CATEGORY_META, getAllCityCategoryPairs } from '@/src/data/city-category-seo';
 import { prisma } from '@/lib/prisma';
+import SeoRankComparisonPanel from '@/components/seo/SeoRankComparisonPanel';
+import { getRankBySlug } from '@/lib/seo-category-keywords';
 
 interface Props { params: { city: string; category: string } }
 
@@ -34,6 +36,12 @@ export default async function CityCategory({ params }: Props) {
   const city = CITIES[params.city];
   const cat  = CATEGORY_META[params.category];
   if (!city || !cat) notFound();
+
+  const seoRanks = (() => {
+    const cityCat = getRankBySlug('city-category', params.category);
+    return cityCat ? [cityCat] : [];
+  })();
+  const pagePath = `/suppliers/${params.city}/${params.category}`;
 
   // Pull verified suppliers in this city who match this category
   let suppliers: { id: string; company: string | null; location: string | null; trustScore: number | null }[] = [];
@@ -155,6 +163,17 @@ export default async function CityCategory({ params }: Props) {
               <Link href="/supplier/registration" className="inline-block bg-[#D4AF37] hover:bg-[#c4a030] text-[#001f3f] font-semibold px-5 py-2.5 rounded-lg text-sm transition-colors">
                 Claim Your Supplier Profile — Free
               </Link>
+            </div>
+          )}
+
+          {seoRanks.length > 0 && (
+            <div className="mb-10">
+              <SeoRankComparisonPanel
+                ranks={seoRanks}
+                title={`SEO: ${cat.name} in ${city.name} vs competitors`}
+                pagePath={pagePath}
+                adminLink
+              />
             </div>
           )}
 

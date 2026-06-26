@@ -102,6 +102,26 @@ export default function SeoOverviewPage() {
       </div>
 
       <div className="grid md:grid-cols-3 gap-4">
+        <Link href="/admin/seo/ai-visibility" className="bg-slate-800/40 border border-red-500/20 rounded-xl p-4 hover:border-indigo-500/40 transition-colors block">
+          <p className="text-white font-semibold text-sm">AI Search Visibility</p>
+          <p className="text-slate-500 text-xs mt-1">0% brand mentions — 9 prompts, IndiaMART leads at 33%</p>
+        </Link>
+        <Link href="/admin/seo/content-ideas" className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-4 hover:border-indigo-500/40 transition-colors block">
+          <p className="text-white font-semibold text-sm">Content Ideas</p>
+          <p className="text-slate-500 text-xs mt-1">7 competitor pages for &quot;b2b marketplace india&quot;</p>
+        </Link>
+        <Link href="/admin/seo/category-ranks" className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-4 hover:border-indigo-500/40 transition-colors block">
+          <p className="text-white font-semibold text-sm">Category keyword ranks</p>
+          <p className="text-slate-500 text-xs mt-1">400+ categories — you vs IndiaMART/TradeIndia</p>
+        </Link>
+        <Link href="/admin/seo/analyze" className="bg-slate-800/40 border border-indigo-500/30 rounded-xl p-4 hover:border-indigo-500/40 transition-colors block">
+          <p className="text-white font-semibold text-sm">AI CSV Analyze</p>
+          <p className="text-slate-500 text-xs mt-1">Upload GSC / rank CSV — Groq or NVIDIA extraction</p>
+        </Link>
+        <Link href="/admin/seo/tools" className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-4 hover:border-indigo-500/40 transition-colors block">
+          <p className="text-white font-semibold text-sm">SEO Tools hub</p>
+          <p className="text-slate-500 text-xs mt-1">GSC, GA4, PageSpeed — deep links + GA4 events</p>
+        </Link>
         <Link href="/admin/seo/opportunities" className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-4 hover:border-indigo-500/40 transition-colors block">
           <p className="text-white font-semibold text-sm">SEO Opportunities</p>
           <p className="text-slate-500 text-xs mt-1">10 tasks — broken links, comparison content, local pages</p>
