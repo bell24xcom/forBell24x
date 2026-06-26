@@ -1,0 +1,36 @@
+# VyaparSethu Weekly Cron Jobs (Mondays)
+# Scheduler: GitHub Actions (temporary until dedicated job engine)
+# Business logic remains in API routes - no business logic in this file
+
+name: Weekly Cron Jobs
+
+on:
+  schedule:
+    - cron: '0 3 * * 1'  # 3 AM UTC on Mondays
+  workflow_dispatch:  # Manual trigger
+
+concurrency:
+  group: vyaparsethu-weekly
+  cancel-in-progress: false
+
+jobs:
+  weekly-digest:
+    name: Weekly Digest
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send weekly digest emails
+        run: |
+          curl -s -X GET \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "${{ secrets.SITE_URL }}/api/cron/weekly-digest"
+
+  churn-check:
+    name: Churn Check
+    runs-on: ubuntu-latest
+    needs: weekly-digest
+    steps:
+      - name: Check for churn risk users
+        run: |
+          curl -s -X GET \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "${{ secrets.SITE_URL }}/api/cron/churn-check"

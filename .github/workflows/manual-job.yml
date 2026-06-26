@@ -1,0 +1,46 @@
+# VyaparSethu Manual Job Trigger
+# Allows running individual jobs on-demand
+# Business logic remains in API routes - no business logic in this file
+
+name: Manual Job Execution
+
+on:
+  workflow_dispatch:
+    inputs:
+      job:
+        description: 'Job to execute'
+        required: true
+        type: choice
+        options:
+          - expire-rfqs
+          - supplier-drip
+          - follow-up-due
+          - demand-loop
+          - analyze-behavior
+          - update-insights
+          - churn-check
+          - weekly-digest
+          - morning-brief
+          - daily-orchestrator
+
+jobs:
+  execute-job:
+    name: Execute ${{ inputs.job }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Execute ${{ inputs.job }}
+        run: |
+          ENDPOINT="${{ inputs.job }}"
+          if [ "$ENDPOINT" = "morning-brief" ]; then
+            ENDPOINT="admin/morning-brief"
+          elif [ "$ENDPOINT" = "daily-orchestrator" ]; then
+            ENDPOINT="cron/daily"
+          else
+            ENDPOINT="cron/$ENDPOINT"
+          fi
+          
+          echo "Executing: ${{ secrets.SITE_URL }}/api/$ENDPOINT"
+          
+          curl -s -X GET \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "${{ secrets.SITE_URL }}/api/$ENDPOINT"

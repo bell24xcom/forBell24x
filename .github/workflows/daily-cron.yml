@@ -1,0 +1,91 @@
+# VyaparSethu Daily Cron Jobs
+# Scheduler: GitHub Actions (temporary until dedicated job engine)
+# Business logic remains in API routes - no business logic in this file
+
+name: Daily Cron Jobs
+
+on:
+  schedule:
+    - cron: '0 2 * * *'  # 2 AM UTC daily
+  workflow_dispatch:  # Manual trigger
+
+concurrency:
+  group: vyaparsethu-cron
+  cancel-in-progress: false
+
+jobs:
+  expire-rfqs:
+    name: Expire RFQs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Expire RFQs
+        run: |
+          curl -s -X GET \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "${{ secrets.SITE_URL }}/api/cron/expire-rfqs"
+
+  supplier-drip:
+    name: Supplier Drip
+    runs-on: ubuntu-latest
+    needs: expire-rfqs
+    steps:
+      - name: Send supplier drips
+        run: |
+          curl -s -X GET \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "${{ secrets.SITE_URL }}/api/cron/supplier-drip"
+
+  follow-up-due:
+    name: Follow-up Due
+    runs-on: ubuntu-latest
+    needs: supplier-drip
+    steps:
+      - name: Process follow-ups
+        run: |
+          curl -s -X GET \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "${{ secrets.SITE_URL }}/api/cron/follow-up-due"
+
+  demand-loop:
+    name: Demand Loop
+    runs-on: ubuntu-latest
+    needs: follow-up-due
+    steps:
+      - name: Run demand analysis
+        run: |
+          curl -s -X GET \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "${{ secrets.SITE_URL }}/api/cron/demand-loop"
+
+  analyze-behavior:
+    name: Analyze Behavior
+    runs-on: ubuntu-latest
+    needs: demand-loop
+    steps:
+      - name: Analyze user behavior
+        run: |
+          curl -s -X GET \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "${{ secrets.SITE_URL }}/api/cron/analyze-behavior"
+
+  update-insights:
+    name: Update Insights
+    runs-on: ubuntu-latest
+    needs: analyze-behavior
+    steps:
+      - name: Update dashboard insights
+        run: |
+          curl -s -X GET \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "${{ secrets.SITE_URL }}/api/cron/update-insights"
+
+  morning-brief-refresh:
+    name: Morning Brief Refresh
+    runs-on: ubuntu-latest
+    needs: update-insights
+    steps:
+      - name: Refresh morning brief cache
+        run: |
+          curl -s -X GET \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "${{ secrets.SITE_URL }}/api/admin/morning-brief"
