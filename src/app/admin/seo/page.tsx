@@ -118,6 +118,10 @@ export default function SeoOverviewPage() {
           <p className="text-white font-semibold text-sm">AI CSV Analyze</p>
           <p className="text-slate-500 text-xs mt-1">Upload GSC / rank CSV — Groq or NVIDIA extraction</p>
         </Link>
+        <Link href="/admin/seo/gap-report" className="bg-slate-800/40 border border-red-500/20 rounded-xl p-4 hover:border-indigo-500/40 transition-colors block">
+          <p className="text-white font-semibold text-sm">SEO Gap Report</p>
+          <p className="text-slate-500 text-xs mt-1">vs Semrush, Ahrefs, Ubersuggest, Moz — missing tools + how to add</p>
+        </Link>
         <Link href="/admin/seo/tools" className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-4 hover:border-indigo-500/40 transition-colors block">
           <p className="text-white font-semibold text-sm">SEO Tools hub</p>
           <p className="text-slate-500 text-xs mt-1">GSC, GA4, PageSpeed — deep links + GA4 events</p>

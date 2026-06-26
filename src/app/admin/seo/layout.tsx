@@ -13,6 +13,7 @@ const TABS = [
   { href: '/admin/seo/content-ideas', label: 'Content Ideas', icon: '📝' },
   { href: '/admin/seo/category-ranks', label: 'Category Ranks', icon: '🏷️' },
   { href: '/admin/seo/analyze', label: 'AI Analyze', icon: '🔬' },
+  { href: '/admin/seo/gap-report', label: 'Gap Report', icon: '📋' },
   { href: '/admin/seo/tools', label: 'SEO Tools', icon: '🧰' },
   { href: '/admin/seo/opportunities', label: 'Opportunities', icon: '💡' },
   { href: '/admin/seo/rankings', label: 'Rankings', icon: '📈' },
