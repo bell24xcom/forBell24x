@@ -7,8 +7,8 @@ import {
   CATEGORY_RANK_SUMMARY,
   searchCategoryRanks,
   type EntityRankType,
-} from '@/lib/seo-category-keywords';
-import { copyRankReportCsv } from '@/lib/seo-analytics';
+} from '@/src/lib/seo-category-keywords';
+import { copyRankReportCsv } from '@/src/lib/seo-analytics';
 
 const TYPE_LABEL: Record<EntityRankType, string> = {
   category: 'Category',

@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import type { EntityKeywordRank } from '@/lib/seo-category-keywords';
-import { openGscInspect, openRichResultsTest, trackSeoEvent } from '@/lib/seo-analytics';
+import type { EntityKeywordRank } from '@/src/lib/seo-category-keywords';
+import { openGscInspect, openRichResultsTest, trackSeoEvent } from '@/src/lib/seo-analytics';
 
 interface Props {
   ranks: EntityKeywordRank[];

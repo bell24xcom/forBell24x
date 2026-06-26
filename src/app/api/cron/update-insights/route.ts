@@ -1,16 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { dailyInsightsCron } from '@/lib/memory-engine';
+import { verifyCronSecret } from '@/lib/cronAuth';
 
 export const dynamic = 'force-dynamic';
 
 async function runCron(request: NextRequest) {
   // Verify cron secret if configured
-  const cronSecret = process.env.CRON_SECRET;
-  if (cronSecret) {
-    const authHeader = request.headers.get('authorization');
-    if (authHeader !== `Bearer ${cronSecret}`) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+  if (!verifyCronSecret(request)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   try {

@@ -6,8 +6,8 @@ import Link from 'next/link';
 import { Building2, MapPin, Shield, Package, Calendar, Award, Star, CheckCircle } from 'lucide-react';
 import TrustScore from '@/components/ui/TrustScore';
 import WhatsAppShare from '@/components/ui/WhatsAppShare';
-import { SupplierSeoRankLoader } from '@/components/seo/SupplierSeoRankLoader';
-import { ProductSeoRankLoader } from '@/components/seo/ProductSeoRankLoader';
+import { SupplierSeoRankLoader } from '@/src/components/seo/SupplierSeoRankLoader';
+import { ProductSeoRankLoader } from '@/src/components/seo/ProductSeoRankLoader';
 
 interface SupplierProduct {
   id: string;

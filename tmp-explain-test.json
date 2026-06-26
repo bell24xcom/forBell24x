@@ -1,0 +1,28 @@
+{
+  "rfq": {
+    "rfq_id": "test1",
+    "title": "Steel pipes",
+    "description": "Need MS pipes",
+    "category": "Metals",
+    "budget_min": 50000,
+    "budget_max": 200000,
+    "quantity": 100,
+    "urgency": "medium",
+    "location": "Mumbai",
+    "specifications": []
+  },
+  "suppliers": [
+    {
+      "supplier_id": "s1",
+      "name": "Test Supplier",
+      "category_expertise": ["Metals"],
+      "rating": 4.5,
+      "location": "Mumbai",
+      "price_range": "medium",
+      "delivery_capability": "high",
+      "certifications": ["GST"],
+      "past_performance": 85
+    }
+  ],
+  "explanation_type": "both"
+}

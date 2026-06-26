@@ -1,68 +1,61 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
-  const INSFORGE_URL = process.env.INSFORGE_URL;
-  const INSFORGE_API_KEY = process.env.INSFORGE_API_KEY;
-
   try {
-    const { rfqId, quoteId, buyerId } = await req.json();
+    const { rfqId, quoteId } = await req.json();
+    if (!rfqId || !quoteId) {
+      return NextResponse.json({ error: 'rfqId and quoteId required' }, { status: 400 });
+    }
 
-    // 1. Fetch Quote Details to get price and supplier
-    const quoteRes = await fetch(`${INSFORGE_URL}/rest/v1/quotes?id=eq.${quoteId}`, {
-      headers: { 'apikey': INSFORGE_API_KEY!, 'Authorization': `Bearer ${INSFORGE_API_KEY}` }
-    });
-    const quoteData = await quoteRes.json();
-    const quote = quoteData[0];
-
-    if (!quote) throw new Error('Quote not found');
-
-    const dealValue = parseFloat(quote.price);
-    const commRate = 5.00; // 5%
-    const commAmount = (dealValue * commRate) / 100;
-    const netPayout = dealValue - commAmount;
-
-    // 2. Create Deal Record
-    const dealRes = await fetch(`${INSFORGE_URL}/rest/v1/deals`, {
-      method: 'POST',
-      headers: { 
-        'apikey': INSFORGE_API_KEY!, 
-        'Authorization': `Bearer ${INSFORGE_API_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'return=representation'
-      },
-      body: JSON.stringify([{
-        rfq_id: rfqId,
-        buyer_id: buyerId || 'unknown',
-        supplier_id: quote.supplier_id,
-        quote_id: quoteId,
-        deal_value: dealValue,
-        commission_rate: commRate,
-        commission_amount: commAmount,
-        net_payout: netPayout,
-        status: 'pending'
-      }])
+    const quote = await prisma.quote.findFirst({
+      where: { id: quoteId, rfqId },
+      include: { rfq: true },
     });
 
-    const dealData = await dealRes.json();
+    if (!quote?.rfq) {
+      return NextResponse.json({ error: 'Quote not found' }, { status: 404 });
+    }
+    if (!quote.supplierId) {
+      return NextResponse.json({ error: 'Quote has no supplier' }, { status: 400 });
+    }
 
-    // 3. Update Existing Statuses (Status logic from previous stage)
-    await fetch(`${INSFORGE_URL}/rest/v1/quotes?id=eq.${quoteId}`, {
-      method: 'PATCH',
-      headers: { 'apikey': INSFORGE_API_KEY!, 'Authorization': `Bearer ${INSFORGE_API_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status: 'accepted' })
+    const buyerId = quote.rfq.createdBy;
+    if (!buyerId) {
+      return NextResponse.json({ error: 'RFQ has no buyer — cannot create deal' }, { status: 400 });
+    }
+
+    const deal = await prisma.$transaction(async tx => {
+      const newDeal = await tx.deal.create({
+        data: {
+          rfqId,
+          quoteId,
+          buyerId,
+          supplierId: quote.supplierId!,
+          price: quote.price,
+          status: 'ACTIVE',
+        },
+      });
+
+      await tx.quote.update({
+        where: { id: quoteId },
+        data: { status: 'ACCEPTED', isAccepted: true },
+      });
+
+      await tx.rFQ.update({
+        where: { id: rfqId },
+        data: { status: 'CLOSED' },
+      });
+
+      return newDeal;
     });
 
-    await fetch(`${INSFORGE_URL}/rest/v1/rfqs?id=eq.${rfqId}`, {
-      method: 'PATCH',
-      headers: { 'apikey': INSFORGE_API_KEY!, 'Authorization': `Bearer ${INSFORGE_API_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status: 'closed' })
-    });
-
-    return NextResponse.json({ success: true, dealId: dealData[0].id });
-
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ success: true, dealId: deal.id });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Selection failed';
+    console.error('[Admin Marketing select-quote]', message);
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

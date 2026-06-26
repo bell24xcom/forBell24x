@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyToken } from '@/lib/jwt';
-import { normalizeProducts, type SupplierPreferences } from '@/lib/supplier-products';
+import { normalizeProducts, type SupplierPreferences } from '@/src/lib/supplier-products';
 
 export const dynamic = 'force-dynamic';
 
@@ -137,7 +137,7 @@ export async function PUT(request: NextRequest) {
       },
     });
 
-    const { recordProfileLifeEvents } = await import('@/lib/bom/profile-events');
+    const { recordProfileLifeEvents } = await import('@/src/lib/bom/profile-events');
     recordProfileLifeEvents(
       userId,
       {

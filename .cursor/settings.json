@@ -32,5 +32,10 @@
   "terminal.integrated.env.linux": {
     "BYPASS_Q_PREFIX": "true",
     "CURSOR_NO_Q_PREFIX": "true"
+  },
+  "plugins": {
+    "prisma": {
+      "enabled": true
+    }
   }
 }

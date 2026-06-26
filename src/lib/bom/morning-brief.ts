@@ -6,7 +6,7 @@ import { prisma } from '@/lib/prisma';
 import { projectBomFromLifeEvents } from './projections';
 import { computeBusinessGenome } from './genome-score';
 import { lifeEventLabel } from './life-events';
-import { callSeoLlm } from '@/lib/seo-llm';
+import { callSeoLlm } from '@/src/lib/seo-llm';
 
 export interface BriefInsight {
   type: 'reminder' | 'alert' | 'opportunity' | 'trust' | 'activity' | 'recommendation';

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { buildSupplierMetadata, fetchSupplierForSeo, supplierJsonLd } from '@/lib/supplier-seo';
+import { buildSupplierMetadata, fetchSupplierForSeo, supplierJsonLd } from '@/src/lib/supplier-seo';
 
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   return buildSupplierMetadata(params.id);

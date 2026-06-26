@@ -1,44 +1,60 @@
 import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
+/** Map Prisma RFQStatus → lowercase labels used by /admin/marketing UI */
+function toUiStatus(status: string): string {
+  const map: Record<string, string> = {
+    ACTIVE: 'new',
+    OPEN: 'new',
+    DRAFT: 'new',
+    QUOTED: 'quoted',
+    ACCEPTED: 'quoted',
+    IN_PROGRESS: 'quoted',
+    COMPLETED: 'closed',
+    CLOSED: 'closed',
+    CANCELLED: 'closed',
+    EXPIRED: 'closed',
+  };
+  return map[status] ?? status.toLowerCase();
+}
+
 export async function GET() {
-  const INSFORGE_URL     = process.env.INSFORGE_URL;
-  const INSFORGE_API_KEY = process.env.INSFORGE_API_KEY;
-
-  if (!INSFORGE_URL || !INSFORGE_API_KEY) {
-    return NextResponse.json({ rfqs: [], serviceDegraded: true, reason: 'InsForge not configured' });
-  }
-
   try {
-    const response = await fetch(`${INSFORGE_URL}/rest/v1/rfqs?order=created_at.desc`, {
-      method: 'GET',
-      headers: {
-        apikey:          INSFORGE_API_KEY,
-        Authorization:   `Bearer ${INSFORGE_API_KEY}`,
-        'Content-Type':  'application/json',
+    const rfqs = await prisma.rFQ.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: 200,
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        category: true,
+        quantity: true,
+        location: true,
+        status: true,
+        createdAt: true,
       },
-      signal: AbortSignal.timeout(5000),
     });
 
-    if (!response.ok) {
-      console.warn(`[Admin RFQ Fetch] InsForge returned ${response.status}`);
-      return NextResponse.json({
-        rfqs: [],
-        serviceDegraded: true,
-        reason: `InsForge returned ${response.status}`,
-      });
-    }
-
-    const rfqs = await response.json();
-    return NextResponse.json(Array.isArray(rfqs) ? rfqs : []);
-  } catch (error: any) {
-    const isTimeout = error?.name === 'TimeoutError' || error?.name === 'AbortError';
-    console.error('[Admin RFQ Fetch]', error?.message);
+    return NextResponse.json(
+      rfqs.map(r => ({
+        id: r.id,
+        rfq_text: r.description || r.title,
+        category: r.category,
+        quantity: r.quantity,
+        location: r.location ?? '',
+        status: toUiStatus(r.status),
+        created_at: r.createdAt.toISOString(),
+      }))
+    );
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Database error';
+    console.error('[Admin Marketing RFQs]', message);
     return NextResponse.json({
       rfqs: [],
       serviceDegraded: true,
-      reason: isTimeout ? 'InsForge timed out (5s)' : error?.message,
+      reason: message,
     });
   }
 }

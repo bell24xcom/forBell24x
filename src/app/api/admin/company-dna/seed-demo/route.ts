@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin, isErrorResponse } from '@/lib/admin-auth';
 import { prisma } from '@/lib/prisma';
-import { syncCompanyDna } from '@/lib/company-dna/engine';
+import { syncCompanyDna } from '@/src/lib/company-dna/engine';
 
 export const dynamic = 'force-dynamic';
 

@@ -4,9 +4,9 @@
 
 import { prisma } from '@/lib/prisma';
 import { getMarketInsights } from '@/lib/memory-engine';
-import { normalizeProducts, type SupplierPreferences } from '@/lib/supplier-products';
-import { projectBomFromLifeEvents, mergeLayersFromProjection } from '@/lib/bom/projections';
-import { recordLifeEventAsync } from '@/lib/bom/life-events';
+import { normalizeProducts, type SupplierPreferences } from '@/src/lib/supplier-products';
+import { projectBomFromLifeEvents, mergeLayersFromProjection } from '@/src/lib/bom/projections';
+import { recordLifeEventAsync } from '@/src/lib/bom/life-events';
 import { buildDnaGraph } from './graph-builder';
 import {
   DNA_LAYERS,

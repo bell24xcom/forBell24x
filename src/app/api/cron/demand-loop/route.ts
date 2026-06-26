@@ -1,15 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { runDailyDemandLoop } from '@/lib/demand-engine';
+import { verifyCronSecret } from '@/lib/cronAuth';
 
 export const dynamic = 'force-dynamic';
 
 async function run(request: NextRequest) {
-  const secret = process.env.CRON_SECRET;
-  if (secret) {
-    const auth = request.headers.get('authorization');
-    if (auth !== `Bearer ${secret}`) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+  if (!verifyCronSecret(request)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   try {

@@ -1,19 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { verifyCronSecret, getCronHeaders } from '@/lib/cronAuth';
 
 export const dynamic = 'force-dynamic';
 
-const CRON_SECRET = process.env.CRON_SECRET;
-const BASE_URL    = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.vyaparsethu.com';
-
-function authorized(req: NextRequest): boolean {
-  if (!CRON_SECRET) return true;
-  return req.headers.get('authorization') === `Bearer ${CRON_SECRET}`;
-}
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.vyaparsethu.com';
 
 async function callCron(path: string): Promise<{ path: string; ok: boolean; body: unknown }> {
   try {
     const res = await fetch(`${BASE_URL}${path}`, {
-      headers: CRON_SECRET ? { authorization: `Bearer ${CRON_SECRET}` } : {},
+      headers: getCronHeaders(),
       signal: AbortSignal.timeout(55_000),
     });
     const body = await res.json().catch(() => null);
@@ -24,7 +19,7 @@ async function callCron(path: string): Promise<{ path: string; ok: boolean; body
 }
 
 async function run(req: NextRequest) {
-  if (!authorized(req)) {
+  if (!verifyCronSecret(req)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

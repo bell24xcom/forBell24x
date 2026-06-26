@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin, isErrorResponse } from '@/lib/admin-auth';
-import { callSeoLlm, parseJsonFromLlm } from '@/lib/seo-llm';
+import { callSeoLlm, parseJsonFromLlm } from '@/src/lib/seo-llm';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;

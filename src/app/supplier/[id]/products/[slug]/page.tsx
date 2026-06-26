@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { buildProductMetadata, fetchSupplierForSeo, productJsonLd } from '@/lib/supplier-seo';
+import { buildProductMetadata, fetchSupplierForSeo, productJsonLd } from '@/src/lib/supplier-seo';
 
 export async function generateMetadata({ params }: { params: { id: string; slug: string } }) {
   return buildProductMetadata(params.id, params.slug);

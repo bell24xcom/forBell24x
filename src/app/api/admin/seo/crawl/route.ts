@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin, isErrorResponse } from '@/lib/admin-auth';
-import { crawlSite } from '@/lib/seo-crawler';
+import { crawlSite } from '@/src/lib/seo-crawler';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;

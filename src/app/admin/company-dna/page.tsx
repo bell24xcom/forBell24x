@@ -2,9 +2,9 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { DNA_LAYERS, type CompanyDnaProfileView, type DnaGraphData, type DnaGraphNode } from '@/lib/company-dna/types';
+import { DNA_LAYERS, type CompanyDnaProfileView, type DnaGraphData, type DnaGraphNode } from '@/src/lib/company-dna/types';
 
-const DnaForceGraph = dynamic(() => import('@/components/admin/company-dna/DnaForceGraph'), { ssr: false });
+const DnaForceGraph = dynamic(() => import('@/src/components/admin/company-dna/DnaForceGraph'), { ssr: false });
 
 interface ProfileListItem {
   userId: string;

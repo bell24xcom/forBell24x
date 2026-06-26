@@ -55,13 +55,13 @@ export default function RevenueControlPage() {
           rfqArray = rfqsData.rfqs;
           if (rfqsData.serviceDegraded) {
             setDegraded(true);
-            setDegradedMsg(rfqsData.reason || 'InsForge unavailable — showing empty dataset.');
+            setDegradedMsg(rfqsData.reason || 'Database unavailable — showing empty dataset.');
           }
         }
       } catch (e: any) {
         clearTimeout(rfqsTimer);
         setDegraded(true);
-        setDegradedMsg(e?.name === 'AbortError' ? 'InsForge timed out after 8s.' : String(e?.message));
+        setDegradedMsg(e?.name === 'AbortError' ? 'Request timed out after 8s.' : String(e?.message));
       }
       setRfqs(rfqArray);
 
@@ -119,8 +119,8 @@ export default function RevenueControlPage() {
         <div className="flex items-start gap-3 bg-amber-900/30 border border-amber-600/40 text-amber-300 rounded-xl px-5 py-4 text-sm">
           <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" />
           <div>
-            <p className="font-semibold">InsForge backend unavailable</p>
-            <p className="text-amber-400/80 text-xs mt-0.5">{degradedMsg} Quotes are served from the primary Prisma DB.</p>
+            <p className="font-semibold">Marketing data degraded</p>
+            <p className="text-amber-400/80 text-xs mt-0.5">{degradedMsg} RFQs and quotes are served from Neon PostgreSQL.</p>
           </div>
         </div>
       )}
@@ -171,7 +171,7 @@ export default function RevenueControlPage() {
 
         {rfqs.length === 0 ? (
           <div className="py-16 text-center text-slate-500">
-            <p className="text-sm">{degraded ? 'InsForge unavailable — no RFQs to display.' : 'No RFQs found.'}</p>
+            <p className="text-sm">{degraded ? 'Could not load RFQs from database.' : 'No RFQs found.'}</p>
           </div>
         ) : (
           <div className="overflow-x-auto">

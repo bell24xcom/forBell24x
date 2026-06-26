@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin, isErrorResponse } from '@/lib/admin-auth';
-import { analyzeOnPage } from '@/lib/seo-on-page';
-import { callSeoLlm } from '@/lib/seo-llm';
+import { analyzeOnPage } from '@/src/lib/seo-on-page';
+import { callSeoLlm } from '@/src/lib/seo-llm';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;

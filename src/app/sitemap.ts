@@ -106,7 +106,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.65,
     }))
 
-    const { normalizeProducts } = await import('@/lib/supplier-products')
+    const { normalizeProducts } = await import('@/src/lib/supplier-products')
     for (const s of suppliers) {
       const prefs = (s.preferences ?? {}) as { products?: unknown }
       for (const p of normalizeProducts(prefs.products)) {

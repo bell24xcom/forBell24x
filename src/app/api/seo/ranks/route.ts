@@ -6,7 +6,7 @@ import {
   searchCategoryRanks,
   CATEGORY_RANK_SUMMARY,
   type EntityRankType,
-} from '@/lib/seo-category-keywords';
+} from '@/src/lib/seo-category-keywords';
 
 export const dynamic = 'force-dynamic';
 

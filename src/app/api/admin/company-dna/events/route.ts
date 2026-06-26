@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin, isErrorResponse } from '@/lib/admin-auth';
-import { getLifeEvents, countLifeEvents } from '@/lib/bom/life-events';
-import { projectBomFromLifeEvents } from '@/lib/bom/projections';
+import { getLifeEvents, countLifeEvents } from '@/src/lib/bom/life-events';
+import { projectBomFromLifeEvents } from '@/src/lib/bom/projections';
 
 export const dynamic = 'force-dynamic';
 

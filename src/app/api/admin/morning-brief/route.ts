@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin, isErrorResponse } from '@/lib/admin-auth';
-import { generateMorningBrief } from '@/lib/bom/morning-brief';
-import { projectBomFromLifeEvents } from '@/lib/bom/projections';
-import { computeBusinessGenome } from '@/lib/bom/genome-score';
+import { generateMorningBrief } from '@/src/lib/bom/morning-brief';
+import { projectBomFromLifeEvents } from '@/src/lib/bom/projections';
+import { computeBusinessGenome } from '@/src/lib/bom/genome-score';
 
 export const dynamic = 'force-dynamic';
 

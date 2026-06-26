@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { normalizeProducts, slugifyProduct, type SupplierPreferences } from '@/lib/supplier-products';
+import { normalizeProducts, slugifyProduct, type SupplierPreferences } from '@/src/lib/supplier-products';
+import { getProfileEvents } from '@/src/lib/bom/profile-events';
 import { verifyToken } from '@/lib/jwt';
 
 export const dynamic = 'force-dynamic';
@@ -76,7 +77,7 @@ export async function POST(request: NextRequest) {
     const { refreshCompanyDnaFromRfq } = await import('@/lib/memory-engine');
     refreshCompanyDnaFromRfq(userId).catch(() => {});
 
-    const { recordProductLifeEvent } = await import('@/lib/bom/profile-events');
+    const { recordProductLifeEvent } = await import('@/src/lib/bom/profile-events');
     recordProductLifeEvent(userId, 'product_added', product);
 
     return NextResponse.json({ success: true, product, message: 'Product created' });

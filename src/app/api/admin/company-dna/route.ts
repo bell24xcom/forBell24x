@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin, isErrorResponse } from '@/lib/admin-auth';
-import { listCompanyDnaProfiles, syncCompanyDna, getCompanyDnaProfile } from '@/lib/company-dna/engine';
+import { listCompanyDnaProfiles, syncCompanyDna, getCompanyDnaProfile } from '@/src/lib/company-dna/engine';
 
 export const dynamic = 'force-dynamic';
 

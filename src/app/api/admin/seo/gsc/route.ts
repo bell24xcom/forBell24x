@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin, isErrorResponse } from '@/lib/admin-auth';
-import { fetchGscSearchAnalytics, isGscConfigured, getGscSiteUrl } from '@/lib/gsc-api';
+import { fetchGscSearchAnalytics, isGscConfigured, getGscSiteUrl } from '@/src/lib/gsc-api';
 import { GSC_PERFORMANCE } from '@/src/data/seo-dashboard';
 
 export const dynamic = 'force-dynamic';

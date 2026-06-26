@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { SEO_TOOLS, SEO_TOOL_CATEGORIES, type SeoToolCategory } from '@/src/data/seo-tools';
-import { trackSeoEvent, openGscInspect, openRichResultsTest } from '@/lib/seo-analytics';
+import { trackSeoEvent, openGscInspect, openRichResultsTest } from '@/src/lib/seo-analytics';
 
 const SAMPLE_PATHS = ['/', '/how-it-works', '/how-payment-works', '/voice-rfq', '/founding-suppliers'];
 

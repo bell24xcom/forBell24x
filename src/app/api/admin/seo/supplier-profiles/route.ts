@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin, isErrorResponse } from '@/lib/admin-auth';
 import { prisma } from '@/lib/prisma';
-import { normalizeProducts, productPublicPath, type SupplierPreferences } from '@/lib/supplier-products';
+import { normalizeProducts, productPublicPath, type SupplierPreferences } from '@/src/lib/supplier-products';
 import { SITE_URL } from '@/lib/site-url';
 
 export const dynamic = 'force-dynamic';

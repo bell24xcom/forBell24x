@@ -1,15 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDripsDue, logDripSent } from '@/lib/supplier-drip-engine';
+import { verifyCronSecret } from '@/lib/cronAuth';
 
 export const dynamic = 'force-dynamic';
 
 async function run(request: NextRequest) {
-  const cronSecret = process.env.CRON_SECRET;
-  if (cronSecret) {
-    const auth = request.headers.get('authorization');
-    if (auth !== `Bearer ${cronSecret}`) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+  if (!verifyCronSecret(request)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   try {

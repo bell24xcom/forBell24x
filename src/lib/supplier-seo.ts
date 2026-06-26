@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { prisma } from '@/lib/prisma';
-import { normalizeProducts, type SupplierPreferences } from '@/lib/supplier-products';
+import { normalizeProducts, type SupplierPreferences } from '@/src/lib/supplier-products';
 import { SITE_URL } from '@/lib/site-url';
 
 export async function fetchSupplierForSeo(supplierId: string) {

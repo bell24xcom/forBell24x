@@ -3,8 +3,8 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { CITIES, CATEGORY_META, getAllCityCategoryPairs } from '@/src/data/city-category-seo';
 import { prisma } from '@/lib/prisma';
-import SeoRankComparisonPanel from '@/components/seo/SeoRankComparisonPanel';
-import { getRankBySlug } from '@/lib/seo-category-keywords';
+import SeoRankComparisonPanel from '@/src/components/seo/SeoRankComparisonPanel';
+import { getRankBySlug } from '@/src/lib/seo-category-keywords';
 
 interface Props { params: { city: string; category: string } }
 
