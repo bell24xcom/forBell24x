@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyToken } from '@/lib/jwt';
+import { normalizeProducts, type SupplierPreferences } from '@/lib/supplier-products';
 
 export const dynamic = 'force-dynamic';
 
@@ -45,7 +46,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: false, message: 'User not found' }, { status: 404 });
     }
 
-    const prefs = (user.preferences as Record<string, unknown>) ?? {};
+    const prefs = (user.preferences as SupplierPreferences) ?? {};
+    const products = normalizeProducts(prefs.products);
 
     return NextResponse.json({
       success: true,
@@ -56,16 +58,17 @@ export async function GET(request: NextRequest) {
         city:            user.location       ?? '',
         gstNumber:       user.gstNumber      ?? '',
         udyamNumber:     user.udyamNumber    ?? '',
-        businessType:    (prefs.businessType    as string) ?? '',
-        yearsInBusiness: (prefs.yearsInBusiness as string) ?? '',
-        employees:       (prefs.employees       as string) ?? '',
-        annualRevenue:   (prefs.annualRevenue   as string) ?? '',
-        description:     (prefs.description     as string) ?? '',
-        website:         (prefs.website         as string) ?? '',
-        whatsapp:        (prefs.whatsapp        as string) ?? '',
-        state:           (prefs.state           as string) ?? '',
-        address:         (prefs.address         as string) ?? '',
-        categories:      (prefs.categories      as string[]) ?? [],
+        businessType:    prefs.businessType    ?? '',
+        yearsInBusiness:   prefs.yearsInBusiness ?? '',
+        employees:         prefs.employees       ?? '',
+        annualRevenue:     prefs.annualRevenue   ?? '',
+        description:       prefs.description     ?? '',
+        website:           prefs.website         ?? '',
+        whatsapp:          prefs.whatsapp        ?? '',
+        state:             prefs.state           ?? '',
+        address:           prefs.address         ?? '',
+        categories:        prefs.categories      ?? [],
+        products,
         verified:        user.isVerified,
         trustScore:      user.trustScore,
       },
@@ -91,7 +94,7 @@ export async function PUT(request: NextRequest) {
     const {
       companyName, businessType, gstNumber, udyamNumber,
       yearsInBusiness, employees, annualRevenue, description,
-      website, email, whatsapp, city, state, address, categories,
+      website, email, whatsapp, city, state, address, categories, products,
     } = await request.json();
 
     // Merge into existing preferences — never wipe fields not sent in this request
@@ -99,7 +102,7 @@ export async function PUT(request: NextRequest) {
       where: { id: userId },
       select: { preferences: true },
     });
-    const existingPrefs = (existing?.preferences as Record<string, unknown>) ?? {};
+    const existingPrefs = (existing?.preferences as SupplierPreferences) ?? {};
 
     const updatedUser = await prisma.user.update({
       where: { id: userId },
@@ -121,6 +124,7 @@ export async function PUT(request: NextRequest) {
           ...(state           !== undefined && { state           }),
           ...(address         !== undefined && { address         }),
           ...(categories      !== undefined && { categories      }),
+          ...(products        !== undefined && { products: normalizeProducts(products) }),
         },
       },
       select: {
@@ -132,6 +136,9 @@ export async function PUT(request: NextRequest) {
         location: true,
       },
     });
+
+    const { refreshCompanyDnaFromRfq } = await import('@/lib/memory-engine');
+    refreshCompanyDnaFromRfq(userId).catch(() => {});
 
     return NextResponse.json({
       success: true,

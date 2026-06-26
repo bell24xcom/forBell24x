@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { normalizeProducts, type SupplierPreferences } from '@/lib/supplier-products';
 
 export const dynamic = 'force-dynamic';
 
@@ -50,7 +51,9 @@ export async function GET(
     trustScore += totalQuotes > 0 ? Math.min(Math.round((wonQuotes / totalQuotes) * 25), 25) : 0;
     trustScore += Math.min(dealsCompleted * 4, 20);
 
-    const preferences = userRecord.preferences as { categories?: string[]; cities?: string[] } | null;
+    const preferences = userRecord.preferences as SupplierPreferences | null;
+    const products = normalizeProducts(preferences?.products);
+    const description = preferences?.description;
 
     return NextResponse.json({
       success: true,
@@ -67,6 +70,8 @@ export async function GET(
         wonQuotes,
         totalQuotes,
         createdAt: userRecord.createdAt,
+        description: description ?? null,
+        products,
         preferences: {
           categories: preferences?.categories || [],
           cities: preferences?.cities || [],

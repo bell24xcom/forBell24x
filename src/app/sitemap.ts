@@ -89,12 +89,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // DB unavailable at build time — skip
   }
 
-  // Dynamic: claimed supplier profiles
+  // Dynamic: claimed supplier profiles + product pages
   let supplierPages: MetadataRoute.Sitemap = []
+  let productPages: MetadataRoute.Sitemap = []
   try {
     const suppliers = await prisma.user.findMany({
       where: { role: 'SUPPLIER', isClaimed: true, isActive: true },
-      select: { id: true, updatedAt: true },
+      select: { id: true, updatedAt: true, preferences: true },
       orderBy: { updatedAt: 'desc' },
       take: 1000,
     })
@@ -104,6 +105,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly' as const,
       priority: 0.65,
     }))
+
+    const { normalizeProducts } = await import('@/lib/supplier-products')
+    for (const s of suppliers) {
+      const prefs = (s.preferences ?? {}) as { products?: unknown }
+      for (const p of normalizeProducts(prefs.products)) {
+        productPages.push({
+          url: `${siteUrl}/supplier/${s.id}/products/${p.slug}`,
+          lastModified: s.updatedAt,
+          changeFrequency: 'weekly' as const,
+          priority: 0.6,
+        })
+      }
+    }
   } catch {
     // DB unavailable at build time — skip
   }
@@ -145,5 +159,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.88,
   }))
 
-  return [...staticPages, ...blogPages, ...categoryPages, ...contentPages, ...glossaryPages, ...cityPages, ...cityCategoryPages, ...rfqPages, ...supplierPages]
+  return [...staticPages, ...blogPages, ...categoryPages, ...contentPages, ...glossaryPages, ...cityPages, ...cityCategoryPages, ...rfqPages, ...supplierPages, ...productPages]
 }

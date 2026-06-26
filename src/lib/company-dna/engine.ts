@@ -4,6 +4,7 @@
 
 import { prisma } from '@/lib/prisma';
 import { getMarketInsights } from '@/lib/memory-engine';
+import { normalizeProducts, type SupplierPreferences } from '@/lib/supplier-products';
 import { buildDnaGraph } from './graph-builder';
 import {
   DNA_LAYERS,
@@ -147,9 +148,11 @@ async function buildLayersFromUser(userId: string): Promise<{ layers: CompanyDna
 
   if (!user) throw new Error('User not found');
 
-  const prefs = (user.preferences ?? {}) as { categories?: string[]; products?: string[]; cities?: string[] };
+  const prefs = (user.preferences ?? {}) as SupplierPreferences;
   const categories = prefs.categories ?? [];
-  const primaryCategory = categories[0] ?? 'General';
+  const products = normalizeProducts(prefs.products);
+  const productNames = products.map(p => p.name);
+  const primaryCategory = categories[0] ?? products[0]?.category ?? 'General';
 
   const rfqMemories = await prisma.rfqMemory.findMany({
     where: { OR: [{ rfqId: { in: user.rfqs.map(r => r.id) } }, { category: { in: categories } }] },
@@ -170,12 +173,32 @@ async function buildLayersFromUser(userId: string): Promise<{ layers: CompanyDna
       companyName: user.company ?? user.name ?? undefined,
       gst: user.gstNumber ?? undefined,
       udyam: user.udyamNumber ?? undefined,
-      locations: user.location ? [user.location] : prefs.cities,
+      locations: user.location ? [user.location, ...(prefs.cities ?? [])].filter(Boolean) : prefs.cities,
+      factoryLocations: prefs.address ? [prefs.address] : undefined,
     },
     business: {
       industry: primaryCategory,
-      products: prefs.products,
-      subIndustry: categories[1],
+      subIndustry: prefs.businessType ?? categories[1],
+      products: productNames.length ? productNames : prefs.products?.map(String),
+      services: categories,
+      monthlyProduction: prefs.employees ? `Team: ${prefs.employees}` : undefined,
+    },
+    procurement: {
+      rawMaterials: categories.length > 1 ? categories.slice(1) : undefined,
+    },
+    customers: {
+      customerCategories: categories,
+      geography: prefs.cities,
+    },
+    financial: {
+      enterpriseSize:
+        prefs.annualRevenue?.includes('crore') || user.plan === 'ENTERPRISE'
+          ? 'medium'
+          : user.plan === 'PRO'
+            ? 'small'
+            : 'micro',
+      growthTrend: marketInsight?.demandTrend === 'RISING' ? 'rising' : marketInsight?.demandTrend === 'DECLINING' ? 'declining' : 'stable',
+      procurementSpendTrend: prefs.annualRevenue,
     },
     procurementMemory: {
       rfqCount: user.rfqs.length,
@@ -190,22 +213,31 @@ async function buildLayersFromUser(userId: string): Promise<{ layers: CompanyDna
       escrowCount: user.buyerDeals.length + user.supplierDeals.length,
     },
     market: {
+      productsSold: productNames.length ? productNames : undefined,
       categoryDemand: marketInsight
         ? { [primaryCategory]: marketInsight.demandTrend ?? 'STABLE' }
         : undefined,
       industryTrends: marketInsight?.demandTrend === 'RISING' ? ['Category demand rising on VyaparSethu'] : undefined,
     },
-    financial: {
-      enterpriseSize: user.plan === 'ENTERPRISE' ? 'medium' : user.plan === 'PRO' ? 'small' : 'micro',
-      growthTrend: marketInsight?.demandTrend === 'RISING' ? 'rising' : marketInsight?.demandTrend === 'DECLINING' ? 'declining' : 'stable',
-    },
     risk: {
       supplierDependencyPct: quoteMemories.length > 0 ? undefined : undefined,
       riskLevel: user.trustScore >= 70 ? 'low' : user.trustScore >= 40 ? 'medium' : 'high',
     },
+    relationships: {
+      industryNetwork: categories,
+      associations: prefs.website ? [prefs.website] : undefined,
+    },
+    opportunities: {
+      crossSell: productNames.length > 1 ? productNames.slice(1, 4) : undefined,
+      newMarkets: prefs.cities,
+    },
     aiMemory: {
-      summary: `VyaparSethu ${user.role} with ${categories.length} categories. Trust score ${user.trustScore}.`,
-      recommendedActions: categories.length === 0 ? ['Complete category profile'] : ['Respond to matching RFQs'],
+      summary: `${user.company || user.name || 'Supplier'} — ${productNames.length} products, ${categories.length} categories. Trust ${user.trustScore}.`,
+      whatHappened: rfqMemories.slice(0, 3).map(m => m.title),
+      recommendedActions:
+        productNames.length === 0
+          ? ['Add products to profile for SEO product pages', 'Complete category profile']
+          : ['Sync DNA after profile updates', 'Respond to matching RFQs'],
     },
   };
 

@@ -14,6 +14,7 @@ const TABS = [
   { href: '/admin/seo/ai-visibility', label: 'AI Visibility', icon: '🤖' },
   { href: '/admin/seo/content-ideas', label: 'Content Ideas', icon: '📝' },
   { href: '/admin/seo/category-ranks', label: 'Category Ranks', icon: '🏷️' },
+  { href: '/admin/seo/supplier-profiles', label: 'Supplier SEO', icon: '🏭' },
   { href: '/admin/seo/analyze', label: 'AI Analyze', icon: '🔬' },
   { href: '/admin/seo/gap-report', label: 'Gap Report', icon: '📋' },
   { href: '/admin/seo/tools', label: 'SEO Tools', icon: '🧰' },

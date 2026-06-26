@@ -7,6 +7,15 @@ import { Building2, MapPin, Shield, Package, Calendar, Award, Star, CheckCircle 
 import TrustScore from '@/components/ui/TrustScore';
 import WhatsAppShare from '@/components/ui/WhatsAppShare';
 import { SupplierSeoRankLoader } from '@/components/seo/SupplierSeoRankLoader';
+import { ProductSeoRankLoader } from '@/components/seo/ProductSeoRankLoader';
+
+interface SupplierProduct {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  category?: string;
+}
 
 interface SupplierData {
   id: string;
@@ -21,6 +30,8 @@ interface SupplierData {
   wonQuotes: number;
   totalQuotes: number;
   createdAt: string;
+  description?: string | null;
+  products: SupplierProduct[];
   preferences: {
     categories: string[];
     cities: string[];
@@ -190,10 +201,33 @@ export default function PublicSupplierPage({ params }: { params: { id: string } 
           </div>
         )}
 
+        {supplier.products?.length > 0 && (
+          <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6 mb-6">
+            <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+              <Package className="w-5 h-5 text-amber-400" /> Products
+            </h3>
+            <div className="grid sm:grid-cols-2 gap-3">
+              {supplier.products.map(p => (
+                <Link
+                  key={p.id}
+                  href={`/supplier/${supplier.id}/products/${p.slug}`}
+                  className="block p-4 bg-slate-900/60 border border-slate-700 rounded-lg hover:border-amber-500/40 transition-colors"
+                >
+                  <p className="text-white font-medium text-sm">{p.name}</p>
+                  {p.category && <p className="text-slate-500 text-xs mt-1">{p.category}</p>}
+                  {p.description && <p className="text-slate-400 text-xs mt-2 line-clamp-2">{p.description}</p>}
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
         <SupplierSeoRankLoader
           categories={supplier.preferences.categories}
           companyName={displayName}
         />
+
+        <ProductSeoRankLoader products={supplier.products ?? []} />
 
         {/* Delivery Locations */}
         {supplier.preferences.cities.length > 0 && (

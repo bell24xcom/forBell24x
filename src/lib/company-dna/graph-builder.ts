@@ -120,6 +120,14 @@ export function buildDnaGraph(companyName: string, layers: CompanyDnaLayers, com
     edges.push({ id: 'e-biz-ind', source: 'layer-business', target: n, type: 'entity_link' });
   }
   addStringList(nodes, edges, 'layer-business', 'business', 2, L('business').color, 'prod', biz?.products);
+
+  // Product nodes (SEO product pages → Business DNA)
+  for (const prod of (biz?.products ?? []).slice(0, 10)) {
+    const nid = `product-${prod.replace(/\s+/g, '-').toLowerCase().slice(0, 30)}`;
+    nodes.push(entityNode(nid, prod, 'business', 2, '#818cf8', 'Supplier product page'));
+    edges.push({ id: `e-prod-${nid}`, source: 'layer-business', target: nid, type: 'entity_link', label: 'product' });
+  }
+
   addStringList(nodes, edges, 'layer-business', 'business', 2, L('business').color, 'machine', biz?.installedMachinery);
   if (biz?.monthlyProduction) {
     const n = 'entity-capacity';
