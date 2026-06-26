@@ -1,5 +1,6 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 interface FormField {
   label: string;
@@ -156,9 +157,19 @@ PRICING: Free for buyers. Supplier listing free. Commission only on completed de
   },
 ];
 
-export default function SubmitDirectoriesPage() {
-  const [active, setActive] = useState('crunchbase');
+const VALID_GUIDES = new Set(GUIDES.map(g => g.id));
+
+function SubmitDirectoriesContent() {
+  const searchParams = useSearchParams();
+  const guideParam = searchParams.get('guide');
+  const initial = guideParam && VALID_GUIDES.has(guideParam) ? guideParam : 'crunchbase';
+
+  const [active, setActive] = useState(initial);
   const [copied, setCopied] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (guideParam && VALID_GUIDES.has(guideParam)) setActive(guideParam);
+  }, [guideParam]);
 
   const guide = GUIDES.find(g => g.id === active)!;
 
@@ -261,5 +272,13 @@ export default function SubmitDirectoriesPage() {
         </ul>
       </div>
     </div>
+  );
+}
+
+export default function SubmitDirectoriesPage() {
+  return (
+    <Suspense fallback={<div className="p-6 text-slate-400 text-sm">Loading submission guide…</div>}>
+      <SubmitDirectoriesContent />
+    </Suspense>
   );
 }

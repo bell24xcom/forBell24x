@@ -18,12 +18,15 @@ const NAV: NavItem[] = [
   { href: '/admin/suppliers',        label: 'Suppliers',        icon: '🏭' },
   { href: '/admin/leads',            label: 'Leads',            icon: '🎯' },
   { href: '/admin/customers',        label: 'Customers',        icon: '🤝' },
-  // Operations
-  { href: '/admin/rfqs',             label: 'RFQs',             icon: '📋', group: 'Operations' },
+  // Growth
+  { href: '/admin/rfqs',             label: 'RFQs',             icon: '📋', group: 'Growth' },
   { href: '/admin/marketing',        label: 'Marketing',        icon: '📣' },
+  { href: '/admin/acquisition',      label: 'Acquisition',      icon: '📈' },
+  { href: '/admin/social',           label: 'Social Calendar',  icon: '📱' },
   { href: '/admin/seo',              label: 'SEO Cockpit',      icon: '🔎' },
+  { href: '/admin/directories/submit', label: 'Crunchbase / G2', icon: '⭐' },
   { href: '/admin/directories',      label: 'Directories',      icon: '🔗' },
-  { href: '/admin/outreach',         label: 'Outreach',         icon: '📢' },
+  { href: '/admin/outreach',         label: 'WhatsApp Outreach', icon: '📢' },
   { href: '/admin/control-panel',    label: 'Control Panel',    icon: '⚙️' },
   { href: '/admin/feature-flags',    label: 'Feature Flags',    icon: '🚩' },
   // System

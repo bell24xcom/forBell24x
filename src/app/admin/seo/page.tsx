@@ -101,6 +101,24 @@ export default function SeoOverviewPage() {
         </section>
       </div>
 
+      {/* Pending backlinks — highest SEO impact */}
+      <section className="bg-[#001f3f] border border-[#D4AF37]/30 rounded-xl p-5">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+          <div>
+            <h2 className="text-white font-semibold">Trust backlinks (manual)</h2>
+            <p className="text-slate-500 text-xs mt-0.5">Crunchbase DA 90 · G2 DA 85 — unlocks rankings faster than more code</p>
+          </div>
+          <Link href="/admin/seo/backlinks" className="px-4 py-2 bg-[#D4AF37] hover:bg-[#c4a030] text-[#001f3f] text-xs font-bold rounded-lg">
+            Start Crunchbase / G2 →
+          </Link>
+        </div>
+        <div className="flex flex-wrap gap-3 text-xs">
+          <Link href="/admin/directories/submit?guide=crunchbase" className="text-indigo-400 hover:text-indigo-300">Crunchbase guide</Link>
+          <Link href="/admin/directories/submit?guide=g2" className="text-indigo-400 hover:text-indigo-300">G2 guide</Link>
+          <Link href="/admin/directories" className="text-slate-500 hover:text-slate-300">All directories</Link>
+        </div>
+      </section>
+
       {/* Pending checklist */}
       <section className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-5">
         <div className="flex items-center justify-between mb-4">

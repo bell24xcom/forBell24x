@@ -10,6 +10,8 @@ const TABS = [
   { href: '/admin/seo/indexing', label: 'Indexing', icon: '🗂️' },
   { href: '/admin/seo/content', label: 'Content', icon: '📄' },
   { href: '/admin/seo/checklist', label: 'Checklist', icon: '✅' },
+  { href: '/admin/seo/backlinks', label: 'Backlinks', icon: '⭐' },
+  { href: '/admin/directories/submit', label: 'Submit guides', icon: '📋' },
   { href: '/admin/directories', label: 'Directories', icon: '🔗' },
 ];
 
@@ -27,9 +29,11 @@ export default function SeoAdminLayout({ children }: { children: React.ReactNode
 
       <nav className="flex flex-wrap gap-1.5 border-b border-slate-800 pb-3">
         {TABS.map(tab => {
-          const active = tab.href === '/admin/directories'
-            ? pathname.startsWith('/admin/directories')
-            : pathname === tab.href || (tab.href !== '/admin/seo' && pathname.startsWith(tab.href));
+          const active =
+            pathname === tab.href ||
+            (tab.href !== '/admin/seo' &&
+              tab.href !== '/admin/directories' &&
+              pathname.startsWith(tab.href));
           return (
             <Link
               key={tab.href}

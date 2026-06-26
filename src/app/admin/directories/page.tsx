@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { useState, useMemo } from 'react';
 import { DIRECTORIES, SUBMISSION_COPY, type Directory, type SubmissionStatus } from '@/src/data/directory-submissions';
 
@@ -63,10 +64,16 @@ export default function DirectoriesPage() {
           <h1 className="text-2xl font-bold text-white">Directory Submissions</h1>
           <p className="text-slate-400 text-sm mt-1">Track listing submissions across {counts.total} B2B, MSME, and SEO directories</p>
         </div>
-        <button onClick={() => setShowCopy(s => !s)}
-          className="px-4 py-2 bg-[#D4AF37]/20 border border-[#D4AF37]/30 text-[#D4AF37] rounded-lg text-xs font-medium hover:bg-[#D4AF37]/30 transition-colors">
-          {showCopy ? '✕ Hide Copy Kit' : '📋 Copy Kit'}
-        </button>
+        <div className="flex gap-2">
+          <Link href="/admin/directories/submit"
+            className="px-4 py-2 bg-[#D4AF37] hover:bg-[#c4a030] text-[#001f3f] font-semibold rounded-lg text-xs transition-colors">
+            Crunchbase / G2 guides →
+          </Link>
+          <button onClick={() => setShowCopy(s => !s)}
+            className="px-4 py-2 bg-[#D4AF37]/20 border border-[#D4AF37]/30 text-[#D4AF37] rounded-lg text-xs font-medium hover:bg-[#D4AF37]/30 transition-colors">
+            {showCopy ? '✕ Hide Copy Kit' : '📋 Copy Kit'}
+          </button>
+        </div>
       </div>
 
       {/* Stats bar */}
