@@ -38,6 +38,12 @@ export interface CompetitorBacklinkGap {
   notes?: string;
 }
 
+export interface OutreachTarget {
+  name: string;
+  url: string;
+  use: string;
+}
+
 export const SEO_OPPORTUNITIES: SeoOpportunity[] = [
   {
     id: 'broken-links',
@@ -125,6 +131,46 @@ export const SEO_OPPORTUNITIES: SeoOpportunity[] = [
     description: 'Vol 880, SD 41 — competitive head term.',
     suggestedAction: 'Long-form guide + Founding Suppliers social proof + backlinks before expecting page 1.',
   },
+  {
+    id: 'content-upholstery-swatch-books',
+    type: 'new_content',
+    priority: 'medium',
+    title: 'Rank for upholstery fabric swatch books',
+    description: 'Textile buyer intent for export and interior design leads.',
+    suggestedAction: 'Publish /categories/upholstery-fabric-swatch-books with MOQ, sample count, and RFQ CTA.',
+    targetUrl: '/categories/upholstery-fabric-swatch-books',
+    contentBrief: 'Explain upholstery swatch-book formats, fabric options, export packing, and turnaround time.',
+  },
+  {
+    id: 'content-curtain-swatch-books',
+    type: 'new_content',
+    priority: 'medium',
+    title: 'Rank for curtain fabric swatch books',
+    description: 'Targets curtain buyers, interior showrooms, and hospitality procurement.',
+    suggestedAction: 'Publish /categories/curtain-fabric-swatch-books with product examples and request-a-quote CTA.',
+    targetUrl: '/categories/curtain-fabric-swatch-books',
+    contentBrief: 'Cover curtain swatch-book formats, blackout/sheer ranges, and domestic plus export supply.',
+  },
+  {
+    id: 'content-fabric-sample-cards',
+    type: 'new_content',
+    priority: 'medium',
+    title: 'Rank for fabric sample cards',
+    description: 'Short-tail lead term for sample-card buyers and textile showrooms.',
+    suggestedAction: 'Publish /categories/fabric-sample-cards with sample-card benefits and order CTA.',
+    targetUrl: '/categories/fabric-sample-cards',
+    contentBrief: 'Focus on compact presentation, color accuracy, and retail/showroom use cases.',
+  },
+  {
+    id: 'content-binding-hardware',
+    type: 'new_content',
+    priority: 'medium',
+    title: 'Rank for sample book fasteners and binding hardware',
+    description: 'Supports accessory buyers who make swatch books and sample books.',
+    suggestedAction: 'Publish /categories/sample-book-fasteners-binding-hardware with hardware specs and RFQ CTA.',
+    targetUrl: '/categories/sample-book-fasteners-binding-hardware',
+    contentBrief: 'Explain binding strips, rings, corners, fasteners, rust-resistant finishes, and bulk supply.',
+  },
 ];
 
 /** B2B-relevant keywords only — "vyapar app" noise keywords excluded (wrong brand). */
@@ -147,6 +193,14 @@ export const TRACKED_KEYWORDS: TrackedKeyword[] = [
   { id: 'kw-16', keyword: 'voice rfq', volume: 0, seoDifficulty: 17, position: null, status: 'pending', url: '/voice-rfq', category: 'feature', notes: 'Brand feature — low volume, own the term' },
   { id: 'kw-17', keyword: 'video rfq', volume: 0, seoDifficulty: 14, position: null, status: 'pending', url: '/video-rfq', category: 'feature' },
   { id: 'kw-18', keyword: 'vyaparsethu.com', volume: 0, seoDifficulty: 1, position: null, status: 'pending', url: '/', category: 'brand', notes: 'Brand query — should rank #1 after awareness' },
+  { id: 'kw-19', keyword: 'upholstery fabric swatch books india', volume: 20, seoDifficulty: 12, position: null, status: 'not_ranked', url: '/categories/upholstery-fabric-swatch-books', category: 'category', notes: 'Textile swatch-book landing page' },
+  { id: 'kw-20', keyword: 'curtain fabric swatch books india', volume: 20, seoDifficulty: 12, position: null, status: 'not_ranked', url: '/categories/curtain-fabric-swatch-books', category: 'category', notes: 'Textile swatch-book landing page' },
+  { id: 'kw-21', keyword: 'fabric sample cards india', volume: 20, seoDifficulty: 11, position: null, status: 'not_ranked', url: '/categories/fabric-sample-cards', category: 'category', notes: 'Textile sample-card landing page' },
+  { id: 'kw-22', keyword: 'sample book fasteners and binding hardware india', volume: 10, seoDifficulty: 10, position: null, status: 'not_ranked', url: '/categories/sample-book-fasteners-binding-hardware', category: 'category', notes: 'Accessory landing page for sample-book makers' },
+  { id: 'kw-23', keyword: 'upholstery swatch book supplier', volume: 10, seoDifficulty: 13, position: null, status: 'not_ranked', url: '/categories/upholstery-fabric-swatch-books', category: 'category' },
+  { id: 'kw-24', keyword: 'curtain swatch book supplier', volume: 10, seoDifficulty: 13, position: null, status: 'not_ranked', url: '/categories/curtain-fabric-swatch-books', category: 'category' },
+  { id: 'kw-25', keyword: 'fabric sample card supplier', volume: 10, seoDifficulty: 10, position: null, status: 'not_ranked', url: '/categories/fabric-sample-cards', category: 'category' },
+  { id: 'kw-26', keyword: 'sample book binding hardware supplier', volume: 10, seoDifficulty: 10, position: null, status: 'not_ranked', url: '/categories/sample-book-fasteners-binding-hardware', category: 'category' },
 ];
 
 export const RANK_SUMMARY = {
@@ -183,6 +237,44 @@ export const COMPETITOR_BACKLINK_GAPS: CompetitorBacklinkGap[] = [
   { domain: 'g2.com', domainAuthority: 85, linksTo: ['indiamart.com'], notes: 'Priority — use /admin/seo/backlinks' },
   { domain: 'startupindia.gov.in', domainAuthority: 66, linksTo: ['indiamart.com'], notes: 'DPIIT recognition' },
   { domain: 'justdial.com', domainAuthority: 68, linksTo: ['indiamart.com'], notes: 'Local listing — in directories tracker' },
+];
+
+export const TEXTILE_BACKLINK_TARGETS: OutreachTarget[] = [
+  {
+    name: 'LinkedIn company page',
+    url: 'https://www.linkedin.com/',
+    use: 'Post textile swatch-book case studies and link back to the category pages.',
+  },
+  {
+    name: 'Pinterest boards',
+    url: 'https://www.pinterest.com/',
+    use: 'Visual boards for upholstery, curtain, and sample-card collections.',
+  },
+  {
+    name: 'Houzz',
+    url: 'https://www.houzz.com/',
+    use: 'Interior-design audience for curtain and upholstery sampling content.',
+  },
+  {
+    name: 'Archiproducts',
+    url: 'https://www.archiproducts.com/',
+    use: 'Architect and specifier discovery for premium fabric sample books.',
+  },
+  {
+    name: 'Medium',
+    url: 'https://medium.com/',
+    use: 'Founder stories, sourcing guides, and textile procurement explainers.',
+  },
+  {
+    name: 'Scribd',
+    url: 'https://www.scribd.com/',
+    use: 'Upload fabric line sheets and swatch-book PDFs as reference assets.',
+  },
+  {
+    name: 'Slideshare',
+    url: 'https://www.slideshare.net/',
+    use: 'Publish procurement decks and exporter pitch materials.',
+  },
 ];
 
 export const FREE_SEO_TOOLS = [

@@ -30,6 +30,7 @@ export const LIFE_EVENT_TYPES = [
   'interaction_logged',
   'decision_recorded',
   'dna_synced',
+  'location_set',
 ] as const;
 
 export type LifeEventType = (typeof LIFE_EVENT_TYPES)[number];
@@ -132,6 +133,7 @@ const EVENT_LABELS: Record<string, string> = {
   machine_added: 'New machine added',
   decision_recorded: 'Business decision',
   dna_synced: 'Business memory synced',
+  location_set: 'Industrial location set',
 };
 
 export function lifeEventLabel(eventType: string): string {

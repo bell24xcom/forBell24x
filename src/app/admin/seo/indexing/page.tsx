@@ -3,8 +3,13 @@
 import Link from 'next/link';
 import { INDEXING_STATUS, EXTERNAL_LINKS, SITE_CANONICAL } from '@/src/data/seo-dashboard';
 import { StatusBadge } from '@/src/components/admin/seo/SeoScoreCard';
+import { openGscInspect } from '@/src/lib/seo-analytics';
 
 export default function SeoIndexingPage() {
+  const copyUrl = async (path: string) => {
+    await navigator.clipboard.writeText(`${SITE_CANONICAL}${path}`);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap gap-3">
@@ -40,13 +45,29 @@ export default function SeoIndexingPage() {
                 <td className="px-5 py-4 text-slate-400 text-xs">{row.lastCrawl ?? '—'}</td>
                 <td className="px-5 py-4 text-slate-500 text-xs max-w-xs">{row.notes}</td>
                 <td className="px-5 py-4">
-                  <Link
-                    href={`${SITE_CANONICAL}${row.path}`}
-                    target="_blank"
-                    className="text-xs text-indigo-400 hover:text-indigo-300"
-                  >
-                    View ↗
-                  </Link>
+                  <div className="flex flex-wrap gap-3">
+                    <button
+                      type="button"
+                      onClick={() => openGscInspect(row.path)}
+                      className="text-xs text-amber-400 hover:text-amber-300"
+                    >
+                      Inspect in GSC ↗
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void copyUrl(row.path)}
+                      className="text-xs text-indigo-400 hover:text-indigo-300"
+                    >
+                      Copy URL
+                    </button>
+                    <Link
+                      href={`${SITE_CANONICAL}${row.path}`}
+                      target="_blank"
+                      className="text-xs text-slate-400 hover:text-slate-300"
+                    >
+                      View ↗
+                    </Link>
+                  </div>
                 </td>
               </tr>
             ))}

@@ -100,7 +100,7 @@ export async function PUT(request: NextRequest) {
     // Merge into existing preferences — never wipe fields not sent in this request
     const existing = await prisma.user.findUnique({
       where: { id: userId },
-      select: { company: true, gstNumber: true, udyamNumber: true, preferences: true },
+      select: { company: true, gstNumber: true, udyamNumber: true, location: true, preferences: true },
     });
     const existingPrefs = (existing?.preferences as SupplierPreferences) ?? {};
 
@@ -144,14 +144,17 @@ export async function PUT(request: NextRequest) {
         company: existing?.company,
         gstNumber: existing?.gstNumber,
         udyamNumber: existing?.udyamNumber,
+        location: existing?.location,
         preferences: existingPrefs,
       },
       {
         company: companyName ?? existing?.company,
         gstNumber: gstNumber ?? existing?.gstNumber,
         udyamNumber: udyamNumber ?? existing?.udyamNumber,
+        location: city ?? existing?.location,
         preferences: {
           ...existingPrefs,
+          ...(state !== undefined && { state }),
           ...(categories !== undefined && { categories }),
           ...(products !== undefined && { products: normalizeProducts(products) }),
         },

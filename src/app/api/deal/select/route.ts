@@ -69,6 +69,41 @@ export async function POST(req: NextRequest) {
       return newDeal;
     });
 
+    // BOM activation: record quote_accepted for both buyer (selected) and
+    // supplier (won the deal). Non-blocking — never fails the deal creation.
+    try {
+      const { recordLifeEventAsync } = await import('@/src/lib/bom/life-events');
+      const sharedMeta = {
+        dealId: deal.id,
+        rfqId: quote.rfqId,
+        quoteId: quote.id,
+        price: quote.price,
+      };
+      recordLifeEventAsync({
+        companyId: quote.rfq.createdBy!,
+        eventType: 'quote_accepted',
+        actorId: user.id,
+        metadata: { ...sharedMeta, supplierId: quote.supplierId, role: 'buyer' },
+        decision: 'accepted_quote',
+        outcome: 'deal_created',
+        source: 'deal',
+        confidence: 1,
+      });
+      if (quote.supplierId) {
+        recordLifeEventAsync({
+          companyId: quote.supplierId,
+          eventType: 'quote_accepted',
+          actorId: user.id,
+          metadata: { ...sharedMeta, role: 'supplier' },
+          outcome: 'deal_won',
+          source: 'deal',
+          confidence: 1,
+        });
+      }
+    } catch (e) {
+      console.error('[Deal Select] life-event failed:', e instanceof Error ? e.message : e);
+    }
+
     return NextResponse.json({ success: true, deal }, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {

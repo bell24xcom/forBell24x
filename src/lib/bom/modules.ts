@@ -166,6 +166,14 @@ export const BOM_MODULES: BomMemoryModule[] = [
     eventTypes: ['price_alert', 'rfq_created', 'payment_completed'],
     enabled: true,
   },
+  {
+    id: 'location',
+    label: 'Location Memory',
+    description: 'Office, factory, warehouse, industrial cluster, freight zone, nearby trade',
+    color: '#10b981',
+    eventTypes: ['location_set', 'company_joined', 'factory_expansion'],
+    enabled: true,
+  },
 ];
 
 export function getEnabledModules(): BomMemoryModule[] {

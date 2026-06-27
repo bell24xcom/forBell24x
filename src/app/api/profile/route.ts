@@ -70,6 +70,11 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'No valid fields to update' }, { status: 400 });
     }
 
+    const existing = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { company: true, gstNumber: true, udyamNumber: true, location: true, preferences: true },
+    });
+
     const user = await prisma.user.update({
       where: { id: userId },
       data: updateData,
@@ -87,6 +92,26 @@ export async function PUT(request: NextRequest) {
         preferences: true,
       },
     });
+
+    const { recordProfileLifeEvents } = await import('@/src/lib/bom/profile-events');
+    const existingPrefs = (existing?.preferences ?? {}) as { categories?: string[]; state?: string };
+    const nextPrefs = (user.preferences ?? {}) as { categories?: string[]; state?: string };
+    recordProfileLifeEvents(
+      userId,
+      {
+        company: existing?.company,
+        gstNumber: existing?.gstNumber,
+        udyamNumber: existing?.udyamNumber,
+        location: existing?.location,
+        preferences: existingPrefs,
+      },
+      {
+        company: user.company,
+        gstNumber: user.gstNumber,
+        location: user.location,
+        preferences: nextPrefs,
+      },
+    );
 
     return NextResponse.json({ success: true, user });
   } catch (error) {

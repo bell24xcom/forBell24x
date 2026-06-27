@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState, useMemo } from 'react';
 import type { SubmissionStatus } from '@/src/data/directory-submissions';
+import { TEXTILE_BACKLINK_TARGETS } from '@/src/data/seo-opportunities';
 
 const PRIORITY_BACKLINKS = [
   {
@@ -145,6 +146,36 @@ export default function SeoBacklinksPage() {
           );
         })}
       </div>
+
+      <section className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-5">
+        <div className="mb-4">
+          <h2 className="text-white font-semibold text-sm">Textile swatch-book outreach targets</h2>
+          <p className="text-slate-500 text-xs mt-1">
+            Use these for the new upholstery, curtain, fabric sample card, and binding-hardware pages.
+          </p>
+        </div>
+        <div className="grid md:grid-cols-2 gap-3">
+          {TEXTILE_BACKLINK_TARGETS.map(target => (
+            <div key={target.name} className="bg-slate-900/40 border border-slate-700/50 rounded-lg p-4">
+              <div className="flex items-start justify-between gap-3 mb-2">
+                <div>
+                  <h3 className="text-white font-medium text-sm">{target.name}</h3>
+                  <p className="text-slate-500 text-xs mt-1">{target.use}</p>
+                </div>
+                <a
+                  href={target.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-indigo-400 hover:text-indigo-300 shrink-0"
+                >
+                  Open ↗
+                </a>
+              </div>
+              <p className="text-slate-600 text-[11px] font-mono break-all">{target.url}</p>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }

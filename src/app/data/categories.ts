@@ -444,13 +444,13 @@ export const ALL_CATEGORIES: Category[] = [
     icon: '🧵',
     supplierCount: '21K+',
     trending: true,
-    description: 'Cotton, silk, leather, synthetic and organic textiles with embroidery tools',
+    description: 'Fabric sample books, swatch cards, curtain samples, and textile finishing products',
     subcategories: [
       'Cotton Fabrics',
-      'Leather Materials',
-      'Embroidery Tools',
-      'Synthetic Fibers',
-      'Organic Textiles',
+      'Upholstery Fabric Swatch Books',
+      'Curtain Fabric Swatch Books',
+      'Fabric Sample Cards',
+      'Sample Book Fasteners & Binding Hardware',
     ],
   },
   // 28

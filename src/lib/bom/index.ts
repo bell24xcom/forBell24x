@@ -22,3 +22,20 @@ export {
 } from './projections';
 export { computeBusinessGenome, type BusinessGenome } from './genome-score';
 export { generateMorningBrief, type MorningBrief, type BriefInsight } from './morning-brief';
+export {
+  resolveAreaKey,
+  getArea,
+  listAreas,
+  geofenceArea,
+  nearbyAreas,
+  companyLocationFromProfile,
+  recordLocationEvent,
+  type CompanyLocation,
+  type IndustrialArea,
+} from './location';
+export {
+  getAreaPulse,
+  type AreaPulse,
+  type PulseFeedItem,
+  type PulseSummary,
+} from './business-pulse';

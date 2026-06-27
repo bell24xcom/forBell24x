@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
     // Build existing preferences to merge with new onboarding data
     const existingUser = await prisma.user.findUnique({
       where: { id: user.userId },
-      select: { preferences: true },
+      select: { company: true, gstNumber: true, udyamNumber: true, location: true, preferences: true },
     });
     const existingPrefs = (existingUser?.preferences as Record<string, unknown>) ?? {};
 
@@ -71,6 +71,25 @@ export async function POST(req: NextRequest) {
         data: { trustScore: 100 },
       });
     }
+
+    const { recordProfileLifeEvents } = await import('@/src/lib/bom/profile-events');
+    recordProfileLifeEvents(
+      user.userId,
+      {
+        company: existingUser?.company,
+        gstNumber: existingUser?.gstNumber,
+        udyamNumber: existingUser?.udyamNumber,
+        location: existingUser?.location,
+        preferences: existingPrefs as import('@/lib/supplier-products').SupplierPreferences,
+      },
+      {
+        company: company.trim(),
+        gstNumber: gstNumber?.trim(),
+        udyamNumber: udyamNumber?.trim(),
+        location: `${city.trim()}, ${state}`,
+        preferences: { ...existingPrefs, ...newPreferences, state } as import('@/lib/supplier-products').SupplierPreferences,
+      },
+    );
 
     return NextResponse.json({
       success: true,

@@ -4,7 +4,18 @@ import { useEffect, useState } from 'react';
 import { SEO_TOOLS, SEO_TOOL_CATEGORIES, type SeoToolCategory } from '@/src/data/seo-tools';
 import { trackSeoEvent, openGscInspect, openRichResultsTest } from '@/src/lib/seo-analytics';
 
-const SAMPLE_PATHS = ['/', '/how-it-works', '/how-payment-works', '/voice-rfq', '/founding-suppliers'];
+const SAMPLE_PATHS = [
+  '/',
+  '/how-it-works',
+  '/how-payment-works',
+  '/voice-rfq',
+  '/founding-suppliers',
+  '/categories/textiles-yarn-fabrics',
+  '/categories/upholstery-fabric-swatch-books',
+  '/categories/curtain-fabric-swatch-books',
+  '/categories/fabric-sample-cards',
+  '/categories/sample-book-fasteners-binding-hardware',
+];
 
 interface ExplainHealth {
   success: boolean;

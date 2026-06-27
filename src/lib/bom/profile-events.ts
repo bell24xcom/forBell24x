@@ -3,6 +3,7 @@
  */
 
 import { recordLifeEventAsync } from './life-events';
+import { companyLocationFromProfile, recordLocationEvent } from './location';
 import type { SupplierPreferences } from '@/lib/supplier-products';
 
 export function recordProfileLifeEvents(
@@ -11,12 +12,14 @@ export function recordProfileLifeEvents(
     company?: string | null;
     gstNumber?: string | null;
     udyamNumber?: string | null;
+    location?: string | null;
     preferences?: SupplierPreferences | null;
   },
   after: {
     company?: string | null;
     gstNumber?: string | null;
     udyamNumber?: string | null;
+    location?: string | null;
     preferences?: SupplierPreferences | null;
   },
 ): void {
@@ -58,6 +61,13 @@ export function recordProfileLifeEvents(
         source: 'profile',
       });
     }
+  }
+
+  const beforeLoc = (before.location ?? '').trim();
+  const afterLoc = (after.location ?? '').trim();
+  if (afterLoc && afterLoc !== beforeLoc) {
+    const loc = companyLocationFromProfile(afterLoc, after.preferences?.state);
+    if (loc) recordLocationEvent(userId, loc);
   }
 
   recordLifeEventAsync({

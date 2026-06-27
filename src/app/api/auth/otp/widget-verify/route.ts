@@ -60,6 +60,20 @@ export async function POST(request: NextRequest) {
         },
       });
       authLogger.info('New user created via widget OTP', { userId: user.id });
+
+      // BOM activation: first life event for every new company. Non-blocking.
+      import('@/src/lib/bom/life-events')
+        .then(({ recordLifeEventAsync }) =>
+          recordLifeEventAsync({
+            companyId: user!.id,
+            eventType: 'company_joined',
+            actorId: user!.id,
+            metadata: { via: 'otp-widget', role: user!.role },
+            source: 'auth',
+            confidence: 1,
+          }),
+        )
+        .catch(() => {});
     } else {
       step = 'db-update';
       user = await prisma.user.update({

@@ -32,7 +32,9 @@ const NAV: NavItem[] = [
   { href: '/admin/control-panel',    label: 'Control Panel',    icon: '⚙️' },
   { href: '/admin/feature-flags',    label: 'Feature Flags',    icon: '🚩' },
   // System
-  { href: '/admin/n8n',              label: 'Automation',       icon: '⚡', group: 'System' },
+  { href: '/admin/system',           label: 'System Health',    icon: '🩺', group: 'System' },
+  { href: '/admin/automation',       label: 'Jobs & Scheduler', icon: '⚡' },
+  { href: '/admin/n8n',              label: 'Automation (n8n)', icon: '🔌' },
   { href: '/admin/monitoring',       label: 'Monitoring',       icon: '🔍' },
   { href: '/admin/security',         label: 'Security',         icon: '🔒' },
   { href: '/admin/errors',           label: 'Error Logs',       icon: '🐛' },

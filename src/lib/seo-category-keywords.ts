@@ -38,6 +38,85 @@ const DEFAULT_COMPETITORS: CompetitorRank[] = [
   { name: 'ExportersIndia', domain: 'exporterindia.com', estPosition: 8, note: 'SERP benchmark' },
 ];
 
+const TEXTILE_SWATCH_ROWS: EntityKeywordRank[] = [
+  {
+    id: 'sub-textiles-yarn-fabrics-upholstery-fabric-swatch-books',
+    entityType: 'subcategory',
+    entityName: 'Upholstery Fabric Swatch Books',
+    slug: 'upholstery-fabric-swatch-books',
+    parentSlug: 'textiles-yarn-fabrics',
+    primaryKeyword: 'upholstery fabric swatch books india',
+    secondaryKeywords: [
+      'upholstery swatch book supplier',
+      'fabric swatch books for upholstery',
+      'export upholstery swatch books',
+    ],
+    ourPosition: null,
+    ourUrl: '/categories/upholstery-fabric-swatch-books',
+    competitors: DEFAULT_COMPETITORS,
+    lastChecked: null,
+    searchVolume: null,
+    seoDifficulty: null,
+  },
+  {
+    id: 'sub-textiles-yarn-fabrics-curtain-fabric-swatch-books',
+    entityType: 'subcategory',
+    entityName: 'Curtain Fabric Swatch Books',
+    slug: 'curtain-fabric-swatch-books',
+    parentSlug: 'textiles-yarn-fabrics',
+    primaryKeyword: 'curtain fabric swatch books india',
+    secondaryKeywords: [
+      'curtain swatch book supplier',
+      'drapery fabric swatch books',
+      'export curtain sample books',
+    ],
+    ourPosition: null,
+    ourUrl: '/categories/curtain-fabric-swatch-books',
+    competitors: DEFAULT_COMPETITORS,
+    lastChecked: null,
+    searchVolume: null,
+    seoDifficulty: null,
+  },
+  {
+    id: 'sub-textiles-yarn-fabrics-fabric-sample-cards',
+    entityType: 'subcategory',
+    entityName: 'Fabric Sample Cards',
+    slug: 'fabric-sample-cards',
+    parentSlug: 'textiles-yarn-fabrics',
+    primaryKeyword: 'fabric sample cards india',
+    secondaryKeywords: [
+      'fabric sample card supplier',
+      'textile sample cards',
+      'export fabric sample cards',
+    ],
+    ourPosition: null,
+    ourUrl: '/categories/fabric-sample-cards',
+    competitors: DEFAULT_COMPETITORS,
+    lastChecked: null,
+    searchVolume: null,
+    seoDifficulty: null,
+  },
+  {
+    id: 'sub-textiles-yarn-fabrics-sample-book-fasteners-binding-hardware',
+    entityType: 'subcategory',
+    entityName: 'Sample Book Fasteners & Binding Hardware',
+    slug: 'sample-book-fasteners-binding-hardware',
+    parentSlug: 'textiles-yarn-fabrics',
+    primaryKeyword: 'sample book fasteners and binding hardware india',
+    secondaryKeywords: [
+      'sample book binding hardware supplier',
+      'textile sample book hardware',
+      'export binding hardware for swatch books',
+    ],
+    ourPosition: null,
+    ourUrl: '/categories/sample-book-fasteners-binding-hardware',
+    competitors: DEFAULT_COMPETITORS,
+    lastChecked: null,
+    searchVolume: null,
+    seoDifficulty: null,
+  },
+];
+
 function slugify(s: string): string {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
@@ -100,6 +179,8 @@ function buildFromCategories(): EntityKeywordRank[] {
       seoDifficulty: null,
     });
   }
+
+  rows.push(...TEXTILE_SWATCH_ROWS);
 
   return rows;
 }

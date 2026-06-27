@@ -7,6 +7,8 @@ import { projectBomFromLifeEvents } from './projections';
 import { computeBusinessGenome } from './genome-score';
 import { lifeEventLabel } from './life-events';
 import { callSeoLlm } from '@/src/lib/seo-llm';
+import { resolveAreaKey, getArea } from './location';
+import { getAreaPulse } from './business-pulse';
 
 export interface BriefInsight {
   type: 'reminder' | 'alert' | 'opportunity' | 'trust' | 'activity' | 'recommendation';
@@ -28,7 +30,7 @@ export interface MorningBrief {
 export async function generateMorningBrief(companyId: string, useAi = false): Promise<MorningBrief> {
   const user = await prisma.user.findUnique({
     where: { id: companyId },
-    select: { company: true, name: true, trustScore: true, gstNumber: true, udyamNumber: true },
+    select: { company: true, name: true, trustScore: true, gstNumber: true, udyamNumber: true, location: true },
   });
 
   if (!user) throw new Error('Company not found');
@@ -99,6 +101,31 @@ export async function generateMorningBrief(companyId: string, useAi = false): Pr
       text: `${projection.productNames.length} product(s) listed — SEO pages live at /supplier/${companyId}/products/…`,
       priority: 'low',
     });
+  }
+
+  const areaKey = resolveAreaKey(user.location);
+  if (areaKey) {
+    const area = getArea(areaKey);
+    const pulse = await getAreaPulse(areaKey, 7);
+    if (pulse.hasActivity && area) {
+      const parts: string[] = [];
+      if (pulse.summary.newRfqs > 0) parts.push('new requirements');
+      if (pulse.summary.quotes > 0) parts.push('quotes flowing');
+      if (pulse.summary.dealsClosed > 0) parts.push('deals closing');
+      insights.push({
+        type: 'activity',
+        text: parts.length
+          ? `Around ${area.name}: ${parts.join(', ')} this week.`
+          : `Trade activity detected in ${area.name} this week.`,
+        priority: 'medium',
+      });
+    } else if (area) {
+      insights.push({
+        type: 'opportunity',
+        text: `${area.name} cluster is onboarding verified suppliers — complete your profile to appear in local matching.`,
+        priority: 'low',
+      });
+    }
   }
 
   if (projection.intents.length > 0) {

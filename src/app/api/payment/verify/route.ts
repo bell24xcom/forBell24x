@@ -98,6 +98,21 @@ export async function POST(request: NextRequest) {
         },
       }).catch(() => {});
 
+      // BOM activation: subscription payment completed
+      import('@/src/lib/bom/life-events')
+        .then(({ recordLifeEventAsync }) =>
+          recordLifeEventAsync({
+            companyId: user.userId,
+            eventType: 'payment_completed',
+            actorId: user.userId,
+            metadata: { kind: 'subscription', plan: planKey, userPlan, amount, paymentId: razorpay_payment_id || razorpay_order_id, testMode: isTestMode },
+            outcome: 'plan_activated',
+            source: 'razorpay',
+            confidence: 1,
+          }),
+        )
+        .catch(() => {});
+
       // Build WhatsApp confirmation link for operator to send
       const dbUser = await prisma.user.findUnique({
         where: { id: user.userId },
@@ -138,6 +153,21 @@ export async function POST(request: NextRequest) {
         },
       }),
     ]);
+
+    // BOM activation: wallet deposit completed
+    import('@/src/lib/bom/life-events')
+      .then(({ recordLifeEventAsync }) =>
+        recordLifeEventAsync({
+          companyId: user.userId,
+          eventType: 'payment_completed',
+          actorId: user.userId,
+          metadata: { kind: 'wallet_deposit', amount, reference: razorpay_payment_id || razorpay_order_id, testMode: isTestMode },
+          outcome: 'wallet_credited',
+          source: 'razorpay',
+          confidence: 1,
+        }),
+      )
+      .catch(() => {});
 
     // Re-fetch updated balance
     const updated = await prisma.wallet.findUnique({ where: { userId: user.userId } });

@@ -92,6 +92,20 @@ export async function POST(request: NextRequest) {
         },
       });
       authLogger.info('New user created', { userId: user.id, phone: `${phone.slice(0, 5)}*****` });
+
+      // BOM activation: first life event for every new company. Non-blocking.
+      import('@/src/lib/bom/life-events')
+        .then(({ recordLifeEventAsync }) =>
+          recordLifeEventAsync({
+            companyId: user!.id,
+            eventType: 'company_joined',
+            actorId: user!.id,
+            metadata: { via: 'otp', role: user!.role },
+            source: 'auth',
+            confidence: 1,
+          }),
+        )
+        .catch(() => {});
     } else {
       user = await prisma.user.update({
         where: { id: user.id },

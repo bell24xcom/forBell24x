@@ -38,6 +38,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/video-rfq`,                   lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.9  },
     { url: `${siteUrl}/rfq/create`,                  lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.9  },
     { url: `${siteUrl}/suppliers`,                   lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.85 },
+    { url: `${siteUrl}/location`,                    lastModified: new Date(), changeFrequency: 'daily',   priority: 0.86 },
     { url: `${siteUrl}/blog`,                        lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.8  },
     { url: `${siteUrl}/pricing`,                     lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7  },
     { url: `${siteUrl}/services`,                    lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7  },
@@ -63,7 +64,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }))
 
   // Category pages — high SEO value
-  const categoryPages: MetadataRoute.Sitemap = CATEGORY_SLUGS.map(slug => ({
+  let categorySlugs = CATEGORY_SLUGS
+  try {
+    const dbCategories = await prisma.category.findMany({
+      where: { isActive: true },
+      select: { slug: true },
+    })
+    categorySlugs = Array.from(new Set([...CATEGORY_SLUGS, ...dbCategories.map(c => c.slug)]))
+  } catch {
+    // DB unavailable at build time — fall back to the static list
+  }
+
+  const categoryPages: MetadataRoute.Sitemap = categorySlugs.map(slug => ({
     url: `${siteUrl}/categories/${slug}`,
     lastModified: new Date(),
     changeFrequency: 'weekly' as const,
@@ -151,6 +163,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.82,
   }))
 
+  // Location intelligence pages (/location/[area]) — Business Pulse SEO
+  const locationPages: MetadataRoute.Sitemap = Object.keys(CITIES).map(areaSlug => ({
+    url: `${siteUrl}/location/${areaSlug}`,
+    lastModified: new Date(),
+    changeFrequency: 'daily' as const,
+    priority: 0.84,
+  }))
+
   // City×Category landing pages (/suppliers/[city]/[category])
   const cityCategoryPages: MetadataRoute.Sitemap = getAllCityCategoryPairs().map(({ city, category }) => ({
     url: `${siteUrl}/suppliers/${city}/${category}`,
@@ -159,5 +179,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.88,
   }))
 
-  return [...staticPages, ...blogPages, ...categoryPages, ...contentPages, ...glossaryPages, ...cityPages, ...cityCategoryPages, ...rfqPages, ...supplierPages, ...productPages]
+  return [...staticPages, ...blogPages, ...categoryPages, ...contentPages, ...glossaryPages, ...cityPages, ...locationPages, ...cityCategoryPages, ...rfqPages, ...supplierPages, ...productPages]
 }

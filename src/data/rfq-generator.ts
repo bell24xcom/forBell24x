@@ -320,10 +320,10 @@ export const ALL_CATEGORIES_WITH_SUBCATEGORIES = [
     name: 'Textiles, Yarn & Fabrics',
     subcategories: [
       'Cotton Fabrics',
-      'Synthetic Fabrics',
-      'Yarns',
-      'Textile Machinery',
-      'Garment Accessories',
+      'Upholstery Fabric Swatch Books',
+      'Curtain Fabric Swatch Books',
+      'Fabric Sample Cards',
+      'Sample Book Fasteners & Binding Hardware',
     ],
   },
   {
