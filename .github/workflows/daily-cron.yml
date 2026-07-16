@@ -5,9 +5,7 @@
 name: Daily Cron Jobs
 
 on:
-  schedule:
-    - cron: '0 2 * * *'  # 2 AM UTC daily
-  workflow_dispatch:  # Manual trigger
+  workflow_dispatch:  # Manual trigger only — schedule disabled to resolve 429
 
 concurrency:
   group: vyaparsethu-cron
