@@ -39,6 +39,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/rfq/create`,                  lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.9  },
     { url: `${siteUrl}/suppliers`,                   lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.85 },
     { url: `${siteUrl}/location`,                    lastModified: new Date(), changeFrequency: 'daily',   priority: 0.86 },
+    { url: `${siteUrl}/industrial-cluster`,          lastModified: new Date(), changeFrequency: 'daily',   priority: 0.87 },
+    { url: `${siteUrl}/product-intelligence`,       lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.84 },
     { url: `${siteUrl}/blog`,                        lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.8  },
     { url: `${siteUrl}/pricing`,                     lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7  },
     { url: `${siteUrl}/services`,                    lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7  },
@@ -51,8 +53,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/refund-policy`,               lastModified: new Date(), changeFrequency: 'yearly',  priority: 0.3  },
     { url: `${siteUrl}/cookies`,                     lastModified: new Date(), changeFrequency: 'yearly',  priority: 0.3  },
     { url: `${siteUrl}/privacy`,                     lastModified: new Date(), changeFrequency: 'yearly',  priority: 0.3  },
-    { url: `${siteUrl}/legal/privacy-policy`,        lastModified: new Date(), changeFrequency: 'yearly',  priority: 0.3  },
-    { url: `${siteUrl}/legal/terms-of-service`,      lastModified: new Date(), changeFrequency: 'yearly',  priority: 0.3  },
   ]
 
   // Blog posts — static data, always available
@@ -171,6 +171,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.84,
   }))
 
+  // Industrial cluster intelligence (/industrial-cluster/[slug])
+  const { listClusterSlugs } = await import('@/src/data/industrial-clusters')
+  const clusterPages: MetadataRoute.Sitemap = listClusterSlugs().map(slug => ({
+    url: `${siteUrl}/industrial-cluster/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'daily' as const,
+    priority: 0.85,
+  }))
+
+  // Product intelligence pages
+  const { listProductSlugs } = await import('@/src/data/product-intelligence-catalog')
+  const productIntelPages: MetadataRoute.Sitemap = listProductSlugs().map(slug => ({
+    url: `${siteUrl}/product-intelligence/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.83,
+  }))
+
   // City×Category landing pages (/suppliers/[city]/[category])
   const cityCategoryPages: MetadataRoute.Sitemap = getAllCityCategoryPairs().map(({ city, category }) => ({
     url: `${siteUrl}/suppliers/${city}/${category}`,
@@ -179,5 +197,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.88,
   }))
 
-  return [...staticPages, ...blogPages, ...categoryPages, ...contentPages, ...glossaryPages, ...cityPages, ...locationPages, ...cityCategoryPages, ...rfqPages, ...supplierPages, ...productPages]
+  return [...staticPages, ...blogPages, ...categoryPages, ...contentPages, ...glossaryPages, ...cityPages, ...locationPages, ...clusterPages, ...productIntelPages, ...cityCategoryPages, ...rfqPages, ...supplierPages, ...productPages]
 }
