@@ -105,7 +105,8 @@ export default function SupplierOnboardingPage() {
       const data = await res.json();
       if (data.success || data.verified) {
         setGstVerified(true);
-        if (data.companyName && !company) setCompany(data.companyName);
+        const gstCompanyName = data.gstData?.legalName || data.gstData?.tradeName;
+        if (gstCompanyName && !company) setCompany(gstCompanyName);
         setGstError('');
       } else {
         setGstError('Could not verify GST number — it will be marked as self-reported');

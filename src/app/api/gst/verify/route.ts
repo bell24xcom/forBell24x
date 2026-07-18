@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     const user = await authenticate(request);
     if (!user) return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
 
-    const { gstNumber } = await request.json();
+    const { gstin: gstNumber } = await request.json();
     const gst = gstNumber?.toUpperCase()?.trim();
 
     if (!gst || gst.length !== 15) {
