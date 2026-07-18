@@ -2,8 +2,9 @@
  * Company DNA Engine — syncs User + Elephant Memory → 15-layer Business DNA profile.
  */
 
-import { prisma } from '@/lib/prisma';
-import { getMarketInsights } from '@/lib/memory-engine';
+import type { Prisma } from '@prisma/client';
+import { prisma } from '@/src/lib/prisma';
+import { getMarketInsights } from '@/src/lib/memory-engine';
 import { normalizeProducts, type SupplierPreferences } from '@/src/lib/supplier-products';
 import { projectBomFromLifeEvents, mergeLayersFromProjection } from '@/src/lib/bom/projections';
 import { recordLifeEventAsync } from '@/src/lib/bom/life-events';
@@ -15,6 +16,11 @@ import {
   type DnaGraphData,
   type DnaLayerId,
 } from './types';
+
+/** Company DNA layers are plain JSON-shaped objects; Prisma's Json input type needs an explicit cast. */
+function toJson<T>(v: T | null | undefined): Prisma.InputJsonValue | undefined {
+  return v === null || v === undefined ? undefined : (v as unknown as Prisma.InputJsonValue);
+}
 
 function scoreLayer(data: unknown, requiredFields: number, filled: number): number {
   if (!data) return 0;
@@ -175,7 +181,9 @@ async function buildLayersFromUser(userId: string): Promise<{ layers: CompanyDna
       companyName: user.company ?? user.name ?? undefined,
       gst: user.gstNumber ?? undefined,
       udyam: user.udyamNumber ?? undefined,
-      locations: user.location ? [user.location, ...(prefs.cities ?? [])].filter(Boolean) : prefs.cities,
+      locations: user.location
+        ? [user.location, ...(prefs.cities ?? [])].filter((c): c is string => Boolean(c))
+        : prefs.cities,
       factoryLocations: prefs.address ? [prefs.address] : undefined,
     },
     business: {
@@ -269,7 +277,7 @@ export async function syncCompanyDna(userId: string, useDemo = false): Promise<C
 
   const layerScores = computeLayerScores(layers);
   const completeness = computeCompleteness(layerScores);
-  const graph = buildDnaGraph(companyName, layers, completeness, layerScores);
+  const graph = await buildDnaGraph(companyName, layers, completeness, layerScores);
 
   const timelineData = useDemo
     ? [
@@ -289,20 +297,20 @@ export async function syncCompanyDna(userId: string, useDemo = false): Promise<C
       companyName,
       completeness,
       layerScores,
-      identity: layers.identity ?? undefined,
-      business: layers.business ?? undefined,
-      procurement: layers.procurement ?? undefined,
-      suppliers: layers.suppliers ?? undefined,
-      customers: layers.customers ?? undefined,
-      financial: layers.financial ?? undefined,
-      market: layers.market ?? undefined,
-      risk: layers.risk ?? undefined,
-      trust: layers.trust ?? undefined,
-      relationships: layers.relationships ?? undefined,
-      procurementMemory: layers.procurementMemory ?? undefined,
-      decisions: layers.decisions ?? undefined,
-      opportunities: layers.opportunities ?? undefined,
-      aiMemory: layers.aiMemory ?? undefined,
+      identity: toJson(layers.identity),
+      business: toJson(layers.business),
+      procurement: toJson(layers.procurement),
+      suppliers: toJson(layers.suppliers),
+      customers: toJson(layers.customers),
+      financial: toJson(layers.financial),
+      market: toJson(layers.market),
+      risk: toJson(layers.risk),
+      trust: toJson(layers.trust),
+      relationships: toJson(layers.relationships),
+      procurementMemory: toJson(layers.procurementMemory),
+      decisions: toJson(layers.decisions),
+      opportunities: toJson(layers.opportunities),
+      aiMemory: toJson(layers.aiMemory),
       graphSnapshot: graph as object,
       lastSyncedAt: new Date(),
     },
@@ -310,20 +318,20 @@ export async function syncCompanyDna(userId: string, useDemo = false): Promise<C
       companyName,
       completeness,
       layerScores,
-      identity: layers.identity ?? undefined,
-      business: layers.business ?? undefined,
-      procurement: layers.procurement ?? undefined,
-      suppliers: layers.suppliers ?? undefined,
-      customers: layers.customers ?? undefined,
-      financial: layers.financial ?? undefined,
-      market: layers.market ?? undefined,
-      risk: layers.risk ?? undefined,
-      trust: layers.trust ?? undefined,
-      relationships: layers.relationships ?? undefined,
-      procurementMemory: layers.procurementMemory ?? undefined,
-      decisions: layers.decisions ?? undefined,
-      opportunities: layers.opportunities ?? undefined,
-      aiMemory: layers.aiMemory ?? undefined,
+      identity: toJson(layers.identity),
+      business: toJson(layers.business),
+      procurement: toJson(layers.procurement),
+      suppliers: toJson(layers.suppliers),
+      customers: toJson(layers.customers),
+      financial: toJson(layers.financial),
+      market: toJson(layers.market),
+      risk: toJson(layers.risk),
+      trust: toJson(layers.trust),
+      relationships: toJson(layers.relationships),
+      procurementMemory: toJson(layers.procurementMemory),
+      decisions: toJson(layers.decisions),
+      opportunities: toJson(layers.opportunities),
+      aiMemory: toJson(layers.aiMemory),
       graphSnapshot: graph as object,
       lastSyncedAt: new Date(),
     },
@@ -451,7 +459,7 @@ export async function getDnaGraphForUser(userId: string): Promise<DnaGraphData |
     identity: p.identity as CompanyDnaLayers['identity'],
     business: p.business as CompanyDnaLayers['business'],
     procurement: p.procurement as CompanyDnaLayers['procurement'],
-    suppliers: p.suppliers as CompanyDnaLayers['suppliers'],
+    suppliers: p.suppliers as unknown as CompanyDnaLayers['suppliers'],
     customers: p.customers as CompanyDnaLayers['customers'],
     financial: p.financial as CompanyDnaLayers['financial'],
     market: p.market as CompanyDnaLayers['market'],
@@ -459,7 +467,7 @@ export async function getDnaGraphForUser(userId: string): Promise<DnaGraphData |
     trust: p.trust as CompanyDnaLayers['trust'],
     relationships: p.relationships as CompanyDnaLayers['relationships'],
     procurementMemory: p.procurementMemory as CompanyDnaLayers['procurementMemory'],
-    decisions: p.decisions as CompanyDnaLayers['decisions'],
+    decisions: p.decisions as unknown as CompanyDnaLayers['decisions'],
     opportunities: p.opportunities as CompanyDnaLayers['opportunities'],
     aiMemory: p.aiMemory as CompanyDnaLayers['aiMemory'],
   };

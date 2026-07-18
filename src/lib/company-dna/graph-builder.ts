@@ -11,6 +11,7 @@ import {
   type DnaGraphNode,
   type DnaLayerId,
 } from './types';
+import { listProductSlugs, getProductRecord } from '@/src/data/product-intelligence-catalog';
 
 function entityNode(
   id: string,
@@ -58,7 +59,7 @@ function addStringList(
   }
 }
 
-export function buildDnaGraph(companyName: string, layers: CompanyDnaLayers, completeness: number, layerScores: Record<string, number>): DnaGraphData {
+export async function buildDnaGraph(companyName: string, layers: CompanyDnaLayers, completeness: number, layerScores: Record<string, number>): Promise<DnaGraphData> {
   const nodes: DnaGraphNode[] = [];
   const edges: DnaGraphEdge[] = [];
 
@@ -126,6 +127,23 @@ export function buildDnaGraph(companyName: string, layers: CompanyDnaLayers, com
     const nid = `product-${prod.replace(/\s+/g, '-').toLowerCase().slice(0, 30)}`;
     nodes.push(entityNode(nid, prod, 'business', 2, '#818cf8', 'Supplier product page'));
     edges.push({ id: `e-prod-${nid}`, source: 'layer-business', target: nid, type: 'entity_link', label: 'product' });
+
+    let matchSlug: string | undefined;
+    for (const s of await listProductSlugs()) {
+      const rec = await getProductRecord(s);
+      if (rec && (prod.toLowerCase().includes(rec.name.toLowerCase().slice(0, 8)) || rec.name.toLowerCase().includes(prod.toLowerCase().slice(0, 8)))) {
+        matchSlug = s;
+        break;
+      }
+    }
+    if (matchSlug) {
+      const rec = await getProductRecord(matchSlug);
+      if (rec) {
+        const intelId = `intel-${matchSlug}`;
+        nodes.push(entityNode(intelId, rec.name, 'market', 7, '#D4AF37', 'Product Intelligence'));
+        edges.push({ id: `e-prod-intel-${matchSlug}`, source: nid, target: intelId, type: 'knowledge_link', label: 'intel' });
+      }
+    }
   }
 
   addStringList(nodes, edges, 'layer-business', 'business', 2, L('business').color, 'machine', biz?.installedMachinery);

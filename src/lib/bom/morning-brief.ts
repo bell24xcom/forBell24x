@@ -9,6 +9,7 @@ import { lifeEventLabel } from './life-events';
 import { callSeoLlm } from '@/src/lib/seo-llm';
 import { resolveAreaKey, getArea } from './location';
 import { getAreaPulse } from './business-pulse';
+import { searchProducts } from '@/src/lib/product-intelligence/search';
 
 export interface BriefInsight {
   type: 'reminder' | 'alert' | 'opportunity' | 'trust' | 'activity' | 'recommendation';
@@ -96,6 +97,14 @@ export async function generateMorningBrief(companyId: string, useAi = false): Pr
   }
 
   if (projection.productNames.length > 0) {
+    const intelMatches = await searchProducts(projection.productNames[0], 1);
+    if (intelMatches.length > 0) {
+      insights.push({
+        type: 'opportunity',
+        text: `Product Intelligence linked: ${intelMatches[0].name} (${intelMatches[0].completenessScore}% complete) — HS ${intelMatches[0].commercial.hsCode ?? 'pending'}.`,
+        priority: 'low',
+      });
+    }
     insights.push({
       type: 'opportunity',
       text: `${projection.productNames.length} product(s) listed — SEO pages live at /supplier/${companyId}/products/…`,
@@ -112,6 +121,9 @@ export async function generateMorningBrief(companyId: string, useAi = false): Pr
       if (pulse.summary.newRfqs > 0) parts.push('new requirements');
       if (pulse.summary.quotes > 0) parts.push('quotes flowing');
       if (pulse.summary.dealsClosed > 0) parts.push('deals closing');
+      if (pulse.trendingCategories.length > 0) {
+        parts.push(`trending: ${pulse.trendingCategories.slice(0, 2).join(', ')}`);
+      }
       insights.push({
         type: 'activity',
         text: parts.length

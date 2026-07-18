@@ -2,6 +2,14 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## ARCHITECTURE REFERENCE
+VyaparSethu = Business OS (Bell24h OS is the internal engine).
+Marketplace = Application #1. Not the platform.
+All intelligence features gated behind FLAGS.INTELLIGENCE_ENABLED.
+All SHAP features gated behind FLAGS.SHAP_ENABLED.
+Phase D gate: 100 verified suppliers before any intelligence activates.
+n8n executes. Backend decides. Never reverse this.
+
 ## Commands
 
 ```bash
@@ -142,7 +150,7 @@ If a proposed feature serves none of these three, push back before building.
 - Never compete with IndiaMART on directory features
 - Never build chat (build "Business Conversations" instead)
 - Never compute Trust Score real-time (use daily cron only)
-- Never add new /api/ functions if it pushes count over 12 (Vercel Hobby tier limit — extend existing dispatchers instead)
+- Never add new /api/ functions if it pushes serverless function count over 12 (Vercel Hobby tier limit) — extend existing dispatcher routes instead. The `/api/admin/*` routes are dispatched through thin handlers to stay under this limit.
 
 ## Dashboard Visibility Policy (5-Level)
 
@@ -192,19 +200,6 @@ Footer must include small "Formerly Bell24h" note during transition.
 Remove all fake/seeded aggregate numbers from public pages (replace with
 "Launching Soon — Reserve your category").
 
-## Current Sprint (May 31 – June 29, 2026)
-
-Goal: rebrand executed + first 30 verified suppliers in pipeline.
-
-| Week | Dates | Focus |
-|------|-------|-------|
-| 1 | May 31 – Jun 6 | Visual rebrand: logo assets → `/public/brand/`, UI text, homepage copy, dashboard cleanup, email/social identity |
-| 2 | Jun 7 – 13 | Founder WhatsApp outreach: 20 contacts/day, Day 1→3→5→7→14 cadence |
-| 3 | Jun 14 – 20 | VIP Claim Profile program: 3 clusters × 5 companies each (Steel/Metals Kalamboli, Corrugated Bhiwandi, Industrial Adhesives Navi Mumbai) |
-| 4 | Jun 21 – 29 | Trust Score MVP (Prisma + daily cron), Business Conversations on Requirements (30s poll, NOT WebSockets), SHAP explainability in UI |
-
-Sprint hard stop: if Day 14 has 0 verified suppliers, stop building and do in-person
-Bhiwandi market outreach before any more code work.
 
 ---
 
@@ -240,25 +235,49 @@ Account must have credits at muapi.ai (digitex.studio@gmail.com). Current balanc
 - **Typography**: Poppins for headings · Inter for body · Devanagari-compatible fallback for Hindi overlays
 - **No zeros publicly**: Never render 0 counts, 0% rates, or empty metric cards on public-facing pages
 
-### New Files Added (Week 3–4 sprint)
+### Intelligence Layer (Static Catalog + Engine Pattern)
 
-| File | Purpose |
-|------|---------|
-| `src/components/crm/LeadFilters.tsx` | CRM lead search + filter with full optional chaining |
-| `src/data/outreachTemplates.ts` | WhatsApp B2B outreach templates (Steel/Textiles/Packaging, Day 1→14) |
-| `src/app/api/trigger-voice-agent/route.ts` | Bolna.ai + Sarvam STT/TTS qualification call bridge |
-| `src/lib/lead-engine/scraper.ts` | ScrapeGraphAI lead ingestion with Prisma deduplication |
-| `src/lib/muapi/batch-images.ts` | MuAPI flux-dev-image batch generator → public/assets/ |
-| `prisma/migrations/0002_leads_dpdp/migration.sql` | Leads table + DPDP consent log + PII erasure trigger |
-| `CL4R1T4S/` | Reference library of AI system prompts (elder-plinius/CL4R1T4S) |
+Several intelligence modules follow a **catalog → engine → view** pattern — all data is static TypeScript, no extra DB tables:
 
-### Required New Env Vars
+| Module | Data Catalog | Engine | Purpose |
+|--------|-------------|--------|---------|
+| Product Intelligence | `src/data/product-intelligence-catalog.ts` | `src/lib/product-intelligence/` | Product specs, HSN, graph, SEO metadata |
+| Industry Intelligence | `src/data/industry-intelligence-catalog.ts` | `src/lib/industry-intelligence/` | Industry profiles, cluster links, trend scoring |
+| Industrial Clusters | `src/data/industrial-clusters.ts` | (direct lookup) | Geo-tagged cluster slugs → public `/industrial-cluster/[slug]` pages |
+| Geographic Intelligence | (registry inside module) | `src/lib/geographic-intelligence/hierarchy.ts` | Country/State/District/City hierarchy for BOM Location Memory |
+
+Public SEO routes: `/industrial-cluster/[slug]` and `/product-intelligence/[slug]` — these are statically rendered from the catalog data.
+
+### Business Operating Memory (BOM)
+
+`src/lib/bom/` is the event-sourced memory layer for each company. Architecture:
+
+- **Life Events** (`life-events.ts`) — the source of truth. All company activity is written as `BusinessLifeEvent` rows in the DB.
+- **Projections** (`projections.ts`) — reads life events and builds a `BomProjection` (20 memory module snapshots).
+- **Genome Score** (`genome-score.ts`) — computes a 0–100 `BusinessGenome` score across the 20 BOM modules.
+- **Morning Brief** (`morning-brief.ts`) — generates a per-company brief from BOM projection + optional LLM polish. Always reads the company's own BOM — never generic chatbot data.
+- **Business Pulse** (`business-pulse.ts`) — area-level + cluster-level pulse feed, for the geographic context of a company.
+- **Location Memory** (`location.ts`) — maps company location to `IndustrialArea` via `src/data/industrial-clusters.ts`.
+
+The 20 BOM modules (identity, business, product, procurement, supplier, customer, financial, trust, risk, market, knowledge, communication, decision, intent, timeline, opportunity, operational, predictive, economic, location) are defined in `modules.ts`.
+
+### Company DNA Graph
+
+`src/lib/company-dna/graph-builder.ts` builds a force-directed graph (`DnaGraphData`) from a company's BOM layers. This powers the `/admin/company-dna` UI. It uses `product-intelligence-catalog.ts` for product node data. The `Company DNA graph is a visualization; BusinessLifeEvent is the source of truth.`
+
+### Knowledge Graph
+
+`src/lib/knowledge-graph/builder.ts` builds a cross-entity graph (`KnowledgeGraphData`) linking users, RFQs, products, and categories. Admin-only via `/admin/knowledge-graph` and `/api/admin/knowledge-graph`.
+
+### Additional Env Vars (beyond .env.example)
 
 ```
 BOLNA_API_KEY       # Bolna.ai voice campaign API key
 BOLNA_AGENT_ID      # Bolna.ai agent UUID for Sethu persona
 SCRAPEGRAPH_API_KEY # ScrapeGraphAI API key for lead scraping
 MUAPI_API_KEY       # MuAPI video/image generation (add credits at muapi.ai)
+CRON_SECRET         # Required on all /api/cron/* endpoints; set on Vercel too
+SEO_LLM_API_KEY     # Used by src/lib/seo-llm.ts for Morning Brief AI polish (optional)
 ```
 
 ### Database Notes

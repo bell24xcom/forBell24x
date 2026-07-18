@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
+import { notFound } from 'next/navigation';
+import { FLAGS } from '@/src/lib/feature-flags';
 import { DNA_LAYERS, type CompanyDnaProfileView, type DnaGraphData, type DnaGraphNode } from '@/src/lib/company-dna/types';
 
 const DnaForceGraph = dynamic(() => import('@/src/components/admin/company-dna/DnaForceGraph'), { ssr: false });
@@ -14,6 +16,10 @@ interface ProfileListItem {
 }
 
 export default function CompanyDnaAdminPage() {
+  if (!FLAGS.INTELLIGENCE_ENABLED) {
+    notFound();
+  }
+
   const [profiles, setProfiles] = useState<ProfileListItem[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [profile, setProfile] = useState<CompanyDnaProfileView | null>(null);

@@ -196,7 +196,7 @@ export interface DnaGraphEdge {
   source: string;
   target: string;
   label?: string;
-  type: 'layer_link' | 'entity_link' | 'relationship' | 'risk' | 'memory';
+  type: 'layer_link' | 'entity_link' | 'relationship' | 'risk' | 'memory' | 'knowledge_link';
 }
 
 export interface DnaGraphData {

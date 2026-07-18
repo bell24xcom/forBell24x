@@ -25,6 +25,10 @@ export interface PulseSummary {
   exporters: number;
   factoryExpansions: number;
   verifications: number;
+  machinesAdded: number;
+  priceAlerts: number;
+  newCustomers: number;
+  decisionsRecorded: number;
   totalEvents: number;
 }
 
@@ -44,6 +48,8 @@ export interface AreaPulse {
   hasActivity: boolean;
   summary: PulseSummary;
   feed: PulseFeedItem[];
+  /** Non-zero trending categories from recent RFQ events */
+  trendingCategories: string[];
   updatedAt: string;
 }
 
@@ -66,6 +72,8 @@ const EVENT_ICON: Record<string, string> = {
   new_customer: '👤',
   decision_recorded: '🧠',
   location_set: '📍',
+  price_alert: '📈',
+  profile_updated: '📝',
 };
 
 const RFQ_TYPES = ['rfq_created', 'voice_rfq', 'video_rfq'];
@@ -103,9 +111,14 @@ export async function getAreaPulse(areaKey: string, windowDays = 7): Promise<Are
       exporters: 0,
       factoryExpansions: 0,
       verifications: 0,
+      machinesAdded: 0,
+      priceAlerts: 0,
+      newCustomers: 0,
+      decisionsRecorded: 0,
       totalEvents: 0,
     },
     feed: [],
+    trendingCategories: [],
     updatedAt: now.toISOString(),
   };
 
@@ -133,8 +146,23 @@ export async function getAreaPulse(areaKey: string, windowDays = 7): Promise<Are
       exporters: events.filter((e) => e.eventType === 'export_started').length,
       factoryExpansions: events.filter((e) => e.eventType === 'factory_expansion').length,
       verifications: events.filter((e) => ['gst_uploaded', 'udyam_verified'].includes(e.eventType)).length,
+      machinesAdded: events.filter((e) => e.eventType === 'machine_added').length,
+      priceAlerts: events.filter((e) => e.eventType === 'price_alert').length,
+      newCustomers: events.filter((e) => e.eventType === 'new_customer').length,
+      decisionsRecorded: events.filter((e) => e.eventType === 'decision_recorded').length,
       totalEvents: events.length,
     };
+
+    const catCounts = new Map<string, number>();
+    for (const e of events) {
+      if (e.category && RFQ_TYPES.includes(e.eventType)) {
+        catCounts.set(e.category, (catCounts.get(e.category) ?? 0) + 1);
+      }
+    }
+    const trendingCategories = Array.from(catCounts.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([c]) => c);
 
     const feed: PulseFeedItem[] = events.slice(0, 40).map((e) => ({
       id: e.id,
@@ -151,10 +179,63 @@ export async function getAreaPulse(areaKey: string, windowDays = 7): Promise<Are
       hasActivity: summary.totalEvents > 0,
       summary,
       feed,
+      trendingCategories,
       updatedAt: now.toISOString(),
     };
   } catch (err) {
     console.error('[BusinessPulse] getAreaPulse failed:', err instanceof Error ? err.message : err);
     return empty;
   }
+}
+
+/** Cluster pulse — resolves industrial cluster slug → area key when linked. */
+export async function getClusterPulse(clusterSlug: string, windowDays = 7): Promise<AreaPulse> {
+  const { getClusterRecord, resolveClusterPulseKey } = await import('@/src/data/industrial-clusters');
+  const cluster = getClusterRecord(clusterSlug);
+  const areaKey = resolveClusterPulseKey(clusterSlug);
+  if (areaKey) {
+    const pulse = await getAreaPulse(areaKey, windowDays);
+    return {
+      ...pulse,
+      area: pulse.area
+        ? { ...pulse.area, name: cluster?.name ?? pulse.area.name, fullName: cluster?.fullName ?? pulse.area.fullName }
+        : null,
+    };
+  }
+  return {
+    area: cluster
+      ? {
+          key: clusterSlug,
+          name: cluster.name,
+          fullName: cluster.fullName,
+          state: cluster.state ?? '',
+          description: cluster.description,
+          clusterNote: cluster.clusterNote,
+          categories: cluster.categories,
+          lat: cluster.lat ?? null,
+          lng: cluster.lng ?? null,
+        }
+      : null,
+    windowDays,
+    hasActivity: false,
+    summary: {
+      newCompanies: 0,
+      newProducts: 0,
+      newRfqs: 0,
+      quotes: 0,
+      dealsClosed: 0,
+      payments: 0,
+      exporters: 0,
+      factoryExpansions: 0,
+      verifications: 0,
+      machinesAdded: 0,
+      priceAlerts: 0,
+      newCustomers: 0,
+      decisionsRecorded: 0,
+      totalEvents: 0,
+    },
+    feed: [],
+    trendingCategories: [],
+    updatedAt: new Date().toISOString(),
+  };
 }

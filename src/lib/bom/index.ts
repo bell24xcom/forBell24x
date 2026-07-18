@@ -35,6 +35,7 @@ export {
 } from './location';
 export {
   getAreaPulse,
+  getClusterPulse,
   type AreaPulse,
   type PulseFeedItem,
   type PulseSummary,

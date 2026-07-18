@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { notFound } from 'next/navigation';
+import { FLAGS } from '@/src/lib/feature-flags';
 
 interface BriefInsight {
   type: string;
@@ -23,6 +25,10 @@ interface GenomeModule {
 }
 
 export default function MorningBriefAdminPage() {
+  if (!FLAGS.INTELLIGENCE_ENABLED) {
+    notFound();
+  }
+
   const [suppliers, setSuppliers] = useState<{ id: string; companyName: string }[]>([]);
   const [userId, setUserId] = useState('');
   const [brief, setBrief] = useState<MorningBrief | null>(null);

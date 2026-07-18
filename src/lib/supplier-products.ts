@@ -19,6 +19,9 @@ export interface SupplierPreferences {
   description?: string;
   businessType?: string;
   website?: string;
+  employees?: string;
+  annualRevenue?: string;
+  address?: string;
   [key: string]: unknown;
 }
 

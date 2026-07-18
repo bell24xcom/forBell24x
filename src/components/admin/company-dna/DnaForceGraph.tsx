@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { DnaGraphData, DnaGraphEdge, DnaGraphNode } from '@/lib/company-dna/types';
+import type { DnaGraphData, DnaGraphEdge, DnaGraphNode } from '@/src/lib/company-dna/types';
 
 interface SimNode extends DnaGraphNode {
   x: number;

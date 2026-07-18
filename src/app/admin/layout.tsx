@@ -9,8 +9,16 @@ type NavItem = { href: string; label: string; icon: string; group?: string };
 const NAV: NavItem[] = [
   // Core
   { href: '/admin',                  label: 'Dashboard',        icon: '▤',  group: 'Intelligence' },
-  { href: '/admin/company-dna',      label: 'Company DNA',      icon: '🧬' },
-  { href: '/admin/morning-brief',    label: 'Morning Brief',    icon: '☀️' },
+  // INTELLIGENCE_LAYER — hidden until Phase D gate opens
+  // { href: '/admin/company-dna',      label: 'Company DNA',      icon: '🧬' },
+  // INTELLIGENCE_LAYER — hidden until Phase D gate opens
+  // { href: '/admin/knowledge-graph',  label: 'Knowledge Graph',  icon: '🕸️' },
+  // INTELLIGENCE_LAYER — hidden until Phase D gate opens
+  // { href: '/admin/product-intelligence', label: 'Product Intel', icon: '📦' },
+  // INTELLIGENCE_LAYER — hidden until Phase D gate opens
+  // { href: '/admin/industry-intelligence', label: 'Industry Intel', icon: '🏭' },
+  // INTELLIGENCE_LAYER — hidden until Phase D gate opens
+  // { href: '/admin/morning-brief',    label: 'Morning Brief',    icon: '☀️' },
   { href: '/admin/kpi',              label: 'KPI',              icon: '📈' },
   { href: '/admin/analytics',        label: 'Analytics',        icon: '📊' },
   { href: '/admin/heatmap',          label: 'Heatmap',          icon: '🔥' },

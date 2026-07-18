@@ -487,6 +487,58 @@ model BusinessLifeEvent {
   @@map("business_life_events")
 }
 
+// ─── Product / Industry Intelligence — DB-backed catalog (replaces static TS catalogs) ────
+
+model ProductIntelligenceRecord {
+  id               String   @id @default(cuid())
+  slug             String   @unique
+  name             String
+  family           String?
+  category         String
+  subcategory      String?
+  brand            String?
+  description      String
+  manufacturing    Json?
+  commercial       Json?
+  knowledge        Json?
+  businessIntel    Json?    @map("business_intel")
+  seo              Json?
+  referenceCompany String?  @map("reference_company")
+  version          Int      @default(1)
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@index([category])
+  @@index([family])
+  @@map("product_intelligence_records")
+}
+
+model IndustryIntelligenceRecord {
+  id                  String   @id @default(cuid())
+  slug                String   @unique
+  name                String
+  description         String
+  manufacturers       String[] @default([])
+  suppliers           String[] @default([])
+  buyers              String[] @default([])
+  products            String[] @default([])
+  machines            String[] @default([])
+  rawMaterials        String[] @default([]) @map("raw_materials")
+  standards           String[] @default([])
+  tradeAssociations   String[] @default([]) @map("trade_associations")
+  tradeShows          String[] @default([]) @map("trade_shows")
+  governmentSchemes   String[] @default([]) @map("government_schemes")
+  certifications      String[] @default([])
+  relatedClusterSlugs String[] @default([]) @map("related_cluster_slugs")
+  relatedProductSlugs String[] @default([]) @map("related_product_slugs")
+  trends              Json
+  version             Int      @default(1)
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("industry_intelligence_records")
+}
+
 model ExternalLead {
   id          String    @id @default(cuid())
   source      String

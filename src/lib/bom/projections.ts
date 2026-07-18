@@ -3,7 +3,7 @@
  * Company DNA reads projections — not raw tables directly.
  */
 
-import type { CompanyDnaLayers } from '@/lib/company-dna/types';
+import type { CompanyDnaLayers } from '@/src/lib/company-dna/types';
 import { getLifeEvents, lifeEventLabel, type LifeEventView } from './life-events';
 import { BOM_MODULES } from './modules';
 
@@ -27,7 +27,7 @@ function extractProducts(events: LifeEventView[]): string[] {
       if (typeof n === 'string') names.add(n);
     }
   }
-  return [...names];
+  return Array.from(names);
 }
 
 function extractCategories(events: LifeEventView[]): string[] {
@@ -35,7 +35,7 @@ function extractCategories(events: LifeEventView[]): string[] {
   for (const e of events) {
     if (e.category) cats.add(e.category);
   }
-  return [...cats];
+  return Array.from(cats);
 }
 
 function scoreModule(moduleId: string, events: LifeEventView[]): number {
@@ -67,7 +67,7 @@ export async function projectBomFromLifeEvents(companyId: string): Promise<BomPr
     }))
     .slice(0, 20);
 
-  const intents = [...new Set(events.map(e => e.intent).filter(Boolean) as string[])];
+  const intents = Array.from(new Set(events.map(e => e.intent).filter(Boolean) as string[]));
   const productNames = extractProducts(events);
   const categories = extractCategories(events);
 

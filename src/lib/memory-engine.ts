@@ -13,7 +13,7 @@
  *  - Every quote triggers storeQuote()
  */
 
-import { prisma } from '@/lib/prisma';
+import { prisma } from '@/src/lib/prisma';
 
 // ─── Type definitions ─────────────────────────────────────────────────────────
 
@@ -114,7 +114,7 @@ export async function storeRFQ(meta: RFQMeta): Promise<void> {
   if (companyId) {
     const via = meta.metadata?.via as string | undefined;
     const eventType = via === 'voice' ? 'voice_rfq' : via === 'video' ? 'video_rfq' : 'rfq_created';
-    const { recordLifeEventAsync } = await import('@/lib/bom/life-events');
+    const { recordLifeEventAsync } = await import('@/src/lib/bom/life-events');
     recordLifeEventAsync({
       companyId,
       eventType,
@@ -211,7 +211,7 @@ export async function storeQuote(meta: QuoteMeta): Promise<void> {
     select: { category: true, title: true, createdBy: true },
   });
 
-  const { recordLifeEventAsync } = await import('@/lib/bom/life-events');
+  const { recordLifeEventAsync } = await import('@/src/lib/bom/life-events');
   const quoteMeta = { rfqId, price, quantity, title: rfq?.title };
 
   recordLifeEventAsync({
@@ -501,7 +501,7 @@ export async function dailyInsightsCron(): Promise<{ updated: number; errors: nu
 /** Non-blocking Company DNA sync after Elephant Memory write (Layer 11). */
 export async function refreshCompanyDnaFromRfq(userId: string): Promise<void> {
   try {
-    const { syncCompanyDna } = await import('@/lib/company-dna/engine');
+    const { syncCompanyDna } = await import('@/src/lib/company-dna/engine');
     await syncCompanyDna(userId, false);
   } catch {
     /* DNA tables may not exist until migration runs */

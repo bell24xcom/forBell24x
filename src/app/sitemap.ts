@@ -1,5 +1,5 @@
 import { MetadataRoute } from 'next'
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/src/lib/prisma'
 import { SITE_URL } from '@/lib/site-url'
 import { BLOG_POSTS } from '@/src/data/blog-posts'
 import { getAllCityCategoryPairs, CITIES } from '@/src/data/city-category-seo'
@@ -182,7 +182,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Product intelligence pages
   const { listProductSlugs } = await import('@/src/data/product-intelligence-catalog')
-  const productIntelPages: MetadataRoute.Sitemap = listProductSlugs().map(slug => ({
+  const productIntelSlugs = await listProductSlugs()
+  const productIntelPages: MetadataRoute.Sitemap = productIntelSlugs.map(slug => ({
     url: `${siteUrl}/product-intelligence/${slug}`,
     lastModified: new Date(),
     changeFrequency: 'weekly' as const,
