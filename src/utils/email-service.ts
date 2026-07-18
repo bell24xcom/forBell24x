@@ -51,6 +51,12 @@ class EmailService {
 
   // Welcome Email for New Users
   async sendWelcomeEmail(data: EmailData): Promise<boolean> {
+    // Phone-only registrations get a placeholder email (ph_{phone}@bell24h.placeholder) —
+    // never a real inbox, so never send to it.
+    if (data.to.includes('@bell24h.placeholder')) {
+      return false;
+    }
+
     const template: EmailTemplate = {
       subject: `🎉 स्वागत है! Welcome to Bell24h - India's Leading B2B Marketplace`,
       html: `

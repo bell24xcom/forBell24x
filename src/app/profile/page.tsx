@@ -254,7 +254,7 @@ export default function ProfilePage() {
                   <label className="block text-sm font-medium text-slate-400 mb-2">Email (read-only)</label>
                   <input
                     type="text"
-                    value={profile?.email || '—'}
+                    value={profile?.email?.includes('@bell24h.placeholder') ? 'No email added' : (profile?.email || '—')}
                     readOnly
                     className="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-slate-400 cursor-not-allowed"
                   />
