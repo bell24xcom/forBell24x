@@ -2,11 +2,13 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { FLAGS } from '@/src/lib/feature-flags';
-import { INDUSTRIAL_CLUSTERS, listClusterSlugs } from '@/src/data/industrial-clusters';
+import { SITE_URL } from '@/lib/site-url';
+import { INDUSTRIAL_CLUSTERS, listClusterSlugs, type IndustrialClusterRecord } from '@/src/data/industrial-clusters';
 import { getClusterPulse } from '@/src/lib/bom/business-pulse';
-import { getProductRecord } from '@/src/data/product-intelligence-catalog';
-import { getIndustryRecord } from '@/src/data/industry-intelligence-catalog';
+import { getProductRecords } from '@/src/data/product-intelligence-catalog';
+import { getIndustryRecords } from '@/src/data/industry-intelligence-catalog';
 import type { PulseSummary } from '@/src/lib/bom/business-pulse';
+import type { ProductIntelligenceRecord } from '@/src/lib/product-intelligence/types';
 
 interface Props { params: { slug: string } }
 
@@ -39,6 +41,58 @@ function highlights(summary: PulseSummary): { label: string; icon: string }[] {
   return items;
 }
 
+function buildClusterJsonLd(cluster: IndustrialClusterRecord, products: ProductIntelligenceRecord[]) {
+  const url = `${SITE_URL}/industrial-cluster/${cluster.slug}`;
+
+  const placeSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Place',
+    name: cluster.fullName,
+    description: cluster.description,
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: cluster.city ?? cluster.name,
+      ...(cluster.state ? { addressRegion: cluster.state } : {}),
+      addressCountry: cluster.countryCode,
+    },
+    ...(cluster.lat !== undefined && cluster.lng !== undefined
+      ? { geo: { '@type': 'GeoCoordinates', latitude: cluster.lat, longitude: cluster.lng } }
+      : {}),
+  };
+
+  const productListSchema =
+    products.length > 0
+      ? {
+          '@context': 'https://schema.org',
+          '@type': 'ItemList',
+          name: `Key Products in ${cluster.name}`,
+          numberOfItems: products.length,
+          itemListElement: products.map((p, i) => ({
+            '@type': 'ListItem',
+            position: i + 1,
+            item: {
+              '@type': 'Product',
+              name: p.name,
+              description: p.description,
+              url: `${SITE_URL}/product-intelligence/${p.slug}`,
+            },
+          })),
+        }
+      : null;
+
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
+      { '@type': 'ListItem', position: 2, name: 'Industrial Clusters', item: `${SITE_URL}/industrial-cluster` },
+      { '@type': 'ListItem', position: 3, name: cluster.name, item: url },
+    ],
+  };
+
+  return { placeSchema, productListSchema, breadcrumbSchema };
+}
+
 export default async function IndustrialClusterPage({ params }: Props) {
   if (!FLAGS.INTELLIGENCE_ENABLED) {
     notFound();
@@ -49,11 +103,24 @@ export default async function IndustrialClusterPage({ params }: Props) {
 
   const pulse = await getClusterPulse(params.slug, 7);
   const activity = highlights(pulse.summary);
-  const clusterProducts = await Promise.all(cluster.relatedProductSlugs.map(slug => getProductRecord(slug)));
-  const clusterIndustries = await Promise.all(cluster.relatedIndustrySlugs.map(slug => getIndustryRecord(slug)));
+  const [productsMap, industriesMap] = await Promise.all([
+    getProductRecords(cluster.relatedProductSlugs),
+    getIndustryRecords(cluster.relatedIndustrySlugs),
+  ]);
+  const clusterProducts = cluster.relatedProductSlugs.map(slug => productsMap.get(slug) ?? null);
+  const clusterIndustries = cluster.relatedIndustrySlugs.map(slug => industriesMap.get(slug) ?? null);
+  const resolvedProducts = clusterProducts.filter((p): p is ProductIntelligenceRecord => p !== null);
+  const { placeSchema, productListSchema, breadcrumbSchema } = buildClusterJsonLd(cluster, resolvedProducts);
 
   return (
-    <div className="min-h-screen bg-[#0F172A]">
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(placeSchema) }} />
+      {productListSchema && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productListSchema) }} />
+      )}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+
+      <div className="min-h-screen bg-[#0F172A]">
       <div className="max-w-5xl mx-auto px-4 py-12">
         <nav className="flex items-center gap-2 text-sm text-slate-500 mb-8 flex-wrap">
           <Link href="/" className="hover:text-slate-300">Home</Link><span>/</span>
@@ -158,6 +225,7 @@ export default async function IndustrialClusterPage({ params }: Props) {
           </Link>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
