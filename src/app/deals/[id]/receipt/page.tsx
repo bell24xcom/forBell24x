@@ -85,7 +85,7 @@ export default function DealReceiptPage() {
           {/* Header */}
           <div className="flex items-start justify-between mb-8 border-b border-slate-700 pb-6">
             <div>
-              <h1 className="text-2xl font-bold text-white">Bell24h</h1>
+              <h1 className="text-2xl font-bold text-white">VyaparSethu</h1>
               <p className="text-slate-400 text-xs mt-1">Digitex Studio — B2B Procurement Platform</p>
             </div>
             <div className="text-right">
@@ -100,7 +100,7 @@ export default function DealReceiptPage() {
             <span className={`px-3 py-1 rounded-full text-sm font-semibold ${deal.status === 'COMPLETED' ? 'bg-green-900/40 text-green-400 border border-green-700/50' : 'bg-amber-900/40 text-amber-400 border border-amber-700/50'}`}>
               {deal.status}
             </span>
-            <span className="text-slate-400 text-sm">Payment Method: Bell24h Wallet</span>
+            <span className="text-slate-400 text-sm">Payment Method: VyaparSethu Wallet</span>
           </div>
 
           {/* RFQ Summary */}
@@ -165,7 +165,7 @@ export default function DealReceiptPage() {
 
           {/* Footer */}
           <div className="border-t border-slate-700 pt-6 text-center">
-            <p className="text-slate-500 text-xs">This is a computer-generated receipt from Bell24h (Digitex Studio)</p>
+            <p className="text-slate-500 text-xs">This is a computer-generated receipt from VyaparSethu (Digitex Studio)</p>
             <p className="text-slate-300 text-xs mt-1">GSTIN: 27AAPFU0939F1ZV · bell24h.com</p>
           </div>
         </div>

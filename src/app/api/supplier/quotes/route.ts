@@ -92,9 +92,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'RFQ ID and price are required' }, { status: 400 });
     }
 
-    // Validate RFQ exists and is open for quoting (ACTIVE or QUOTED both accept new quotes)
+    // Validate RFQ exists and is open for quoting.
+    // OPEN: default status for voice-created RFQs (src/app/api/voice-rfq/save/route.ts).
+    // ACTIVE: default status for text-created RFQs (src/app/api/rfq/create/route.ts).
+    // QUOTED: already has at least one quote but still accepts more.
     const rfq = await prisma.rFQ.findFirst({
-      where: { id: rfqId, isPublic: true, status: { in: ['ACTIVE', 'QUOTED'] } },
+      where: { id: rfqId, isPublic: true, status: { in: ['OPEN', 'ACTIVE', 'QUOTED'] } },
     });
 
     if (!rfq) {

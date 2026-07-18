@@ -11,6 +11,7 @@ interface VoiceRFQData {
   description: string;
   category: string;
   quantity: string;
+  location: string | null;
   specifications: string[];
   timeline: string;
   budget: string;
@@ -199,6 +200,7 @@ export default function VoiceRFQPage() {
           quantity: data.extractedData.quantity && clean(data.extractedData.quantity)
             ? `${data.extractedData.quantity} ${data.extractedData.unit || 'units'}`
             : '1 units',
+          location: clean(data.extractedData.location),
           specifications: clean(data.extractedData.specifications)
             ? [data.extractedData.specifications]
             : [],
@@ -411,6 +413,9 @@ export default function VoiceRFQPage() {
                   </div>
                   <div className="text-base">
                     <strong className="text-slate-300">Quantity:</strong> <span className="text-white">{generatedRFQ.quantity || 'N/A'}</span>
+                  </div>
+                  <div className="text-base">
+                    <strong className="text-slate-300">Location:</strong> <span className="text-white">{generatedRFQ.location || 'Not specified'}</span>
                   </div>
                   <div className="text-base">
                     <strong className="text-slate-300">Timeline:</strong> <span className="text-white">{generatedRFQ.timeline || 'N/A'}</span>

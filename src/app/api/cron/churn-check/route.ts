@@ -34,23 +34,23 @@ export async function GET(request: NextRequest) {
       try {
         await resendService.sendEmail({
           to: u.email,
-          subject: 'Miss you on Bell24h — new RFQs waiting',
+          subject: 'Miss you on VyaparSethu — new RFQs waiting',
           html: `
             <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
               <div style="background:#1E40AF;padding:20px 24px;text-align:center;">
-                <h1 style="color:white;margin:0;font-size:22px;">Bell24h</h1>
+                <h1 style="color:white;margin:0;font-size:22px;">VyaparSethu</h1>
               </div>
               <div style="padding:28px 24px;background:#f8fafc;">
                 <p>Namaste ${u.name || 'there'},</p>
                 <p>It's been a while! ${u.role === 'SUPPLIER' ? 'New RFQs are waiting for your quotes.' : 'Suppliers are ready to quote your requirements.'}</p>
                 <p style="text-align:center;">
                   <a href="${SITE_URL}/dashboard" style="display:inline-block;background:#2563EB;color:white;padding:12px 28px;text-decoration:none;border-radius:8px;font-weight:bold;">
-                    Back to Bell24h →
+                    Back to VyaparSethu →
                   </a>
                 </p>
               </div>
               <div style="background:#f1f5f9;padding:16px 24px;text-align:center;color:#64748b;font-size:12px;">
-                Bell24h · Digitex Studio · ${SITE_HOST}
+                VyaparSethu · Digitex Studio · ${SITE_HOST}
               </div>
             </div>
           `,

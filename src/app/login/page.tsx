@@ -106,7 +106,7 @@ export default function LoginPage() {
             <span className="text-white font-bold text-xl">B</span>
           </div>
           <h2 className="mt-6 text-3xl font-extrabold text-white">
-            {step === 'phone' ? 'Sign in to Bell24h' : 'Enter OTP'}
+            {step === 'phone' ? 'Sign in to VyaparSethu' : 'Enter OTP'}
           </h2>
           <p className="mt-2 text-sm text-slate-400">
             {step === 'phone'
@@ -222,7 +222,7 @@ export default function LoginPage() {
 
           <div className="text-center border-t border-slate-700 pt-4">
             <p className="text-sm text-slate-400">
-              New to Bell24h?{' '}
+              New to VyaparSethu?{' '}
               <Link href="/register" className="font-medium text-indigo-400 hover:text-indigo-300">
                 Create an account
               </Link>

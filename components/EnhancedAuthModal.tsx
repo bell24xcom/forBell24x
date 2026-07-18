@@ -390,6 +390,16 @@ export default function EnhancedAuthModal({ isOpen, onClose, onSuccess }: Enhanc
     onClose();
   };
 
+  // Auto-close the success screen — don't make the user hunt for the
+  // "Go to Dashboard" button, and don't let dismissing it any other way
+  // (e.g. the header X) skip onSuccess and leave the nav out of sync.
+  useEffect(() => {
+    if (step !== 'success') return;
+    const timer = setTimeout(handleComplete, 2500);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
+
   if (!isOpen) return null;
 
   return (
@@ -405,7 +415,7 @@ export default function EnhancedAuthModal({ isOpen, onClose, onSuccess }: Enhanc
               <h2 className="text-xl font-bold text-gray-900">Join VyaparSethu</h2>
             </div>
             <button
-              onClick={onClose}
+              onClick={step === 'success' ? handleComplete : onClose}
               className="text-gray-400 hover:text-gray-600 transition-colors"
             >
               <X className="w-6 h-6" />
@@ -443,7 +453,7 @@ export default function EnhancedAuthModal({ isOpen, onClose, onSuccess }: Enhanc
               {step === 'emailOtp' && 'Verify Your Email'}
               {step === 'kyc' && 'Company Registration'}
               {step === 'plan' && 'Choose Your Plan'}
-              {step === 'success' && 'Welcome to Bell24h!'}
+              {step === 'success' && 'Welcome to VyaparSethu!'}
             </h3>
             <p className="text-gray-600">
               {step === 'phone' && 'We\'ll send you a verification code to get started'}
@@ -995,7 +1005,7 @@ function SuccessPage({ user, onComplete }: { user: any; onComplete: () => void }
       </div>
       
       <div>
-        <h3 className="text-xl font-bold text-gray-900">Welcome to Bell24h!</h3>
+        <h3 className="text-xl font-bold text-gray-900">Welcome to VyaparSethu!</h3>
         <p className="text-sm text-gray-600 mt-1">
           Your account has been set up successfully
         </p>

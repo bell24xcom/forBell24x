@@ -45,7 +45,7 @@ export default function CheckoutPage() {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: order.amount,
         currency: order.currency,
-        name: "Bell24h Marketplace",
+        name: "VyaparSethu Marketplace",
         description: `Escrow for Deal #${dealId.toString().substring(0,8)}`,
         order_id: order.orderId,
         handler: function (response: any) {
@@ -80,7 +80,7 @@ export default function CheckoutPage() {
             <div className="flex items-start justify-between">
               <div>
                 <h1 className="text-3xl font-black mb-2">Secure Escrow Payment</h1>
-                <p className="text-slate-400">Funds are held by Bell24h and only released to the supplier after you confirm delivery.</p>
+                <p className="text-slate-400">Funds are held by VyaparSethu and only released to the supplier after you confirm delivery.</p>
               </div>
               <Lock className="text-indigo-500 w-8 h-8 mt-2" />
             </div>
@@ -123,7 +123,7 @@ export default function CheckoutPage() {
             </button>
 
             <p className="text-center text-[10px] text-slate-600 font-bold uppercase tracking-[0.2em]">
-              Powered by Razorpay • Protected by Bell24h AI
+              Powered by Razorpay • Protected by VyaparSethu AI
             </p>
           </div>
         </div>

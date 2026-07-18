@@ -99,7 +99,7 @@ export default function RegisterPage() {
                 Create your account
               </h2>
               <p className="mt-2 text-slate-400">
-                Join thousands of businesses on Bell24h
+                Join thousands of businesses on VyaparSethu
               </p>
             </div>
 

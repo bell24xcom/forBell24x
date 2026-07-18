@@ -238,7 +238,7 @@ export default function WalletPage() {
         key: data.key,
         amount: data.amount,
         currency: data.currency,
-        name: 'Bell24h',
+        name: 'VyaparSethu',
         description: 'Wallet Top-up',
         order_id: data.orderId,
         theme: { color: '#2563EB' },

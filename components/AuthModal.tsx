@@ -210,7 +210,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
               {currentStep === 'otp' && 'Verify OTP'}
               {currentStep === 'kyc' && 'Company Registration'}
               {currentStep === 'plan' && 'Choose Your Plan'}
-              {currentStep === 'complete' && 'Welcome to Bell24h!'}
+              {currentStep === 'complete' && 'Welcome to VyaparSethu!'}
             </h2>
             <button
               onClick={onClose}
@@ -496,7 +496,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900">Welcome to Bell24h!</h3>
+              <h3 className="text-xl font-semibold text-gray-900">Welcome to VyaparSethu!</h3>
               <p className="text-gray-600">
                 Your account has been set up successfully. You can now access all features of our B2B marketplace.
               </p>

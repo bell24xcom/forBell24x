@@ -68,7 +68,7 @@ export class VoiceBotService {
   private async playGreeting(callId: string): Promise<void> {
     try {
       const greeting = await this.speechSynthesizer.synthesize(
-        'Welcome to Bell24h. How can I help you today?',
+        'Welcome to VyaparSethu. How can I help you today?',
         this.config.voiceId
       );
       await this.callRouter.playAudio(callId, greeting);

@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
         where: { id: user.userId },
         select: { phone: true, name: true, company: true },
       });
-      const confirmMsg = `Hi ${dbUser?.name ?? dbUser?.company ?? 'there'},\n\nYour Bell24h ${planKey.charAt(0).toUpperCase() + planKey.slice(1)} Plan is now active! 🎉\n\nValid until: ${expiresAt.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}\n\nLog in to access your full supplier dashboard:\n${SITE_URL}/dashboard\n\n— Bell24h Team`;
+      const confirmMsg = `Hi ${dbUser?.name ?? dbUser?.company ?? 'there'},\n\nYour VyaparSethu ${planKey.charAt(0).toUpperCase() + planKey.slice(1)} Plan is now active! 🎉\n\nValid until: ${expiresAt.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}\n\nLog in to access your full supplier dashboard:\n${SITE_URL}/dashboard\n\n— VyaparSethu Team`;
       const waConfirm = dbUser?.phone
         ? `https://wa.me/${dbUser.phone.replace(/\D/g, '').replace(/^(?!91)/, '91')}?text=${encodeURIComponent(confirmMsg)}`
         : null;

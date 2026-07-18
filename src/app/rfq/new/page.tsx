@@ -66,7 +66,7 @@ export default function NewRFQPage() {
               <div className="flex items-center gap-2">
                 <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">B</div>
                 <div>
-                  <div className="font-bold text-xl">Bell24h</div>
+                  <div className="font-bold text-xl">VyaparSethu</div>
                   <div className="text-xs text-slate-300">Verified B2B Platform</div>
                 </div>
               </div>

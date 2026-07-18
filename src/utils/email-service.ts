@@ -58,16 +58,16 @@ class EmailService {
     }
 
     const template: EmailTemplate = {
-      subject: `🎉 स्वागत है! Welcome to Bell24h - India's Leading B2B Marketplace`,
+      subject: `🎉 स्वागत है! Welcome to VyaparSethu - India's Leading B2B Marketplace`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8f9fa;">
           <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px;">
-            <h1 style="margin: 0; font-size: 28px;">🇮🇳 Bell24h</h1>
+            <h1 style="margin: 0; font-size: 28px;">🇮🇳 VyaparSethu</h1>
             <p style="margin: 10px 0; font-size: 16px;">India's Leading AI-Powered B2B Marketplace</p>
           </div>
           
           <div style="padding: 30px; background: white; border-radius: 10px; margin-top: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-            <h2 style="color: #333; margin-bottom: 20px;">🎉 Welcome to Bell24h, ${data.name}!</h2>
+            <h2 style="color: #333; margin-bottom: 20px;">🎉 Welcome to VyaparSethu, ${data.name}!</h2>
             
             <p style="color: #666; line-height: 1.6; margin-bottom: 20px;">
               Thank you for joining India's most advanced B2B marketplace! You're now part of a community of 
@@ -75,7 +75,7 @@ class EmailService {
             </p>
 
             <div style="background: #f0f8ff; padding: 20px; border-radius: 8px; margin: 20px 0;">
-              <h3 style="color: #2563eb; margin-top: 0;">🚀 Your Bell24h Journey Starts Here:</h3>
+              <h3 style="color: #2563eb; margin-top: 0;">🚀 Your VyaparSethu Journey Starts Here:</h3>
               <ul style="color: #666; line-height: 1.8;">
                 <li>✅ <strong>GST Integration:</strong> Complete compliance for Indian businesses</li>
                 <li>✅ <strong>UPI Payments:</strong> Secure transactions with Razorpay</li>
@@ -116,20 +116,20 @@ class EmailService {
                 Need help? Contact us at <a href="mailto:support@bell24h.com" style="color: #667eea;">support@bell24h.com</a>
               </p>
               <p style="color: #666; font-size: 12px;">
-                Bell24h - Made in India, for Indian Businesses 🇮🇳
+                VyaparSethu - Made in India, for Indian Businesses 🇮🇳
               </p>
             </div>
           </div>
         </div>
       `,
       text: `
-Welcome to Bell24h - India's Leading B2B Marketplace!
+Welcome to VyaparSethu - India's Leading B2B Marketplace!
 
 Dear ${data.name},
 
-Thank you for joining Bell24h! You're now part of India's most advanced B2B marketplace.
+Thank you for joining VyaparSethu! You're now part of India's most advanced B2B marketplace.
 
-Your Bell24h Features:
+Your VyaparSethu Features:
 ✅ GST Integration for complete compliance
 ✅ UPI Payments with Razorpay
 ✅ AI-Powered supplier-buyer matching
@@ -142,7 +142,7 @@ Access your dashboard: https://bell24h-v1.vercel.app/dashboard
 
 Need help? Contact: support@bell24h.com
 
-Bell24h - Made in India, for Indian Businesses 🇮🇳
+VyaparSethu - Made in India, for Indian Businesses 🇮🇳
       `
     };
 
@@ -152,12 +152,12 @@ Bell24h - Made in India, for Indian Businesses 🇮🇳
   // RFQ Status Update Email
   async sendRFQStatusEmail(data: EmailData): Promise<boolean> {
     const template: EmailTemplate = {
-      subject: `📋 RFQ Update: ${data.rfqId} - Bell24h`,
+      subject: `📋 RFQ Update: ${data.rfqId} - VyaparSethu`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8f9fa;">
           <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px;">
             <h1 style="margin: 0; font-size: 28px;">📋 RFQ Update</h1>
-            <p style="margin: 10px 0; font-size: 16px;">Bell24h B2B Marketplace</p>
+            <p style="margin: 10px 0; font-size: 16px;">VyaparSethu B2B Marketplace</p>
           </div>
           
           <div style="padding: 30px; background: white; border-radius: 10px; margin-top: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
@@ -194,7 +194,7 @@ Bell24h - Made in India, for Indian Businesses 🇮🇳
         </div>
       `,
       text: `
-RFQ Update - Bell24h
+RFQ Update - VyaparSethu
 
 Hello ${data.name},
 
@@ -207,7 +207,7 @@ RFQ Details:
 
 View responses: https://bell24h-v1.vercel.app/rfq/${data.rfqId}
 
-Bell24h - Made in India 🇮🇳
+VyaparSethu - Made in India 🇮🇳
       `
     };
 
@@ -217,12 +217,12 @@ Bell24h - Made in India 🇮🇳
   // Order Confirmation Email
   async sendOrderConfirmationEmail(data: EmailData): Promise<boolean> {
     const template: EmailTemplate = {
-      subject: `✅ Order Confirmed: ${data.orderId} - Bell24h`,
+      subject: `✅ Order Confirmed: ${data.orderId} - VyaparSethu`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8f9fa;">
           <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: white; border-radius: 10px;">
             <h1 style="margin: 0; font-size: 28px;">✅ Order Confirmed</h1>
-            <p style="margin: 10px 0; font-size: 16px;">Bell24h B2B Marketplace</p>
+            <p style="margin: 10px 0; font-size: 16px;">VyaparSethu B2B Marketplace</p>
           </div>
           
           <div style="padding: 30px; background: white; border-radius: 10px; margin-top: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
@@ -267,7 +267,7 @@ Bell24h - Made in India 🇮🇳
         </div>
       `,
       text: `
-Order Confirmed - Bell24h
+Order Confirmed - VyaparSethu
 
 Hello ${data.name},
 
@@ -283,7 +283,7 @@ Order Details:
 
 Track your order: https://bell24h-v1.vercel.app/orders/${data.orderId}
 
-Bell24h - Made in India 🇮🇳
+VyaparSethu - Made in India 🇮🇳
       `
     };
 
@@ -293,11 +293,11 @@ Bell24h - Made in India 🇮🇳
   // Indian Business Newsletter
   async sendNewsletterEmail(data: EmailData): Promise<boolean> {
     const template: EmailTemplate = {
-      subject: `📰 Bell24h Newsletter: Latest Indian B2B Updates & Opportunities`,
+      subject: `📰 VyaparSethu Newsletter: Latest Indian B2B Updates & Opportunities`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8f9fa;">
           <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px;">
-            <h1 style="margin: 0; font-size: 28px;">📰 Bell24h Newsletter</h1>
+            <h1 style="margin: 0; font-size: 28px;">📰 VyaparSethu Newsletter</h1>
             <p style="margin: 10px 0; font-size: 16px;">Indian B2B Market Updates</p>
           </div>
           
@@ -347,7 +347,7 @@ Bell24h - Made in India 🇮🇳
 
             <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
               <p style="color: #666; font-size: 14px;">
-                Bell24h - Connecting Indian Businesses 🇮🇳
+                VyaparSethu - Connecting Indian Businesses 🇮🇳
               </p>
               <p style="color: #666; font-size: 12px;">
                 Unsubscribe: <a href="mailto:unsubscribe@bell24h.com" style="color: #667eea;">unsubscribe@bell24h.com</a>
@@ -357,7 +357,7 @@ Bell24h - Made in India 🇮🇳
         </div>
       `,
       text: `
-Bell24h Newsletter - Indian B2B Updates
+VyaparSethu Newsletter - Indian B2B Updates
 
 Hello ${data.name},
 
@@ -381,7 +381,7 @@ Latest opportunities and trends in Indian B2B commerce:
 
 Explore: https://bell24h-v1.vercel.app/dashboard
 
-Bell24h - Made in India 🇮🇳
+VyaparSethu - Made in India 🇮🇳
       `
     };
 
@@ -397,7 +397,7 @@ Bell24h - Made in India 🇮🇳
       }
 
       await this.transporter.sendMail({
-        from: `"Bell24h" <${process.env.SMTP_USER || 'noreply@bell24h.com'}>`,
+        from: `"VyaparSethu" <${process.env.SMTP_USER || 'noreply@bell24h.com'}>`,
         to,
         subject: template.subject,
         html: template.html,

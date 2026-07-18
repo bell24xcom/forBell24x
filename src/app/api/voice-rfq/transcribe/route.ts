@@ -42,11 +42,16 @@ export async function POST(request: NextRequest) {
 
     // STEP 1: Transcribe with Groq Whisper v3
     let transcription = '';
+    let detectedLanguage: string | undefined;
     try {
       const fd = new FormData();
       fd.append('file', new Blob([audioBuffer], { type: 'audio/webm' }), 'audio.webm');
       fd.append('model', 'whisper-large-v3');
-      fd.append('response_format', 'json');
+      // No `language` field — Whisper auto-detects the spoken language and
+      // transcribes in that language (never translates). verbose_json (vs json)
+      // surfaces the detected language so misdetections are visible in logs
+      // instead of silently producing a transcript in the wrong language.
+      fd.append('response_format', 'verbose_json');
 
       const groqRes = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
         method: 'POST',
@@ -62,7 +67,8 @@ export async function POST(request: NextRequest) {
 
       const groqData = await groqRes.json();
       transcription = groqData.text || '';
-      console.log('[Voice RFQ] Transcription success:', transcription.substring(0, 100));
+      detectedLanguage = groqData.language;
+      console.log('[Voice RFQ] Transcription success:', transcription.substring(0, 100), '| detected language:', detectedLanguage);
 
       if (!transcription) {
         throw new Error('Groq returned empty transcription');
@@ -104,7 +110,9 @@ Text: "${transcription}"
 Rules:
 - If the text is unclear, ambiguous, or doesn't clearly describe a product/service the user wants to buy, set category to "Other" and product to null.
 - Match the category strictly to what the user said. Do NOT guess. If unsure, use "Other".
-- Examples: "cotton t-shirts" → "Apparel & Clothing"; "steel pipes" → "Metals & Alloys"; "LED bulbs" → "Electronics & Electricals".
+- Examples: "cotton t-shirts" → "Apparel & Clothing"; "steel pipes" → "Metals & Alloys"; "LED bulbs" → "Electronics & Electricals"; "shrink plastic labels" → "Plastics & Rubber"; "corrugated boxes" or "packaging material" → "Paper & Printing".
+- quantity must be the exact number mentioned. Convert word numbers to digits (e.g. "one thousand" → 1000, "five hundred" → 500). Never default to 1 if a number was actually said.
+- location must be the exact Indian city/place name mentioned (e.g. "Bhiwandi", "Surat"). Only use null if no place was mentioned at all.
 
 JSON format (all fields required, use null if not mentioned):
 {
@@ -176,6 +184,7 @@ JSON format (all fields required, use null if not mentioned):
       debug: {
         groqKeyPresent: true,
         audioSize: audioBuffer.length,
+        detectedLanguage,
         transcriptionLength: transcription.length,
       },
     });

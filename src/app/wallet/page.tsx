@@ -113,7 +113,7 @@ export default function WalletPage() {
         key: orderData.key,
         amount: orderData.amount,
         currency: orderData.currency,
-        name: 'Bell24h',
+        name: 'VyaparSethu',
         description: 'Wallet Top-up',
         order_id: orderData.orderId,
         handler: async function (response: any) {

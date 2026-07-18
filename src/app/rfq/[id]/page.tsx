@@ -45,6 +45,7 @@ export default function RFQDetailPage() {
     terms: '',
   });
   const [error, setError] = useState('');
+  const [quoteError, setQuoteError] = useState('');
   const [existingQuote, setExistingQuote] = useState<any>(null);
   const [existingQuoteLoading, setExistingQuoteLoading] = useState(false);
   // Buyer quotes state
@@ -88,11 +89,11 @@ export default function RFQDetailPage() {
 
   const submitQuote = async () => {
     if (!quoteData.price || !quoteData.quantity || !quoteData.timeline) {
-      setError('Please fill all required fields');
+      setQuoteError('Please fill all required fields');
       return;
     }
     setIsSubmitting(true);
-    setError('');
+    setQuoteError('');
     try {
       const response = await fetch('/api/supplier/quotes', {
         method: 'POST',
@@ -127,10 +128,10 @@ export default function RFQDetailPage() {
         alert('Quote submitted successfully!');
         router.push('/supplier/my-quotes');
       } else {
-        setError(data.error || 'Failed to submit quote');
+        setQuoteError(data.error || 'Failed to submit quote');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setQuoteError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setIsSubmitting(false);
     }
@@ -310,7 +311,7 @@ export default function RFQDetailPage() {
                 ) : (
                   <div className="flex items-center gap-2 text-slate-500 text-sm">
                     <CheckCircle size={16} className="text-green-500" />
-                    <span>Posted by Bell24h Marketplace</span>
+                    <span>Posted by VyaparSethu Marketplace</span>
                   </div>
                 )}
               </div>
@@ -544,9 +545,9 @@ export default function RFQDetailPage() {
                 </div>
 
                 {/* Error */}
-                {error && (
+                {quoteError && (
                   <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
-                    {error}
+                    {quoteError}
                   </div>
                 )}
 

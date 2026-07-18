@@ -50,7 +50,7 @@ export default function PaymentPage() {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: order.data.amount,
         currency: order.data.currency,
-        name: 'Bell24h',
+        name: 'VyaparSethu',
         description: order.data.description,
         order_id: order.data.id,
         handler: function (response: any) {

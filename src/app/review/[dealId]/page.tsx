@@ -54,7 +54,7 @@ export default function ReviewSubmissionPage() {
             <CheckCircle className="text-emerald-500 w-10 h-10" />
           </div>
           <h1 className="text-2xl font-black text-white mb-2">Review Captured!</h1>
-          <p className="text-slate-400">Your feedback helps maintain high standards in the Bell24h Marketplace.</p>
+          <p className="text-slate-400">Your feedback helps maintain high standards in the VyaparSethu Marketplace.</p>
           <button 
             onClick={() => router.push('/dashboard')}
             className="mt-8 text-indigo-400 font-bold hover:underline"

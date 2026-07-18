@@ -131,7 +131,7 @@ export default function PhoneOTPModal({ isOpen, onClose, onSuccess }: PhoneOTPMo
             <h3 className="text-2xl font-bold text-gray-900 mb-2">
               {step === 'phone' && 'Enter Your Phone Number'}
               {step === 'phoneOtp' && 'Verify Your Phone'}
-              {step === 'success' && 'Welcome to Bell24h!'}
+              {step === 'success' && 'Welcome to VyaparSethu!'}
             </h3>
             <p className="text-gray-600">
               {step === 'phone' && 'We\'ll send you a verification code to get started'}
@@ -286,7 +286,7 @@ function SuccessPage({ user }: { user: any }) {
       </div>
 
       <div>
-        <h3 className="text-xl font-bold text-gray-900">Welcome to Bell24h!</h3>
+        <h3 className="text-xl font-bold text-gray-900">Welcome to VyaparSethu!</h3>
         <p className="text-sm text-gray-600 mt-1">
           Your account has been created successfully
         </p>

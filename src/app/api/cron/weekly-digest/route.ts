@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
           html: `
             <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
               <div style="background:#1E40AF;padding:20px 24px;text-align:center;">
-                <h1 style="color:white;margin:0;font-size:22px;">Bell24h Weekly Digest</h1>
+                <h1 style="color:white;margin:0;font-size:22px;">VyaparSethu Weekly Digest</h1>
               </div>
               <div style="padding:28px 24px;background:#f8fafc;">
                 <p>Namaste ${supplier.name || 'Supplier'},</p>
@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
                 </p>
               </div>
               <div style="background:#f1f5f9;padding:16px 24px;text-align:center;color:#64748b;font-size:12px;">
-                Bell24h · Digitex Studio · ${SITE_HOST}
+                VyaparSethu · Digitex Studio · ${SITE_HOST}
               </div>
             </div>
           `,
