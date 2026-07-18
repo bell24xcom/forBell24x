@@ -172,3 +172,69 @@ instead of placeholder text."
 ### Priority 4 — After all tests pass
 Declare Phase B Platform Validation Complete.
 Begin pilot supplier onboarding.
+
+---
+
+## Phase B Bug Fixes — July 18, 2026
+
+Commit: 68f0271
+
+### Bugs Fixed
+
+| Bug | Root Cause | Fix | Status |
+|---|---|---|---|
+| "Welcome to Bell24h!" on registration | Hard-coded brand name in 22 user-facing files | Updated all instances to VyaparSethu | ✅ Fixed |
+| "RFQ not found or not active" for Voice RFQs | Voice RFQs saved with status OPEN but quote validation only accepted ACTIVE/QUOTED | Added OPEN to accepted status list in supplier/quotes route | ✅ Fixed |
+| Full-page crash on quote submit failure | Shared error state between RFQ load and quote submit | Split into separate error states; quote errors now shown inline | ✅ Fixed |
+| Voice RFQ location not saved | Location extracted by AI but never wired to UI, save API, or DB | Added location field through full pipeline | ✅ Fixed |
+| Auth modal not auto-closing after registration | Success screen had no auto-close; X button bypassed onSuccess handler | Added 2.5s auto-close; X button now calls handleComplete | ✅ Fixed |
+| Nav showing Login after successful auth | Same root cause as modal — X bypass skipped state propagation | Fixed in same commit as modal | ✅ Fixed |
+
+### Remaining Known Issues
+
+| Issue | Severity | Notes |
+|---|---|---|
+| GST API not verifying live | Medium | Shows "Could not verify GST number" — API credentials or endpoint issue |
+| Voice transcript language misdetection | Medium | Whisper misdetected English as Hindi on one short clip. Language logging now added. Needs real-device testing across multiple languages before fixing. |
+| "Complete your supplier profile" banner persists | Low | Banner shows even after profile setup is complete — profile completion calculation issue |
+| Voice RFQ UX is form-heavy | Medium | Current flow: Speak → Review form → Edit → Select category → Tick checkbox → Save. Original vision: Speak → AI structures → Confirm → Publish. Redesign deferred until voice pipeline quality is confirmed. |
+| Voice Quote UX (supplier) | Medium | Supplier sees empty quote form. Vision: Speak → AI fills price/delivery/terms → Submit. Not yet built. |
+
+### Voice RFQ — Required Real-Device Tests Before UX Redesign
+
+Before any Voice RFQ UX work begins, run these 5 test cases
+on the live deployment and record PASS/FAIL:
+
+| Test | Spoken Input | Expected Transcript | Expected Category | Expected Location |
+|---|---|---|---|---|
+| 1 | "I need 1000 shrink plastic labels in Bhiwandi." | English preserved | Plastics & Rubber | Bhiwandi |
+| 2 | "Need 500 cotton T-shirts for Mumbai." | English preserved | Apparel & Clothing | Mumbai |
+| 3 | "Require steel pipes for Surat construction." | English preserved | Metals & Alloys | Surat |
+| 4 | "मुझे 1000 प्लास्टिक लेबल चाहिए।" | Hindi preserved | Plastics & Rubber | null |
+| 5 | "મારે 500 કોટન ટી-શર્ટ જોઈએ." | Gujarati preserved | Apparel & Clothing | null |
+
+Results must be documented before Voice RFQ redesign begins.
+
+### Overall Phase B Readiness
+
+| Area | Status |
+|---|---|
+| Infrastructure | ✅ Verified healthy |
+| Feature gating | ✅ Working |
+| Registration + Auth | ✅ Fixed — auto-close, nav update |
+| Branding | ✅ Fixed — VyaparSethu throughout |
+| RFQ creation (text) | ✅ Working |
+| Voice RFQ creation | ✅ Working — location fixed, quote bug fixed |
+| Voice RFQ quality | ⚠️ Needs real-device testing |
+| Supplier quote submission | ✅ Fixed — OPEN status accepted |
+| Admin panel | ✅ Working |
+| GST verification | ❌ API not working in production |
+| Payments | ⏳ Not yet tested end-to-end |
+| Welcome email | ⏳ Not yet confirmed |
+
+### Phase B Declaration
+
+Phase B Core Bug Fixes: COMPLETE
+Platform status: Ready for controlled pilot with known limitations above.
+Next milestone: Real-device Voice RFQ testing (5 test cases above),
+then GST API investigation, then Voice RFQ UX redesign if tests pass.
