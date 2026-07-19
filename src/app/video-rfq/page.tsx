@@ -159,29 +159,17 @@ export default function VideoRFQPage() {
         setError(result.error || 'Failed to process video RFQ');
       }
     } catch (error) {
-      console.error('Video RFQ processing error:', error);
-      
-      // Provide fallback mock data for testing
-      const mockTranscription = "I need 50 units of industrial machinery for our manufacturing plant in Mumbai. Budget is around 2 lakhs. Need delivery within 3 weeks.";
-      const mockRfqData = {
-        title: "Industrial Machinery - 50 units",
-        description: mockTranscription,
-        category: "Machinery & Equipment",
-        subcategory: "Industrial Machinery",
-        quantity: 50,
-        unit: "units",
-        budget: 200000,
-        currency: "INR",
-        location: "Mumbai",
-        deliveryDeadline: "3 weeks",
-        priority: "medium",
-        specifications: ["Industrial grade", "Manufacturing use"],
-        requirements: ["Quality certification", "Installation support"]
-      };
-
-      setTranscription(mockTranscription);
-      setRfqData(mockRfqData);
-      setError('AI analysis complete (preview mode)');
+      console.error('[VideoRFQ] Processing failed:', {
+        error: error instanceof Error ? error.message : String(error),
+        timestamp: new Date().toISOString(),
+      });
+      setError(
+        error instanceof Error
+          ? error.message
+          : 'Video processing failed. Please try again.'
+      );
+      setRfqData(null);
+      setTranscription('');
     } finally {
       setIsUploading(false);
     }
@@ -389,8 +377,18 @@ export default function VideoRFQPage() {
 
                 {/* Error Display */}
                 {error && (
-                  <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                    <p className="text-sm text-red-600">{error}</p>
+                  <div className="p-4 bg-red-50 border border-red-200 rounded-lg space-y-3">
+                    <div>
+                      <p className="text-sm font-semibold text-red-700">Video processing failed</p>
+                      <p className="text-sm text-red-600 mt-1">{error}</p>
+                    </div>
+                    <Button
+                      onClick={resetVideo}
+                      variant="outline"
+                      className="border-red-300 text-red-700 hover:bg-red-100"
+                    >
+                      Try Again
+                    </Button>
                   </div>
                 )}
               </CardContent>
