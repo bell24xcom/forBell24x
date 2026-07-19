@@ -1,12 +1,30 @@
 'use client';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
-import { Package, Plus, Edit2, Trash2 } from 'lucide-react';
+import { Package, Plus, Edit2, Trash2, Image as ImageIcon } from 'lucide-react';
+
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
+
+async function uploadProductImage(file: File): Promise<string> {
+  const formData = new FormData();
+  formData.append('file', file);
+  const res = await fetch('/api/supplier/upload-image', {
+    method: 'POST',
+    credentials: 'include',
+    body: formData,
+  });
+  const data = await res.json();
+  if (!res.ok || !data.success) {
+    throw new Error(data.error || 'Image upload failed');
+  }
+  return data.url as string;
+}
 
 interface Product {
   id: string;
@@ -191,23 +209,64 @@ function ProductForm({
     unit: product?.unit || 'piece',
   });
 
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(
+    product?.image_urls?.[0] || null
+  );
+  const [imageError, setImageError] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setImageError('');
+
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      setImageError('Only JPEG, PNG, and WebP images are allowed.');
+      return;
+    }
+    if (file.size > MAX_IMAGE_SIZE) {
+      setImageError('Image must be 5MB or smaller.');
+      return;
+    }
+
+    setImageFile(file);
+    setImagePreviewUrl(URL.createObjectURL(file));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+    setImageError('');
+
+    let imageUrl = product?.image_urls?.[0];
+
+    if (imageFile) {
+      setUploading(true);
+      try {
+        imageUrl = await uploadProductImage(imageFile);
+      } catch (error) {
+        setImageError(error instanceof Error ? error.message : 'Image upload failed');
+        setUploading(false);
+        return;
+      }
+      setUploading(false);
+    }
+
     const productData: Product = {
       id: product?.id || `product-${Date.now()}`,
       ...formData,
-      image_urls: product?.image_urls || [],
+      image_urls: imageUrl ? [imageUrl] : [],
     };
 
     try {
-      // TODO: Implement API call to save product
       const response = await fetch(
         product ? `/api/supplier/products/${product.id}` : '/api/supplier/products',
         {
           method: product ? 'PUT' : 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(productData),
+          body: JSON.stringify({ ...productData, imageUrl }),
         }
       );
 
@@ -243,6 +302,40 @@ function ProductForm({
         />
       </div>
 
+      <div>
+        <label className="block text-sm font-medium text-slate-200 mb-2">
+          Product Image
+        </label>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          onChange={handleImageSelect}
+          className="hidden"
+        />
+        <div className="flex items-center gap-4">
+          {imagePreviewUrl && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={imagePreviewUrl}
+              alt="Product preview"
+              className="w-20 h-20 object-cover rounded-md border border-slate-700"
+            />
+          )}
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+          >
+            <ImageIcon className="h-4 w-4 mr-2" />
+            {imagePreviewUrl ? 'Change Image' : 'Upload Image'}
+          </Button>
+        </div>
+        {imageError && <p className="text-sm text-red-400 mt-2">{imageError}</p>}
+        <p className="text-xs text-slate-400 mt-1">JPEG, PNG, or WebP. Max 5MB.</p>
+      </div>
+
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-slate-200 mb-2">
@@ -268,10 +361,10 @@ function ProductForm({
       </div>
 
       <div className="flex gap-4">
-        <Button type="submit" className="bg-cyan-600 hover:bg-cyan-700">
-          {product ? 'Update Product' : 'Add Product'}
+        <Button type="submit" className="bg-cyan-600 hover:bg-cyan-700" disabled={uploading}>
+          {uploading ? 'Uploading Image...' : product ? 'Update Product' : 'Add Product'}
         </Button>
-        <Button type="button" variant="outline" onClick={onCancel}>
+        <Button type="button" variant="outline" onClick={onCancel} disabled={uploading}>
           Cancel
         </Button>
       </div>

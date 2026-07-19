@@ -35,6 +35,22 @@ export async function POST(request: NextRequest) {
     const videoBuffer = Buffer.from(await videoFile.arrayBuffer());
     console.log('[VideoRFQ] Received video:', videoFile.size, 'bytes, type:', videoFile.type);
 
+    // Groq Whisper's hard limit is 25MB. The full video (not just its audio
+    // track) is uploaded here, so anything beyond a short clip can exceed
+    // this well before the recording is "too long" in any meaningful sense.
+    // Reject early with an accurate message instead of letting Groq's 4xx
+    // get relabeled as a generic "no audio track" error below.
+    const GROQ_WHISPER_MAX_BYTES = 25 * 1024 * 1024;
+    if (videoBuffer.length > GROQ_WHISPER_MAX_BYTES) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: `Video is too large (${(videoBuffer.length / (1024 * 1024)).toFixed(1)}MB). Please record a shorter clip — the limit is 25MB.`,
+        },
+        { status: 413 },
+      );
+    }
+
     // STEP 1 — Transcribe with Groq Whisper. Whisper accepts webm and decodes
     // the audio track on its side, so we can ship the recording as-is.
     let transcription = '';
