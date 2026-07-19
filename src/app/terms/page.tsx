@@ -39,6 +39,9 @@ export default function TermsPage() {
         <li>Pay agreed amounts for accepted quotes via the platform's Protected Payment (escrow) flow — not through off-platform arrangements intended to avoid platform fees.</li>
         <li>Confirm delivery honestly and promptly once goods or services are received and inspected.</li>
         <li>Do not use Requirements to extract free consulting, samples, or designs without genuine intent to transact.</li>
+        <li>Post genuine business Requirements only — test, duplicate, or spam Requirements are not permitted and may be removed without notice.</li>
+        <li>Respond to supplier quotes within 48 hours where reasonably possible.</li>
+        <li>Do not contact matched suppliers outside the platform to bypass platform fees or commissions.</li>
       </ul>
 
       <h2>4. Supplier Responsibilities</h2>
@@ -48,6 +51,9 @@ export default function TermsPage() {
         <li>Honour quotes once accepted by a buyer; withdraw or update a quote before acceptance if terms change.</li>
         <li>Deliver goods or services materially consistent with what was quoted.</li>
         <li>Do not misrepresent business capacity, certifications, or verification status.</li>
+        <li>Respond to matched Requirements within 24 hours where reasonably possible.</li>
+        <li>Only quote for product or service categories you can genuinely supply.</li>
+        <li>Do not solicit matched buyers outside the platform to bypass platform fees or commissions.</li>
       </ul>
 
       <h2>5. Requirement (RFQ) and Quotation Rules</h2>
@@ -57,6 +63,9 @@ export default function TermsPage() {
         <li>A buyer may accept only one quote per Requirement; acceptance creates a Deal between that buyer and supplier.</li>
         <li>Requirements automatically expire after their stated validity period if no quote is accepted; expired Requirements no longer accept new quotes.</li>
         <li>Suppliers may withdraw an unaccepted quote at any time before the buyer accepts it.</li>
+        <li>The default Requirement validity period is 30 days from posting, after which it expires automatically if no deal has closed.</li>
+        <li>The Budget field must be stated accurately or marked "Negotiable" if not yet determined.</li>
+        <li>Requirements identified as spam or test postings may be removed without prior notice.</li>
       </ul>
 
       <h2>6. User-Generated Content</h2>

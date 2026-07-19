@@ -31,6 +31,10 @@ export default function RefundPolicyPage() {
           any circumstances, as it covers payment processing and Protected Payment infrastructure costs
           already incurred at the time of the transaction.
         </li>
+        <li>
+          The <strong>platform fee</strong> charged on completed deals (see §8 of the Terms &amp; Conditions)
+          is non-refundable in all cases once a deal has been confirmed.
+        </li>
       </ul>
       <p>
         Unused credits purchased separately are refundable within 7 days of purchase if not yet spent,
@@ -91,6 +95,8 @@ export default function RefundPolicyPage() {
       <p>
         Email <a href={`mailto:${LEGAL_ENTITY.grievanceEmail}`}>{LEGAL_ENTITY.grievanceEmail}</a>{' '}
         with your registered mobile, deal ID, and the refund reason. Response time: within 48 hours.
+        Refund requests should be raised within <strong>7 days</strong> of the transaction or issue giving
+        rise to the request.
       </p>
 
     </LegalPage>
