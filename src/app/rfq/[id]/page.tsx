@@ -5,6 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useSession } from '@/src/app/contexts/AuthContext';
 import { Video, Mic, FileText, MapPin, Clock, DollarSign, Package, AlertTriangle, CheckCircle } from 'lucide-react';
 import { storeInteraction } from '@/lib/memory-engine';
+import { SITE_URL } from '@/lib/site-url';
 
 const URGENCY_CONFIG = {
   LOW:      { bg: 'bg-blue-100',    text: 'text-blue-800',  border: 'border-blue-200',  label: 'Low Priority' },
@@ -199,6 +200,29 @@ export default function RFQDetailPage() {
   const urgency = rfq?.urgency ? URGENCY_CONFIG[rfq.urgency as keyof typeof URGENCY_CONFIG] : URGENCY_CONFIG.NORMAL;
   const rfqType = rfq?.type?.toLowerCase() || 'text';
 
+  // NOTE: the RFQ Prisma model has no `videoUrl` column, and /api/video-rfq
+  // never uploads/stores the recorded video anywhere — it only transcribes
+  // the audio track and discards the file. So rfq.videoUrl is always
+  // undefined today; this schema is a correctly-gated no-op until real
+  // video storage exists, not a fabricated value.
+  const videoObjectLd =
+    rfqType === 'video' && rfq?.videoUrl
+      ? {
+          '@context': 'https://schema.org',
+          '@type': 'VideoObject',
+          name: rfq.title,
+          description: rfq.description || rfq.title,
+          thumbnailUrl: `${SITE_URL}/og-image.png`,
+          uploadDate: new Date(rfq.createdAt).toISOString(),
+          contentUrl: rfq.videoUrl,
+          publisher: {
+            '@type': 'Organization',
+            name: 'VyaparSethu',
+            logo: { '@type': 'ImageObject', url: `${SITE_URL}/apple-touch-icon.png` },
+          },
+        }
+      : null;
+
   if (error) {
     return (
       <div className="min-h-screen bg-[#0F172A] flex items-center justify-center">
@@ -224,6 +248,9 @@ export default function RFQDetailPage() {
 
   return (
     <div className="min-h-screen bg-[#0F172A] text-white">
+      {videoObjectLd && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(videoObjectLd) }} />
+      )}
       <div className="max-w-5xl mx-auto px-4 py-8">
 
         {/* Breadcrumb */}

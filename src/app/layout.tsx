@@ -8,6 +8,7 @@ import { DashboardProvider } from '@/contexts/DashboardContext'
 import { AuthProvider } from '@/src/app/contexts/AuthContext'
 import PhoneCaptureModal from '@/src/components/capture/PhoneCaptureModal'
 import FloatingBar from '@/src/components/capture/FloatingBar'
+import InstallAppBanner from '@/src/components/InstallAppBanner'
 import { SITE_URL } from '@/lib/site-url'
 
 export const metadata: Metadata = {
@@ -72,6 +73,12 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth dark">
       <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="VyaparSethu" />
+        <meta name="theme-color" content="#0B1F45" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -120,8 +127,10 @@ export default function RootLayout({
               "legalName": "Digitex Studio",
               "taxID": "27AAAPP9753F2ZF",
               "url": SITE_URL,
+              "logo": `${SITE_URL}/apple-touch-icon.png`,
               "image": `${SITE_URL}/og-image.png`,
-              "telephone": "+91-90049-62871",
+              "telephone": "+91-9004962871",
+              "email": "digitex.studio@gmail.com",
               "address": {
                 "@type": "PostalAddress",
                 "streetAddress": "Lodha Upper Thane",
@@ -136,7 +145,11 @@ export default function RootLayout({
                 "longitude": "73.0660"
               },
               "openingHours": "Mo-Sa 09:00-18:00",
-              "priceRange": "₹₹",
+              "priceRange": "Free - ₹9,999/month",
+              "areaServed": {
+                "@type": "Country",
+                "name": "India"
+              },
               "description": "B2B supplier marketplace for Indian MSMEs — verified suppliers, protected payments, 24-hour quotations."
             })
           }}
@@ -172,6 +185,7 @@ export default function RootLayout({
             <CookieBanner />
             <PhoneCaptureModal />
             <FloatingBar />
+            <InstallAppBanner />
           </DashboardProvider>
         </AuthProvider>
         {/* Cloudflare Web Analytics — cookie-free, DPDP-safe, loads after interactive */}

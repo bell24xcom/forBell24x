@@ -133,6 +133,16 @@ export default function HelpPage() {
             </ul>
           </div>
         </div>
+
+        {/* Closing CTA */}
+        <div className="mt-12 text-center">
+          <Link
+            href="/rfq/create"
+            className="inline-flex items-center gap-2 bg-[#D4AF37] hover:bg-[#c4a030] text-[#0B1F45] font-semibold px-8 py-4 rounded-xl transition-colors text-base"
+          >
+            Ready to start? Post your first RFQ →
+          </Link>
+        </div>
       </div>
     </div>
   );

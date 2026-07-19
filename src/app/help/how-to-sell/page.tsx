@@ -38,7 +38,7 @@ export default function HowToSellPage() {
     <div className="min-h-screen bg-[#0F172A] py-12">
       <div className="max-w-5xl mx-auto px-4">
         <div className="text-center mb-10">
-          <h1 className="text-4xl font-bold text-white mb-4">How to Sell on Bell24h</h1>
+          <h1 className="text-4xl font-bold text-white mb-4">How to Sell on VyaparSethu</h1>
           <p className="text-slate-300 text-lg">Your complete guide to growing your B2B business with verified buyers across India</p>
         </div>
 
