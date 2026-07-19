@@ -155,6 +155,169 @@ PRICING: Free for buyers. Supplier listing free. Commission only on completed de
       'Connect with NASSCOM Emerge 50 after DPIIT recognition — good PR angle',
     ],
   },
+  {
+    id: 'alternativeto',
+    name: 'AlternativeTo',
+    url: 'https://alternativeto.net/',
+    da: 85,
+    estimatedTime: '15 min (+ 7-day account-age wait before you can submit)',
+    category: 'SEO/Backlink + Alternative Positioning — DA 85',
+    steps: [
+      'Create an account at alternativeto.net TODAY with digitex.studio@gmail.com — new accounts must wait 7 days before the site allows a new app submission, so don\'t wait to register',
+      'After 7+ days: log in → click your profile icon (top right) → "Suggest new application"',
+      'Search "VyaparSethu" first to confirm it isn\'t already listed by someone else',
+      'Fill all fields below exactly as shown',
+      'When asked "Alternative to", add IndiaMART and TradeIndia — this is the field that captures "IndiaMART alternative" search traffic',
+      'Submit — review typically takes a few days to about a week',
+    ],
+    fields: [
+      { label: 'Application Name', value: 'VyaparSethu' },
+      { label: 'Short Description', value: 'A verified alternative to IndiaMART and TradeIndia for Indian B2B trade — every supplier is GSTIN + Udyam verified, and buyer payments sit in escrow until delivery is confirmed.' },
+      { label: 'Website', value: 'https://www.vyaparsethu.com' },
+      { label: 'Platforms', value: 'Web' },
+      { label: 'License / Pricing', value: 'Free (Freemium — commission on completed deals)' },
+      { label: 'Tags / Categories', value: 'B2B Marketplace, Procurement, Supplier Directory, Escrow Payments, MSME, Supply Chain' },
+      { label: 'Alternative To', value: 'IndiaMART, TradeIndia' },
+      { label: 'Long Description', value: `Most Indian B2B directories connect you to a supplier — VyaparSethu verifies them first and protects your money after.
+
+Every supplier is GSTIN + Udyam verified before they can quote. Buyer funds sit in an RBI-regulated nodal escrow account and only release on delivery confirmation. Post a Requirement by voice (90-second AI transcription), video, or text, and get 3+ quotes within 24 hours.
+
+Built for MSME buyers and suppliers across India's industrial clusters — Steel/Kalamboli, Packaging/Bhiwandi, Chemicals/Taloja, Textiles/Surat.
+
+Formerly Bell24h.`, multiline: true },
+    ],
+    tips: [
+      'The "Alternative to" field is the highest-value part of this listing — it puts VyaparSethu in front of people actively comparing IndiaMART/TradeIndia',
+      'Don\'t attempt submission before the 7-day account-age window passes — the option won\'t appear and the form-fill is wasted',
+      'AlternativeTo ranking is community-driven — a few genuine early users upvoting/commenting helps visibility',
+    ],
+  },
+  {
+    id: 'saashub',
+    name: 'SaaSHub',
+    url: 'https://www.saashub.com/services/submit',
+    da: 74,
+    estimatedTime: '15 min',
+    category: 'SEO/Backlink + Alternative Positioning — DR 74',
+    steps: [
+      'Go to saashub.com/services/submit (free, no account required to start)',
+      'Paste the website URL: https://www.vyaparsethu.com',
+      'Fill all fields below exactly as shown',
+      'List competitors (IndiaMART, TradeIndia) — SaaSHub explicitly slows down/deprioritizes submissions with no competitors listed',
+      'If possible, submit from an email address on the vyaparsethu.com domain rather than Gmail — SaaSHub gives verified-domain submissions higher priority',
+      'Submit — most listings are reviewed within 1–2 days',
+    ],
+    fields: [
+      { label: 'Product Name', value: 'VyaparSethu' },
+      { label: 'Tagline', value: "India's Verified B2B Trade Network" },
+      { label: 'Website', value: 'https://www.vyaparsethu.com' },
+      { label: 'Category', value: 'B2B Marketplace / Procurement Software' },
+      { label: 'Competitors / Rivals', value: 'IndiaMART, TradeIndia' },
+      { label: 'Description', value: 'VyaparSethu is a verified B2B trade network for Indian MSMEs — GSTIN + Udyam-verified suppliers, escrow-protected buyer payments, and voice-powered requirement posting with AI transcription. 3+ quotes within 24 hours, deals settle in 7 days.' },
+      { label: 'Pricing', value: 'Free for buyers. Free supplier listing. Commission only on completed deals.' },
+    ],
+    tips: [
+      'Do not submit if the site looks like "just a landing page with a waitlist" — SaaSHub rejects those; VyaparSethu is live and functional, so this is fine',
+      'Competitors field is not optional in practice — always fill it',
+      'Verification via a company-domain email (not Gmail) is worth doing once @vyaparsethu.com email is set up',
+    ],
+  },
+  {
+    id: 'linkedin',
+    name: 'LinkedIn Company Page',
+    url: 'https://www.linkedin.com/company/setup/new/',
+    da: 98,
+    estimatedTime: '10 min',
+    category: 'GEO/AI Citation — DA 98',
+    steps: [
+      'Sign in to a personal LinkedIn account (must be an admin of the future page)',
+      'Go to linkedin.com/company/setup/new/ → choose page type "Company"',
+      'Fill all fields below exactly as shown',
+      'Upload logo (square) and a cover banner image',
+      'Publish the page, then post an intro update announcing VyaparSethu',
+      'Have every team member add "VyaparSethu" as their current company/experience — this is a real trust + discovery signal, not just cosmetic',
+    ],
+    fields: [
+      { label: 'Page Name', value: 'VyaparSethu' },
+      { label: 'LinkedIn Public URL', value: 'linkedin.com/company/vyaparsethu' },
+      { label: 'Website', value: 'https://www.vyaparsethu.com' },
+      { label: 'Industry', value: 'Technology, Information and Internet' },
+      { label: 'Company Size', value: '2-10 employees' },
+      { label: 'Company Type', value: 'Privately Held' },
+      { label: 'Tagline', value: 'Commerce Connections Globally' },
+      { label: 'About', value: `VyaparSethu is India's verified B2B trade network for MSME buyers and suppliers.
+
+Verified Matching — every supplier is GSTIN + Udyam verified before they can quote.
+Protected Payment — buyer funds held in RBI-regulated escrow until delivery is confirmed.
+Faster Trade — post a Requirement by voice, video, or text; get 3+ quotes within 24 hours.
+
+Formerly Bell24h. Operating entity: VyaparSethu Technologies Pvt Ltd (registration in progress).`, multiline: true },
+    ],
+    tips: [
+      'LinkedIn company pages are one of the sources AI engines (ChatGPT, Claude, Perplexity) pull from when answering "what is [company]" — this is a GEO play, not just a social profile',
+      'Keep the About text factual and distinct from the Crunchbase/G2 copy — don\'t copy-paste the same paragraph everywhere',
+      'Post at least once a week once live — a dormant page with zero posts looks less credible to both people and AI crawlers',
+    ],
+  },
+  {
+    id: 'wikidata',
+    name: 'Wikidata',
+    url: 'https://www.wikidata.org/wiki/Special:NewItem',
+    da: 94,
+    estimatedTime: '20–30 min — more technical than the others, structured data not free text',
+    category: 'GEO/AI Citation — Structured Data',
+    steps: [
+      'Create a Wikidata/Wikimedia account if you don\'t have one, then go to Special:NewItem',
+      'Set Label = VyaparSethu',
+      'Set Description in Wikidata\'s terse, neutral, encyclopedic style — NOT marketing copy (see Description field below for the correct tone)',
+      'Add statements: "instance of" → business / online marketplace; "country" → India; "inception" → founding year; "official website" → https://www.vyaparsethu.com; "industry" → e-commerce / B2B commerce',
+      'IMPORTANT: Wikidata requires at least one independent reference for a new entity — cite the Crunchbase profile, a DPIIT/Startup India record, or a press mention once one exists. A new item with zero references is likely to be flagged or deleted',
+      'Save — Wikidata items go live immediately but may be reviewed/challenged by volunteer editors if unsourced',
+    ],
+    fields: [
+      { label: 'Label', value: 'VyaparSethu' },
+      { label: 'Description (Wikidata style — neutral, factual, no adjectives)', value: 'Indian business-to-business e-commerce platform' },
+      { label: 'Instance of', value: 'business / online marketplace' },
+      { label: 'Country', value: 'India' },
+      { label: 'Official website', value: 'https://www.vyaparsethu.com' },
+      { label: 'Industry', value: 'e-commerce, business-to-business commerce' },
+    ],
+    tips: [
+      'This is the one listing in this tool where marketing language actively hurts you — Wikidata editors remove promotional wording on sight',
+      'Do this AFTER Crunchbase/Startup India are live so you have something independent to cite as a reference',
+      'Wikidata feeds AI model training corpora directly — this is worth doing even though it has no direct traffic value, per GEO best practice',
+    ],
+  },
+  {
+    id: 'f6s',
+    name: 'F6S',
+    url: 'https://www.f6s.com/',
+    da: 86,
+    estimatedTime: '15 min',
+    category: 'Startup Network — DA 86',
+    steps: [
+      'Create an account at f6s.com with digitex.studio@gmail.com',
+      'From your account/profile menu, look for "List your startup" / "Add company" (F6S\'s exact navigation changes periodically — use their search bar for "add company" if the button isn\'t where expected)',
+      'Fill all fields below exactly as shown',
+      'Upload logo, at least one product photo, and add LinkedIn/Twitter links',
+      'Submit — F6S listings are typically visible right away, full profile review may take longer',
+      'Once listed, check F6S\'s startup deals/perks section — often includes free SaaS credits worth claiming separately',
+    ],
+    fields: [
+      { label: 'Business Name', value: 'VyaparSethu' },
+      { label: 'Tagline', value: "India's Verified B2B Trade Network" },
+      { label: 'Website', value: 'https://www.vyaparsethu.com' },
+      { label: 'Business Categories', value: 'B2B Marketplace, Procurement, FinTech, Supply Chain' },
+      { label: 'Year Established', value: '2024' },
+      { label: 'Employees', value: '2-10' },
+      { label: 'Country', value: 'India' },
+      { label: 'Description', value: 'VyaparSethu connects verified MSME suppliers with B2B buyers across India\'s industrial clusters. Every supplier passes GSTIN + Udyam verification before quoting; buyer payments are protected in escrow until delivery. Bootstrapped, building toward Seed.' },
+    ],
+    tips: [
+      'F6S is also a deal/perks platform for startups (AWS, other SaaS credits) — worth checking after listing, separate from the SEO value',
+      'Strong for founder-to-founder and accelerator visibility, not primarily a consumer-facing directory',
+    ],
+  },
 ];
 
 const VALID_GUIDES = new Set(GUIDES.map(g => g.id));
@@ -190,14 +353,14 @@ function SubmitDirectoriesContent() {
     <div className="p-6 max-w-4xl mx-auto">
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-white">Priority Submissions</h1>
-        <p className="text-slate-400 text-sm mt-1">Crunchbase · G2 · Startup India — highest DA backlinks, do these first</p>
+        <p className="text-slate-400 text-sm mt-1">Highest DA backlinks + GEO/AI-citation surfaces — copy-paste guides, do these first</p>
       </div>
 
       {/* Tab selector */}
-      <div className="flex gap-3 mb-8">
+      <div className="flex flex-wrap gap-3 mb-8">
         {GUIDES.map(g => (
           <button key={g.id} onClick={() => setActive(g.id)}
-            className={`flex-1 rounded-xl p-4 text-left border transition-all ${
+            className={`w-40 shrink-0 rounded-xl p-4 text-left border transition-all ${
               active === g.id
                 ? 'bg-[#001f3f] border-[#D4AF37]/40'
                 : 'bg-slate-800/40 border-slate-700/50 hover:border-slate-600'

@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
       recentQuotes,
     ] = await Promise.all([
       prisma.rFQ.count({ where: { createdBy: userId } }),
-      prisma.rFQ.count({ where: { createdBy: userId, status: 'ACTIVE' } }),
+      prisma.rFQ.count({ where: { createdBy: userId, status: { in: ['ACTIVE', 'OPEN'] } } }),
       prisma.quote.count({ where: { rfq: { createdBy: userId } } }),
       prisma.transaction.aggregate({
         where: { buyerId: userId, status: 'COMPLETED' },

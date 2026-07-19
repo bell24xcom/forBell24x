@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
       dailyRfqs,
     ] = await Promise.all([
       prisma.rFQ.count({ where: { createdAt: { gte: since } } }),
-      prisma.rFQ.count({ where: { status: 'ACTIVE' } }),
+      prisma.rFQ.count({ where: { status: { in: ['ACTIVE', 'OPEN'] } } }),
       prisma.quote.count({ where: { createdAt: { gte: since } } }),
       prisma.deal.count({ where: { createdAt: { gte: since } } }),
       prisma.deal.count({ where: { createdAt: { gte: since }, status: 'COMPLETED' } }),

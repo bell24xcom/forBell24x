@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
       prisma.user.count({ where: { createdAt: { gte: startOfToday } } }),
       prisma.user.count({ where: { createdAt: { gte: startOfWeek  } } }),
       prisma.rFQ.count(),
-      prisma.rFQ.count({ where: { status: 'ACTIVE'    } }),
+      prisma.rFQ.count({ where: { status: { in: ['ACTIVE', 'OPEN'] } } }),
       prisma.rFQ.count({ where: { status: 'COMPLETED' } }),
       prisma.rFQ.count({ where: { status: 'CANCELLED' } }),
       prisma.quote.count(),
@@ -60,15 +60,15 @@ export async function GET(request: NextRequest) {
       prisma.user.count({ where: { role: 'SUPPLIER', trustScore: { gte: 70 } } }),
       // Quick actions
       prisma.user.count({ where: { isVerified: false, isActive: true } }),
-      prisma.rFQ.count({ where: { status: 'ACTIVE', quotes: { none: {} } } }),
-      prisma.rFQ.count({ where: { status: 'ACTIVE', expiresAt: { lte: threeDays, gt: now } } }),
+      prisma.rFQ.count({ where: { status: { in: ['ACTIVE', 'OPEN'] }, quotes: { none: {} } } }),
+      prisma.rFQ.count({ where: { status: { in: ['ACTIVE', 'OPEN'] }, expiresAt: { lte: threeDays, gt: now } } }),
     ]);
 
     const [seededRfqs, realRfqs, importedUnverified, unansweredRealRfqs] = await Promise.all([
       prisma.rFQ.count({ where: { isSeeded: true } }),
       prisma.rFQ.count({ where: { isSeeded: false } }),
       prisma.user.count({ where: { isVerified: false, isActive: true, importedFrom: { not: null } } }),
-      prisma.rFQ.count({ where: { status: 'ACTIVE', quotes: { none: {} }, isSeeded: { not: true } } }),
+      prisma.rFQ.count({ where: { status: { in: ['ACTIVE', 'OPEN'] }, quotes: { none: {} }, isSeeded: { not: true } } }),
     ]);
 
     const volumeResult = await prisma.transaction.aggregate({

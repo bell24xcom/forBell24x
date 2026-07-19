@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * limit;
 
     const where: Parameters<typeof prisma.rFQ.findMany>[0]['where'] = {
-      status: 'ACTIVE',
+      status: { in: ['ACTIVE', 'OPEN'] },
       isPublic: true,
     };
 

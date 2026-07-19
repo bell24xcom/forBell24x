@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
       prisma.user.count({ where: { role: 'SUPPLIER', isClaimed: true } }),
       prisma.user.count({ where: { role: 'SUPPLIER', isClaimed: false, outreachCount: { lt: 3 }, phone: { not: null } } }),
       prisma.rFQ.count(),
-      prisma.rFQ.count({ where: { status: 'ACTIVE' } }),
+      prisma.rFQ.count({ where: { status: { in: ['ACTIVE', 'OPEN'] } } }),
       prisma.deal.count(),
       prisma.deal.count({ where: { createdAt: { gte: since7 } } }),
       prisma.interactionMemory.groupBy({

@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
       // Count new RFQs in their categories this week
       const newRFQs = await prisma.rFQ.count({
         where: {
-          status: 'ACTIVE',
+          status: { in: ['ACTIVE', 'OPEN'] },
           createdAt: { gte: since },
           ...(categories.length > 0 ? { category: { in: categories } } : {}),
         },

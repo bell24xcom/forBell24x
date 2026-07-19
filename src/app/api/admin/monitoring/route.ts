@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
 
       // RFQs
       prisma.rFQ.count(),
-      prisma.rFQ.count({ where: { status: 'ACTIVE' } }),
+      prisma.rFQ.count({ where: { status: { in: ['ACTIVE', 'OPEN'] } } }),
       prisma.rFQ.count({ where: { createdAt: { gte: last24h } } }),
       prisma.rFQ.count({ where: { createdAt: { gte: last7days } } }),
       prisma.rFQ.count({ where: { status: 'ACCEPTED' } }),

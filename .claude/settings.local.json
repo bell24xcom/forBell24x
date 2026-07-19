@@ -181,7 +181,10 @@
       "Bash(grep -n \"product-intelligence\\\\|industry-intelligence\\\\|cache-store\\\\|db-timeout\\\\|version-conflict\\\\|pagination.ts\\\\|/pagination'\" /tmp_tsc_out.txt)",
       "Read(//c/Users/Sanika/AppData/Local/Temp/claude/C--Users-Sanika-Projects-bell24h/952f6df4-7a5f-4c4a-8ed9-8d2df4e09b83/scratchpad/**)",
       "Bash(awk -F\"'\" '{print NF-1}')",
-      "Bash(bc)"
+      "Bash(bc)",
+      "WebFetch(domain:www.f6s.com)",
+      "WebFetch(domain:alternativeto.net)",
+      "WebFetch(domain:www.saashub.com)"
     ]
   },
   "enableAllProjectMcpServers": true,

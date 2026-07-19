@@ -73,7 +73,7 @@ export async function GET(req: NextRequest) {
     ]);
 
     const stats = await Promise.all([
-      prisma.rFQ.count({ where: { status: 'ACTIVE' } }),
+      prisma.rFQ.count({ where: { status: { in: ['ACTIVE', 'OPEN'] } } }),
       prisma.rFQ.count({ where: { status: 'COMPLETED' } }),
       prisma.rFQ.count({ where: { status: 'CANCELLED' } }),
       prisma.rFQ.count({

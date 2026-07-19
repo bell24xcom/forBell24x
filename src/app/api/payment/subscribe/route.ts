@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticate } from '@/lib/jwt';
+import { PLANS } from '@/lib/plans';
 
 export const dynamic = 'force-dynamic';
 
-// Subscription plan pricing (in INR)
-export const PLANS: Record<string, { name: string; amount: number; label: string }> = {
-  verified:   { name: 'verified',   amount: 999,  label: 'Verified Supplier' },
-  starter:    { name: 'starter',    amount: 999,  label: 'Starter'    },
-  growth:     { name: 'growth',     amount: 2999, label: 'Growth'     },
-  enterprise: { name: 'enterprise', amount: 7999, label: 'Enterprise' },
+// Maps the lowercase plan key the client sends to the canonical plan
+// defined in lib/plans.ts (the same source the pricing page renders from).
+// FREE has no payment flow, so it isn't in this map — it's rejected explicitly below.
+const PAYABLE_PLANS: Record<string, 'PRO' | 'ENTERPRISE'> = {
+  pro: 'PRO',
+  enterprise: 'ENTERPRISE',
 };
 
 /**
@@ -26,11 +27,20 @@ export async function POST(request: NextRequest) {
 
     const { plan } = await request.json();
     const planKey = plan?.toLowerCase();
-    const planConfig = PLANS[planKey];
+
+    if (planKey === 'free' || planKey === 'starter') {
+      return NextResponse.json(
+        { success: false, error: 'Free plan does not require payment' },
+        { status: 400 }
+      );
+    }
+
+    const planName = planKey ? PAYABLE_PLANS[planKey] : undefined;
+    const planConfig = planName ? PLANS[planName] : undefined;
 
     if (!planConfig) {
       return NextResponse.json(
-        { success: false, error: `Invalid plan. Choose: ${Object.keys(PLANS).join(', ')}` },
+        { success: false, error: `Invalid plan. Choose: ${Object.keys(PAYABLE_PLANS).join(', ')}` },
         { status: 400 }
       );
     }
@@ -44,7 +54,7 @@ export async function POST(request: NextRequest) {
         success: true,
         testMode: true,
         orderId: `order_test_sub_${planKey}_${Date.now()}`,
-        amount: planConfig.amount * 100,
+        amount: planConfig.monthlyPriceINR * 100,
         currency: 'INR',
         plan: planKey,
         keyId: 'rzp_test_placeholder',
@@ -55,7 +65,7 @@ export async function POST(request: NextRequest) {
     const razorpay = new Razorpay({ key_id: keyId, key_secret: keySecret });
 
     const order = await razorpay.orders.create({
-      amount: planConfig.amount * 100, // paise
+      amount: planConfig.monthlyPriceINR * 100, // paise
       currency: 'INR',
       receipt: `sub_${planKey}_${Date.now()}`.slice(0, 40),
       notes: {

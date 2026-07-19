@@ -14,7 +14,7 @@ export async function GET() {
   try {
     const [suppliers, totalRFQs, categories] = await Promise.all([
       prisma.user.count({ where: { role: 'SUPPLIER', isActive: true } }),
-      prisma.rFQ.count({ where: { status: { in: ['ACTIVE', 'QUOTED', 'ACCEPTED', 'COMPLETED'] } } }),
+      prisma.rFQ.count({ where: { status: { in: ['ACTIVE', 'OPEN', 'QUOTED', 'ACCEPTED', 'COMPLETED'] } } }),
       prisma.category.count({ where: { isActive: true } }),
     ]);
 

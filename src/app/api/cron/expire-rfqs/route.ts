@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const result = await prisma.rFQ.updateMany({
-      where: { status: 'ACTIVE', expiresAt: { lt: new Date() } },
+      where: { status: { in: ['ACTIVE', 'OPEN'] }, expiresAt: { lt: new Date() } },
       data: { status: 'EXPIRED' },
     });
 
