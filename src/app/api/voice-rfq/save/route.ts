@@ -75,6 +75,7 @@ export async function POST(request: NextRequest) {
         timeline: rfqData.timeline || 'flexible',
         urgency: rfqData.timeline === 'urgent' ? 'URGENT' : 'NORMAL',
         status: 'OPEN',
+        type: 'voice',
         createdBy: payload.userId,
         expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
       },
