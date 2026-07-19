@@ -43,7 +43,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // INTELLIGENCE_LAYER — excluded from sitemap until Phase D gate opens
     { url: `${siteUrl}/blog`,                        lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.8  },
     { url: `${siteUrl}/pricing`,                     lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7  },
-    { url: `${siteUrl}/services`,                    lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7  },
     { url: `${siteUrl}/about`,                       lastModified: new Date(), changeFrequency: 'monthly', priority: 0.65 },
     { url: `${siteUrl}/contact`,                     lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6  },
     { url: `${siteUrl}/press`,                       lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6  },
