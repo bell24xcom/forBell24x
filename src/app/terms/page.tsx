@@ -32,7 +32,34 @@ export default function TermsPage() {
         <li>You are responsible for all activity under your account.</li>
       </ul>
 
-      <h2>3. User-Generated Content</h2>
+      <h2>3. Buyer Responsibilities</h2>
+      <ul>
+        <li>Provide accurate, complete details when posting a Quotation Requirement (product, quantity, specifications, location, and timeline).</li>
+        <li>Respond to supplier quotes in good faith and within a reasonable time.</li>
+        <li>Pay agreed amounts for accepted quotes via the platform's Protected Payment (escrow) flow — not through off-platform arrangements intended to avoid platform fees.</li>
+        <li>Confirm delivery honestly and promptly once goods or services are received and inspected.</li>
+        <li>Do not use Requirements to extract free consulting, samples, or designs without genuine intent to transact.</li>
+      </ul>
+
+      <h2>4. Supplier Responsibilities</h2>
+      <ul>
+        <li>Maintain valid, current GST and/or Udyam registration details on your profile at all times.</li>
+        <li>Submit quotes that accurately reflect price, quantity, specifications, and delivery timeline you can genuinely fulfil.</li>
+        <li>Honour quotes once accepted by a buyer; withdraw or update a quote before acceptance if terms change.</li>
+        <li>Deliver goods or services materially consistent with what was quoted.</li>
+        <li>Do not misrepresent business capacity, certifications, or verification status.</li>
+      </ul>
+
+      <h2>5. Requirement (RFQ) and Quotation Rules</h2>
+      <ul>
+        <li>A Requirement remains open for quoting until it is closed, cancelled, expires, or a quote is accepted and a Deal is created.</li>
+        <li>A quote is a binding offer from the supplier until the buyer accepts it, the Requirement closes, or the supplier withdraws it beforehand.</li>
+        <li>A buyer may accept only one quote per Requirement; acceptance creates a Deal between that buyer and supplier.</li>
+        <li>Requirements automatically expire after their stated validity period if no quote is accepted; expired Requirements no longer accept new quotes.</li>
+        <li>Suppliers may withdraw an unaccepted quote at any time before the buyer accepts it.</li>
+      </ul>
+
+      <h2>6. User-Generated Content</h2>
       <p>
         When you post a Text, Speak (Voice), or Video Requirement, you grant {LEGAL_ENTITY.platform}
         a non-exclusive, royalty-free licence to display, transmit, and match that content with
@@ -49,14 +76,14 @@ export default function TermsPage() {
         Raw audio and video are not stored by us. See our <a href="/privacy">Privacy Policy</a> for details.
       </p>
 
-      <h2>4. Supplier Profiles and Pre-Built Listings</h2>
+      <h2>7. Supplier Profiles and Pre-Built Listings</h2>
       <p>
         Some supplier profiles are pre-built from publicly available business information. If you are
         a business whose profile appears on the platform, you may claim, correct, or request deletion
         of that profile at any time. See <a href="/data-deletion">Data Deletion</a>.
       </p>
 
-      <h2>5. Payments and Protected Payment</h2>
+      <h2>8. Payments and Protected Payment</h2>
       <ul>
         <li>Payments are processed via Razorpay, a third-party payment gateway. We do not directly hold buyer funds.</li>
         <li>The "Protected Payment" feature holds funds in escrow until both parties confirm delivery.</li>
@@ -65,7 +92,7 @@ export default function TermsPage() {
         <li>We comply with RBI guidelines; Trade Account balances are maintained through licensed nodal partners and are not our proprietary wallets.</li>
       </ul>
 
-      <h2>6. Prohibited Activities</h2>
+      <h2>9. Prohibited Activities</h2>
       <p>You must not:</p>
       <ul>
         <li>Post false, misleading, or fraudulent requirements or quotes.</li>
@@ -78,13 +105,13 @@ export default function TermsPage() {
         Violations may result in immediate account suspension and reporting to relevant authorities.
       </p>
 
-      <h2>7. Intellectual Property</h2>
+      <h2>10. Intellectual Property</h2>
       <p>
         All platform IP (branding, code, matching algorithms, Trust Confidence Score™ methodology) is
         owned by {LEGAL_ENTITY.name}. You may not reproduce or use our trademarks without written consent.
       </p>
 
-      <h2>8. Limitation of Liability</h2>
+      <h2>11. Limitation of Liability</h2>
       <p>
         {LEGAL_ENTITY.platform} is a marketplace facilitator. We are not liable for the quality,
         delivery, or legality of goods and services transacted between buyers and suppliers. Our
@@ -92,7 +119,7 @@ export default function TermsPage() {
         12 months preceding the claim.
       </p>
 
-      <h2>9. Governing Law and Dispute Resolution</h2>
+      <h2>12. Governing Law and Dispute Resolution</h2>
       <p>
         These Terms are governed by the laws of India. Disputes shall first be attempted to be
         resolved through our grievance mechanism (email {LEGAL_ENTITY.grievanceEmail}).
@@ -100,14 +127,23 @@ export default function TermsPage() {
         Thane, Maharashtra.
       </p>
 
-      <h2>10. Grievance Redressal</h2>
+      <h2>13. Grievance Redressal</h2>
       <p>
         Grievance Officer: <strong>{LEGAL_ENTITY.proprietor}</strong>, {LEGAL_ENTITY.name}.
         Email: {LEGAL_ENTITY.grievanceEmail}. We aim to acknowledge grievances within 48 hours and
         resolve them within 30 days.
       </p>
 
-      <h2>11. Amendments</h2>
+      <h2>14. Contact Information</h2>
+      <ul>
+        <li><strong>Platform:</strong> {LEGAL_ENTITY.platform} ({LEGAL_ENTITY.domain})</li>
+        <li><strong>Operated by:</strong> {LEGAL_ENTITY.name} ({LEGAL_ENTITY.type})</li>
+        <li><strong>GSTIN:</strong> {LEGAL_ENTITY.gstin}</li>
+        <li><strong>Registered Address:</strong> {LEGAL_ENTITY.address}</li>
+        <li><strong>Email:</strong> {LEGAL_ENTITY.grievanceEmail}</li>
+      </ul>
+
+      <h2>15. Amendments</h2>
       <p>
         We may update these Terms at any time. Material changes will be notified via the platform
         or email. Continued use after the effective date constitutes acceptance.

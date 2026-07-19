@@ -20,4 +20,4 @@ export const LEGAL_ENTITY = {
 export const CONSENT_TEXT_VERSION = '1.0';
 
 export const POLICY_EFFECTIVE_DATE = '11 June 2026';
-export const POLICY_LAST_UPDATED   = '11 June 2026';
+export const POLICY_LAST_UPDATED   = '19 July 2026';

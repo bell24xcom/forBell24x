@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Phone, Mail, ArrowLeft, CheckCircle, X, Building2, CreditCard, User } from 'lucide-react';
+import ConsentCheckbox from '@/src/components/legal/ConsentCheckbox';
 
 const WIDGET_ID  = process.env.NEXT_PUBLIC_MSG91_WIDGET_ID;
 const TOKEN_AUTH = process.env.NEXT_PUBLIC_MSG91_TOKEN_AUTH;
@@ -537,10 +538,11 @@ export default function EnhancedAuthModal({ isOpen, onClose, onSuccess }: Enhanc
 // Phone Input Component
 function PhoneInput({ onPhoneSubmit, loading }: { onPhoneSubmit: (phone: string, demoOTP?: string) => void; loading: boolean }) {
   const [phone, setPhone] = useState('');
+  const [consentGiven, setConsentGiven] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (phone.length >= 10) {
+    if (phone.length >= 10 && consentGiven) {
       onPhoneSubmit(phone);
     }
   };
@@ -564,9 +566,21 @@ function PhoneInput({ onPhoneSubmit, loading }: { onPhoneSubmit: (phone: string,
         </div>
       </div>
 
+      <ConsentCheckbox
+        id="registration-consent"
+        checked={consentGiven}
+        onChange={setConsentGiven}
+        textClassName="text-sm text-gray-600 leading-snug"
+      >
+        I agree to VyaparSethu's{' '}
+        <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">Terms of Service</a>
+        {' '}and{' '}
+        <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">Privacy Policy</a>.
+      </ConsentCheckbox>
+
       <button
         type="submit"
-        disabled={loading || phone.length < 10}
+        disabled={loading || phone.length < 10 || !consentGiven}
         className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {loading ? 'Sending OTP...' : 'Send OTP'}

@@ -16,9 +16,23 @@ export default function RefundPolicyPage() {
         <strong>{LEGAL_ENTITY.name}</strong>.
       </p>
 
-      <h2>1. Platform Fees</h2>
+      <h2>1. Subscription Plan Refunds</h2>
+      <ul>
+        <li>
+          <strong>Pro plan (₹2,999/month):</strong> if you cancel within 7 days of the start of a
+          billing period, you receive a full refund for that period.
+        </li>
+        <li>
+          <strong>After 7 days:</strong> no refund is issued for that billing period, but you retain
+          full access to Pro features until the end of the period you already paid for.
+        </li>
+        <li>
+          The <strong>transaction fee (2%)</strong> charged on completed deals is non-refundable under
+          any circumstances, as it covers payment processing and Protected Payment infrastructure costs
+          already incurred at the time of the transaction.
+        </li>
+      </ul>
       <p>
-        Platform subscription fees (if any) are non-refundable once the billing period has begun.
         Unused credits purchased separately are refundable within 7 days of purchase if not yet spent,
         subject to a processing fee of ₹99 or 5% (whichever is lower).
       </p>
