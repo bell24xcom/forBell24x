@@ -184,7 +184,12 @@
       "Bash(bc)",
       "WebFetch(domain:www.f6s.com)",
       "WebFetch(domain:alternativeto.net)",
-      "WebFetch(domain:www.saashub.com)"
+      "WebFetch(domain:www.saashub.com)",
+      "Bash(npm --version)",
+      "Bash(npx --yes create-expo-app@latest vyaparsethu --template blank-typescript --yes)",
+      "Bash(npx expo *)",
+      "Bash(npm view *)",
+      "Bash(npx expo-doctor *)"
     ]
   },
   "enableAllProjectMcpServers": true,
