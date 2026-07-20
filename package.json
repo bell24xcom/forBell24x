@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
-    "vercel-build": "prisma generate && next build",
+    "build": "prisma migrate resolve --rolled-back 0002_leads_dpdp || true && prisma migrate deploy && prisma generate && next build",
+    "vercel-build": "prisma migrate resolve --rolled-back 0002_leads_dpdp || true && prisma migrate deploy && prisma generate && next build",
     "db:migrate": "prisma migrate resolve --rolled-back 0002_leads_dpdp || true && prisma migrate deploy",
     "start": "next start",
     "db:push": "prisma db push --accept-data-loss",
