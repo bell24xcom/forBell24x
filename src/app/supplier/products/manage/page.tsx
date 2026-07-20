@@ -266,7 +266,12 @@ function ProductForm({
         {
           method: product ? 'PUT' : 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...productData, imageUrl }),
+          body: JSON.stringify({
+            id: productData.id,
+            name: formData.product_name,
+            description: formData.description,
+            imageUrl,
+          }),
         }
       );
 
@@ -279,7 +284,7 @@ function ProductForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form method="post" onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label className="block text-sm font-medium text-slate-200 mb-2">
           Product Name *
@@ -309,6 +314,7 @@ function ProductForm({
         <input
           ref={fileInputRef}
           type="file"
+          name="productImage"
           accept="image/jpeg,image/png,image/webp"
           onChange={handleImageSelect}
           className="hidden"
