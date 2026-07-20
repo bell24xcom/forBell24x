@@ -12,6 +12,7 @@ import {
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CameraView, useCameraPermissions, useMicrophonePermissions } from 'expo-camera';
+import { useVideoPlayer, VideoView } from 'expo-video';
 import { apiFetch, apiUpload } from '../../src/lib/api';
 import { COLORS } from '../../src/constants/theme';
 
@@ -64,6 +65,10 @@ export default function VideoRfqScreen() {
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [showCategoryPicker, setShowCategoryPicker] = useState(false);
+
+  const player = useVideoPlayer(videoUri, (p) => {
+    p.loop = false;
+  });
 
   // Editable fields, seeded from AI extraction but user-correctable before
   // saving — extraction is best-effort, not authoritative.
@@ -227,10 +232,12 @@ export default function VideoRfqScreen() {
         {stage === 'camera' ? (
           <CameraView ref={cameraRef} style={styles.fullScreen} mode="video" facing="back" />
         ) : (
-          <View style={[styles.fullScreen, styles.previewPlaceholder]}>
-            <Text style={styles.previewIcon}>🎬</Text>
-            <Text style={styles.previewText}>Video recorded — {formatTime(seconds)}</Text>
-          </View>
+          <VideoView
+            style={styles.fullScreen}
+            player={player}
+            nativeControls
+            contentFit="contain"
+          />
         )}
 
         {stage === 'camera' && recording && (
@@ -383,9 +390,6 @@ const styles = StyleSheet.create({
   permissionText: { textAlign: 'center', color: COLORS.textDark, fontSize: 15 },
   processingText: { marginTop: 16, color: COLORS.textDark, fontSize: 15 },
   fullScreen: { flex: 1, backgroundColor: '#000' },
-  previewPlaceholder: { alignItems: 'center', justifyContent: 'center' },
-  previewIcon: { fontSize: 56, marginBottom: 12 },
-  previewText: { color: COLORS.white, fontSize: 16, fontWeight: '600' },
   timerBadge: {
     position: 'absolute',
     top: 60,

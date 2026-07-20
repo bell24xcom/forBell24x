@@ -17,7 +17,12 @@
       "permissions": [
         "RECORD_AUDIO",
         "CAMERA",
-        "INTERNET"
+        "INTERNET",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",
+        "android.permission.CAMERA"
       ],
       "adaptiveIcon": {
         "backgroundColor": "#0B1F45",
@@ -63,6 +68,12 @@
           "imageWidth": 120
         }
       ]
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "5750a4df-1219-48ad-ba93-abe8a3a75a43"
+      }
+    }
   }
 }
