@@ -40,6 +40,14 @@
         }
       ],
       [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow VyaparSethu to access your camera to record Video Requirements.",
+          "microphonePermission": "Allow VyaparSethu to access your microphone to record Video Requirements.",
+          "recordAudioAndroid": true
+        }
+      ],
+      [
         "expo-notifications",
         {
           "icon": "./assets/icon.png",

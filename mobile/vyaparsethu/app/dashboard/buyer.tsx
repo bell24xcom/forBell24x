@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, RefreshControl, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, RefreshControl, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { apiFetch } from '../../src/lib/api';
@@ -85,11 +85,7 @@ export default function BuyerDashboard() {
         <Text style={styles.sectionTitle}>Quick Actions</Text>
         <View style={styles.quickActions}>
           <QuickAction icon="🎤" label="Voice RFQ" onPress={() => router.push('/rfq/voice')} />
-          <QuickAction
-            icon="📹"
-            label="Video RFQ"
-            onPress={() => Alert.alert('Coming soon', 'Video Requirement capture is launching in a future update.')}
-          />
+          <QuickAction icon="📹" label="Video RFQ" onPress={() => router.push('/rfq/video')} />
           <QuickAction icon="📝" label="Text RFQ" onPress={() => router.push('/rfq/text')} />
         </View>
 

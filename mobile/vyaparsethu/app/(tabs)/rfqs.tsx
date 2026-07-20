@@ -45,6 +45,9 @@ function MyRfqsList() {
           <Pressable style={styles.postButton} onPress={() => router.push('/rfq/voice')}>
             <Text style={styles.postButtonText}>🎤 Voice</Text>
           </Pressable>
+          <Pressable style={styles.postButton} onPress={() => router.push('/rfq/video')}>
+            <Text style={styles.postButtonText}>📹 Video</Text>
+          </Pressable>
           <Pressable style={styles.postButton} onPress={() => router.push('/rfq/text')}>
             <Text style={styles.postButtonText}>📝 Text</Text>
           </Pressable>

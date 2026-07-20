@@ -19,6 +19,11 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const videoFile = formData.get('video') as File | null;
     const additionalContext = (formData.get('context') as string) || '';
+    // Mobile's Video RFQ screen lets the user edit extracted fields before
+    // saving (no update endpoint exists for an already-saved RFQ), so it
+    // opts out of the auto-save below and finalizes via /api/rfq/create
+    // instead. Web's VideoRFQ.tsx doesn't send this and keeps auto-save.
+    const skipSave = formData.get('save') === 'false';
 
     if (!videoFile) {
       return NextResponse.json({ success: false, error: 'Video file is required' }, { status: 400 });
@@ -178,7 +183,7 @@ JSON (all fields required, use null if not mentioned):
     const urgency = urgencyMap[String(processedRFQ.urgency).toLowerCase()] ?? 'NORMAL';
 
     let savedRFQId: string | null = null;
-    if (processedRFQ.title && processedRFQ.category) {
+    if (!skipSave && processedRFQ.title && processedRFQ.category) {
       try {
         const savedRFQ = await prisma.rFQ.create({
           data: {
