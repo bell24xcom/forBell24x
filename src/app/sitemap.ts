@@ -8,20 +8,14 @@ import { GLOSSARY_TERMS } from '@/src/data/glossary'
 export const dynamic = 'force-dynamic'
 export const revalidate = 3600
 
-// All category slugs served by /categories/[category]
+// Build-time-DB-unavailable fallback only — verified against the real
+// Category table (36 of the previous 43 static slugs didn't exist in the
+// DB at all, which was submitting nonexistent category URLs to Google
+// and causing Soft 404s). The real, current category list always comes
+// from the DB query below; this is only used if that query throws.
 const CATEGORY_SLUGS = [
-  'metals-alloys', 'chemicals-petrochemicals', 'textiles-garments',
-  'machinery-equipment', 'electronics-electricals', 'construction-real-estate',
-  'food-beverages', 'pharmaceuticals-healthcare', 'automotive-transport',
-  'plastics-rubber', 'paper-printing', 'agriculture-farming', 'it-telecom',
-  'furniture-wood', 'safety-security', 'packaging-materials', 'industrial-adhesives',
-  'fire-safety', 'hvac-refrigeration', 'solar-energy', 'pipes-fittings',
-  'valves-actuators', 'bearings-transmission', 'fasteners-bolts', 'paints-coatings',
-  'ceramics-refractories', 'laboratory-equipment', 'medical-devices',
-  'agricultural-equipment', 'pumps-compressors', 'welding-equipment',
-  'rubber-products', 'leather-footwear', 'lighting-fixtures', 'jewellery-gems',
-  'mining-minerals', 'office-supplies', 'sports-fitness', 'toys-games',
-  'transport-logistics', 'wood-timber', 'tools-hardware', 'apparel-fashion',
+  'packaging-materials', 'fire-safety', 'medical-devices', 'welding-equipment',
+  'office-supplies', 'toys-games', 'apparel-fashion',
 ]
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
