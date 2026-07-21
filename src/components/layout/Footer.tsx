@@ -19,7 +19,7 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/rfq/video" className="hover:text-white transition">
+                <Link href="/video-rfq" className="hover:text-white transition">
                   Video RFQ
                 </Link>
               </li>

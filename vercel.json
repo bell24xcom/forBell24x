@@ -85,6 +85,11 @@
       "source": "/home",
       "destination": "/",
       "permanent": true
+    },
+    {
+      "source": "/rfq/video",
+      "destination": "/video-rfq",
+      "permanent": true
     }
   ]
 }
