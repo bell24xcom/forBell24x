@@ -13,6 +13,7 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CameraView, useCameraPermissions, useMicrophonePermissions } from 'expo-camera';
 import { useVideoPlayer, VideoView } from 'expo-video';
+import { File } from 'expo-file-system';
 import { apiFetch, apiUpload } from '../../src/lib/api';
 import { COLORS } from '../../src/constants/theme';
 
@@ -59,6 +60,7 @@ export default function VideoRfqScreen() {
   const [micPermission, requestMicPermission] = useMicrophonePermissions();
 
   const [stage, setStage] = useState<Stage>('camera');
+  const [facing, setFacing] = useState<'front' | 'back'>('back');
   const [recording, setRecording] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const [videoUri, setVideoUri] = useState<string | null>(null);
@@ -135,11 +137,10 @@ export default function VideoRfqScreen() {
     setError(null);
     try {
       const formData = new FormData();
-      formData.append('video', {
-        uri: videoUri,
-        name: 'video-requirement.mp4',
-        type: 'video/mp4',
-      } as unknown as Blob);
+      // Same fix as Voice RFQ: global fetch is Expo's WinterCG fetch, whose
+      // FormData serializer rejects the RN pseudo-blob { uri, name, type }
+      // shape. expo-file-system's File implements `.bytes()` instead.
+      formData.append('video', new File(videoUri));
       // Extraction only — the mobile flow lets the user correct fields
       // before saving, so it opts out of the route's default auto-save
       // and finalizes via /api/rfq/create once fields are confirmed.
@@ -230,7 +231,7 @@ export default function VideoRfqScreen() {
     return (
       <View style={styles.fullScreen}>
         {stage === 'camera' ? (
-          <CameraView ref={cameraRef} style={styles.fullScreen} mode="video" facing="back" />
+          <CameraView ref={cameraRef} style={styles.fullScreen} mode="video" facing={facing} />
         ) : (
           <VideoView
             style={styles.fullScreen}
@@ -251,6 +252,17 @@ export default function VideoRfqScreen() {
           <View style={styles.errorBanner}>
             <Text style={styles.errorBannerText}>{error}</Text>
           </View>
+        )}
+
+        {stage === 'camera' && !recording && (
+          <SafeAreaView style={styles.flipButtonContainer} edges={['top']}>
+            <Pressable
+              style={styles.flipButton}
+              onPress={() => setFacing((prev) => (prev === 'back' ? 'front' : 'back'))}
+            >
+              <Text style={styles.flipButtonIcon}>🔄</Text>
+            </Pressable>
+          </SafeAreaView>
         )}
 
         <SafeAreaView style={styles.controlsOverlay} edges={['bottom']}>
@@ -406,6 +418,18 @@ const styles = StyleSheet.create({
   timerText: { color: COLORS.white, fontWeight: '700', fontSize: 13 },
   errorBanner: { position: 'absolute', top: 60, left: 20, right: 20, backgroundColor: 'rgba(0,0,0,0.75)', padding: 10, borderRadius: 10 },
   errorBannerText: { color: COLORS.white, fontSize: 13, textAlign: 'center' },
+  flipButtonContainer: { position: 'absolute', top: 0, right: 0 },
+  flipButton: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: COLORS.gold,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 12,
+    marginRight: 20,
+  },
+  flipButtonIcon: { fontSize: 20 },
   controlsOverlay: { position: 'absolute', bottom: 0, left: 0, right: 0, paddingBottom: 24, alignItems: 'center' },
   recordButton: {
     width: 76,

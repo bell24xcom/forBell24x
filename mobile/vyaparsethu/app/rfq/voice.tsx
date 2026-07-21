@@ -9,6 +9,7 @@ import {
   requestRecordingPermissionsAsync,
   setAudioModeAsync,
 } from 'expo-audio';
+import { File } from 'expo-file-system';
 import { apiFetch, apiUpload } from '../../src/lib/api';
 import { COLORS } from '../../src/constants/theme';
 
@@ -72,14 +73,12 @@ export default function VoiceRfqScreen() {
       if (!uri) throw new Error('No recording captured');
 
       const formData = new FormData();
-      // React Native's fetch FormData accepts this { uri, name, type } shape
-      // for file uploads — it's not a real Blob, but RN's networking layer
-      // knows how to stream it as multipart form data.
-      formData.append('audio', {
-        uri,
-        name: 'requirement.m4a',
-        type: 'audio/m4a',
-      } as unknown as Blob);
+      // Global fetch is Expo's WinterCG fetch, not React Native's classic
+      // fetch — its FormData serializer only accepts strings, real Blobs, or
+      // objects exposing `.bytes()`. The old { uri, name, type } RN pseudo-blob
+      // shape satisfies none of those and throws "Unsupported FormDataPart
+      // implementation". expo-file-system's File class implements `.bytes()`.
+      formData.append('audio', new File(uri));
 
       const res = await apiUpload<{
         success: boolean;
