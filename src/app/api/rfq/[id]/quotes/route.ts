@@ -37,6 +37,8 @@ export async function GET(
             createdAt: true,
             supplierId: true,
             isAccepted: true,
+            source: true,
+            sourcingNote: true,
             supplier: {
               select: {
                 id: true,

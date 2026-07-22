@@ -126,6 +126,11 @@ export default function BuyerQuotesInbox() {
                         <p className="text-xs text-slate-400 mt-1">
                           {quote.supplier?.company || quote.supplier?.name || 'Supplier'}
                         </p>
+                        {quote.source === 'CONCIERGE_SOURCED' && (
+                          <span className="inline-block mt-2 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide bg-amber-500/10 text-amber-400 border border-amber-500/30">
+                            Sourced by our team — pending supplier verification
+                          </span>
+                        )}
                       </div>
                       {quote.status === 'ACCEPTED' ? (
                         <CheckCircle className="w-5 h-5 text-green-500 mt-1" />

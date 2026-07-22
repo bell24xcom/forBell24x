@@ -58,6 +58,7 @@ export async function GET(request: NextRequest) {
         timeline: q.timeline,
         status: q.status,
         isAccepted: q.status === 'ACCEPTED', // Derived from status
+        isConciergeSourced: q.source === 'CONCIERGE_SOURCED',
         createdAt: q.createdAt.toISOString(),
       })),
     });
