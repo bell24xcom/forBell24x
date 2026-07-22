@@ -9,6 +9,7 @@ interface User {
   phone: string;
   role: string;
   isActive: boolean;
+  isVerified: boolean;
   createdAt: string;
   updatedAt: string;
   _count: {
@@ -31,6 +32,8 @@ interface UsersResponse {
     suppliers: number;
     activeUsers: number;
     newUsersThisWeek: number;
+    kycPending: number;
+    kycApproved: number;
   };
 }
 
@@ -41,6 +44,7 @@ export default function UsersPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
+  const [kycStatusFilter, setKycStatusFilter] = useState('');
 
   const fetchUsers = async () => {
     try {
@@ -52,6 +56,7 @@ export default function UsersPage() {
 
       if (searchTerm) params.append('search', searchTerm);
       if (roleFilter) params.append('role', roleFilter);
+      if (kycStatusFilter) params.append('kycStatus', kycStatusFilter);
 
       const response = await fetch(`/api/admin/users?${params}`);
       if (!response.ok) {
@@ -71,7 +76,7 @@ export default function UsersPage() {
 
   useEffect(() => {
     fetchUsers();
-  }, [currentPage, searchTerm, roleFilter]);
+  }, [currentPage, searchTerm, roleFilter, kycStatusFilter]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,6 +102,27 @@ export default function UsersPage() {
       }
     } catch (err) {
       console.error('Error updating user:', err);
+    }
+  };
+
+  const toggleKycStatus = async (userId: string, isVerified: boolean) => {
+    try {
+      const response = await fetch('/api/admin/users', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId,
+          updates: { isVerified: !isVerified }
+        })
+      });
+
+      if (response.ok) {
+        fetchUsers();
+      }
+    } catch (err) {
+      console.error('Error updating KYC status:', err);
     }
   };
 
@@ -139,12 +165,14 @@ export default function UsersPage() {
 
       {/* Stats Cards */}
       {usersData?.stats && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
           {[
             { label: 'Total Users',  value: usersData.stats.totalUsers,        color: 'text-blue-400',   border: 'border-blue-500/20' },
             { label: 'Buyers',       value: usersData.stats.buyers,            color: 'text-green-400',  border: 'border-green-500/20' },
             { label: 'Suppliers',    value: usersData.stats.suppliers,         color: 'text-purple-400', border: 'border-purple-500/20' },
             { label: 'Active',       value: usersData.stats.activeUsers,       color: 'text-amber-400',  border: 'border-amber-500/20' },
+            { label: 'KYC Pending',  value: usersData.stats.kycPending,        color: 'text-yellow-400', border: 'border-yellow-500/20' },
+            { label: 'KYC Approved', value: usersData.stats.kycApproved,       color: 'text-emerald-400', border: 'border-emerald-500/20' },
           ].map(s => (
             <div key={s.label} className={`bg-slate-800/60 border ${s.border} rounded-xl p-4`}>
               <p className={`text-2xl font-bold ${s.color}`}>{s.value.toLocaleString()}</p>
@@ -174,6 +202,16 @@ export default function UsersPage() {
           <option value="SUPPLIER">Suppliers</option>
           <option value="ADMIN">Admins</option>
         </select>
+        <select
+          value={kycStatusFilter}
+          onChange={(e) => { setKycStatusFilter(e.target.value); setCurrentPage(1); }}
+          title="Filter users by KYC status"
+          className="px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white text-sm focus:outline-none focus:border-indigo-500"
+        >
+          <option value="">All KYC Status</option>
+          <option value="pending">⏳ Pending</option>
+          <option value="approved">✅ Approved</option>
+        </select>
         <button
           type="submit"
           className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg transition-colors"
@@ -192,6 +230,7 @@ export default function UsersPage() {
                 <th className="text-left text-xs text-slate-400 font-medium uppercase tracking-wide px-4 py-3">Role</th>
                 <th className="text-left text-xs text-slate-400 font-medium uppercase tracking-wide px-4 py-3">Activity</th>
                 <th className="text-left text-xs text-slate-400 font-medium uppercase tracking-wide px-4 py-3">Status</th>
+                <th className="text-left text-xs text-slate-400 font-medium uppercase tracking-wide px-4 py-3">KYC Status</th>
                 <th className="text-left text-xs text-slate-400 font-medium uppercase tracking-wide px-4 py-3">Joined</th>
                 <th className="text-left text-xs text-slate-400 font-medium uppercase tracking-wide px-4 py-3">Actions</th>
               </tr>
@@ -224,20 +263,39 @@ export default function UsersPage() {
                       {user.isActive ? 'Active' : 'Inactive'}
                     </span>
                   </td>
+                  <td className="px-4 py-3">
+                    <span className={`inline-flex px-2 py-0.5 text-xs font-semibold rounded ${
+                      user.isVerified ? 'bg-emerald-900/50 text-emerald-400' : 'bg-yellow-900/50 text-yellow-400'
+                    }`}>
+                      {user.isVerified ? '✅ Approved' : '⏳ Pending'}
+                    </span>
+                  </td>
                   <td className="px-4 py-3 text-xs text-slate-400">
                     {new Date(user.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-4 py-3">
-                    <button
-                      onClick={() => toggleUserStatus(user.id, user.isActive)}
-                      className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
-                        user.isActive
-                          ? 'bg-red-900/40 text-red-400 hover:bg-red-900/70'
-                          : 'bg-green-900/40 text-green-400 hover:bg-green-900/70'
-                      }`}
-                    >
-                      {user.isActive ? 'Deactivate' : 'Activate'}
-                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => toggleUserStatus(user.id, user.isActive)}
+                        className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+                          user.isActive
+                            ? 'bg-red-900/40 text-red-400 hover:bg-red-900/70'
+                            : 'bg-green-900/40 text-green-400 hover:bg-green-900/70'
+                        }`}
+                      >
+                        {user.isActive ? 'Deactivate' : 'Activate'}
+                      </button>
+                      <button
+                        onClick={() => toggleKycStatus(user.id, user.isVerified)}
+                        className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+                          user.isVerified
+                            ? 'bg-yellow-900/40 text-yellow-400 hover:bg-yellow-900/70'
+                            : 'bg-emerald-900/40 text-emerald-400 hover:bg-emerald-900/70'
+                        }`}
+                      >
+                        {user.isVerified ? 'Revoke KYC' : 'Approve KYC'}
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

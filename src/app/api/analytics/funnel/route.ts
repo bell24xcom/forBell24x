@@ -25,17 +25,20 @@ export async function GET(request: NextRequest) {
       // RFQs that got at least 1 view
       prisma.rFQ.count({ where: { createdAt: { gte: since }, isSeeded: false, views: { gt: 0 } } }),
 
-      // RFQs that received at least 1 quote
+      // RFQs that received at least 1 quote (organic only — concierge-sourced
+      // quotes are staff-facilitated bootstrapping, not a product-market-fit signal)
       prisma.rFQ.count({
         where: {
           createdAt: { gte: since },
           isSeeded: false,
-          quotes: { some: {} },
+          quotes: { some: { source: 'SELF_SUBMITTED' } },
         },
       }),
 
-      // Quotes that were accepted (deals closed)
-      prisma.quote.count({ where: { status: 'ACCEPTED', updatedAt: { gte: since } } }),
+      // Quotes that were accepted (deals closed) — organic only, same reason
+      prisma.quote.count({
+        where: { status: 'ACCEPTED', updatedAt: { gte: since }, source: 'SELF_SUBMITTED' },
+      }),
 
       // Breakdown by category
       prisma.rFQ.groupBy({

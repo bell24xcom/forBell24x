@@ -47,6 +47,7 @@ model User {
   receivedMessages     Message[]      @relation("ReceivedMessages")
   notifications        Notification[]
   quotes               Quote[]
+  conciergeQuotesSourced Quote[]      @relation("ConciergeSourcedQuotes")
   rfqs                 RFQ[]
   buyerTransactions    Transaction[]  @relation("BuyerTransactions")
   supplierTransactions Transaction[]  @relation("SupplierTransactions")
@@ -138,26 +139,39 @@ model RFQ {
 }
 
 model Quote {
-  id           String        @id @default(cuid())
-  price        Float
-  quantity     String
-  description  String?
-  status       QuoteStatus   @default(PENDING)
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  isAccepted   Boolean       @default(false)
-  rfqId        String?       @map("rfq_id")
-  supplierId   String?       @map("supplier_id")
-  terms        String?
-  timeline     String?
-  deliveryDays Int?          @map("delivery_days")
-  notes        String?
-  deal         Deal?
-  rfq          RFQ?          @relation(fields: [rfqId], references: [id])
-  supplier     User?         @relation(fields: [supplierId], references: [id])
-  transactions Transaction[]
+  id             String        @id @default(cuid())
+  price          Float
+  quantity       String
+  description    String?
+  status         QuoteStatus   @default(PENDING)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  isAccepted     Boolean       @default(false)
+  rfqId          String?       @map("rfq_id")
+  supplierId     String?       @map("supplier_id")
+  terms          String?
+  timeline       String?
+  deliveryDays   Int?          @map("delivery_days")
+  notes          String?
+  // Concierge sourcing: staff enters a real quote, obtained off-platform from
+  // a real supplier, on that supplier's behalf. Never used for fabricated
+  // suppliers or invented prices — sourcingNote is the audit trail (who was
+  // contacted, when, how) and is required whenever source is CONCIERGE_SOURCED.
+  source         QuoteSource   @default(SELF_SUBMITTED)
+  sourcedByUserId String?      @map("sourced_by_user_id")
+  sourcingNote   String?       @map("sourcing_note")
+  deal           Deal?
+  rfq            RFQ?          @relation(fields: [rfqId], references: [id])
+  supplier       User?         @relation(fields: [supplierId], references: [id])
+  sourcedBy      User?         @relation("ConciergeSourcedQuotes", fields: [sourcedByUserId], references: [id])
+  transactions   Transaction[]
 
   @@map("quotes")
+}
+
+enum QuoteSource {
+  SELF_SUBMITTED
+  CONCIERGE_SOURCED
 }
 
 model Deal {

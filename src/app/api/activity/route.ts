@@ -21,7 +21,9 @@ export async function GET(request: NextRequest) {
         select: { id: true, title: true, category: true, location: true, urgency: true, createdAt: true },
       }),
       prisma.quote.findMany({
-        where: { createdAt: { gte: since } },
+        // Exclude concierge-sourced quotes — the public ticker must never
+        // present staff-facilitated activity as organic supplier engagement.
+        where: { createdAt: { gte: since }, source: 'SELF_SUBMITTED' },
         orderBy: { createdAt: 'desc' },
         take: 10,
         select: {
@@ -33,7 +35,7 @@ export async function GET(request: NextRequest) {
         },
       }),
       prisma.quote.findMany({
-        where: { status: 'ACCEPTED', updatedAt: { gte: since } },
+        where: { status: 'ACCEPTED', updatedAt: { gte: since }, source: 'SELF_SUBMITTED' },
         orderBy: { updatedAt: 'desc' },
         take: 5,
         select: {

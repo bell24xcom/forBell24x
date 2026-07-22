@@ -12,14 +12,21 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const page   = Math.max(1, parseInt(searchParams.get('page')  || '1'));
     const limit  = Math.min(100, parseInt(searchParams.get('limit') || '20'));
-    const role   = searchParams.get('role') as string | null;
-    const search = searchParams.get('search');
-    const plan   = searchParams.get('plan') as string | null;
-    const skip   = (page - 1) * limit;
+    const role      = searchParams.get('role') as string | null;
+    const search    = searchParams.get('search');
+    const plan      = searchParams.get('plan') as string | null;
+    const kycStatus = searchParams.get('kycStatus') as 'approved' | 'pending' | null;
+    const skip      = (page - 1) * limit;
 
     const where: Record<string, unknown> = {};
     if (role)   where.role = role;
     if (plan)   where.plan = plan;
+    // KYC has only two real states in the current data model: isVerified
+    // true (approved) or false (pending). There is no separate Rejected/
+    // Suspended status tracked yet — isActive is a distinct account-level
+    // flag, not a KYC decision.
+    if (kycStatus === 'approved') where.isVerified = true;
+    if (kycStatus === 'pending')  where.isVerified = false;
     if (search) {
       where.OR = [
         { name:    { contains: search, mode: 'insensitive' } },
@@ -48,18 +55,24 @@ export async function GET(request: NextRequest) {
     ]);
 
     const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-    const [buyers, suppliers, activeUsers, newUsersThisWeek] = await Promise.all([
+    const [buyers, suppliers, activeUsers, newUsersThisWeek, kycPending, kycApproved] = await Promise.all([
       prisma.user.count({ where: { role: 'BUYER'    } }),
       prisma.user.count({ where: { role: 'SUPPLIER' } }),
       prisma.user.count({ where: { isActive: true   } }),
       prisma.user.count({ where: { createdAt: { gte: oneWeekAgo } } }),
+      prisma.user.count({ where: { isVerified: false } }),
+      prisma.user.count({ where: { isVerified: true  } }),
     ]);
 
     return NextResponse.json({
       success: true,
       users,
       pagination: { page, limit, total, pages: Math.ceil(total / limit) },
-      stats: { totalUsers: await prisma.user.count(), buyers, suppliers, activeUsers, newUsersThisWeek },
+      stats: {
+        totalUsers: await prisma.user.count(),
+        buyers, suppliers, activeUsers, newUsersThisWeek,
+        kycPending, kycApproved,
+      },
     });
   } catch (error) {
     console.error('Admin users GET error:', error);
