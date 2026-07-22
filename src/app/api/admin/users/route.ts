@@ -109,6 +109,56 @@ export async function PUT(request: NextRequest) {
   }
 }
 
+// POST /api/admin/users — action-dispatched, admin-only.
+// action: 'review-kyc-document' — verify/reject a single uploaded KYC document.
+export async function POST(request: NextRequest) {
+  const auth = requireAdmin(request);
+  if (isErrorResponse(auth)) return auth;
+
+  try {
+    const body = await request.json();
+    if (body.action === 'review-kyc-document') {
+      return reviewKycDocument(body, auth.userId);
+    }
+    return NextResponse.json({ success: false, message: 'Unknown action' }, { status: 400 });
+  } catch (error) {
+    console.error('Admin users POST error:', error);
+    return NextResponse.json({ success: false, message: 'Request failed' }, { status: 500 });
+  }
+}
+
+async function reviewKycDocument(
+  body: { documentId?: string; status?: string; rejectionReason?: string },
+  adminUserId: string,
+) {
+  const { documentId, status, rejectionReason } = body;
+
+  if (!documentId || (status !== 'VERIFIED' && status !== 'REJECTED')) {
+    return NextResponse.json(
+      { success: false, message: 'documentId and status ("VERIFIED" or "REJECTED") are required' },
+      { status: 400 },
+    );
+  }
+  if (status === 'REJECTED' && !rejectionReason?.trim()) {
+    return NextResponse.json(
+      { success: false, message: 'rejectionReason is required when rejecting a document' },
+      { status: 400 },
+    );
+  }
+
+  const document = await prisma.kycDocument.update({
+    where: { id: documentId },
+    data: {
+      status,
+      rejectionReason: status === 'REJECTED' ? rejectionReason!.trim() : null,
+      reviewedByUserId: adminUserId === 'system' ? null : adminUserId,
+      reviewedAt: new Date(),
+    },
+  });
+
+  return NextResponse.json({ success: true, document });
+}
+
 export async function DELETE(request: NextRequest) {
   const auth = requireAdmin(request);
   if (isErrorResponse(auth)) return auth;

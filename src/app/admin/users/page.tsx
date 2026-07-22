@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Fragment, useState, useEffect } from 'react';
 
 interface User {
   id: string;
@@ -17,6 +17,21 @@ interface User {
     quotes: number;
   };
 }
+
+interface KycDocument {
+  id: string;
+  documentType: 'ID_PROOF' | 'GST_CERTIFICATE' | 'BUSINESS_REGISTRATION';
+  fileUrl: string;
+  status: 'PENDING' | 'VERIFIED' | 'REJECTED';
+  rejectionReason: string | null;
+  createdAt: string;
+}
+
+const DOCUMENT_TYPE_LABEL: Record<KycDocument['documentType'], string> = {
+  ID_PROOF: 'ID Proof',
+  GST_CERTIFICATE: 'GST Certificate',
+  BUSINESS_REGISTRATION: 'Business Registration',
+};
 
 interface UsersResponse {
   users: User[];
@@ -45,6 +60,9 @@ export default function UsersPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
   const [kycStatusFilter, setKycStatusFilter] = useState('');
+  const [expandedUserId, setExpandedUserId] = useState<string | null>(null);
+  const [documentsByUser, setDocumentsByUser] = useState<Record<string, KycDocument[]>>({});
+  const [documentsLoading, setDocumentsLoading] = useState<string | null>(null);
 
   const fetchUsers = async () => {
     try {
@@ -102,6 +120,52 @@ export default function UsersPage() {
       }
     } catch (err) {
       console.error('Error updating user:', err);
+    }
+  };
+
+  const toggleDocuments = async (userId: string) => {
+    if (expandedUserId === userId) {
+      setExpandedUserId(null);
+      return;
+    }
+    setExpandedUserId(userId);
+    if (!documentsByUser[userId]) {
+      setDocumentsLoading(userId);
+      try {
+        const res = await fetch(`/api/kyc/documents?userId=${userId}`);
+        const data = await res.json();
+        if (data.success) {
+          setDocumentsByUser(prev => ({ ...prev, [userId]: data.documents }));
+        }
+      } catch (err) {
+        console.error('Error fetching KYC documents:', err);
+      } finally {
+        setDocumentsLoading(null);
+      }
+    }
+  };
+
+  const reviewDocument = async (userId: string, documentId: string, status: 'VERIFIED' | 'REJECTED') => {
+    let rejectionReason: string | undefined;
+    if (status === 'REJECTED') {
+      rejectionReason = window.prompt('Reason for rejecting this document?') || undefined;
+      if (!rejectionReason?.trim()) return;
+    }
+    try {
+      const response = await fetch('/api/admin/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'review-kyc-document', documentId, status, rejectionReason }),
+      });
+      if (response.ok) {
+        const res = await fetch(`/api/kyc/documents?userId=${userId}`);
+        const data = await res.json();
+        if (data.success) {
+          setDocumentsByUser(prev => ({ ...prev, [userId]: data.documents }));
+        }
+      }
+    } catch (err) {
+      console.error('Error reviewing document:', err);
     }
   };
 
@@ -237,7 +301,8 @@ export default function UsersPage() {
             </thead>
             <tbody className="divide-y divide-slate-700/30">
               {usersData?.users.map((user) => (
-                <tr key={user.id} className="hover:bg-slate-700/20 transition-colors">
+                <Fragment key={user.id}>
+                <tr className="hover:bg-slate-700/20 transition-colors">
                   <td className="px-4 py-3">
                     <p className="text-white font-medium text-sm">{user.name}</p>
                     <p className="text-slate-500 text-xs">{user.email}</p>
@@ -295,9 +360,68 @@ export default function UsersPage() {
                       >
                         {user.isVerified ? 'Revoke KYC' : 'Approve KYC'}
                       </button>
+                      <button
+                        onClick={() => toggleDocuments(user.id)}
+                        className="px-3 py-1 rounded text-xs font-medium bg-indigo-900/40 text-indigo-400 hover:bg-indigo-900/70 transition-colors"
+                      >
+                        {expandedUserId === user.id ? 'Hide Docs' : 'Documents'}
+                      </button>
                     </div>
                   </td>
                 </tr>
+                {expandedUserId === user.id && (
+                  <tr className="bg-slate-950/40">
+                    <td colSpan={7} className="px-4 py-4">
+                      {documentsLoading === user.id ? (
+                        <p className="text-slate-500 text-xs">Loading documents…</p>
+                      ) : !documentsByUser[user.id]?.length ? (
+                        <p className="text-slate-500 text-xs">No KYC documents uploaded yet.</p>
+                      ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                          {documentsByUser[user.id].map(doc => (
+                            <div key={doc.id} className="bg-slate-800/60 border border-slate-700/50 rounded-lg p-3">
+                              <p className="text-white text-xs font-semibold">{DOCUMENT_TYPE_LABEL[doc.documentType]}</p>
+                              <a
+                                href={doc.fileUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-indigo-400 text-xs hover:underline"
+                              >
+                                View file
+                              </a>
+                              <p className={`text-[10px] font-bold uppercase mt-1 ${
+                                doc.status === 'VERIFIED' ? 'text-emerald-400' :
+                                doc.status === 'REJECTED' ? 'text-red-400' : 'text-yellow-400'
+                              }`}>
+                                {doc.status}
+                              </p>
+                              {doc.status === 'REJECTED' && doc.rejectionReason && (
+                                <p className="text-red-400/80 text-[10px] mt-0.5">{doc.rejectionReason}</p>
+                              )}
+                              <div className="flex gap-2 mt-2">
+                                <button
+                                  onClick={() => reviewDocument(user.id, doc.id, 'VERIFIED')}
+                                  disabled={doc.status === 'VERIFIED'}
+                                  className="px-2 py-0.5 rounded text-[10px] font-medium bg-emerald-900/40 text-emerald-400 hover:bg-emerald-900/70 disabled:opacity-30 transition-colors"
+                                >
+                                  Verify
+                                </button>
+                                <button
+                                  onClick={() => reviewDocument(user.id, doc.id, 'REJECTED')}
+                                  disabled={doc.status === 'REJECTED'}
+                                  className="px-2 py-0.5 rounded text-[10px] font-medium bg-red-900/40 text-red-400 hover:bg-red-900/70 disabled:opacity-30 transition-colors"
+                                >
+                                  Reject
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                )}
+                </Fragment>
               ))}
             </tbody>
           </table>
