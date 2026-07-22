@@ -223,6 +223,32 @@ export default function RFQDetailPage() {
         }
       : null;
 
+  // Product/Offer schema for the requirement itself — deliberately omits
+  // aggregateRating/review: this platform has no real review system yet
+  // (see prior discussion), and a fabricated rating is worse for SEO than
+  // none — Google's spam policies explicitly cover fake review markup.
+  const productLd = rfq
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'Product',
+        name: rfq.title,
+        description: rfq.description || rfq.title,
+        category: rfq.category,
+        url: `${SITE_URL}/rfq/${rfq.slug || rfq.id}`,
+        offers: {
+          '@type': 'Offer',
+          priceCurrency: 'INR',
+          ...(rfq.maxBudget ? { price: rfq.maxBudget } : {}),
+          availability:
+            rfq.status === 'ACTIVE' || rfq.status === 'OPEN'
+              ? 'https://schema.org/InStock'
+              : 'https://schema.org/OutOfStock',
+          url: `${SITE_URL}/rfq/${rfq.slug || rfq.id}`,
+        },
+        ...(rfq.location ? { areaServed: rfq.location } : {}),
+      }
+    : null;
+
   if (error) {
     return (
       <div className="min-h-screen bg-[#0F172A] flex items-center justify-center">
@@ -250,6 +276,9 @@ export default function RFQDetailPage() {
     <div className="min-h-screen bg-[#0F172A] text-white">
       {videoObjectLd && (
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(videoObjectLd) }} />
+      )}
+      {productLd && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productLd) }} />
       )}
       <div className="max-w-5xl mx-auto px-4 py-8">
 
