@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { generateToken } from '@/lib/jwt';
 import { authLogger } from '@/lib/logger';
 import { errorLogger } from '@/lib/errorLogger';
+import { recordSignupConsent, NO_CONSENT_UI } from '@/src/lib/consent/recordSignupConsent';
 
 export const dynamic = 'force-dynamic';
 
@@ -92,6 +93,16 @@ export async function POST(request: NextRequest) {
         },
       });
       authLogger.info('New user created', { userId: user.id, phone: `${phone.slice(0, 5)}*****` });
+
+      // consent: passing NO_CONSENT_UI until /auth/phone-email (the canonical
+      // Header-linked login/register screen this route actually serves)
+      // ships a real, versioned consent line; then pass that version.
+      await recordSignupConsent({
+        userId: user.id,
+        req: request,
+        consentTextVersion: NO_CONSENT_UI,
+        entryPoint: 'otp/verify (web: /auth/phone-email, /auth/login, /login, mobile app/auth/login.tsx)',
+      });
 
       // BOM activation: first life event for every new company. Non-blocking.
       import('@/src/lib/bom/life-events')

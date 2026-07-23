@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { generateToken } from '@/lib/jwt';
 import { authLogger } from '@/lib/logger';
+import { recordSignupConsent, NO_CONSENT_UI } from '@/src/lib/consent/recordSignupConsent';
 
 export const dynamic = 'force-dynamic';
 
@@ -60,6 +61,16 @@ export async function POST(request: NextRequest) {
         },
       });
       authLogger.info('New user created via widget OTP', { userId: user.id });
+
+      // consent: passing NO_CONSENT_UI until the MSG91-widget screens
+      // (/auth/phone-email, /auth/login, /admin/login) ship a real,
+      // versioned consent line; then pass that version.
+      await recordSignupConsent({
+        userId: user.id,
+        req: request,
+        consentTextVersion: NO_CONSENT_UI,
+        entryPoint: 'otp/widget-verify (web: /auth/phone-email, /auth/login, /admin/login widget mode)',
+      });
 
       // BOM activation: first life event for every new company. Non-blocking.
       import('@/src/lib/bom/life-events')
