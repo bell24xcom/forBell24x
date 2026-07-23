@@ -78,6 +78,23 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // TODO(consent): this is the flow real claim links (sent via WhatsApp
+    // drip, see supplier-drip-engine.ts) actually reach, and the OTP check
+    // above proves control of the phone the claim link was delivered to —
+    // the right place to record whatsapp/transactional-messaging consent.
+    // NOT wired yet: ClaimForm.tsx / claim/[token]/page.tsx show no specific
+    // consent line for this purpose (only a generic "agree to Terms of
+    // Service" link, no consentTextVersion). Add a real consent line to that
+    // screen first, then write a ConsentEvent here:
+    //   { userId: updatedUser.id, purpose: 'whatsapp/transactional-messaging',
+    //     method: 'claim-otp-verified', consentTextVersion: <version shown>,
+    //     granted: true, ipHash }
+    // Guard re-claims: check for an existing granted event for
+    // (userId, purpose: 'whatsapp/transactional-messaging') before creating
+    // another — a user re-running the claim flow (e.g. after a failed OTP
+    // attempt, or a second claim on the same profile) must not accumulate
+    // duplicate consent rows.
+
     // Issue JWT — 7 day session
     const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
     const authToken = sign(
