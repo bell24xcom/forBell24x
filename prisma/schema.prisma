@@ -735,6 +735,12 @@ model ConsentEvent {
   consentTextVersion String   @map("consent_text_version")
   granted            Boolean
   createdAt          DateTime @default(now()) @map("created_at")
+  // ISO country code of the regime governing this event, and the lawful
+  // basis relied on. Optional and unpopulated for now — no ConsentEvent rows
+  // exist yet (writes are still gated by NO_CONSENT_UI) — but additive here
+  // is free while the table is empty, and a backfill later would not be.
+  jurisdiction       String?      @map("jurisdiction")
+  lawfulBasis        LawfulBasis? @map("lawful_basis")
 
   @@map("consent_events")
 }
@@ -779,6 +785,13 @@ enum ErasureStatus {
   VERIFYING
   COMPLETED
   REJECTED
+}
+
+enum LawfulBasis {
+  CONSENT
+  LEGITIMATE_INTEREST
+  CONTRACT
+  LEGAL_OBLIGATION
 }
 
 enum NotificationType {

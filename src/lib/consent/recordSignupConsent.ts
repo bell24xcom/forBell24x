@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { authLogger } from '@/lib/logger';
+import { LawfulBasis } from '@prisma/client';
 
 /**
  * Sentinel passed by callers that have no real, versioned consent line to
@@ -17,6 +18,10 @@ interface RecordSignupConsentArgs {
   consentTextVersion: string;
   /** Which screen/endpoint is calling — named in the skip warning so a real gap is traceable. */
   entryPoint: string;
+  /** ISO country code of the regime governing this event. Optional — not yet supplied by any call site. */
+  jurisdiction?: string;
+  /** Lawful basis relied on. Optional — not yet supplied by any call site. */
+  lawfulBasis?: LawfulBasis;
 }
 
 /**
@@ -30,6 +35,8 @@ export async function recordSignupConsent({
   req,
   consentTextVersion,
   entryPoint,
+  jurisdiction,
+  lawfulBasis,
 }: RecordSignupConsentArgs): Promise<void> {
   if (consentTextVersion === NO_CONSENT_UI) {
     authLogger.warn('[consent] account_signup skipped — no real consent line yet', { userId, entryPoint });
@@ -54,6 +61,8 @@ export async function recordSignupConsent({
       consentTextVersion,
       granted: true,
       ipHash,
+      jurisdiction,
+      lawfulBasis,
     },
   });
 }
