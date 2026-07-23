@@ -128,6 +128,9 @@ async function submitConciergeQuote(
 }
 
 export async function GET(req: NextRequest) {
+  const auth = requireAdmin(req);
+  if (isErrorResponse(auth)) return auth;
+
   try {
     const { searchParams } = new URL(req.url);
     const page = parseInt(searchParams.get('page') || '1');
@@ -183,6 +186,12 @@ export async function GET(req: NextRequest) {
                   id: true,
                   name: true,
                   email: true
+                }
+              },
+              deal: {
+                select: {
+                  id: true,
+                  status: true
                 }
               }
             }

@@ -3,7 +3,11 @@
 import { CheckCircle, Clock, Download, Eye, FileText, Mic, Play, RefreshCw, X, XCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
-interface Quote { id: string; price: number; status: string; createdAt: string; supplier: { name: string | null; email: string | null } | null }
+interface Quote {
+  id: string; price: number; status: string; createdAt: string;
+  supplier: { name: string | null; email: string | null } | null;
+  deal: { id: string; status: string } | null;
+}
 interface RFQ {
   id: string; title: string; description: string | null;
   user: { name: string | null; company: string | null; email: string | null; phone: string | null } | null;
@@ -31,6 +35,41 @@ export default function AdminRFQsPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const LIMIT = 50;
+
+  // Off-platform deal settlement (admin-only; see /api/deal/[id]/complete —
+  // never touches the separate wallet-escrow flow, which stays untouched)
+  const [settleOpenId, setSettleOpenId] = useState<string | null>(null);
+  const [settleMethod, setSettleMethod] = useState('');
+  const [settleRef,    setSettleRef]    = useState('');
+  const [settleLoading, setSettleLoading] = useState(false);
+  const [settleMsg,    setSettleMsg]    = useState<{ dealId: string; text: string; ok: boolean } | null>(null);
+
+  const markDealComplete = async (dealId: string) => {
+    setSettleLoading(true);
+    setSettleMsg(null);
+    try {
+      const res = await fetch(`/api/deal/${dealId}/complete`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ settlementMethod: settleMethod || undefined, reference: settleRef || undefined }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSettleMsg({ dealId, text: data.alreadyCompleted ? 'Already recorded.' : 'Recorded — deal marked complete.', ok: true });
+        setSettleOpenId(null);
+        setSettleMethod('');
+        setSettleRef('');
+        if (drawer) fetchRFQs(page); // refresh deal.status shown in the drawer's source data
+      } else {
+        setSettleMsg({ dealId, text: data.error || 'Failed to record settlement.', ok: false });
+      }
+    } catch {
+      setSettleMsg({ dealId, text: 'Network error. Please try again.', ok: false });
+    } finally {
+      setSettleLoading(false);
+    }
+  };
 
   const fetchRFQs = async (pg = page) => {
     setRefreshing(true);
@@ -287,15 +326,75 @@ export default function AdminRFQsPage() {
                 ) : (
                   <div className="space-y-2">
                     {drawer.quotes.map(q => (
-                      <div key={q.id} className="bg-slate-800/60 rounded-lg p-3 flex items-center justify-between text-sm">
-                        <div>
-                          <p className="text-white">{q.supplier?.name || 'Supplier'}</p>
-                          <p className="text-slate-400 text-xs">{new Date(q.createdAt).toLocaleDateString('en-IN')}</p>
+                      <div key={q.id} className="bg-slate-800/60 rounded-lg p-3 text-sm">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-white">{q.supplier?.name || 'Supplier'}</p>
+                            <p className="text-slate-400 text-xs">{new Date(q.createdAt).toLocaleDateString('en-IN')}</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-indigo-300 font-semibold">₹{q.price.toLocaleString('en-IN')}</p>
+                            <span className={`text-xs px-1.5 py-0.5 rounded ${q.status === 'ACCEPTED' ? 'bg-green-900/40 text-green-400' : q.status === 'REJECTED' ? 'bg-red-900/40 text-red-400' : 'bg-slate-800 text-slate-400'}`}>{q.status}</span>
+                          </div>
                         </div>
-                        <div className="text-right">
-                          <p className="text-indigo-300 font-semibold">₹{q.price.toLocaleString('en-IN')}</p>
-                          <span className={`text-xs px-1.5 py-0.5 rounded ${q.status === 'ACCEPTED' ? 'bg-green-900/40 text-green-400' : q.status === 'REJECTED' ? 'bg-red-900/40 text-red-400' : 'bg-slate-800 text-slate-400'}`}>{q.status}</span>
-                        </div>
+
+                        {/* Deal settlement — admin-only, off-platform recorder.
+                            Never shown/available for the wallet-escrow flow;
+                            that one lives entirely on the buyer's own dashboard. */}
+                        {q.status === 'ACCEPTED' && q.deal && (
+                          <div className="mt-2 pt-2 border-t border-slate-700/50">
+                            {q.deal.status === 'ACTIVE' ? (
+                              settleOpenId === q.deal.id ? (
+                                <div className="space-y-2">
+                                  <input
+                                    type="text"
+                                    placeholder="Settlement method (e.g. UPI, Bank Transfer)"
+                                    value={settleMethod}
+                                    onChange={e => setSettleMethod(e.target.value)}
+                                    className="w-full px-2 py-1.5 bg-slate-900 border border-slate-700 rounded text-white text-xs placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                  />
+                                  <input
+                                    type="text"
+                                    placeholder="Reference / note (e.g. UPI ref, who confirmed)"
+                                    value={settleRef}
+                                    onChange={e => setSettleRef(e.target.value)}
+                                    className="w-full px-2 py-1.5 bg-slate-900 border border-slate-700 rounded text-white text-xs placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                  />
+                                  <div className="flex gap-2">
+                                    <button
+                                      onClick={() => markDealComplete(q.deal!.id)}
+                                      disabled={settleLoading}
+                                      className="flex-1 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded disabled:opacity-50 min-h-[32px]"
+                                    >
+                                      {settleLoading ? 'Recording…' : 'Confirm Paid (Off-Platform)'}
+                                    </button>
+                                    <button
+                                      onClick={() => { setSettleOpenId(null); setSettleMethod(''); setSettleRef(''); }}
+                                      className="px-3 py-1.5 border border-slate-700 text-slate-300 text-xs rounded min-h-[32px]"
+                                    >
+                                      Cancel
+                                    </button>
+                                  </div>
+                                </div>
+                              ) : (
+                                <button
+                                  onClick={() => setSettleOpenId(q.deal!.id)}
+                                  className="text-xs px-3 py-1.5 bg-amber-900/40 hover:bg-amber-900/60 text-amber-300 border border-amber-700/50 rounded transition-colors min-h-[32px]"
+                                >
+                                  Mark Paid (Off-Platform)
+                                </button>
+                              )
+                            ) : (
+                              <span className="text-xs text-slate-500">
+                                Deal status: <span className="text-slate-300">{q.deal.status}</span>
+                                {q.deal.status !== 'COMPLETED' && ' — using wallet escrow, complete via buyer dashboard'}
+                              </span>
+                            )}
+                            {settleMsg?.dealId === q.deal.id && (
+                              <p className={`text-xs mt-1.5 ${settleMsg.ok ? 'text-emerald-400' : 'text-red-400'}`}>{settleMsg.text}</p>
+                            )}
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
