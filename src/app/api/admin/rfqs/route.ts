@@ -243,6 +243,9 @@ export async function GET(req: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
+  const auth = requireAdmin(req);
+  if (isErrorResponse(auth)) return auth;
+
   try {
     const { rfqId, updates } = await req.json();
 
@@ -283,6 +286,9 @@ export async function PUT(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
+  const auth = requireAdmin(req);
+  if (isErrorResponse(auth)) return auth;
+
   try {
     const { searchParams } = new URL(req.url);
     const rfqId = searchParams.get('rfqId');

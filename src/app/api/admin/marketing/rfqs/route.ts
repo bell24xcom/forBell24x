@@ -1,5 +1,6 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { requireAdmin, isErrorResponse } from '@/lib/admin-auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,7 +21,10 @@ function toUiStatus(status: string): string {
   return map[status] ?? status.toLowerCase();
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const auth = requireAdmin(req);
+  if (isErrorResponse(auth)) return auth;
+
   try {
     const rfqs = await prisma.rFQ.findMany({
       orderBy: { createdAt: 'desc' },

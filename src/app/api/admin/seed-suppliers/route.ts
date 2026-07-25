@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic';
 
 function auth(req: NextRequest): boolean {
   const secret = process.env.CRON_SECRET;
-  if (!secret) return true; // no secret set → allow (dev)
+  if (!secret) return false; // no secret configured → deny (fail closed, never open by default)
   return req.headers.get('authorization') === `Bearer ${secret}`;
 }
 

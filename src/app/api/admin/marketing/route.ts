@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { requireAdmin, isErrorResponse } from '@/lib/admin-auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -54,6 +55,9 @@ async function runRuleEngine(rfq: any) {
 }
 
 export async function GET(req: NextRequest) {
+  const auth = requireAdmin(req);
+  if (isErrorResponse(auth)) return auth;
+
   try {
     const { searchParams } = new URL(req.url);
     const page     = parseInt(searchParams.get('page')  || '1');
@@ -97,6 +101,9 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const auth = requireAdmin(req);
+  if (isErrorResponse(auth)) return auth;
+
   try {
     const body = await req.json();
     const { rfq_text, status, urgency, category, ...rest } = body;
@@ -120,6 +127,9 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
+  const auth = requireAdmin(req);
+  if (isErrorResponse(auth)) return auth;
+
   try {
     const { id, status, rfq_text, category, urgency } = await req.json();
     if (!id) throw new Error('Missing id');

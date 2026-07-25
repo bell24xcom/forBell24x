@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { requireAdmin, isErrorResponse } from '@/lib/admin-auth';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
+  const auth = requireAdmin(req);
+  if (isErrorResponse(auth)) return auth;
+
   try {
     const { rfqId, quoteId } = await req.json();
     if (!rfqId || !quoteId) {
