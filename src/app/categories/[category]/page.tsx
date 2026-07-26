@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { SITE_URL } from '@/lib/site-url';
 
 interface CategoryPageProps {
   params: {
@@ -143,9 +144,15 @@ async function getCategory(slug: string) {
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
   const category = await getCategory(params.category);
 
+  // Alias slugs (e.g. "steel", "metals-steel") resolve to one DB category —
+  // canonical points at that category's real slug so aliases collapse onto
+  // a single indexed URL instead of each ranking as a duplicate.
+  const canonicalSlug = category?.slug ?? params.category;
+
   return {
     title: `${category?.name || 'Category'} - Bell24h`,
-    description: category?.description || `Find suppliers and create RFQs for ${category?.name || 'this category'}`
+    description: category?.description || `Find suppliers and create RFQs for ${category?.name || 'this category'}`,
+    alternates: { canonical: `${SITE_URL}/categories/${canonicalSlug}` },
   };
 }
 
