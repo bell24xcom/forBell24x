@@ -135,7 +135,7 @@ export const generateUploadSignature = (uploadConfig: any) => {
     signature: cloudinary.utils.api_sign_request(params, process.env.CLOUDINARY_API_SECRET!),
     timestamp,
     api_key: process.env.CLOUDINARY_API_KEY,
-    cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+    cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || process.env.CLOUDINARY_CLOUD_NAME,
   };
 };
 

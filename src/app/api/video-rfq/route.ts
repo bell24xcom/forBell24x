@@ -14,19 +14,68 @@ function extractBudgetNumber(budgetStr: string): number {
   return isNaN(num) ? 0 : Math.round(num * multiplier);
 }
 
+// Only our own Cloudinary bucket may be handed to Groq's url param — otherwise
+// this endpoint becomes a free "transcribe any URL on Bell24h's Groq quota" relay.
+function isOwnCloudinaryUrl(url: string): boolean {
+  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || process.env.CLOUDINARY_CLOUD_NAME;
+  if (!cloudName) return false;
+  try {
+    const parsed = new URL(url);
+    return (
+      parsed.protocol === 'https:' &&
+      parsed.hostname === 'res.cloudinary.com' &&
+      parsed.pathname.startsWith(`/${cloudName}/`)
+    );
+  } catch {
+    return false;
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
-    const formData = await request.formData();
-    const videoFile = formData.get('video') as File | null;
-    const additionalContext = (formData.get('context') as string) || '';
-    // Mobile's Video RFQ screen lets the user edit extracted fields before
-    // saving (no update endpoint exists for an already-saved RFQ), so it
-    // opts out of the auto-save below and finalizes via /api/rfq/create
-    // instead. Web's VideoRFQ.tsx doesn't send this and keeps auto-save.
-    const skipSave = formData.get('save') === 'false';
+    const contentType = request.headers.get('content-type') || '';
+    // Mobile's Video RFQ screen uploads direct-to-Cloudinary first (avoids
+    // the 4.5MB Vercel body cap and client-side OOM on large files — see
+    // mobile/vyaparsethu/app/rfq/video.tsx) and sends only the resulting URL
+    // as JSON. Web's VideoRFQ.tsx still posts the raw blob as multipart —
+    // left untouched so it keeps working unchanged.
+    const isJsonRequest = contentType.includes('application/json');
 
-    if (!videoFile) {
-      return NextResponse.json({ success: false, error: 'Video file is required' }, { status: 400 });
+    let videoFile: File | null = null;
+    let videoUrl: string | null = null;
+    let videoPublicId: string | null = null;
+    let additionalContext = '';
+    let skipSave = false;
+
+    if (isJsonRequest) {
+      const body = await request.json();
+      videoUrl = typeof body.videoUrl === 'string' ? body.videoUrl : null;
+      videoPublicId = typeof body.videoPublicId === 'string' ? body.videoPublicId : null;
+      additionalContext = body.context || '';
+      // Mobile always lets the user edit extracted fields before saving (no
+      // update endpoint exists for an already-saved RFQ), so it always sends
+      // save:false and finalizes via /api/rfq/create once confirmed.
+      skipSave = body.save === false;
+
+      if (!videoUrl) {
+        return NextResponse.json({ success: false, error: 'videoUrl is required' }, { status: 400 });
+      }
+      if (!isOwnCloudinaryUrl(videoUrl)) {
+        return NextResponse.json({ success: false, error: 'videoUrl must point to our Cloudinary bucket' }, { status: 400 });
+      }
+    } else {
+      const formData = await request.formData();
+      videoFile = formData.get('video') as File | null;
+      additionalContext = (formData.get('context') as string) || '';
+      // Mobile's Video RFQ screen lets the user edit extracted fields before
+      // saving (no update endpoint exists for an already-saved RFQ), so it
+      // opts out of the auto-save below and finalizes via /api/rfq/create
+      // instead. Web's VideoRFQ.tsx doesn't send this and keeps auto-save.
+      skipSave = formData.get('save') === 'false';
+
+      if (!videoFile) {
+        return NextResponse.json({ success: false, error: 'Video file is required' }, { status: 400 });
+      }
     }
 
     const groqKey = process.env.GROQ_API_KEY;
@@ -37,31 +86,45 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const videoBuffer = Buffer.from(await videoFile.arrayBuffer());
-    console.log('[VideoRFQ] Received video:', videoFile.size, 'bytes, type:', videoFile.type);
+    let videoBuffer: Buffer | null = null;
+    if (videoFile) {
+      videoBuffer = Buffer.from(await videoFile.arrayBuffer());
+      console.log('[VideoRFQ] Received video:', videoFile.size, 'bytes, type:', videoFile.type);
 
-    // Groq Whisper's hard limit is 25MB. The full video (not just its audio
-    // track) is uploaded here, so anything beyond a short clip can exceed
-    // this well before the recording is "too long" in any meaningful sense.
-    // Reject early with an accurate message instead of letting Groq's 4xx
-    // get relabeled as a generic "no audio track" error below.
-    const GROQ_WHISPER_MAX_BYTES = 25 * 1024 * 1024;
-    if (videoBuffer.length > GROQ_WHISPER_MAX_BYTES) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: `Video is too large (${(videoBuffer.length / (1024 * 1024)).toFixed(1)}MB). Please record a shorter clip — the limit is 25MB.`,
-        },
-        { status: 413 },
-      );
+      // Groq Whisper's hard limit is 25MB. The full video (not just its audio
+      // track) is uploaded here, so anything beyond a short clip can exceed
+      // this well before the recording is "too long" in any meaningful sense.
+      // Reject early with an accurate message instead of letting Groq's 4xx
+      // get relabeled as a generic "no audio track" error below.
+      // (Only applies to the legacy blob path — the videoUrl path hands
+      // Groq a URL to fetch itself, so no bytes are buffered here at all.)
+      const GROQ_WHISPER_MAX_BYTES = 25 * 1024 * 1024;
+      if (videoBuffer.length > GROQ_WHISPER_MAX_BYTES) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: `Video is too large (${(videoBuffer.length / (1024 * 1024)).toFixed(1)}MB). Please record a shorter clip — the limit is 25MB.`,
+          },
+          { status: 413 },
+        );
+      }
+    } else {
+      console.log('[VideoRFQ] Received videoUrl:', videoUrl);
     }
 
     // STEP 1 — Transcribe with Groq Whisper. Whisper accepts webm and decodes
     // the audio track on its side, so we can ship the recording as-is.
+    // For the videoUrl path, Groq fetches the file itself (its documented
+    // `url` param, mutually exclusive with `file`) — no bytes touch this
+    // function, so the OOM/413 risk that motivated this change doesn't recur.
     let transcription = '';
     try {
       const fd = new FormData();
-      fd.append('file', new Blob([videoBuffer], { type: videoFile.type || 'video/webm' }), videoFile.name || 'video.webm');
+      if (videoBuffer) {
+        fd.append('file', new Blob([videoBuffer], { type: videoFile!.type || 'video/webm' }), videoFile!.name || 'video.webm');
+      } else {
+        fd.append('url', videoUrl!);
+      }
       fd.append('model', 'whisper-large-v3');
       fd.append('response_format', 'json');
 
@@ -197,6 +260,8 @@ JSON (all fields required, use null if not mentioned):
             timeline: processedRFQ.timeline,
             urgency,
             type: 'VIDEO',
+            videoUrl,
+            videoPublicId,
             status: 'OPEN',
             isSeeded: false,
             createdBy: userId,

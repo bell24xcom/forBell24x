@@ -13,8 +13,8 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CameraView, useCameraPermissions, useMicrophonePermissions } from 'expo-camera';
 import { useVideoPlayer, VideoView } from 'expo-video';
-import { File } from 'expo-file-system';
-import { apiFetch, apiUpload } from '../../src/lib/api';
+import { File, UploadType } from 'expo-file-system';
+import { apiFetch } from '../../src/lib/api';
 import { COLORS } from '../../src/constants/theme';
 
 const MAX_DURATION_SECONDS = 60;
@@ -67,6 +67,9 @@ export default function VideoRfqScreen() {
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [showCategoryPicker, setShowCategoryPicker] = useState(false);
+  const [uploadPercent, setUploadPercent] = useState(0);
+  const [cloudinaryUrl, setCloudinaryUrl] = useState<string | null>(null);
+  const [cloudinaryPublicId, setCloudinaryPublicId] = useState<string | null>(null);
 
   const player = useVideoPlayer(videoUri, (p) => {
     p.loop = false;
@@ -135,23 +138,70 @@ export default function VideoRfqScreen() {
     if (!videoUri) return;
     setStage('processing');
     setError(null);
+    setUploadPercent(0);
     try {
-      const formData = new FormData();
-      // Same fix as Voice RFQ: global fetch is Expo's WinterCG fetch, whose
-      // FormData serializer rejects the RN pseudo-blob { uri, name, type }
-      // shape. expo-file-system's File implements `.bytes()` instead.
-      formData.append('video', new File(videoUri));
+      // Direct-to-Cloudinary upload: the recorded video never passes through
+      // our own API — that was the root cause of both the 413 (Vercel's
+      // 4.5MB request-body cap) and the OutOfMemoryError (loading the whole
+      // file into JS memory to send it). expo-file-system's File.upload()
+      // is a native, streamed multipart upload from the file URI, so the
+      // bytes never enter JS memory either.
+      const sig = await apiFetch<{
+        success: boolean;
+        signature: string;
+        timestamp: number;
+        apiKey: string;
+        uploadPreset: string;
+        folder: string;
+        uploadUrl: string;
+        error?: string;
+      }>('/api/cloudinary/upload-signature', { method: 'POST', body: {} });
+
+      if (!sig.success) throw new Error(sig.error || 'Could not prepare upload');
+
+      const file = new File(videoUri);
+      const uploadResult = await file.upload(sig.uploadUrl, {
+        uploadType: UploadType.MULTIPART,
+        fieldName: 'file',
+        // Must match exactly what the server signed — no more, no fewer
+        // fields, or Cloudinary rejects with "Invalid Signature".
+        parameters: {
+          api_key: sig.apiKey,
+          timestamp: String(sig.timestamp),
+          signature: sig.signature,
+          upload_preset: sig.uploadPreset,
+          folder: sig.folder,
+        },
+        onProgress: (data) => {
+          if (data.totalBytes > 0) {
+            setUploadPercent(Math.round((data.bytesSent / data.totalBytes) * 100));
+          }
+        },
+      });
+
+      if (uploadResult.status < 200 || uploadResult.status >= 300) {
+        throw new Error(`Video upload failed (${uploadResult.status})`);
+      }
+      const cloudinaryResult = JSON.parse(uploadResult.body);
+      const videoUrl: string = cloudinaryResult.secure_url;
+      const publicId: string | undefined = cloudinaryResult.public_id;
+      if (!videoUrl) throw new Error('Upload succeeded but no video URL was returned');
+      // Carried into handleSave()'s /api/rfq/create call below — without this,
+      // the uploaded video is transcribed but never attached to the saved RFQ.
+      setCloudinaryUrl(videoUrl);
+      // Cloudinary's transform/delete/watermark/analytics APIs key on this,
+      // not the URL — same upload response, so free to capture alongside it.
+      if (publicId) setCloudinaryPublicId(publicId);
+
       // Extraction only — the mobile flow lets the user correct fields
       // before saving, so it opts out of the route's default auto-save
       // and finalizes via /api/rfq/create once fields are confirmed.
-      formData.append('save', 'false');
-
-      const res = await apiUpload<{
+      const res = await apiFetch<{
         success: boolean;
         transcription: string;
         extractedInfo: ExtractedInfo;
         error?: string;
-      }>('/api/video-rfq', formData);
+      }>('/api/video-rfq', { method: 'POST', body: { videoUrl, save: false } });
 
       if (!res.success) throw new Error(res.error || 'Video processing failed');
 
@@ -195,6 +245,8 @@ export default function VideoRfqScreen() {
           maxBudget: budget ? parseFloat(budget) : undefined,
           location: location.trim() || undefined,
           urgency: 'NORMAL',
+          videoUrl: cloudinaryUrl || undefined,
+          videoPublicId: cloudinaryPublicId || undefined,
         },
       });
       if (!res.success) throw new Error(res.error || 'Failed to save requirement');
@@ -292,7 +344,9 @@ export default function VideoRfqScreen() {
     return (
       <SafeAreaView style={styles.center}>
         <ActivityIndicator size="large" color={COLORS.navy} />
-        <Text style={styles.processingText}>AI is analysing your video…</Text>
+        <Text style={styles.processingText}>
+          {uploadPercent > 0 && uploadPercent < 100 ? `Uploading video… ${uploadPercent}%` : 'AI is analysing your video…'}
+        </Text>
       </SafeAreaView>
     );
   }

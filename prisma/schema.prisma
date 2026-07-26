@@ -127,6 +127,8 @@ model RFQ {
   tags           String[]
   timeline       String?
   type           String?
+  videoUrl       String?
+  videoPublicId  String?
   views          Int           @default(0)
   urgency        RFQUrgency    @default(NORMAL)
   isSeeded       Boolean       @default(false) @map("is_seeded")

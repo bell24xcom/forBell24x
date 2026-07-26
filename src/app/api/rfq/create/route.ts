@@ -15,6 +15,14 @@ const CreateRFQSchema = z.object({
   maxBudget: z.number().optional(),
   location: z.string().optional(),
   urgency: z.enum(['LOW', 'NORMAL', 'HIGH', 'URGENT']).default('NORMAL'),
+  // Set when this RFQ originates from a recorded Video Requirement — the
+  // Cloudinary URL from the direct upload (see video.tsx's processVideo),
+  // carried through the review/edit step so the video isn't lost on save.
+  videoUrl: z.string().url().optional(),
+  // Same Cloudinary upload response that yields videoUrl — keyed separately
+  // since Cloudinary's transform/delete/watermark/analytics APIs operate on
+  // public_id, not the URL.
+  videoPublicId: z.string().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -69,6 +77,9 @@ export async function POST(req: NextRequest) {
         maxBudget: validatedData.maxBudget,
         location: validatedData.location,
         urgency: validatedData.urgency,
+        type: validatedData.videoUrl ? 'VIDEO' : undefined,
+        videoUrl: validatedData.videoUrl,
+        videoPublicId: validatedData.videoPublicId,
         status: 'ACTIVE',
         createdBy: user.id, // Real user ID from JWT
       },
