@@ -37,6 +37,15 @@ export default function RFQCreatePage() {
     { value: 'urgent', label: 'Urgent (24 hours)' }
   ];
 
+  // /api/rfq/create's Zod schema requires the uppercase enum values below —
+  // sending the lowercase select value 400s regardless of what else is filled in.
+  const URGENCY_MAP: Record<string, string> = {
+    low: 'LOW',
+    normal: 'NORMAL',
+    high: 'HIGH',
+    urgent: 'URGENT',
+  };
+
   const validateForm = () => {
     const newErrors = {};
     
@@ -89,12 +98,21 @@ export default function RFQCreatePage() {
     }).catch(() => {});
     
     try {
+      // This form collects a single "budget" field (schema has minBudget/
+      // maxBudget instead) — passed as both, as a number — and urgency must
+      // be uppercase to match the schema's enum.
+      const payload = {
+        ...formData,
+        minBudget: formData.budget ? Number(formData.budget) : undefined,
+        maxBudget: formData.budget ? Number(formData.budget) : undefined,
+        urgency: URGENCY_MAP[formData.urgency] || 'NORMAL',
+      };
       const response = await fetch('/api/rfq/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
       
       if (response.ok) {

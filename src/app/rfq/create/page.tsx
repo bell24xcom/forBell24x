@@ -11,6 +11,17 @@ type Category = {
   slug: string;
 };
 
+// /api/rfq/create's Zod schema requires the uppercase enum values below —
+// the UI's lowercase select values (including 'critical', which has no
+// matching enum member) must be mapped before submission or every request
+// 400s regardless of what else is filled in.
+const URGENCY_MAP: Record<string, 'LOW' | 'NORMAL' | 'HIGH' | 'URGENT'> = {
+  low: 'LOW',
+  normal: 'NORMAL',
+  high: 'HIGH',
+  critical: 'URGENT',
+};
+
 export default function CreateRFQPage() {
   const [formData, setFormData] = useState({
     title: '',
@@ -71,11 +82,20 @@ export default function CreateRFQPage() {
 
     try {
       // 1. Save to Neon (Core Platform)
+      // minBudget/maxBudget must be numbers (schema: z.number()) and urgency
+      // must match the uppercase enum — the raw formData values are strings
+      // and lowercase respectively, which 400 every time otherwise.
+      const payload = {
+        ...formData,
+        minBudget: formData.minBudget ? Number(formData.minBudget) : undefined,
+        maxBudget: formData.maxBudget ? Number(formData.maxBudget) : undefined,
+        urgency: URGENCY_MAP[formData.urgency] || 'NORMAL',
+      };
       const neonRes = await fetch('/api/rfq/create', {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       if (!neonRes.ok) {

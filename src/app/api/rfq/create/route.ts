@@ -125,7 +125,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true, rfq }, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ success: false, error: 'Validation failed', details: error.errors }, { status: 400 });
+      // Zod v4's ZodError exposes `.issues`, not `.errors` (the latter is
+      // undefined here, which JSON.stringify silently drops — every
+      // validation failure was returning zero diagnostic info, client or
+      // server side, with no way to tell which field actually failed).
+      console.error('[RFQ Create] Validation failed:', error.issues);
+      return NextResponse.json({ success: false, error: 'Validation failed', details: error.issues }, { status: 400 });
     }
     console.error('RFQ Create Error:', error);
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
