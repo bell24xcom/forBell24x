@@ -14,7 +14,11 @@ interface RFQ {
   category: string; minBudget: number | null; maxBudget: number | null;
   status: string; urgency: string; timeline: string | null;
   createdAt: string; expiresAt: string | null; type: string | null;
+  quantity?: string; // already returned by GET /api/admin/rfqs (include, not select) — just untyped until now
   _count: { quotes: number }; quotes: Quote[];
+}
+interface SupplierOption {
+  id: string; name: string; company: string | null; phone: string | null; email: string | null;
 }
 
 const urgencyColor: Record<string, string> = { URGENT: 'bg-red-500', HIGH: 'bg-orange-500', MEDIUM: 'bg-yellow-500', NORMAL: 'bg-green-500', LOW: 'bg-green-500' };
@@ -71,6 +75,86 @@ export default function AdminRFQsPage() {
     }
   };
 
+  // Concierge quote submission (admin-only; see POST /api/admin/rfqs
+  // {action:'submit-concierge-quote'} — existing, unmodified endpoint that
+  // previously had no UI to reach it).
+  const [conciergeOpen,        setConciergeOpen]        = useState(false);
+  const [supplierQuery,        setSupplierQuery]        = useState('');
+  const [supplierResults,      setSupplierResults]      = useState<SupplierOption[]>([]);
+  const [supplierSearching,    setSupplierSearching]    = useState(false);
+  const [selectedSupplier,     setSelectedSupplier]     = useState<SupplierOption | null>(null);
+  const [conciergePrice,       setConciergePrice]       = useState('');
+  const [sourcingNote,         setSourcingNote]         = useState('');
+  const [showOptionalFields,   setShowOptionalFields]   = useState(false);
+  const [conciergeQuantity,    setConciergeQuantity]    = useState('');
+  const [conciergeTerms,       setConciergeTerms]       = useState('');
+  const [conciergeTimeline,    setConciergeTimeline]    = useState('');
+  const [conciergeDeliveryDays, setConciergeDeliveryDays] = useState('');
+  const [conciergeNotes,       setConciergeNotes]       = useState('');
+  const [conciergeSubmitting,  setConciergeSubmitting]  = useState(false);
+  const [conciergeMsg,         setConciergeMsg]         = useState<{ text: string; ok: boolean } | null>(null);
+
+  const resetConciergeForm = () => {
+    setConciergeOpen(false);
+    setSupplierQuery(''); setSupplierResults([]); setSelectedSupplier(null);
+    setConciergePrice(''); setSourcingNote(''); setShowOptionalFields(false);
+    setConciergeQuantity(''); setConciergeTerms(''); setConciergeTimeline('');
+    setConciergeDeliveryDays(''); setConciergeNotes(''); setConciergeMsg(null);
+  };
+
+  // Debounced supplier search — mirrors the existing /admin/suppliers list
+  // endpoint (role: SUPPLIER, matches name/company/phone/email).
+  useEffect(() => {
+    if (!conciergeOpen) return;
+    if (!supplierQuery.trim()) { setSupplierResults([]); return; }
+    const t = setTimeout(async () => {
+      setSupplierSearching(true);
+      try {
+        const res = await fetch(`/api/admin/suppliers?search=${encodeURIComponent(supplierQuery)}`, { credentials: 'include' });
+        const data = await res.json();
+        if (data.success) setSupplierResults(data.suppliers);
+      } catch (e) { console.error(e); }
+      finally { setSupplierSearching(false); }
+    }, 300);
+    return () => clearTimeout(t);
+  }, [supplierQuery, conciergeOpen]);
+
+  const submitConciergeQuote = async () => {
+    if (!drawer || !selectedSupplier || !conciergePrice || sourcingNote.trim().length < 10) return;
+    setConciergeSubmitting(true);
+    setConciergeMsg(null);
+    try {
+      const res = await fetch('/api/admin/rfqs', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'submit-concierge-quote',
+          rfqId: drawer.id,
+          supplierId: selectedSupplier.id,
+          price: Number(conciergePrice),
+          sourcingNote: sourcingNote.trim(),
+          quantity: conciergeQuantity || undefined,
+          terms: conciergeTerms || undefined,
+          timeline: conciergeTimeline || undefined,
+          deliveryDays: conciergeDeliveryDays ? Number(conciergeDeliveryDays) : undefined,
+          notes: conciergeNotes || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        await fetchRFQs(page); // also refreshes the open drawer's quotes list
+        resetConciergeForm();
+      } else {
+        setConciergeMsg({ text: data.error || 'Failed to submit concierge quote.', ok: false });
+      }
+    } catch {
+      setConciergeMsg({ text: 'Network error. Please try again.', ok: false });
+    } finally {
+      setConciergeSubmitting(false);
+    }
+  };
+
   const fetchRFQs = async (pg = page) => {
     setRefreshing(true);
     try {
@@ -83,6 +167,9 @@ export default function AdminRFQsPage() {
         setRfqs(data.rfqs);
         setTotalPages(data.pagination?.pages ?? 1);
         setTotalCount(data.pagination?.total ?? data.rfqs.length);
+        // Keep an open drawer showing fresh data (e.g. its quotes list right
+        // after a concierge quote is submitted) instead of a stale snapshot.
+        setDrawer(prev => prev ? (data.rfqs.find((r: RFQ) => r.id === prev.id) ?? prev) : prev);
       }
     } catch (e) { console.error(e); }
     finally { setLoading(false); setRefreshing(false); }
@@ -100,7 +187,7 @@ export default function AdminRFQsPage() {
         body: JSON.stringify({ rfqId: id, updates: action === 'close' ? { status: 'CANCELLED' } : { expiresAt: new Date(Date.now() + (days || 7) * 86400000) } }),
       });
       await fetchRFQs();
-      if (drawer?.id === id) setDrawer(null);
+      if (drawer?.id === id) { resetConciergeForm(); setDrawer(null); }
     } catch (e) { console.error(e); }
     finally { setActionLoading(false); setConfirm(null); }
   };
@@ -204,7 +291,7 @@ export default function AdminRFQsPage() {
                   <td className="px-4 py-3 text-slate-400 text-xs whitespace-nowrap">{fmtDate(rfq.createdAt)}</td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
-                      <button onClick={() => setDrawer(rfq)} title="View" className="text-indigo-400 hover:text-indigo-300 transition-colors min-h-[32px] min-w-[32px] flex items-center justify-center">
+                      <button onClick={() => { resetConciergeForm(); setDrawer(rfq); }} title="View" className="text-indigo-400 hover:text-indigo-300 transition-colors min-h-[32px] min-w-[32px] flex items-center justify-center">
                         <Eye className="w-4 h-4" />
                       </button>
                       <button onClick={() => setConfirm(rfq.id)} title="Close RFQ" className="text-red-400 hover:text-red-300 transition-colors min-h-[32px] min-w-[32px] flex items-center justify-center" disabled={rfq.status !== 'ACTIVE'}>
@@ -270,14 +357,14 @@ export default function AdminRFQsPage() {
       {/* RFQ Drawer */}
       {drawer && (
         <div className="fixed inset-0 z-50 flex">
-          <div className="flex-1 bg-black/40" onClick={() => setDrawer(null)} />
+          <div className="flex-1 bg-black/40" onClick={() => { resetConciergeForm(); setDrawer(null); }} />
           <div className="w-full max-w-[440px] bg-slate-900 border-l border-slate-700 overflow-y-auto flex flex-col shadow-2xl">
             <div className="flex items-start justify-between p-5 border-b border-slate-700 sticky top-0 bg-slate-900 z-10">
               <div>
                 <h2 className="text-white font-bold text-base leading-snug">{drawer.title}</h2>
                 <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${statusBadge(drawer.status)}`}>{drawer.status}</span>
               </div>
-              <button onClick={() => setDrawer(null)} className="text-slate-400 hover:text-white transition-colors ml-3 mt-1"><X className="w-5 h-5" /></button>
+              <button onClick={() => { resetConciergeForm(); setDrawer(null); }} className="text-slate-400 hover:text-white transition-colors ml-3 mt-1"><X className="w-5 h-5" /></button>
             </div>
 
             <div className="p-5 space-y-5 flex-1">
@@ -315,6 +402,115 @@ export default function AdminRFQsPage() {
                 <div>
                   <p className="text-slate-500 text-xs mb-1 uppercase tracking-wider">Description</p>
                   <p className="text-slate-300 text-sm leading-relaxed">{drawer.description}</p>
+                </div>
+              )}
+
+              {/* Concierge Quote — staff logs a real quote obtained off-platform
+                  from a real supplier; see route.ts doc-comment on
+                  submit-concierge-quote for the disclosure/audit rules this
+                  form must satisfy (real supplier with contact info, mandatory
+                  sourcing note). */}
+              {conciergeOpen && (
+                <div className="bg-slate-800/60 border border-amber-700/40 rounded-lg p-3 space-y-3">
+                  <p className="text-amber-300 text-xs font-semibold uppercase tracking-wider">Submit Concierge Quote</p>
+
+                  {!selectedSupplier ? (
+                    <div>
+                      <input
+                        type="text"
+                        placeholder="Search supplier by name, company, phone, email…"
+                        value={supplierQuery}
+                        onChange={e => setSupplierQuery(e.target.value)}
+                        className="w-full px-2.5 py-2 bg-slate-900 border border-slate-700 rounded text-white text-xs placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                      />
+                      {supplierSearching && <p className="text-slate-500 text-xs mt-1">Searching…</p>}
+                      {supplierResults.length > 0 && (
+                        <div className="mt-1.5 max-h-40 overflow-y-auto border border-slate-700 rounded divide-y divide-slate-700/50">
+                          {supplierResults.map(s => (
+                            <button
+                              key={s.id}
+                              onClick={() => { setSelectedSupplier(s); setSupplierResults([]); }}
+                              className="w-full text-left px-2.5 py-1.5 hover:bg-slate-700/50 transition-colors"
+                            >
+                              <p className="text-white text-xs">{s.company || s.name}</p>
+                              <p className="text-slate-500 text-[11px]">{s.phone || s.email || 'no contact on file'}</p>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                      {!supplierSearching && supplierQuery.trim() && supplierResults.length === 0 && (
+                        <p className="text-slate-500 text-xs mt-1">No matching suppliers.</p>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between bg-slate-900 border border-slate-700 rounded px-2.5 py-2">
+                      <div>
+                        <p className="text-white text-xs">{selectedSupplier.company || selectedSupplier.name}</p>
+                        <p className="text-slate-500 text-[11px]">{selectedSupplier.phone || selectedSupplier.email}</p>
+                      </div>
+                      <button onClick={() => setSelectedSupplier(null)} className="text-slate-400 hover:text-white text-xs">Change</button>
+                    </div>
+                  )}
+
+                  <input
+                    type="number"
+                    placeholder="Price (₹) *"
+                    value={conciergePrice}
+                    onChange={e => setConciergePrice(e.target.value)}
+                    className="w-full px-2.5 py-2 bg-slate-900 border border-slate-700 rounded text-white text-xs placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  />
+
+                  <textarea
+                    placeholder='Sourcing note * (how this quote was obtained, e.g. "Phone call 2026-07-20 with Mr. Sharma, Apparel Solutions Inc, +9198xxxxxxx")'
+                    value={sourcingNote}
+                    onChange={e => setSourcingNote(e.target.value)}
+                    rows={2}
+                    className="w-full px-2.5 py-2 bg-slate-900 border border-slate-700 rounded text-white text-xs placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  />
+                  {sourcingNote.length > 0 && sourcingNote.trim().length < 10 && (
+                    <p className="text-red-400 text-[11px]">At least 10 characters.</p>
+                  )}
+
+                  <button onClick={() => setShowOptionalFields(v => !v)} className="text-slate-400 hover:text-white text-[11px] underline">
+                    {showOptionalFields ? 'Hide' : 'Show'} optional fields (quantity, terms, timeline, delivery)
+                  </button>
+
+                  {showOptionalFields && (
+                    <div className="space-y-2">
+                      <input type="text" placeholder={`Quantity (defaults to ${drawer.quantity || 'RFQ quantity'})`} value={conciergeQuantity}
+                        onChange={e => setConciergeQuantity(e.target.value)}
+                        className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded text-white text-xs placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500" />
+                      <input type="text" placeholder="Terms" value={conciergeTerms}
+                        onChange={e => setConciergeTerms(e.target.value)}
+                        className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded text-white text-xs placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500" />
+                      <input type="text" placeholder="Timeline" value={conciergeTimeline}
+                        onChange={e => setConciergeTimeline(e.target.value)}
+                        className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded text-white text-xs placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500" />
+                      <input type="number" placeholder="Delivery days" value={conciergeDeliveryDays}
+                        onChange={e => setConciergeDeliveryDays(e.target.value)}
+                        className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded text-white text-xs placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500" />
+                      <textarea placeholder="Notes" value={conciergeNotes}
+                        onChange={e => setConciergeNotes(e.target.value)} rows={2}
+                        className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded text-white text-xs placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500" />
+                    </div>
+                  )}
+
+                  {conciergeMsg && (
+                    <p className={`text-xs ${conciergeMsg.ok ? 'text-emerald-400' : 'text-red-400'}`}>{conciergeMsg.text}</p>
+                  )}
+
+                  <div className="flex gap-2">
+                    <button
+                      onClick={submitConciergeQuote}
+                      disabled={conciergeSubmitting || !selectedSupplier || !conciergePrice || sourcingNote.trim().length < 10}
+                      className="flex-1 px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded disabled:opacity-50 min-h-[32px]"
+                    >
+                      {conciergeSubmitting ? 'Submitting…' : 'Submit Quote'}
+                    </button>
+                    <button onClick={resetConciergeForm} className="px-3 py-1.5 border border-slate-700 text-slate-300 text-xs rounded min-h-[32px]">
+                      Cancel
+                    </button>
+                  </div>
                 </div>
               )}
 
@@ -404,13 +600,17 @@ export default function AdminRFQsPage() {
 
             {/* Actions */}
             {drawer.status === 'ACTIVE' && (
-              <div className="p-5 border-t border-slate-700 flex gap-3 sticky bottom-0 bg-slate-900">
+              <div className="p-5 border-t border-slate-700 flex gap-2 sticky bottom-0 bg-slate-900">
                 <button onClick={() => patchRFQ(drawer.id, 'extend', 7)} disabled={actionLoading}
-                  className="flex-1 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 min-h-[44px]">
+                  className="flex-1 px-3 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold transition-colors disabled:opacity-50 min-h-[44px]">
                   {actionLoading ? '…' : 'Extend 7 Days'}
                 </button>
-                <button onClick={() => { setConfirm(drawer.id); setDrawer(null); }} disabled={actionLoading}
-                  className="flex-1 px-4 py-2.5 bg-red-900/40 hover:bg-red-900/60 text-red-300 border border-red-700/50 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 min-h-[44px]">
+                <button onClick={() => setConciergeOpen(v => !v)} disabled={actionLoading}
+                  className="flex-1 px-3 py-2.5 bg-amber-900/40 hover:bg-amber-900/60 text-amber-300 border border-amber-700/50 rounded-lg text-xs font-semibold transition-colors disabled:opacity-50 min-h-[44px]">
+                  {conciergeOpen ? 'Hide Concierge Form' : 'Submit Concierge Quote'}
+                </button>
+                <button onClick={() => { setConfirm(drawer.id); resetConciergeForm(); setDrawer(null); }} disabled={actionLoading}
+                  className="flex-1 px-3 py-2.5 bg-red-900/40 hover:bg-red-900/60 text-red-300 border border-red-700/50 rounded-lg text-xs font-semibold transition-colors disabled:opacity-50 min-h-[44px]">
                   Close RFQ
                 </button>
               </div>
