@@ -79,13 +79,34 @@ const CSP = `
 
 const PROTECTED_USER_PATHS = [
   '/dashboard',
-  '/supplier',
   '/rfq/create',
   '/checkout',
   '/wallet',
   '/messages',
   '/notifications',
   '/negotiation',
+];
+
+// Account-management supplier pages only — NOT the bare '/supplier' prefix.
+// The old bare '/supplier' entry above used startsWith(), which also matched
+// '/suppliers/*' (the public directory, plural) and public profile pages
+// like '/supplier/[id]', blocking Google from ever crawling them. Each path
+// here is listed explicitly so this list can never re-catch '/suppliers/*'.
+const PROTECTED_SUPPLIER_PATHS = [
+  '/supplier/dashboard',
+  '/supplier/profile',
+  '/supplier/onboarding',
+  '/supplier/registration',
+  '/supplier/browse-rfqs',
+  '/supplier/products/add',
+  '/supplier/products/manage',
+  '/supplier/products/showcase',
+  '/supplier/public-profile',
+  '/supplier/gst',
+  '/supplier/leads',
+  '/supplier/my-quotes',
+  '/supplier/kyc-documents',
+  '/supplier/deals',
 ];
 
 const FORBIDDEN_PATHS = ['/node_modules', '/.env', '/package.json', '/prisma/schema.prisma'];
@@ -129,7 +150,10 @@ export function middleware(request: NextRequest) {
   }
 
   // 4. User route protection
-  if (PROTECTED_USER_PATHS.some(p => pathname.startsWith(p))) {
+  const isProtected =
+    PROTECTED_USER_PATHS.some(p => pathname.startsWith(p)) ||
+    PROTECTED_SUPPLIER_PATHS.some(p => pathname.startsWith(p));
+  if (isProtected) {
     const token = request.cookies.get('auth-token')?.value;
     if (!token) {
       const loginUrl = new URL('/auth/phone-email', request.url);
