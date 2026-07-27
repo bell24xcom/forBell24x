@@ -21,8 +21,8 @@ export default function StatsSidebar() {
       <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-4">
         <h3 className="font-semibold text-lg mb-4 text-white">Featured Categories</h3>
         <div className="space-y-2">
-          <Link href="/categories/steel-metals" className="block p-2 hover:bg-slate-700/50 rounded-lg transition text-sm text-slate-300 hover:text-white">
-            🏭 Steel & Metals
+          <Link href="/categories/iron-steel" className="block p-2 hover:bg-slate-700/50 rounded-lg transition text-sm text-slate-300 hover:text-white">
+            🏭 Iron & Steel
           </Link>
           <Link href="/categories/electronics" className="block p-2 hover:bg-slate-700/50 rounded-lg transition text-sm text-slate-300 hover:text-white">
             ⚡ Electronics

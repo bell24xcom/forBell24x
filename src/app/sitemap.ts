@@ -56,14 +56,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.75,
   }))
 
-  // Category pages — high SEO value
+  // Category pages — high SEO value. The DB is the single source of truth so the
+  // sitemap can never advertise a slug the app 404s on. The static list is used
+  // ONLY as a genuine fallback when the DB query throws (build-time DB outage) —
+  // it is NOT unioned in on success (it contained dead slugs like
+  // 'packaging-materials' that the sitemap was advertising as 404s to Googlebot).
   let categorySlugs = CATEGORY_SLUGS
   try {
     const dbCategories = await prisma.category.findMany({
       where: { isActive: true },
       select: { slug: true },
     })
-    categorySlugs = Array.from(new Set([...CATEGORY_SLUGS, ...dbCategories.map(c => c.slug)]))
+    categorySlugs = dbCategories.map(c => c.slug)
   } catch {
     // DB unavailable at build time — fall back to the static list
   }
