@@ -231,6 +231,15 @@ export const CATEGORY_META: Record<string, CategoryMeta> = {
     keywords: ['textile manufacturers India', 'fabric suppliers India', 'garment manufacturers India', 'yarn suppliers'],
     hsn: '5208-5212, 5407-5408, 6101-6117',
   },
+  // Distinct from textiles-garments (fabric/yarn): finished apparel & fashion.
+  // Backed by a real /categories/apparel-fashion DB row; Surat lists both, and
+  // Agra (leather + apparel hub) has no textiles-garments entry of its own.
+  'apparel-fashion': {
+    name: 'Apparel & Fashion',
+    description: 'Readymade garments, ethnic wear, hosiery, fashion accessories, and finished apparel',
+    keywords: ['apparel manufacturers India', 'garment suppliers India', 'fashion wholesale India', 'readymade garment exporters'],
+    hsn: '6101-6117, 6201-6217',
+  },
   'electronics-electricals': {
     name: 'Electronics & Electricals',
     description: 'PCBs, electrical cables, switchgear, motors, LED lighting, transformers, sensors',
@@ -292,7 +301,14 @@ export function getAllCityCategoryPairs(): { city: string; category: string }[] 
   const pairs: { city: string; category: string }[] = [];
   for (const [citySlug, cityData] of Object.entries(CITIES)) {
     for (const category of cityData.categories) {
-      pairs.push({ city: citySlug, category });
+      // Structural invariant: only emit pairs the page can actually render.
+      // The /suppliers/[city]/[category] page notFound()s when the category is
+      // absent from CATEGORY_META, so an unvalidated city.categories slug would
+      // otherwise put a 404 in the sitemap AND generateStaticParams. This makes
+      // the generated output validated, not a raw union of the config arrays.
+      if (category in CATEGORY_META) {
+        pairs.push({ city: citySlug, category });
+      }
     }
   }
   return pairs;
