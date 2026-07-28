@@ -43,23 +43,36 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const validatedData = CreateRFQSchema.parse(body);
 
-    // 3b. Resolve categoryId FK from the free-text category name so the RFQ
-    //     joins cleanly to /categories/[slug] listings. Best-effort — if the
-    //     name doesn't match a row we save without the FK and fall back to
-    //     the existing free-text column.
+    // 3b. Resolve categoryId FK so the RFQ joins cleanly to /categories/[slug]
+    //     listings. The category <select> in both create forms submits
+    //     Category.slug (the canonical identifier used everywhere else —
+    //     sitemap, category pages, city×category pages), so slug is matched
+    //     first. Name-based matching is kept as a fallback only for legacy/
+    //     non-form callers (e.g. voice/video extraction) that may still send
+    //     a free-text category name instead of a slug. Best-effort — if
+    //     nothing matches we save without the FK and fall back to the
+    //     existing free-text column.
     let categoryId: number | undefined;
     try {
-      const cat = await prisma.category.findFirst({
-        where: {
-          isActive: true,
-          OR: [
-            { name: { equals: validatedData.category, mode: 'insensitive' } },
-            { name: { contains: validatedData.category, mode: 'insensitive' } },
-          ],
-        },
+      const bySlug = await prisma.category.findFirst({
+        where: { isActive: true, slug: { equals: validatedData.category, mode: 'insensitive' } },
         select: { id: true },
       });
-      if (cat) categoryId = cat.id;
+      if (bySlug) {
+        categoryId = bySlug.id;
+      } else {
+        const byName = await prisma.category.findFirst({
+          where: {
+            isActive: true,
+            OR: [
+              { name: { equals: validatedData.category, mode: 'insensitive' } },
+              { name: { contains: validatedData.category, mode: 'insensitive' } },
+            ],
+          },
+          select: { id: true },
+        });
+        if (byName) categoryId = byName.id;
+      }
     } catch (e) {
       console.warn('[RFQ Create] categoryId lookup failed (non-fatal):', e);
     }
