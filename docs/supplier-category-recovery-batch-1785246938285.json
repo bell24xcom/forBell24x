@@ -1,0 +1,109 @@
+{
+  "runAt": "2026-07-28T13:55:36.362Z",
+  "suppliers": [
+    {
+      "id": "cmm62umxa0008vjk85323zq5z",
+      "company": "Hyderabad Pharmaceuticals",
+      "before": [],
+      "after": [
+        "pharmaceutical-chemicals"
+      ]
+    },
+    {
+      "id": "cmm62umi00001vjk8hm11s4ie",
+      "company": "Steel India Works",
+      "before": [],
+      "after": [
+        "steel-metal"
+      ]
+    },
+    {
+      "id": "cmm62umlp0002vjk8sryqvz0t",
+      "company": "Delhi Textiles Co",
+      "before": [],
+      "after": [
+        "textiles"
+      ]
+    },
+    {
+      "id": "cmm62umnl0003vjk8qaypkjos",
+      "company": "Surat Chemical Industries",
+      "before": [],
+      "after": [
+        "chemical"
+      ]
+    },
+    {
+      "id": "cmm62umtj0006vjk8rju6wvx7",
+      "company": "Ahmedabad Machinery",
+      "before": [],
+      "after": [
+        "industrial-machinery"
+      ]
+    },
+    {
+      "id": "cmm62umz50009vjk8nnzt4km6",
+      "company": "Bangalore Plastics Ltd",
+      "before": [],
+      "after": [
+        "plastics"
+      ]
+    },
+    {
+      "id": "cmm62un0y000avjk8ashddllv",
+      "company": "Cochin Food Products",
+      "before": [],
+      "after": [
+        "food-beverage"
+      ]
+    },
+    {
+      "id": "cmm62un2u000bvjk8artee893",
+      "company": "Delhi Construction Materials",
+      "before": [],
+      "after": [
+        "construction-materials"
+      ]
+    },
+    {
+      "id": "cmm62un8d000evjk8kf77c9zu",
+      "company": "Surat Furniture Exports",
+      "before": [],
+      "after": [
+        "furniture-carpentry"
+      ]
+    },
+    {
+      "id": "cmm62unee000hvjk8sfzsrdq8",
+      "company": "Indore Metal Works",
+      "before": [],
+      "after": [
+        "steel-metal"
+      ]
+    },
+    {
+      "id": "cmm62ungb000ivjk81gdsdtou",
+      "company": "Mumbai Cosmetics Ltd",
+      "before": [],
+      "after": [
+        "cosmetics-personal-care"
+      ]
+    },
+    {
+      "id": "cmm62uni7000jvjk8ki2rzphx",
+      "company": "Kerala Spices Export",
+      "before": [],
+      "after": [
+        "spices-seasonings"
+      ]
+    },
+    {
+      "id": "cmm62unki000kvjk873xf6040",
+      "company": "Punjab Agriculture Supplies",
+      "before": [],
+      "after": [
+        "agriculture"
+      ]
+    }
+  ]
+}
