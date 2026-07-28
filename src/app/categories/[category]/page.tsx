@@ -63,13 +63,13 @@ async function getCategory(slug: string) {
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
   const category = await getCategory(params.category);
 
-  // Alias slugs (e.g. "steel", "metals-steel") resolve to one DB category —
-  // canonical points at that category's real slug so aliases collapse onto
-  // a single indexed URL instead of each ranking as a duplicate.
+  // Canonical points at the category's real DB slug so any variant request
+  // collapses onto a single indexed URL instead of ranking as a duplicate.
   const canonicalSlug = category?.slug ?? params.category;
 
   return {
-    title: `${category?.name || 'Category'} - Bell24h`,
+    // Bare title — the root layout template appends " | VyaparSethu".
+    title: `${category?.name || 'Category'}`,
     description: category?.description || `Find suppliers and create RFQs for ${category?.name || 'this category'}`,
     alternates: { canonical: `${SITE_URL}/categories/${canonicalSlug}` },
   };
@@ -136,9 +136,11 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
               {category.description && (
                 <p className="text-lg text-slate-300 mt-2">{category.description}</p>
               )}
-              <p className="text-sm text-slate-400 mt-2">
-                {category._count.rfqs} active RFQs in this category
-              </p>
+              {category._count.rfqs > 0 && (
+                <p className="text-sm text-slate-400 mt-2">
+                  {category._count.rfqs} active RFQs in this category
+                </p>
+              )}
             </div>
           </div>
 
@@ -193,7 +195,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         {/* Real RFQs in this Category */}
         <div className="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-8">
           <h2 className="text-2xl font-bold text-white mb-6">
-            {rfqs.length > 0 ? `Active RFQs in ${category.name}` : `No RFQs in ${category.name} yet`}
+            {rfqs.length > 0 ? `Active RFQs in ${category.name}` : `Be the first to source ${category.name}`}
           </h2>
 
           {rfqs.length > 0 ? (

@@ -35,7 +35,9 @@ export async function fetchSupplierForSeo(supplierId: string) {
 export async function buildSupplierMetadata(supplierId: string): Promise<Metadata> {
   const data = await fetchSupplierForSeo(supplierId);
   if (!data) {
-    return { title: 'Supplier Not Found | VyaparSethu' };
+    // `absolute` stops the root layout template ("%s | VyaparSethu") from
+    // appending a second brand suffix onto a title that already carries one.
+    return { title: { absolute: 'Supplier Not Found | VyaparSethu' } };
   }
 
   const { companyName, categories, description, products, user } = data;
@@ -49,7 +51,9 @@ export async function buildSupplierMetadata(supplierId: string): Promise<Metadat
   ];
 
   return {
-    title,
+    // `absolute` — the title already ends in "| VyaparSethu"; without this the
+    // layout template would append it again ("…VyaparSethu | VyaparSethu").
+    title: { absolute: title },
     description,
     keywords,
     openGraph: {
@@ -66,10 +70,10 @@ export async function buildSupplierMetadata(supplierId: string): Promise<Metadat
 
 export async function buildProductMetadata(supplierId: string, productSlug: string): Promise<Metadata> {
   const data = await fetchSupplierForSeo(supplierId);
-  if (!data) return { title: 'Product Not Found | VyaparSethu' };
+  if (!data) return { title: { absolute: 'Product Not Found | VyaparSethu' } };
 
   const product = data.products.find(p => p.slug === productSlug);
-  if (!product) return { title: 'Product Not Found | VyaparSethu' };
+  if (!product) return { title: { absolute: 'Product Not Found | VyaparSethu' } };
 
   const title = `${product.name} — ${data.companyName} | B2B Supplier India`;
   const description =

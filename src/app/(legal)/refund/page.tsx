@@ -1,5 +1,6 @@
 export const metadata = {
-  title: 'Refund & Cancellation | Bell24h',
+  // Bare title — the root layout template appends " | VyaparSethu".
+  title: 'Refund & Cancellation',
 }
 
 export default function RefundPage() {

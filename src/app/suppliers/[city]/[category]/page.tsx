@@ -3,8 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { CITIES, CATEGORY_META, getAllCityCategoryPairs } from '@/src/data/city-category-seo';
 import { prisma } from '@/lib/prisma';
-import SeoRankComparisonPanel from '@/src/components/seo/SeoRankComparisonPanel';
-import { getRankBySlug } from '@/src/lib/seo-category-keywords';
+import { CityCategorySeoRankLoader } from '@/src/components/seo/CityCategorySeoRankLoader';
 
 interface Props { params: { city: string; category: string } }
 
@@ -32,15 +31,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export const revalidate = 3600;
 
+// Supplier `location` often already includes the state (e.g. "Pune, Maharashtra").
+// Append the cluster state only when it's not already present, so we never render
+// "Pune, Maharashtra, Maharashtra".
+function formatSupplierLocation(location: string | null, cityName: string, state: string): string {
+  const base = location || cityName;
+  return base.toLowerCase().includes(state.toLowerCase()) ? base : `${base}, ${state}`;
+}
+
 export default async function CityCategory({ params }: Props) {
   const city = CITIES[params.city];
   const cat  = CATEGORY_META[params.category];
   if (!city || !cat) notFound();
 
-  const seoRanks = (() => {
-    const cityCat = getRankBySlug('city-category', params.category);
-    return cityCat ? [cityCat] : [];
-  })();
   const pagePath = `/suppliers/${params.city}/${params.category}`;
 
   // Pull verified suppliers in this city who match this category
@@ -66,7 +69,7 @@ export default async function CityCategory({ params }: Props) {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
     name: `${cat.name} Suppliers in ${city.fullName}`,
-    description: `Verified ${cat.name} suppliers and manufacturers in ${city.fullName}, ${city.state}`,
+    description: `Verified ${cat.name} suppliers and manufacturers in ${city.fullName}`,
     url: `https://www.vyaparsethu.com/suppliers/${params.city}/${params.category}`,
     numberOfItems: suppliers.length || 10,
     itemListElement: suppliers.slice(0, 5).map((s, i) => ({
@@ -152,7 +155,7 @@ export default async function CityCategory({ params }: Props) {
                     <h3 className="text-white font-medium text-sm mb-1 group-hover:text-[#D4AF37] transition-colors">
                       {s.company || 'Verified Supplier'}
                     </h3>
-                    <p className="text-slate-500 text-xs">{s.location || city.name}, {city.state}</p>
+                    <p className="text-slate-500 text-xs">{formatSupplierLocation(s.location, city.name, city.state)}</p>
                   </Link>
                 ))}
               </div>
@@ -166,16 +169,13 @@ export default async function CityCategory({ params }: Props) {
             </div>
           )}
 
-          {seoRanks.length > 0 && (
-            <div className="mb-10">
-              <SeoRankComparisonPanel
-                ranks={seoRanks}
-                title={`SEO: ${cat.name} in ${city.name} vs competitors`}
-                pagePath={pagePath}
-                adminLink
-              />
-            </div>
-          )}
+          {/* Admin-only SEO benchmark panel — the loader hits the admin-gated
+              /api/seo/ranks and renders nothing for anonymous/non-admin visitors. */}
+          <CityCategorySeoRankLoader
+            categorySlug={params.category}
+            title={`SEO: ${cat.name} in ${city.name} vs competitors`}
+            pagePath={pagePath}
+          />
 
           {/* Post requirement CTA */}
           <div className="bg-[#001f3f] border border-[#D4AF37]/20 rounded-2xl p-8">
