@@ -1,0 +1,3087 @@
+{
+  "runAt": "2026-07-28T12:56:57.349Z",
+  "batches": {
+    "public_search": {
+      "targetSlugs": [
+        "mineral-metals"
+      ],
+      "suppliers": [
+        {
+          "id": "cmqly2hgy0002vjj484rxv1gk",
+          "company": "Shivam Metal Industries",
+          "before": [
+            "Mineral & Metals"
+          ],
+          "after": [
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly2hd60001vjj4pc2cw7f9",
+          "company": "SBK Steel Traders",
+          "before": [
+            "Mineral & Metals"
+          ],
+          "after": [
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly2hvt0006vjj460o868iz",
+          "company": "K S Metal Corporation",
+          "before": [
+            "Mineral & Metals"
+          ],
+          "after": [
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly2iaj000avjj4w0senvf9",
+          "company": "Kalamboli Iron And Steel Yard Private Limited",
+          "before": [
+            "Mineral & Metals"
+          ],
+          "after": [
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly2hs40005vjj48xvz89zs",
+          "company": "Dinesh Metal Industries",
+          "before": [
+            "Mineral & Metals"
+          ],
+          "after": [
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly2hog0004vjj4vih4nol9",
+          "company": "JSW Shoppe - Shubh M L Shah & Sons",
+          "before": [
+            "Mineral & Metals"
+          ],
+          "after": [
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly2hzi0007vjj4u80qznhy",
+          "company": "Fortran Steel (Works)",
+          "before": [
+            "Mineral & Metals"
+          ],
+          "after": [
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly2i6u0009vjj4dc7mshyl",
+          "company": "Laxmi Metal Industries",
+          "before": [
+            "Mineral & Metals"
+          ],
+          "after": [
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly2ie6000bvjj456usxy3t",
+          "company": "Anuradha Iron And Steel Private Limited",
+          "before": [
+            "Mineral & Metals"
+          ],
+          "after": [
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly2i360008vjj4nnasubr8",
+          "company": "Gopani Metal Industries Pvt Ltd",
+          "before": [
+            "Mineral & Metals"
+          ],
+          "after": [
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly2hkp0003vjj4wkck6yr9",
+          "company": "Shreeji Steel Tubes Pvt Ltd",
+          "before": [
+            "Mineral & Metals"
+          ],
+          "after": [
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly2h6k0000vjj4shy2jxup",
+          "company": "JSW Shoppe - Ddvn Steel",
+          "before": [
+            "Mineral & Metals"
+          ],
+          "after": [
+            "mineral-metals"
+          ]
+        }
+      ]
+    },
+    "mpcb": {
+      "targetSlugs": [
+        "iron-steel"
+      ],
+      "suppliers": [
+        {
+          "id": "cmqly6bj4000rvjbsniahnxbo",
+          "company": "Harisons Steel Ltd.",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly6cgd0010vjbsjim40j89",
+          "company": "Thane Steels Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly65r80005vjbsq7xnj52e",
+          "company": "Gajkeshari Steels & Alloys Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly6crh0013vjbs09eeuyuc",
+          "company": "Indrayani Ferrocast Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly6a22000dvjbst3sgg6sz",
+          "company": "Saptashrungi Alloy Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly65uw0006vjbsqss2m35c",
+          "company": "Gajlaxmi Steel Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly656l0000vjbs3voidema",
+          "company": "Ganraj Ispat Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly65g30002vjbs8f1gnxy0",
+          "company": "Jailaxmi Casting & Alloys Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly65jy0003vjbsq3bt549i",
+          "company": "Shan Engineering Works",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly65nl0004vjbst6j3w4y5",
+          "company": "Bhagyalaxmi Rolling Mills Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly66dl000bvjbs52qzn3g4",
+          "company": "Om Sai Ram Steels & Alloys Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly6atf000kvjbsw7s9ecxs",
+          "company": "Raja Ram Steel Industries Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly669x000avjbs98icsw6g",
+          "company": "Metarolls Ispat Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly65yp0007vjbsh4ere86o",
+          "company": "Geetai Steels Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly662i0008vjbs2u34i1od",
+          "company": "Jalna Siddhivinayak Alloys Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly66680009vjbsgzsidlgw",
+          "company": "Matsyodari Steel & Alloys Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly66ha000cvjbswon24qm0",
+          "company": "Rathi Steel & Metal Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly6a5r000evjbsdvlwrxnt",
+          "company": "SRJ Peety Steels Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly6a9d000fvjbs0jrjjwhs",
+          "company": "SRJ Strips And Pipes Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly6ad4000gvjbs8bxf2i2i",
+          "company": "Mahalaxmi Metallics",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly6agr000hvjbs0fxcykfg",
+          "company": "Nilanjan Iron Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly6am5000ivjbsz92gbrfu",
+          "company": "Bajaj Steel Industries Ltd.",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly6aps000jvjbsrmim0cuq",
+          "company": "Diwanka Energy Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly6ax3000lvjbsg8j7th3g",
+          "company": "Ramsons Castings Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly6b0s000mvjbsbjyhbnvp",
+          "company": "Ramsons Tmt Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly6ccr000zvjbsgr7cw0hn",
+          "company": "Surya Ferrous Alloys Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly6b84000ovjbsfrzrt15b",
+          "company": "Bhartiya Metacast Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly6bbs000pvjbskjq9yzcv",
+          "company": "Bholaram Metal Industries Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly6bfh000qvjbskamp737i",
+          "company": "Gopal Ferrous Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly6bmt000svjbsxg39zher",
+          "company": "Jaideep Metallics & Alloys Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly6bqm000tvjbs3usypqwu",
+          "company": "Lion Steel Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly6bu8000uvjbs9crjbgvl",
+          "company": "Shivkrupa Steel and Alloys Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly6bxu000vvjbsyxwll9d8",
+          "company": "Skytech Rollingmill Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly6c1n000wvjbsnteosyfc",
+          "company": "Solo Metals Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly6c5c000xvjbsl499ltbi",
+          "company": "Sudsar Balaji Steel Rolling Mills Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly6c91000yvjbsma51weaa",
+          "company": "Sun Metallics And Alloys Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly6ck10011vjbs2rq7r8m7",
+          "company": "Torane Ispat Udyog Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly6cnq0012vjbsy32l6cvc",
+          "company": "Viraj Profiles Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly6cv70014vjbsbyiosq77",
+          "company": "Meenakshi Ferro Ingots Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly6cyy0015vjbsthk7q4gk",
+          "company": "Roop Rajat Steel Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly6d670017vjbs8dpwecgf",
+          "company": "Goradia Special Steels Ltd.",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly6d9v0018vjbsjufdb3b1",
+          "company": "Sanyo Special Steel Mfg India Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly6d2l0016vjbsnmrscoiy",
+          "company": "Sant Gyaneshwar Steel Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly6b4g000nvjbs8zzihvly",
+          "company": "MITC Rolling Mills Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        },
+        {
+          "id": "cmqly65c90001vjbs5nt8pfxn",
+          "company": "Rushas Engineering Company Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry"
+          ],
+          "after": [
+            "iron-steel"
+          ]
+        }
+      ]
+    },
+    "wagle_estate": {
+      "targetSlugs": [
+        "iron-steel",
+        "mineral-metals"
+      ],
+      "suppliers": [
+        {
+          "id": "cmqly6e5d001gvjbstmyc5k0h",
+          "company": "Cair Valve Automation",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6g1s001xvjbsuk8p6v99",
+          "company": "KR Steel And Alloys",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6hyw002fvjbs4yis3v5b",
+          "company": "Smaco Engineering Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6ddk0019vjbsbemsw9w4",
+          "company": "AKS Steel Processors",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6dh6001avjbs47l4rhf9",
+          "company": "Ambica Steels India Limited",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6dku001bvjbsixtvhdmw",
+          "company": "Anil Engineering Pvt Ltd",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6doj001cvjbsj3sbcu41",
+          "company": "Ardh Metals & Alloys Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6dsl001dvjbsgyn9kpqc",
+          "company": "Beegees Confab Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6dxe001evjbs505xx8st",
+          "company": "Bombay Metal & Steel Traders",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6e1m001fvjbsmmqsl5sx",
+          "company": "Bygging Infrastructure Pvt Ltd",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6eew001ivjbscgxz513n",
+          "company": "Chase Bright Steel Ltd",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6eij001jvjbsdbapkfu1",
+          "company": "D. H. Exports Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6em8001kvjbs9s7cd7t5",
+          "company": "Effex Industrial Solutions",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6epv001lvjbs71ob560c",
+          "company": "Excelhone Mfg I Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6eu4001mvjbs1cmu3h3h",
+          "company": "Expert Control & Infotech",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6exw001nvjbs6ftpnoxa",
+          "company": "Fabrinox Potnis India Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6f1r001ovjbsl67qd4uh",
+          "company": "Farohar Engineering",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6f5k001pvjbspbp9p5d9",
+          "company": "Forstar Engineers",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6f9e001qvjbs0j51ktme",
+          "company": "Gandhi Engineering Co",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6fd8001rvjbs0x9b061n",
+          "company": "Hardcarb Technologies P. Ltd.",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6fh2001svjbsa13ye4ag",
+          "company": "Havistha Steel Wool",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6fkw001tvjbsrc0su0on",
+          "company": "Hitesh Mechanicals Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6foo001uvjbshoykpb1y",
+          "company": "Incrab Engineers Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6fsh001vvjbsbwgrrj5z",
+          "company": "India Flex Industries Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6fx9001wvjbsfl8bz4zz",
+          "company": "Insteel Engineers Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6g9g001zvjbslgyx1b61",
+          "company": "Meltroll Engineering Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6gdb0020vjbs93zmsnrz",
+          "company": "Metalita",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6gh30021vjbszs0gqgt9",
+          "company": "Natvar Iron & Steel Works P. Ltd",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6gkq0022vjbslyj42gli",
+          "company": "Mould N Cast/Amar Industries",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6gqc0023vjbsype1cdfm",
+          "company": "P M Steel Industries",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6gu70024vjbs5gssia6h",
+          "company": "Pratham Heat Treatments",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6gy10025vjbsv8itsdfj",
+          "company": "Prima Steels Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6h1o0026vjbskxp7j3lz",
+          "company": "Quality Steel Processors",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6h5d0027vjbs8p87zo3z",
+          "company": "Ref Industries",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6h920028vjbsu7phak8x",
+          "company": "S. V. Steel & Alloys P. Ltd.",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6hcr0029vjbsn6csilpq",
+          "company": "Sanghvi Steel & Alloys",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6hgf002avjbs3tow6ed7",
+          "company": "Shalimar Valves Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6hns002cvjbspeoe3jxq",
+          "company": "Siddhi Steels Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6hk5002bvjbsn0bu42wr",
+          "company": "Siddhesh Steel Treatment P. Ltd.",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6hrg002dvjbsrf9ebl6g",
+          "company": "Sigma Galvanizing Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6i2j002gvjbs7bzmvted",
+          "company": "Stainless Alloys",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6i6a002hvjbsnwjx09ni",
+          "company": "Steel Mech Engineers",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6ia2002ivjbsm4d97xi5",
+          "company": "Steel Strong Valves (I) Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6idq002jvjbsxe00omgh",
+          "company": "Steelcons Engineers Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6il3002lvjbsq9fjodl2",
+          "company": "Swastik Steels (P) Ltd.",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6isd002nvjbsv1sbr0dr",
+          "company": "Vashi Steels Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6iw0002ovjbszcglsqu4",
+          "company": "X'Mas Steel",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6ioq002mvjbsg9lwuj27",
+          "company": "Technostar Engineering Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6ihe002kvjbshvcqeogt",
+          "company": "Steelkraft Equipment I Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6eb9001hvjbsg88ylqlh",
+          "company": "Cape Town Impex",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6g5m001yvjbsdrbp1xmb",
+          "company": "Sheth Fabricators Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        },
+        {
+          "id": "cmqly6hv5002evjbsc0sm1ut9",
+          "company": "SK Intech Metchems Pvt. Ltd.",
+          "before": [
+            "Iron & Steel Industry",
+            "Mineral & Metals"
+          ],
+          "after": [
+            "iron-steel",
+            "mineral-metals"
+          ]
+        }
+      ]
+    },
+    "mjp": {
+      "targetSlugs": [
+        "industrial-supplies"
+      ],
+      "suppliers": [
+        {
+          "id": "cmqly74p7002bvjvc3auh7t2j",
+          "company": "Optifiux Pipe Industries",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly78eh003avjvcmvsrndmb",
+          "company": "Shree Maheshwari Industries",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly6x260009vjvctdse0ucu",
+          "company": "APL Apollo Tubes Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly6w8i0001vjvckms3goqm",
+          "company": "Aashirwad Industries",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly6xrt000gvjvck8n1p3mi",
+          "company": "Bothra Agro Equipments Pvt Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly7ah4003uvjvc7i8l7k9m",
+          "company": "S.V. Agro Products.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly766n002pvjvc6ggbzgfg",
+          "company": "Pratiksha Industries Pvt. Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly75o1002kvjvcek9yhz22",
+          "company": "Polysil Irrigation Systems Pvt.Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly77fb0031vjvcjlxlpuvk",
+          "company": "SAS Polymers Pvt. Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly7981003ivjvclsvn33v6",
+          "company": "Signet Industries Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly6w2z0000vjvcn59pszxd",
+          "company": "AA Vasani Poly Pipe LLP",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly6wc80002vjvcw80uuvyn",
+          "company": "Agricture Polymers",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly6wfx0003vjvcajrz5w26",
+          "company": "Agrifem Industries",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly6wjo0004vjvcx5sx8ir0",
+          "company": "Agro Plast Industries",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly6wnd0005vjvcnnpmlkua",
+          "company": "Aion Pipes Pvt.Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly6wr30006vjvcmotpuv52",
+          "company": "Alex Pipe India Pvt.Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly7azn003zvjvcng0kf604",
+          "company": "Tatiwar Agro Industries",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly6x5x000avjvc8oojwdjn",
+          "company": "Apollo Pipes Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly6y6j000kvjvc9679jdcs",
+          "company": "Chemfab Alkalis Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly6wur0007vjvc6vg82rvj",
+          "company": "Anant Extrusion Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly6wyi0008vjvcs73fb1z7",
+          "company": "Anant Irrigation",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly6x9k000bvjvcjpc9qohg",
+          "company": "Arihant Industries",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly6xgu000dvjvc8bvy4iw8",
+          "company": "Astral poly Technik Limited",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly6xki000evjvclrp62n9t",
+          "company": "Avon Plastic Industries Pvt. Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly6xo5000fvjvcccbk97f4",
+          "company": "Bhagwati Plastice & Pipes Industries",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly6xvl000hvjvc1nvbpbjz",
+          "company": "Braj polymers",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly6xz9000ivjvcb16pkkr6",
+          "company": "Centuary Irrigation Systems",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly6y2v000jvjvc9xy0vjzx",
+          "company": "Chamunda Plastic Pvt. Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly6ya6000lvjvcosr1w67q",
+          "company": "Constech Engineers",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly6ydt000mvjvcsnb2ed9y",
+          "company": "Creator Poly Extrusions LLP",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly6yhl000nvjvchrfxw6lw",
+          "company": "Crown Pipes",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly6xd6000cvjvc0oio4rxq",
+          "company": "Ashirvad Pipes Pvt.Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly6yla000ovjvc1w50wo8v",
+          "company": "Das Civil Project Pvt.Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly6yoz000pvjvclas7xdtk",
+          "company": "Deepshika Castings Pvt. Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly6ysm000qvjvchaxajro6",
+          "company": "Delta Irrigation India LLP",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly6yw9000rvjvc9wr9xjd3",
+          "company": "Desana Poly Plastic Industries",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly6z3j000tvjvca8cx7k7i",
+          "company": "Drip Inida Irrigation Pvt. Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly6z77000uvjvc7mk0bdc5",
+          "company": "Duke Pipes Pvt.Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly6zaw000vvjvcql5zrk8b",
+          "company": "Dutron Polymers, Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly6zeh000wvjvcjl71cwun",
+          "company": "Earth & Alloys Pvt.Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly6zi5000xvjvcxqayj54t",
+          "company": "Electrotherm (India) Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly6zlu000yvjvcg8y8w949",
+          "company": "ESL Steel Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly6ztc0010vjvcengym3sl",
+          "company": "Flowkem Poly Plast Pvt. Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly700n0012vjvc9nunzdus",
+          "company": "Ganesh Gouri Industries",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly704l0013vjvc3wrczx94",
+          "company": "Gariman pipe Industries",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly708c0014vjvclcltstpk",
+          "company": "Geeta Plasticwood Industries",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly6zx00011vjvcxa32285c",
+          "company": "Gajanan Pipe Industries",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly71kw001hvjvc7w1hhs6i",
+          "company": "Jain Irrigation Systems Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly70fk0016vjvc7r3m3t01",
+          "company": "GSK Irigation Pvt. Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly70ja0017vjvca72ywqx9",
+          "company": "HEERA PLASTIC",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly71zt001lvjvcxlc7b55v",
+          "company": "Jindal SAW Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly70n00018vjvcletpgd8b",
+          "company": "Hil Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly70qt0019vjvcauijxd71",
+          "company": "HiTech Polyplast Nagpur Pvt. Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly70yd001bvjvc892an6b2",
+          "company": "Idol Plasto Pvt.Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly7125001cvjvcz63r43fy",
+          "company": "Idol Polytech Pvt.Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly715w001dvjvc3xucc1fr",
+          "company": "Indofin Polymers",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly719n001evjvcrxyyg17a",
+          "company": "Indus Pipes & Fittings",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly71dh001fvjvc9akxjyvp",
+          "company": "Integrated Thermoplastics Ltd",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly71h5001gvjvc1fl5frz1",
+          "company": "Jai Balaji Industries Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly71on001ivjvc8a3p380y",
+          "company": "Jalpurti Pipes Pvt.Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly71sg001jvjvcqq1krwzt",
+          "company": "Jeevan Polymers",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly70ul001avjvck7vfk9xz",
+          "company": "Hitech Polyplast Nagpur Pvt.Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly72er001pvjvcmgi7pkq4",
+          "company": "Kejriwal Castings Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly7278001nvjvc02oqp5zs",
+          "company": "Kakatiya Pipes & Infra Pvt. Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly72b2001ovjvct4k5ubqb",
+          "company": "Kanha Plastics Pvt. Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly72if001qvjvc9vzyw0vs",
+          "company": "Kelvin Plastic Pvt. Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly72px001svjvcv9ehxc6o",
+          "company": "Kiran Pipe Industries",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly72xj001uvjvcg3oi5owb",
+          "company": "Kisan Mouldings Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly7319001vvjvcyf3bkg8q",
+          "company": "Kothari Agrotech Pvt. Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly7352001wvjvcd1fr81a2",
+          "company": "Kriti Industries Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly738v001xvjvcee064j0h",
+          "company": "Kriti Industries (India) Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly73cp001yvjvc1oh0h9g5",
+          "company": "L G Irrigation",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly73gd001zvjvcv2jyzd4j",
+          "company": "Laddha Agroplast Industries Pvt Ltd",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly73k40020vjvcyqex0r31",
+          "company": "Mahesh Agro Plast.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly73nu0021vjvcr8styd5p",
+          "company": "Mahindra EPC Irrigation LTD.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly73rl0022vjvckuqv31di",
+          "company": "Mak Industries",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly72m5001rvjvciwringa6",
+          "company": "Kiran Infra Tech",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly7518002evjvc85773jyg",
+          "company": "Paras PVC Pipes & Fittings Pvt. Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly75kc002jvjvc76xav686",
+          "company": "Polyraj Pipes LLP",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly74hn0029vjvcmqx8nyok",
+          "company": "Noble Polytec",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly74le002avjvcjsxnvvri",
+          "company": "Omkar Polymers Pvt. Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly74t0002cvjvctxw2lfyl",
+          "company": "Ori-Plast Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly74wq002dvjvcwdpoaiqj",
+          "company": "Oza Piping System Pvt. Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly755e002fvjvco6i9x51e",
+          "company": "Paravati Agro Plast",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly7596002gvjvc2jjlnfh1",
+          "company": "Paravati Polyextrusion (I) Pvt.Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly75cv002hvjvc8c3nidnr",
+          "company": "Parixit Irrigation Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly75gk002ivjvch47sszaf",
+          "company": "Parshwanath Polymers",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly73yv0024vjvc8ktld07s",
+          "company": "Modigold Pipes Pvt. Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly742l0025vjvc5cw6pdxa",
+          "company": "Natraj Polyplast Pvt. Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly746b0026vjvcsniowglw",
+          "company": "Nineplast Industries Pvt. Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly74a40027vjvc14xol9p5",
+          "company": "Noble Green Agritech Pvt. Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly74du0028vjvcu05k1dzz",
+          "company": "Noble Polymers (TNB Polymers Ltd.)",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly75z5002nvjvcpmq8ubet",
+          "company": "Pragati Pipe Industries Pvt. Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly76ah002qvjvcnib8s6hr",
+          "company": "Precision Plastic Industries Pvt.Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly75rq002lvjvcobsija3z",
+          "company": "Polysl Pipes Pvt. Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly75vf002mvjvcqs40djws",
+          "company": "Prabhavati Udyog",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly762u002ovjvcq0z1t0r6",
+          "company": "Prajapati Industries Pvt. Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly76e5002rvjvc5hmaek0r",
+          "company": "Premier Irrigation Adritec Pvt.Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly76hw002svjvcod2w6s2n",
+          "company": "Prince Pipes & Fittings Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly76ll002tvjvc5kgq7fpq",
+          "company": "R C Plasto Tanks & Pipes Pvt. Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly76pb002uvjvcnx5bi79y",
+          "company": "Rainson Pipes Indudtries",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly76t0002vvjvccok5e5vp",
+          "company": "Rashmi Metaliks Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly76wt002wvjvcczdofa9o",
+          "company": "Reliance Industries Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly770i002xvjvcnjugajrd",
+          "company": "R.G. Industries",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly7747002yvjvc19914jm9",
+          "company": "Sahyadri Agro Pipe Industries",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly777x002zvjvc7q847r5w",
+          "company": "Sairoop Industries",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly77bo0030vjvcbdlm1gcb",
+          "company": "Sarita Krushi Industries LLP",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly77zr0036vjvcp3e64eoz",
+          "company": "Shiv Ganga Polymers Pvt. Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly77j10032vjvccvhjgezk",
+          "company": "Savatram Polymers",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly77ok0033vjvceb2c66x4",
+          "company": "Sethi & Sons Industries.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly77sb0034vjvcmmmno8mc",
+          "company": "Shakti Industries",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly77w10035vjvc6gqzv25b",
+          "company": "Shakti Polymers",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly783e0037vjvcohks3qao",
+          "company": "Shivdatta Irrigation",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly78730038vjvcjnrxzrxt",
+          "company": "Shivshakti Industries",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly78at0039vjvclmr56qc2",
+          "company": "Shree Darshan Pipes",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly78i5003bvjvcs8t787li",
+          "company": "Shree TNB Polymers Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly78lw003cvjvc4qoz13nd",
+          "company": "Shri. Bajrang Power and Ispat Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly78pl003dvjvc2x779gj0",
+          "company": "Shri Balaji Industries",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly78tb003evjvckwkdjdxx",
+          "company": "Shri Sairam Plastic & Irrigation",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly78wy003fvjvce36i131a",
+          "company": "Shrileela Industries",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly790n003gvjvct4jv5tl7",
+          "company": "Shriniwas Industris",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly794c003hvjvcu0og6kto",
+          "company": "Siddhivinayak precast pipes pvt.Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly79ui003ovjvc8akweitl",
+          "company": "Sudhakar Polymers Pvt. Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly7as8003xvjvcbne0llec",
+          "company": "Systoverse Pvt.Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly7avx003yvjvcnac2pddl",
+          "company": "Tata Metaliks Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly79bu003jvjvc7b2g0682",
+          "company": "Sona Industries",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly79fl003kvjvctpoxhhm6",
+          "company": "Spark Irrigation Pvt. Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly79ja003lvjvc21s2rdc6",
+          "company": "Srikalahasthi Pipes Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly79mz003mvjvcybimhymx",
+          "company": "SSV Piping Industries",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly79qv003nvjvco0e3687e",
+          "company": "Sudhakar Plastic Pvt. Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly79y7003pvjvcum38ds8d",
+          "company": "Sunvesta Pipes Pvt. Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly7a21003qvjvcjpcstbk0",
+          "company": "Supreme Gold Irrigation Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly7a5w003rvjvcrwlrgi9u",
+          "company": "Supreme industries limited",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly7a9p003svjvctgqfstqw",
+          "company": "Surya Pipes",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly7adf003tvjvcrb0kq0y4",
+          "company": "Surya Roshni Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly7aku003vvjvc32k7osfe",
+          "company": "Swastik Industries",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly7aoi003wvjvci12ov8i3",
+          "company": "Swastik Pipes, Yavatmal",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly7baw0042vjvcl5h0y2ce",
+          "company": "Telangana Pipes (P)Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly7bib0044vjvcj0qtupqg",
+          "company": "Texmo Pipes & Products Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly7bpq0046vjvc1k6hr32v",
+          "company": "Tirupati Plastomatics Pvt. Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly7c0v0049vjvch2holrod",
+          "company": "TVS Polymers",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly7c4o004avjvcmx02bzuf",
+          "company": "Unicel Engineering Pvt. Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly7c8e004bvjvcuer3az50",
+          "company": "Unitec Pipe Industry",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly7cc9004cvjvc1tahqie9",
+          "company": "United Agro Pipe Industries",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly7cfy004dvjvc664oamm2",
+          "company": "Vahini Irrigation Pvt. Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly7cjm004evjvcgq8iwqj4",
+          "company": "Vardhaman Pipes & Cables",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly7cne004fvjvcxjo5ngni",
+          "company": "Vardhaman Polyextrusion",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly7b3c0040vjvcgq4bbs08",
+          "company": "Techstar Endineer Pvt. Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly7b720041vjvckpxlgg8e",
+          "company": "Tejas Agro Irrigation System Pvt. Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly7bel0043vjvcycn2advc",
+          "company": "Teraflow Pipes",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly7bm20045vjvcghx8j3b8",
+          "company": "Time Technoplast Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly7bte0047vjvc503vek0z",
+          "company": "Tru Form Engneers",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly7bx40048vjvclx6pslxn",
+          "company": "Tulsi Extrusions Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly7cr2004gvjvcogojiw7n",
+          "company": "Vasani Polymers Pvt.Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly7cus004hvjvcet4ok2e2",
+          "company": "Venuka Polymers",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly7cyi004ivjvcz0go06w7",
+          "company": "Vidharbha Irrigation System Pvt.Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly7d26004jvjvcyw1ah2di",
+          "company": "Vijaya Polymers India Pvt. Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly7d61004kvjvctkuuvlbz",
+          "company": "Vinayak Polypipes Pvt. Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly7d9o004lvjvcjz67lqa5",
+          "company": "viraj Polymers",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly7ddc004mvjvc348a7vol",
+          "company": "Visek Industries Pvt. Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly7dh1004nvjvct3iokjug",
+          "company": "Vishakha Plastic Pipes Pvt. Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly7dko004ovjvcqy5d595l",
+          "company": "Welspun DI Pipes Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly6zpj000zvjvc6cjhb88z",
+          "company": "Esscon Pipes & Fittings",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly70by0015vjvc9n5qf9t3",
+          "company": "Graphite India.Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly71w5001kvjvc7pso5u2s",
+          "company": "Jindal Fittings.Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly723k001mvjvc6egiigit",
+          "company": "J.K. Technoplast Pvt.Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly72ts001tvjvc7l2odefj",
+          "company": "Kisan Irrigation & Infrastucture Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly73v80023vjvc2s1pkh8a",
+          "company": "Malpani Pipes and Fittings Pvt. Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        },
+        {
+          "id": "cmqly6yzx000svjvcxt2ucnv8",
+          "company": "Dolphin Poly Plast Pvt. Ltd.",
+          "before": [
+            "Pipes & Irrigation Equipment",
+            "Industrial Supplies"
+          ],
+          "after": [
+            "industrial-supplies"
+          ]
+        }
+      ]
+    }
+  }
+}
