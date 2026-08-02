@@ -19,6 +19,21 @@ export default function SupplierClaimClient({ category, city, claimToken }: Prop
   }, [isAuthenticated, router]);
 
   const handleClaim = () => {
+    // A claim token means this is an outreach deep-link (see
+    // src/app/api/admin/outreach/bulk-wa/route.ts). Claim completion for a
+    // token must go through the same verify/complete pair the plain
+    // /claim/[token] flow already uses (src/app/claim/[token]/ClaimForm.tsx)
+    // — that page has its own OTP UI, so the generic capture modal below is
+    // only for the no-token case.
+    if (claimToken) {
+      const params = new URLSearchParams();
+      if (category) params.set('category', category);
+      if (city) params.set('city', city);
+      const qs = params.toString();
+      router.push(`/claim/${claimToken}${qs ? `?${qs}` : ''}`);
+      return;
+    }
+
     const label = category && city
       ? `Claim Supplier Profile — ${category} in ${city}`
       : 'Claim Free Verified Supplier Profile';
@@ -28,9 +43,7 @@ export default function SupplierClaimClient({ category, city, claimToken }: Prop
       label,
       category,
       city,
-      redirectTo: claimToken
-        ? `/api/auth/claim?token=${claimToken}`
-        : '/dashboard?tab=supplier&onboarding=1',
+      redirectTo: '/dashboard?tab=supplier&onboarding=1',
     });
 
     openCaptureModal({ action: 'supplier-claim', label, category, city });
