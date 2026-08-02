@@ -1,17 +1,40 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronRight, Search, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
-import { ALL_50_CATEGORIES } from '@/data/all-50-categories';
+
+interface Category {
+  id: number;
+  name: string;
+  slug: string;
+  icon?: string | null;
+  description?: string | null;
+  _count?: { rfqs: number };
+}
 
 export default function CategoryGrid() {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const displayedCategories = expanded ? ALL_50_CATEGORIES : ALL_50_CATEGORIES.slice(0, 12);
+
+  useEffect(() => {
+    fetch('/api/categories?level=1')
+      .then(r => r.json())
+      .then(d => {
+        if (d.success && Array.isArray(d.categories)) {
+          setCategories(d.categories);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  const displayedCategories = expanded ? categories : categories.slice(0, 12);
   const filteredCategories = displayedCategories.filter(cat =>
     cat.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    cat.description.toLowerCase().includes(searchTerm.toLowerCase())
+    (cat.description || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
   return (
     <section className="py-20 md:py-28 bg-white">
@@ -30,6 +53,9 @@ export default function CategoryGrid() {
             <input type="text" placeholder="Search categories..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full pl-16 pr-6 py-5 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none text-lg" />
           </div>
         </div>
+        {loading && (
+          <p className="text-center text-gray-500 mb-16">Loading categories…</p>
+        )}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-16">
           {filteredCategories.map((category) => (
             <Link key={category.id} href={`/categories/${category.slug}`} className="group bg-white rounded-2xl p-8 shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border-2 border-gray-100 hover:border-blue-500">
@@ -37,7 +63,7 @@ export default function CategoryGrid() {
               <h3 className="font-bold text-xl text-gray-900 mb-3 group-hover:text-blue-600 transition-colors">{category.name}</h3>
               <p className="text-gray-600 mb-6 line-clamp-2">{category.description}</p>
               <div className="flex items-center justify-between pt-4 border-t-2 border-gray-100">
-                <div className="text-sm text-gray-600"><span className="font-bold text-blue-600">{category.rfqCount || '100+'}</span> RFQs</div>
+                <div className="text-sm text-gray-600"><span className="font-bold text-blue-600">{category._count?.rfqs || '100+'}</span> RFQs</div>
                 <ChevronRight className="w-6 h-6 text-gray-400 group-hover:text-blue-600 group-hover:translate-x-2 transition-all" />
               </div>
             </Link>
@@ -46,7 +72,7 @@ export default function CategoryGrid() {
         {!searchTerm && filteredCategories.length > 0 && (
           <div className="text-center">
             <button onClick={() => setExpanded(!expanded)} className="inline-flex items-center gap-3 px-10 py-5 bg-blue-600 text-white rounded-xl font-bold shadow-xl hover:bg-blue-700 hover:shadow-2xl transform hover:scale-105 transition-all text-lg">
-              {expanded ? 'Show Less' : `View All ${ALL_50_CATEGORIES.length} Categories`}
+              {expanded ? 'Show Less' : `View All ${categories.length} Categories`}
               <ChevronRight className={`w-6 h-6 transition-transform ${expanded ? 'rotate-90' : ''}`} />
             </button>
           </div>
