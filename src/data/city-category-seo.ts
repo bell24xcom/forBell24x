@@ -26,6 +26,7 @@ export const CITIES: Record<string, CityData> = {
     description: 'India\'s largest steel and metals distribution hub, with 800+ dealers, stockists, and processors within a 5 km radius.',
     clusterNote: 'CIDCO-developed industrial node; proximity to JNPT makes it the primary import-landing point for steel coils.',
     categories: ['metals-alloys', 'pipes-fittings', 'fasteners-bolts', 'tools-hardware', 'construction-real-estate'],
+    lat: 19.033, lng: 73.101,
   },
   'bhiwandi': {
     name: 'Bhiwandi',
@@ -35,6 +36,7 @@ export const CITIES: Record<string, CityData> = {
     description: 'Maharashtra\'s largest corrugated packaging and textiles manufacturing cluster, with 400+ packaging units and India\'s highest warehousing density.',
     clusterNote: 'Home to the largest number of power looms in India. Packaging cluster serves Mumbai, Pune, and Nashik FMCG manufacturers.',
     categories: ['packaging-materials', 'textiles-garments', 'paper-printing', 'transport-logistics'],
+    lat: 19.297, lng: 73.063,
   },
   'taloja': {
     name: 'Taloja',
@@ -44,6 +46,7 @@ export const CITIES: Record<string, CityData> = {
     description: 'MIDC Taloja houses Maharashtra\'s highest concentration of specialty chemical, adhesive, and polymer manufacturers.',
     clusterNote: 'MIDC Taloja has 600+ registered industrial units. Key sectors: industrial adhesives, solvents, polymers, rubber compounds.',
     categories: ['chemicals-petrochemicals', 'industrial-adhesives', 'plastics-rubber', 'paints-coatings'],
+    lat: 19.073, lng: 73.114,
   },
   'rabale': {
     name: 'Rabale',
@@ -53,6 +56,7 @@ export const CITIES: Record<string, CityData> = {
     description: 'Rabale MIDC is a premium industrial estate hosting electronics, chemicals, and engineering companies.',
     clusterNote: 'Adjacent to Thane-Belapur Road industrial corridor. Strong in electronics assembly and specialty chemicals.',
     categories: ['electronics-electricals', 'chemicals-petrochemicals', 'machinery-equipment'],
+    lat: 19.120, lng: 73.020,
   },
   'ambernath': {
     name: 'Ambernath',
@@ -62,6 +66,7 @@ export const CITIES: Record<string, CityData> = {
     description: 'Ambernath MIDC specialises in engineering, chemicals, and defence manufacturing.',
     clusterNote: 'One of the oldest MIDCs in Maharashtra. Strong in batch chemical manufacturing and engineering components.',
     categories: ['chemicals-petrochemicals', 'machinery-equipment', 'tools-hardware', 'industrial-adhesives'],
+    lat: 19.187, lng: 73.186,
   },
   'chakan': {
     name: 'Chakan',
@@ -71,6 +76,7 @@ export const CITIES: Record<string, CityData> = {
     description: 'Chakan is India\'s fastest-growing auto components and engineering cluster, hosting Volkswagen, Tata Motors, and 2,000+ tier-2/3 suppliers.',
     clusterNote: 'MIDC Chakan Phase 1–3 spans 2,000+ acres. Dominant sectors: auto parts, die casting, precision machining, wiring harnesses.',
     categories: ['automotive-transport', 'machinery-equipment', 'metals-alloys', 'electronics-electricals'],
+    lat: 18.761, lng: 73.864,
   },
   'bhosari': {
     name: 'Bhosari',
@@ -80,6 +86,7 @@ export const CITIES: Record<string, CityData> = {
     description: 'Bhosari MIDC is Pune\'s oldest industrial area, strong in plastics, engineering machinery, and defence components.',
     clusterNote: 'Home to BARC equipment manufacturers and defence supply chain. Strong in CNC machining and plastic moulding.',
     categories: ['plastics-rubber', 'machinery-equipment', 'automotive-transport', 'tools-hardware'],
+    lat: 18.630, lng: 73.848,
   },
   'ranjangaon': {
     name: 'Ranjangaon',
@@ -89,6 +96,7 @@ export const CITIES: Record<string, CityData> = {
     description: 'Ranjangaon MIDC hosts Bajaj Auto, Bosch, and 500+ auto ancillary manufacturers.',
     clusterNote: 'Part of Pune-Nashik highway industrial corridor. Strong in auto ancillaries, electronics, and food processing.',
     categories: ['automotive-transport', 'electronics-electricals', 'food-beverages', 'machinery-equipment'],
+    lat: 18.783, lng: 74.233,
   },
   'silvassa': {
     name: 'Silvassa',
@@ -98,6 +106,7 @@ export const CITIES: Record<string, CityData> = {
     description: 'Silvassa is India\'s plastics and polymer manufacturing capital, with 7,000+ industrial units and significant tax advantages.',
     clusterNote: 'UT status gives Silvassa-based manufacturers GST and power cost advantages. Major hub for PVC pipes, plastic containers, lubricants.',
     categories: ['plastics-rubber', 'chemicals-petrochemicals', 'packaging-materials', 'pipes-fittings'],
+    lat: 20.277, lng: 72.997,
   },
   'vatva': {
     name: 'Vatva',
@@ -107,6 +116,7 @@ export const CITIES: Record<string, CityData> = {
     description: 'Vatva GIDC is India\'s largest chemical manufacturing cluster, hosting 2,000+ chemical units producing dyes, pharmaceuticals, and industrial chemicals.',
     clusterNote: 'India\'s largest dye and intermediate chemicals hub. Also strong in pharmaceuticals and specialty chemicals for textiles.',
     categories: ['chemicals-petrochemicals', 'pharmaceuticals-healthcare', 'textiles-garments', 'paints-coatings'],
+    lat: 22.965, lng: 72.630,
   },
   'ankleshwar': {
     name: 'Ankleshwar',
@@ -116,6 +126,7 @@ export const CITIES: Record<string, CityData> = {
     description: 'Ankleshwar is Asia\'s largest industrial estate by area, specialising in agrochemicals, pharmaceuticals, and specialty chemicals.',
     clusterNote: 'Bharuch district hosts India\'s highest concentration of chemical manufacturers per sq km.',
     categories: ['chemicals-petrochemicals', 'pharmaceuticals-healthcare', 'agriculture-farming'],
+    lat: 21.627, lng: 73.010,
   },
   'surat': {
     name: 'Surat',
@@ -125,6 +136,7 @@ export const CITIES: Record<string, CityData> = {
     description: 'Surat handles 95% of India\'s diamond cutting and polishing, and is India\'s largest synthetic textile and embroidery cluster.',
     clusterNote: 'Surat\'s textile market (Ring Road) is the world\'s largest fabric trading hub. Embroidery and zari work is concentrated in Surat city.',
     categories: ['textiles-garments', 'jewellery-gems', 'apparel-fashion', 'packaging-materials'],
+    lat: 21.170, lng: 72.831,
   },
   'ludhiana': {
     name: 'Ludhiana',
@@ -134,6 +146,7 @@ export const CITIES: Record<string, CityData> = {
     description: 'Ludhiana is India\'s largest woollen hosiery manufacturing city and a major bicycle and auto parts hub.',
     clusterNote: 'Known as the Manchester of India. Strong in bicycle components, hosiery, and machine tools.',
     categories: ['textiles-garments', 'automotive-transport', 'machinery-equipment', 'metals-alloys'],
+    lat: 30.901, lng: 75.857,
   },
   'coimbatore': {
     name: 'Coimbatore',
@@ -143,6 +156,7 @@ export const CITIES: Record<string, CityData> = {
     description: 'Coimbatore is India\'s pump and motor manufacturing capital and a major textile machinery hub.',
     clusterNote: 'Known as the Manchester of South India. Hosts 30,000+ small industries. Pumps, motors, and wet grinders are global exports.',
     categories: ['pumps-compressors', 'machinery-equipment', 'textiles-garments', 'electronics-electricals'],
+    lat: 11.017, lng: 76.956,
   },
   'rajkot': {
     name: 'Rajkot',
@@ -152,6 +166,7 @@ export const CITIES: Record<string, CityData> = {
     description: 'Rajkot is a major engineering and brass parts manufacturing hub, and one of India\'s top diesel engine producers.',
     clusterNote: 'Brass parts (auto, plumbing, electrical fittings) are Rajkot\'s primary export. 15,000+ MSME engineering units.',
     categories: ['machinery-equipment', 'metals-alloys', 'automotive-transport', 'fasteners-bolts'],
+    lat: 22.304, lng: 70.802,
   },
   'agra': {
     name: 'Agra',
@@ -161,6 +176,7 @@ export const CITIES: Record<string, CityData> = {
     description: 'Agra is India\'s largest leather footwear manufacturing centre and a major tourist goods cluster.',
     clusterNote: '5,000+ leather units. Agra produces 65% of India\'s total leather footwear. Petha and Dalmoth are also food industry highlights.',
     categories: ['leather-footwear', 'apparel-fashion', 'food-beverages'],
+    lat: 27.177, lng: 78.008,
   },
   'mumbai': {
     name: 'Mumbai',
@@ -170,6 +186,7 @@ export const CITIES: Record<string, CityData> = {
     description: 'India\'s financial and commercial capital, with major trading hubs across all B2B categories.',
     clusterNote: 'Dharavi for leather/recycled goods, Kurla-Mankhurd for electronics, Crawford Market for bulk commodities.',
     categories: ['electronics-electricals', 'leather-footwear', 'food-beverages', 'metals-alloys', 'packaging-materials'],
+    lat: 19.076, lng: 72.877,
   },
   'pune': {
     name: 'Pune',
@@ -179,6 +196,7 @@ export const CITIES: Record<string, CityData> = {
     description: 'Pune is India\'s second-largest automotive hub and a major IT and manufacturing centre.',
     clusterNote: 'Automotive ecosystem spans OEMs (Tata, Bajaj, Force) and 10,000+ tier-2/3 suppliers across Chakan, Pimpri, Bhosari.',
     categories: ['automotive-transport', 'machinery-equipment', 'electronics-electricals', 'it-telecom'],
+    lat: 18.520, lng: 73.857,
   },
 };
 
