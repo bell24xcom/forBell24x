@@ -50,6 +50,8 @@ model User {
   conciergeQuotesSourced Quote[]      @relation("ConciergeSourcedQuotes")
   kycDocuments         KycDocument[]  @relation("KycDocumentsOwned")
   kycDocumentsReviewed KycDocument[]  @relation("KycDocumentsReviewed")
+  reviewsGiven         Review[]       @relation("ReviewsGiven")
+  reviewsReceived      Review[]       @relation("ReviewsReceived")
   rfqs                 RFQ[]
   buyerTransactions    Transaction[]  @relation("BuyerTransactions")
   supplierTransactions Transaction[]  @relation("SupplierTransactions")
@@ -224,8 +226,26 @@ model Deal {
   quote      Quote    @relation(fields: [quoteId], references: [id])
   rfq        RFQ      @relation(fields: [rfqId], references: [id])
   supplier   User     @relation("SupplierDeals", fields: [supplierId], references: [id])
+  reviews    Review[]
 
   @@map("deals")
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  dealId     String   @map("deal_id")
+  reviewerId String   @map("reviewer_id")
+  revieweeId String   @map("reviewee_id")
+  rating     Int
+  comment    String?
+  createdAt  DateTime @default(now()) @map("created_at")
+  deal       Deal     @relation(fields: [dealId], references: [id])
+  reviewer   User     @relation("ReviewsGiven", fields: [reviewerId], references: [id])
+  reviewee   User     @relation("ReviewsReceived", fields: [revieweeId], references: [id])
+
+  @@unique([dealId, reviewerId])
+  @@index([revieweeId])
+  @@map("reviews")
 }
 
 model Transaction {

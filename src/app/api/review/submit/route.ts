@@ -1,55 +1,93 @@
+/**
+ * POST /api/review/submit
+ * Buyer or supplier reviews the other party on a COMPLETED deal.
+ * Identity is derived from the verified session token only — never from
+ * client-supplied reviewer fields.
+ */
 import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { verifyToken } from '@/lib/jwt';
 
 export const dynamic = 'force-dynamic';
 
-export async function POST(req: NextRequest) {
-  const INSFORGE_URL = process.env.INSFORGE_URL;
-  const INSFORGE_API_KEY = process.env.INSFORGE_API_KEY;
-
+export async function POST(request: NextRequest) {
   try {
-    const { deal_id, reviewer_id, reviewer_type, rating, feedback } = await req.json();
+    const token =
+      request.cookies.get('auth-token')?.value ||
+      request.headers.get('authorization')?.replace('Bearer ', '');
 
-    // 1. Verify Deal Status and Participants
-    const dealRes = await fetch(`${INSFORGE_URL}/rest/v1/deals?id=eq.${deal_id}`, {
-      headers: { 'apikey': INSFORGE_API_KEY!, 'Authorization': `Bearer ${INSFORGE_API_KEY}` }
+    if (!token) {
+      return NextResponse.json({ success: false, error: 'Authentication required' }, { status: 401 });
+    }
+
+    const payload = verifyToken(token);
+    if (!payload) {
+      return NextResponse.json({ success: false, error: 'Invalid or expired session' }, { status: 401 });
+    }
+
+    const userId = payload.userId;
+    const { dealId, rating, comment } = await request.json();
+
+    if (!dealId || typeof rating !== 'number' || rating < 1 || rating > 5) {
+      return NextResponse.json(
+        { success: false, error: 'dealId and a rating between 1 and 5 are required' },
+        { status: 400 }
+      );
+    }
+
+    const deal = await prisma.deal.findUnique({ where: { id: dealId } });
+    if (!deal) {
+      return NextResponse.json({ success: false, error: 'Deal not found' }, { status: 404 });
+    }
+
+    const isBuyer = deal.buyerId === userId;
+    const isSupplier = deal.supplierId === userId;
+    if (!isBuyer && !isSupplier) {
+      return NextResponse.json({ success: false, error: 'Access denied' }, { status: 403 });
+    }
+
+    if (deal.status !== 'COMPLETED') {
+      return NextResponse.json(
+        { success: false, error: 'Reviews are only allowed after the deal is completed' },
+        { status: 400 }
+      );
+    }
+
+    const revieweeId = isBuyer ? deal.supplierId : deal.buyerId;
+
+    const existing = await prisma.review.findUnique({
+      where: { dealId_reviewerId: { dealId, reviewerId: userId } },
     });
-    const deals = await dealRes.json();
-    const deal = deals[0];
+    if (existing) {
+      return NextResponse.json({ success: false, error: 'You have already reviewed this deal' }, { status: 400 });
+    }
 
-    if (!deal) throw new Error('Deal not found');
-    if (deal.status !== 'completed') throw new Error('Reviews only allowed after deal completion');
+    const review = await prisma.$transaction(async (tx) => {
+      const created = await tx.review.create({
+        data: { dealId, reviewerId: userId, revieweeId, rating, comment: comment || null },
+      });
 
-    // Determine reviewee
-    const reviewee_id = reviewer_type === 'buyer' ? deal.supplier_id : deal.buyer_id;
+      // Same increment-then-clamp pattern used elsewhere for trust score
+      // (src/app/api/supplier/onboarding/route.ts): nudge relative to a
+      // neutral 3-star rating, then keep the score within [0, 100].
+      const delta = rating - 3;
+      const updated = await tx.user.update({
+        where: { id: revieweeId },
+        data: { trustScore: { increment: delta } },
+        select: { trustScore: true },
+      });
+      if (updated.trustScore > 100) {
+        await tx.user.update({ where: { id: revieweeId }, data: { trustScore: 100 } });
+      } else if (updated.trustScore < 0) {
+        await tx.user.update({ where: { id: revieweeId }, data: { trustScore: 0 } });
+      }
 
-    // 2. Prevent Duplicate Reviews
-    const existingRes = await fetch(`${INSFORGE_URL}/rest/v1/marketplace_reviews?deal_id=eq.${deal_id}&reviewer_id=eq.${reviewer_id}`, {
-      headers: { 'apikey': INSFORGE_API_KEY!, 'Authorization': `Bearer ${INSFORGE_API_KEY}` }
-    });
-    const existing = await existingRes.json();
-    if (existing.length > 0) throw new Error('You have already reviewed this deal');
-
-    // 3. Submit Review
-    await fetch(`${INSFORGE_URL}/rest/v1/marketplace_reviews`, {
-      method: 'POST',
-      headers: { 
-        'apikey': INSFORGE_API_KEY!, 
-        'Authorization': `Bearer ${INSFORGE_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify([{
-        deal_id,
-        reviewer_id,
-        reviewee_id,
-        reviewer_type,
-        rating,
-        feedback
-      }])
+      return created;
     });
 
-    return NextResponse.json({ success: true });
-
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ success: true, review });
+  } catch (error) {
+    console.error('POST /api/review/submit error:', error);
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }

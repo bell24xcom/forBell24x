@@ -25,13 +25,12 @@ export default function ReviewSubmissionPage() {
     try {
       const res = await fetch('/api/review/submit', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          deal_id: dealId,
-          reviewer_id: 'current_user_id', // Needs session integration
-          reviewer_type: 'buyer', // Needs session role detection
+          dealId,
           rating,
-          feedback
+          comment: feedback,
         })
       });
 
