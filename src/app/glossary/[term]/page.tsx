@@ -23,7 +23,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description,
     keywords: term.keywords,
     alternates: { canonical },
-    openGraph: { title, description, url: canonical, siteName: 'VyaparSethu' },
+    openGraph: {
+      title,
+      description,
+      url: canonical,
+      siteName: 'VyaparSethu',
+      images: [{ url: 'https://www.vyaparsethu.com/og-image.png', width: 1200, height: 630, alt: term.title }],
+    },
   };
 }
 

@@ -33,6 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description,
       url: `https://www.vyaparsethu.com/location/${params.area}`,
       siteName: 'VyaparSethu',
+      images: [{ url: 'https://www.vyaparsethu.com/og-image.png', width: 1200, height: 630, alt: seoTitle }],
     },
     alternates: { canonical: `https://www.vyaparsethu.com/location/${params.area}` },
   };
