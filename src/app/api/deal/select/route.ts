@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getAuthenticatedUser, hasRole } from '@/src/lib/auth-helpers';
+import { getAuthenticatedUser } from '@/src/lib/auth-helpers';
 import { z } from 'zod';
 
 const SelectDealSchema = z.object({
@@ -14,11 +14,6 @@ export async function POST(req: NextRequest) {
     
     if (!user) {
       return NextResponse.json({ success: false, error: 'Unauthorized: Please log in' }, { status: 401 });
-    }
-
-    // 2. Authorize role (Buyer or Admin)
-    if (!hasRole(user, ['BUYER', 'ADMIN'])) {
-      return NextResponse.json({ success: false, error: 'Forbidden: Only buyers can select deals' }, { status: 403 });
     }
 
     // 3. Validate request body
