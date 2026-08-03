@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { normalizeProducts, type SupplierPreferences } from '@/src/lib/supplier-products';
+import { getTrustScore } from '@/src/lib/trust-score';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,6 +23,7 @@ export async function GET(
           gstNumber: true,
           createdAt: true,
           preferences: true,
+          trustScore: true,
           _count: { select: { quotes: true } },
         },
       }),
@@ -44,12 +46,7 @@ export async function GET(
 
     const gstVerified = !!userRecord.gstNumber;
     const responseRate = totalQuotes > 0 ? Math.round((wonQuotes / totalQuotes) * 100) : 0;
-
-    let trustScore = 0;
-    trustScore += gstVerified ? 30 : 0;
-    trustScore += Math.round(profileComplete * 0.25);
-    trustScore += totalQuotes > 0 ? Math.min(Math.round((wonQuotes / totalQuotes) * 25), 25) : 0;
-    trustScore += Math.min(dealsCompleted * 4, 20);
+    const trustScore = getTrustScore(userRecord);
 
     const preferences = userRecord.preferences as SupplierPreferences | null;
     const products = normalizeProducts(preferences?.products);

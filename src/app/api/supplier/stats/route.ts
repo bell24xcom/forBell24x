@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticate } from '@/lib/jwt';
 import { prisma } from '@/lib/prisma';
+import { getTrustScore } from '@/src/lib/trust-score';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,7 +19,7 @@ export async function GET(request: NextRequest) {
       prisma.quote.count({ where: { supplierId, status: 'ACCEPTED' } }),
       prisma.quote.count({ where: { supplierId } }),
       prisma.deal.count({ where: { supplierId, status: 'COMPLETED' } }),
-      prisma.user.findUnique({ where: { id: supplierId }, select: { name: true, company: true, gstNumber: true, location: true, phone: true } }),
+      prisma.user.findUnique({ where: { id: supplierId }, select: { name: true, company: true, gstNumber: true, location: true, phone: true, trustScore: true } }),
     ]);
 
     const totalEarned = await prisma.transaction.aggregate({
@@ -36,13 +37,7 @@ export async function GET(request: NextRequest) {
 
     const gstVerified = !!userRecord?.gstNumber;
     const responseRate = totalQuotes > 0 ? Math.round((wonQuotes / totalQuotes) * 100) : 0;
-
-    // Trust score calculation
-    let trustScore = 0;
-    trustScore += gstVerified ? 30 : 0;
-    trustScore += Math.round(profileComplete * 0.25);
-    trustScore += totalQuotes > 0 ? Math.min(Math.round((wonQuotes / totalQuotes) * 25), 25) : 0;
-    trustScore += Math.min(dealsCompleted * 4, 20);
+    const trustScore = userRecord ? getTrustScore(userRecord) : 0;
 
     return NextResponse.json({
       success: true,
