@@ -17,6 +17,14 @@ export default function robots(): MetadataRoute.Robots {
           '/profile',
           '/api/auth',
           '/api/private',
+          // Auth-gated in middleware.ts (PROTECTED_USER_PATHS) but not
+          // previously listed here — not linked anywhere public, but
+          // disallowing keeps crawl budget off login-redirect churn.
+          '/checkout',
+          '/wallet',
+          '/messages',
+          '/notifications',
+          '/negotiation',
         ],
       },
     ],

@@ -134,6 +134,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // FAQ, compare, tools hub, and individual tool pages
   const contentPages: MetadataRoute.Sitemap = [
     { url: `${siteUrl}/faq`,                                              lastModified: new Date(), changeFrequency: 'monthly', priority: 0.75 },
+    // Learn hub + guides — real content, had a self-referencing canonical
+    // already, but was never added here and isn't linked from Header/Footer/
+    // homepage, so it was an orphan Google could only reach by accident.
+    { url: `${siteUrl}/learn`,                                            lastModified: new Date(), changeFrequency: 'monthly', priority: 0.75 },
+    { url: `${siteUrl}/learn/what-is-b2b-marketplace`,                    lastModified: new Date(), changeFrequency: 'monthly', priority: 0.72 },
+    { url: `${siteUrl}/learn/how-to-find-verified-b2b-suppliers-india`,   lastModified: new Date(), changeFrequency: 'monthly', priority: 0.72 },
+    { url: `${siteUrl}/learn/b2b-procurement-guide-india`,                lastModified: new Date(), changeFrequency: 'monthly', priority: 0.72 },
     { url: `${siteUrl}/compare/vyaparsethu-vs-indiamart`,                 lastModified: new Date(), changeFrequency: 'monthly', priority: 0.80 },
     { url: `${siteUrl}/tools`,                                            lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.80 },
     { url: `${siteUrl}/tools/hsn-lookup`,                                 lastModified: new Date(), changeFrequency: 'monthly', priority: 0.85 },

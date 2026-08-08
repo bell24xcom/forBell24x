@@ -1,9 +1,15 @@
 import Link from 'next/link';
+import { SITE_URL } from '@/lib/site-url';
 import { listClusterSlugs, INDUSTRIAL_CLUSTERS } from '@/src/data/industrial-clusters';
 
 export const metadata = {
   title: { absolute: 'Industrial Clusters — Business Intelligence | VyaparSethu' },
   description: 'Explore India\'s industrial clusters with live Business Pulse, product intelligence, and verified supplier networks.',
+  // Missing previously — page silently inherited the root layout's
+  // `alternates.canonical: '/'`, i.e. self-declared the homepage as its
+  // canonical despite being a distinct, sitemapped page. Verified live 8 Aug
+  // 2026.
+  alternates: { canonical: `${SITE_URL}/industrial-cluster` },
 };
 
 export default function IndustrialClusterIndexPage() {

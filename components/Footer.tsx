@@ -64,6 +64,8 @@ export default function Footer() {
               <li><Link href="/how-payment-works" className="text-slate-400 hover:text-slate-200 text-sm transition-colors">Payment Protection</Link></li>
               <li><Link href="/how-verification-works" className="text-slate-400 hover:text-slate-200 text-sm transition-colors">Supplier Verification</Link></li>
               <li><Link href="/founding-suppliers" className="text-slate-400 hover:text-slate-200 text-sm transition-colors">Founding Suppliers</Link></li>
+              <li><Link href="/learn" className="text-slate-400 hover:text-slate-200 text-sm transition-colors">Learn</Link></li>
+              <li><Link href="/blog" className="text-slate-400 hover:text-slate-200 text-sm transition-colors">Blog</Link></li>
             </ul>
           </div>
 

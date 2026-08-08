@@ -3,7 +3,11 @@ import Link from 'next/link';
 import { SITE_URL } from '@/lib/site-url';
 
 export const metadata: Metadata = {
-  title: 'Learn B2B Procurement — Guides for Indian SMEs | VyaparSethu',
+  // `absolute` — this string already ends in "| VyaparSethu"; without it the
+  // root layout's `template: '%s | VyaparSethu'` appends the suffix a
+  // second time. Verified live 8 Aug 2026: rendered as "... | VyaparSethu |
+  // VyaparSethu".
+  title: { absolute: 'Learn B2B Procurement — Guides for Indian SMEs | VyaparSethu' },
   description: 'Free B2B procurement guides for Indian SMEs: what is a B2B marketplace, how to find verified suppliers, GST procurement guide, RFQ templates, and more.',
   openGraph: {
     title: 'B2B Procurement Learning Hub | VyaparSethu',

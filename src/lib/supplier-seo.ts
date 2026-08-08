@@ -4,8 +4,14 @@ import { normalizeProducts, type SupplierPreferences } from '@/src/lib/supplier-
 import { SITE_URL } from '@/lib/site-url';
 
 export async function fetchSupplierForSeo(supplierId: string) {
+  // No `role: 'SUPPLIER'` filter — every account is dual-role by design (see
+  // CLAUDE.md Dashboard Architecture), and the public API this page mirrors
+  // (`/api/supplier/[id]`) resolves any existing user id regardless of role.
+  // Filtering by role here made this return null for real, live profiles
+  // whose dashboard role happens to be 'BUYER', which produced a false
+  // "Supplier Not Found" title/soft-404 on pages that actually render fine.
   const user = await prisma.user.findUnique({
-    where: { id: supplierId, role: 'SUPPLIER' },
+    where: { id: supplierId },
     select: {
       id: true,
       name: true,
