@@ -63,3 +63,4 @@ mirror.git/
 .vercel
 .env*.local
 .env.production
+.env*.txt
