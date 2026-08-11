@@ -37,6 +37,16 @@ const nextConfig = {
       // is the framework-recommended way to permanently retire a route —
       // no page.tsx needed at all. permanent:true -> 308.
       { source: '/rfq/new', destination: '/rfq/create', permanent: true },
+      // /rfq/compare-quotes and /rfq-compare were orphaned demo pages —
+      // hardcoded mock quotes ("ABC Electronics Ltd." etc.), zero internal
+      // links anywhere in the app (verified via repo-wide search, Hackathon
+      // 6.0 P1 demo-safety cleanup). The real quote-comparison-and-accept
+      // experience lives on /rfq/[id] itself. Neither orphaned page carried
+      // an RFQ-id context to redirect more specifically, so both go to the
+      // real RFQ browse page — already used elsewhere in the app as the
+      // "Marketplace" breadcrumb destination from /rfq/[id].
+      { source: '/rfq/compare-quotes', destination: '/rfq', permanent: true },
+      { source: '/rfq-compare', destination: '/rfq', permanent: true },
     ];
   },
   async headers() {
