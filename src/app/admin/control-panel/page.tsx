@@ -194,7 +194,17 @@ export default function ControlPanelPage() {
           <p className="text-slate-400 text-xs mt-0.5">Toggle platform features on/off in real-time</p>
         </div>
         <div className="divide-y divide-slate-700/40">
-          {(data.flags || []).map(flag => (
+          {(data.flags || []).map(flag => {
+            // Escrow/Wallet are core payment infrastructure (H6-09/H6-10A):
+            // confirmed live and unconditional in production, and — unlike the
+            // other flags in this list — never actually read by the routes
+            // that would need to enforce them (src/app/api/dashboard/deals,
+            // the payment/wallet routes). The toggle below persists a real DB
+            // value and looked like a working switch, but flipping it has no
+            // effect on real payment behavior. Show that honestly instead of
+            // a switch that implies control the platform doesn't have yet.
+            const isUnenforcedPaymentCore = flag.key === 'escrow_payments' || flag.key === 'wallet_system';
+            return (
             <div key={flag.key} className={`flex items-center justify-between px-5 py-3 ${flag.key === 'maintenance_mode' && flag.enabled ? 'bg-amber-900/10' : ''}`}>
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
@@ -208,20 +218,32 @@ export default function ControlPanelPage() {
                 {flag.description && (
                   <p className="text-xs text-slate-500 mt-0.5">{flag.description}</p>
                 )}
+                {isUnenforcedPaymentCore && (
+                  <p className="text-xs text-amber-500/80 mt-0.5">
+                    Core payment infrastructure — always on in production. This switch is not wired to any enforcement and toggling it has no effect on live payments.
+                  </p>
+                )}
               </div>
-              <button
-                onClick={() => toggleFlag(flag.key, flag.enabled)}
-                disabled={togglingFlag === flag.key}
-                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors duration-200 focus:outline-none ml-4 ${
-                  flag.enabled ? 'bg-indigo-600' : 'bg-slate-600'
-                } ${togglingFlag === flag.key ? 'opacity-50' : ''}`}
-              >
-                <span className={`inline-block h-5 w-5 rounded-full bg-white shadow transform transition-transform duration-200 mt-0.5 ${
-                  flag.enabled ? 'translate-x-5' : 'translate-x-0.5'
-                }`} />
-              </button>
+              {isUnenforcedPaymentCore ? (
+                <span className="shrink-0 ml-4 text-xs font-medium text-slate-300 bg-slate-700/60 border border-slate-600 px-2.5 py-1 rounded-full">
+                  Always On (Production)
+                </span>
+              ) : (
+                <button
+                  onClick={() => toggleFlag(flag.key, flag.enabled)}
+                  disabled={togglingFlag === flag.key}
+                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors duration-200 focus:outline-none ml-4 ${
+                    flag.enabled ? 'bg-indigo-600' : 'bg-slate-600'
+                  } ${togglingFlag === flag.key ? 'opacity-50' : ''}`}
+                >
+                  <span className={`inline-block h-5 w-5 rounded-full bg-white shadow transform transition-transform duration-200 mt-0.5 ${
+                    flag.enabled ? 'translate-x-5' : 'translate-x-0.5'
+                  }`} />
+                </button>
+              )}
             </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
