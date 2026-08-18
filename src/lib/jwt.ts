@@ -1,6 +1,18 @@
 import { sign, verify, JwtPayload } from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+// In production, JWT_SECRET must be set explicitly — never a hardcoded fallback.
+// Mirrors the fail-closed pattern already used in lib/jwt.ts (repo root).
+const JWT_SECRET = (() => {
+  const s = process.env.JWT_SECRET;
+  if (!s) {
+    if (process.env.NODE_ENV === 'production') {
+      console.error('[JWT] CRITICAL: JWT_SECRET env var is not set. Set it in Vercel → Settings → Environment Variables.');
+      return '__MISSING_JWT_SECRET__';
+    }
+    return 'dev_only_jwt_secret_not_for_production';
+  }
+  return s;
+})();
 const ACCESS_TOKEN_EXPIRY = '15m';
 const REFRESH_TOKEN_EXPIRY = '7d';
 
