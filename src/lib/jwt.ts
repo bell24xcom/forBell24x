@@ -1,18 +1,27 @@
-import { sign, verify, JwtPayload } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
+import type { JwtPayload } from 'jsonwebtoken';
+const { sign, verify } = jwt;
 
-// In production, JWT_SECRET must be set explicitly — never a hardcoded fallback.
-// Mirrors the fail-closed pattern already used in lib/jwt.ts (repo root).
-const JWT_SECRET = (() => {
+// H6-16A: true fail-closed. No hardcoded secret is ever substituted — if
+// JWT_SECRET is missing or empty, signing/verification throws instead of
+// proceeding with a guessable default. Resolved lazily per call (not at
+// module load) so importing this module doesn't crash routes that never
+// actually sign/verify a token.
+export class MissingJwtSecretError extends Error {
+  constructor() {
+    super('JWT_SECRET is not configured — refusing to sign or verify JWTs');
+    this.name = 'MissingJwtSecretError';
+  }
+}
+
+function requireSecret(): string {
   const s = process.env.JWT_SECRET;
   if (!s) {
-    if (process.env.NODE_ENV === 'production') {
-      console.error('[JWT] CRITICAL: JWT_SECRET env var is not set. Set it in Vercel → Settings → Environment Variables.');
-      return '__MISSING_JWT_SECRET__';
-    }
-    return 'dev_only_jwt_secret_not_for_production';
+    console.error('[JWT] CRITICAL: JWT_SECRET env var is not set. Set it in Vercel → Settings → Environment Variables.');
+    throw new MissingJwtSecretError();
   }
   return s;
-})();
+}
 const ACCESS_TOKEN_EXPIRY = '15m';
 const REFRESH_TOKEN_EXPIRY = '7d';
 
@@ -23,11 +32,12 @@ export interface TokenPayload extends JwtPayload {
 }
 
 export const generateTokens = (user: { id: string; email: string; role: string }) => {
-  const accessToken = sign({ userId: user.id, email: user.email, role: user.role }, JWT_SECRET, {
+  const secret = requireSecret();
+  const accessToken = sign({ userId: user.id, email: user.email, role: user.role }, secret, {
     expiresIn: ACCESS_TOKEN_EXPIRY,
   });
 
-  const refreshToken = sign({ userId: user.id, email: user.email }, JWT_SECRET, {
+  const refreshToken = sign({ userId: user.id, email: user.email }, secret, {
     expiresIn: REFRESH_TOKEN_EXPIRY,
   });
 
@@ -39,12 +49,12 @@ export const generateTokens = (user: { id: string; email: string; role: string }
 };
 
 export const verifyToken = (token: string): TokenPayload => {
-  return verify(token, JWT_SECRET) as TokenPayload;
+  return verify(token, requireSecret()) as TokenPayload;
 };
 
 export const decodeToken = (token: string): TokenPayload | null => {
   try {
-    return verify(token, JWT_SECRET) as TokenPayload;
+    return verify(token, requireSecret()) as TokenPayload;
   } catch (error) {
     return null;
   }

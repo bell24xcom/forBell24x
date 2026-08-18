@@ -15,6 +15,7 @@
     "compile": "hardhat compile",
     "test": "hardhat test",
     "test:bell24h-os": "node --test src/lib/bell24h-os/*.test.ts",
+    "test:jwt-fail-closed": "node --test src/lib/jwt.test.ts",
     "deploy:polygon": "hardhat run scripts/deploy.js --network polygon",
     "deploy:mumbai": "hardhat run scripts/deploy.js --network polygonMumbai",
     "verify:polygon": "hardhat verify --network polygon",

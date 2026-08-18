@@ -18,21 +18,28 @@ export interface AuthToken {
   exp: number;
 }
 
-export class AgentAuth {
-  // In production, JWT_SECRET must be set explicitly — never a hardcoded fallback.
-  // Mirrors the fail-closed pattern already used in lib/jwt.ts (repo root).
-  private static readonly JWT_SECRET = (() => {
-    const s = process.env.JWT_SECRET;
-    if (!s) {
-      if (process.env.NODE_ENV === 'production') {
-        console.error('[JWT] CRITICAL: JWT_SECRET env var is not set. Set it in Vercel → Settings → Environment Variables.');
-        return '__MISSING_JWT_SECRET__';
-      }
-      return 'dev_only_jwt_secret_not_for_production';
-    }
-    return s;
-  })();
+/**
+ * H6-16A: true fail-closed. No hardcoded secret is ever substituted — if
+ * JWT_SECRET is missing or empty, signing/verification throws instead of
+ * proceeding with a guessable default.
+ */
+export class MissingJwtSecretError extends Error {
+  constructor() {
+    super('JWT_SECRET is not configured — refusing to sign or verify JWTs');
+    this.name = 'MissingJwtSecretError';
+  }
+}
 
+function requireJwtSecret(): string {
+  const s = process.env.JWT_SECRET;
+  if (!s) {
+    console.error('[JWT] CRITICAL: JWT_SECRET env var is not set. Set it in Vercel → Settings → Environment Variables.');
+    throw new MissingJwtSecretError();
+  }
+  return s;
+}
+
+export class AgentAuth {
   static generateToken(agent: Agent): string {
     return jwt.sign(
       {
@@ -40,14 +47,14 @@ export class AgentAuth {
         email: agent.email,
         role: agent.role,
       },
-      this.JWT_SECRET,
+      requireJwtSecret(),
       { expiresIn: '24h' }
     );
   }
 
   static verifyToken(token: string): AuthToken | null {
     try {
-      return jwt.verify(token, this.JWT_SECRET) as AuthToken;
+      return jwt.verify(token, requireJwtSecret()) as AuthToken;
     } catch (error) {
       return null;
     }

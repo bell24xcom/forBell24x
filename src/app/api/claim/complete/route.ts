@@ -96,19 +96,15 @@ export async function POST(request: NextRequest) {
     // duplicate consent rows.
 
     // Issue JWT — 7 day session
-    // In production, JWT_SECRET must be set explicitly — never a hardcoded fallback.
-    // Mirrors the fail-closed pattern already used in lib/jwt.ts (repo root).
-    const JWT_SECRET = (() => {
-      const s = process.env.JWT_SECRET;
-      if (!s) {
-        if (process.env.NODE_ENV === 'production') {
-          console.error('[JWT] CRITICAL: JWT_SECRET env var is not set. Set it in Vercel → Settings → Environment Variables.');
-          return '__MISSING_JWT_SECRET__';
-        }
-        return 'dev_only_jwt_secret_not_for_production';
-      }
-      return s;
-    })();
+    // H6-16A: true fail-closed. No hardcoded secret is ever substituted — if
+    // JWT_SECRET is missing or empty, signing throws and falls through to
+    // this handler's existing catch block (below), which already returns a
+    // safe error response for any thrown error.
+    if (!process.env.JWT_SECRET) {
+      console.error('[JWT] CRITICAL: JWT_SECRET env var is not set. Set it in Vercel → Settings → Environment Variables.');
+      throw new Error('JWT_SECRET is not configured — refusing to sign a session token');
+    }
+    const JWT_SECRET = process.env.JWT_SECRET;
     const authToken = sign(
       { userId: updatedUser.id, phone: updatedUser.phone ?? phone, role: updatedUser.role },
       JWT_SECRET,

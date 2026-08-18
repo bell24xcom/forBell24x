@@ -6,32 +6,38 @@ import jwt from 'jsonwebtoken';
 import { prisma } from '@/lib/prisma';
 import type { NextRequest } from 'next/server';
 
-// In production, JWT_SECRET must be set explicitly — never use the fallback.
-// NOTE: We do NOT throw at module load time (would cause routes to hang/500).
-// Instead, functions will use a non-functional placeholder that causes 401s.
-const JWT_SECRET = (() => {
-  const s = process.env.JWT_SECRET;
-  if (!s || s === 'bell24h_jwt_secret_change_in_production') {
-    if (process.env.NODE_ENV === 'production') {
-      console.error('[JWT] CRITICAL: JWT_SECRET env var is not set. Set it in Vercel → Settings → Environment Variables.');
-      return '__MISSING_JWT_SECRET__';
-    }
-    return 'dev_only_jwt_secret_not_for_production';
+/**
+ * H6-16A: true fail-closed secret resolution. No hardcoded secret is ever
+ * substituted, in any environment. If JWT_SECRET/JWT_REFRESH_SECRET is
+ * missing, empty, or still the placeholder value, signing and verification
+ * throw MissingJwtSecretError instead of proceeding. We deliberately do NOT
+ * throw at module load time (an unconditional throw here would crash the
+ * module for every route that imports it, including ones that don't need a
+ * token on every request) — instead each sign/verify call resolves the
+ * secret lazily via requireSecret(), so the throw happens exactly at the
+ * point an operation actually needs it. Existing callers already wrap
+ * verifyToken()/generateTokens() in try/catch (jwt.verify() has always been
+ * able to throw, for expired/invalid tokens) and already translate any
+ * thrown error into their normal 401/error response — see authenticate()
+ * below and lib/admin-auth.ts for the pattern this relies on.
+ */
+export class MissingJwtSecretError extends Error {
+  constructor(varName: string) {
+    super(`${varName} is not configured — refusing to sign or verify JWTs`);
+    this.name = 'MissingJwtSecretError';
   }
-  return s;
-})();
+}
 
-const JWT_REFRESH_SECRET = (() => {
-  const s = process.env.JWT_REFRESH_SECRET;
-  if (!s || s === 'bell24h_refresh_secret_change_in_production') {
-    if (process.env.NODE_ENV === 'production') {
-      console.error('[JWT] CRITICAL: JWT_REFRESH_SECRET env var is not set. Set it in Vercel → Settings → Environment Variables.');
-      return '__MISSING_JWT_REFRESH_SECRET__';
-    }
-    return 'dev_only_refresh_secret_not_for_production';
+function requireSecret(varName: 'JWT_SECRET' | 'JWT_REFRESH_SECRET'): string {
+  const s = process.env[varName];
+  const placeholder =
+    varName === 'JWT_SECRET' ? 'bell24h_jwt_secret_change_in_production' : 'bell24h_refresh_secret_change_in_production';
+  if (!s || s === placeholder) {
+    console.error(`[JWT] CRITICAL: ${varName} env var is not set (or is a known placeholder). Set it in Vercel → Settings → Environment Variables.`);
+    throw new MissingJwtSecretError(varName);
   }
   return s;
-})();
+}
 
 export interface TokenPayload {
   userId: string;
@@ -52,13 +58,13 @@ export interface TokenResult {
 export function generateTokens(payload: Omit<TokenPayload, 'type'>): TokenResult {
   const accessToken = jwt.sign(
     { ...payload, type: 'access' },
-    JWT_SECRET,
+    requireSecret('JWT_SECRET'),
     { expiresIn: '7d' }
   );
 
   const refreshToken = jwt.sign(
     { ...payload, type: 'refresh' },
-    JWT_REFRESH_SECRET,
+    requireSecret('JWT_REFRESH_SECRET'),
     { expiresIn: '30d' }
   );
 
@@ -73,21 +79,21 @@ export function generateTokens(payload: Omit<TokenPayload, 'type'>): TokenResult
  * Generate a single access token (for backward compatibility)
  */
 export function generateToken(payload: Omit<TokenPayload, 'type'>, expiresIn = '7d'): string {
-  return jwt.sign({ ...payload, type: 'access' }, JWT_SECRET, { expiresIn });
+  return jwt.sign({ ...payload, type: 'access' }, requireSecret('JWT_SECRET'), { expiresIn });
 }
 
 /**
  * Verify and decode an access token
  */
 export function verifyToken(token: string): TokenPayload {
-  return jwt.verify(token, JWT_SECRET) as TokenPayload;
+  return jwt.verify(token, requireSecret('JWT_SECRET')) as TokenPayload;
 }
 
 /**
  * Verify and decode a refresh token
  */
 export function verifyRefreshToken(token: string): TokenPayload {
-  return jwt.verify(token, JWT_REFRESH_SECRET) as TokenPayload;
+  return jwt.verify(token, requireSecret('JWT_REFRESH_SECRET')) as TokenPayload;
 }
 
 /**
