@@ -127,7 +127,11 @@ export async function POST(req: NextRequest) {
         ? `${SITE_URL}/supplier/claim?category=${encodeURIComponent(deepCategory)}&city=${encodeURIComponent(deepCity)}&token=${token}`
         : `${SITE_URL}/claim/${token}`;
       const rawPhone    = (s.phone || '').replace(/\D/g, '').slice(-10);
-      const companyName = (s.company && s.company.trim()) ? s.company : 'your business';
+      const companyName = (s.company && s.company.trim()) ? s.company.trim() : null;
+      // Avoid "Your business "your business"" — use distinct phrasing when no company name
+      const companyLine = companyName
+        ? `Your business *${companyName}* has a verified supplier profile on VyaparSethu — India's B2B Trade Network.`
+        : `We've created a verified supplier profile for your business on VyaparSethu — India's B2B Trade Network.`;
 
       // In dry-run mode: skip DB writes and API calls entirely
       if (!dryRun) {
@@ -187,11 +191,10 @@ export async function POST(req: NextRequest) {
       // Always generate wa.me link as fallback / confirmation
       const msg    = encodeURIComponent(
         `Namaste! 🙏\n\n` +
-        `Your business "${companyName}" has a verified profile on VyaparSethu — ` +
-        `India's B2B Supplier & Buyer Network.\n\n` +
+        `${companyLine}\n\n` +
         `Verified buyers are searching for your products right now.\n\n` +
         `Claim your FREE profile in 2 minutes:\n${claimLink}\n\n` +
-        `— Team VyaparSethu\nvyaparsethu.com`
+        `Reply STOP to opt out permanently.\n— Team VyaparSethu\nvyaparsethu.com`
       );
       const waLink = rawPhone.length === 10 ? `https://wa.me/91${rawPhone}?text=${msg}` : null;
 
@@ -208,7 +211,7 @@ export async function POST(req: NextRequest) {
       }
 
       results.push({
-        id: s.id, company: companyName, phone: s.phone,
+        id: s.id, company: companyName ?? s.name ?? 'Unknown', phone: s.phone,
         location: s.location, trustScore: s.trustScore,
         gstVerified: !!s.gstNumber, udyamVerified: !!s.udyamNumber,
         claimLink, waLink, apiSent: thisSentViaApi,

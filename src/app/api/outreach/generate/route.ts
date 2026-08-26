@@ -75,7 +75,8 @@ export async function GET(request: NextRequest) {
       const topSuppliers = suppliers.slice(0, limit);
 
       const messages = topSuppliers.map(s => {
-        const name = s.name ?? s.company ?? 'there';
+        const ownerFirst   = (s.name || '').split(' ')[0].trim() || 'there';
+        const displayCo    = (s.company && s.company.trim()) ? s.company.trim() : (s.name || 'your business');
         const budget = topRFQ.maxBudget
           ? ` Budget: ₹${Number(topRFQ.maxBudget).toLocaleString('en-IN')}.`
           : '';
@@ -86,11 +87,11 @@ export async function GET(request: NextRequest) {
         const productSummary = topRFQ.quantity
           ? `${topRFQ.title} — Qty: ${topRFQ.quantity}${budget}${loc}`
           : `${topRFQ.title}${budget}${loc}`;
-        const whatsapp = `Hi ${name},\n\nWe found your company *${s.company ?? name}* in *${category}* (${city}).\n\nA buyer is looking for:\n👉 ${productSummary}\n\nView requirement:\n${link}\n\n– Team Bell24h`;
+        const whatsapp = `Hi ${ownerFirst} ji,\n\nWe found *${displayCo}* listed under *${category}* (${city}).\n\nA buyer is looking for:\n👉 ${productSummary}\n\nView Requirement and submit your quote:\n${link}\n\n– Team VyaparSethu`;
 
         const email = {
-          subject: `New RFQ Opportunity: ${topRFQ.title} — Bell24h`,
-          body: `Hi ${name},\n\nA buyer on Bell24h is looking for ${topRFQ.title} in ${category}.\n\nQuantity: ${topRFQ.quantity || 'To be discussed'}${budget}${loc}\n\nYou can view full details and submit your quote here:\n${link}\n\nThis is free to quote during our beta phase.\n\n— Bell24h Team\n${SITE_URL}`,
+          subject: `New Requirement Opportunity: ${topRFQ.title} — VyaparSethu`,
+          body: `Hi ${ownerFirst} ji,\n\nA buyer on VyaparSethu is looking for ${topRFQ.title} in ${category}.\n\nQuantity: ${topRFQ.quantity || 'To be discussed'}${budget}${loc}\n\nView full details and submit your quote (free during beta):\n${link}\n\n— VyaparSethu Team\n${SITE_URL}`,
         };
 
         const cleanPhone = s.phone ? s.phone.replace(/\D/g, '').replace(/^91/, '') : null;
@@ -101,7 +102,7 @@ export async function GET(request: NextRequest) {
         return {
           supplierId: s.id,
           name: s.name ?? 'Unknown',
-          company: s.company ?? 'Unknown',
+          company: displayCo,
           phone: s.phone,
           emailAddress: s.email,
           location: s.location,

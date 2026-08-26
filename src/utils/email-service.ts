@@ -70,8 +70,8 @@ class EmailService {
             <h2 style="color: #333; margin-bottom: 20px;">🎉 Welcome to VyaparSethu, ${data.name}!</h2>
             
             <p style="color: #666; line-height: 1.6; margin-bottom: 20px;">
-              Thank you for joining India's most advanced B2B marketplace! You're now part of a community of 
-              <strong>50,000+ Indian businesses</strong> connecting across 17+ industries.
+              Thank you for joining VyaparSethu — India's verified B2B Trade Network.
+              You're now part of our founding supplier community.
             </p>
 
             <div style="background: #f0f8ff; padding: 20px; border-radius: 8px; margin: 20px 0;">
@@ -321,7 +321,7 @@ VyaparSethu - Made in India 🇮🇳
             <div style="background: #f0fff4; padding: 20px; border-radius: 8px; margin: 20px 0;">
               <h3 style="color: #059669; margin-top: 0;">💰 Business Opportunities:</h3>
               <ul style="color: #666; line-height: 1.6;">
-                <li>🎯 <strong>New RFQs:</strong> 50+ active requests in your category</li>
+                <li>🎯 <strong>New Requirements:</strong> Active buyer requests in your category</li>
                 <li>🤝 <strong>Supplier Matching:</strong> AI-powered recommendations</li>
                 <li>📊 <strong>Market Analytics:</strong> Regional demand insights</li>
                 <li>🏆 <strong>Success Stories:</strong> Featured business achievements</li>

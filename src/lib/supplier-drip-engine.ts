@@ -5,13 +5,14 @@ export type DripType = 'day3' | 'day7' | 'day14';
 
 const DRIP_DAYS: Record<DripType, number> = { day3: 3, day7: 7, day14: 14 };
 
-const DRIP_MESSAGES: Record<DripType, (company: string, link: string) => string> = {
-  day3: (c, l) =>
-    `Hi ${c} 👋 Reminder about your free verified supplier profile on VyaparSethu. Buyers in your cluster are actively posting Requirements. Claim it in 2 min: ${l}`,
-  day7: (c, l) =>
-    `Hi ${c} — It's been a week. Verified buyers are searching your category on VyaparSethu right now. Your profile slot is still reserved: ${l}`,
-  day14: (c, l) =>
-    `Hi ${c} — Last message. We're completing our verified supplier list for your category this week. Claim your free profile before it's offered to a competitor: ${l}`,
+// owner = owner first name (e.g. "Ishwar"), company = company display name
+const DRIP_MESSAGES: Record<DripType, (owner: string, company: string, link: string) => string> = {
+  day3: (owner, company, l) =>
+    `${owner} ji 👋\n\nJust checking in — ${company}'s profile on VyaparSethu is still unclaimed.\n\nBuyers in your area are posting Requirements this week. Your slot is reserved.\n\nClaim free (2 min): ${l}\n\nReply STOP anytime.`,
+  day7: (owner, _company, l) =>
+    `${owner} ji — it's been a week.\n\nVerified buyers are searching your category on VyaparSethu right now. Your profile is still available for free.\n\n${l}\n\nReply STOP to opt out permanently.`,
+  day14: (owner, company, l) =>
+    `${owner} ji, this is our last message.\n\n${company}'s profile will be offered to another supplier in your category if unclaimed this week.\n\nVyaparSethu's Protected Payment removes bad debt risk for suppliers.\n\nClaim free: ${l}\n\nReply STOP to never hear from us again.`,
 };
 
 export interface DripDue {
@@ -47,9 +48,11 @@ export async function getDripsDue(): Promise<DripDue[]> {
 
     for (const s of suppliers) {
       const claimLink   = s.claimToken ? `${SITE_URL}/claim/${s.claimToken}` : SITE_URL;
-      const companyName = (s.company && s.company.trim()) ? s.company : 'your business';
+      const companyName = (s.company && s.company.trim()) ? s.company.trim() : 'your business';
+      // Use owner first name for personalized greeting; fall back to company name
+      const ownerFirst  = (s.name || '').split(' ')[0].trim() || companyName;
       const rawPhone    = (s.phone || '').replace(/\D/g, '').slice(-10);
-      const message     = DRIP_MESSAGES[dripType](companyName, claimLink);
+      const message     = DRIP_MESSAGES[dripType](ownerFirst, companyName, claimLink);
       const waLink      = rawPhone.length === 10
         ? `https://wa.me/91${rawPhone}?text=${encodeURIComponent(message)}`
         : null;
