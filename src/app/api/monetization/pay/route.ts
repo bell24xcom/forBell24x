@@ -3,12 +3,18 @@ import Razorpay from 'razorpay';
 
 export const dynamic = 'force-dynamic';
 
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID!,
-  key_secret: process.env.RAZORPAY_KEY_SECRET!,
-});
+// Lazy init — do NOT instantiate at module scope.
+// next build evaluates modules without runtime env vars, causing Razorpay
+// to throw "key_id is mandatory" and fail page-data collection.
+function getRazorpay() {
+  return new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID!,
+    key_secret: process.env.RAZORPAY_KEY_SECRET!,
+  });
+}
 
 export async function POST(req: NextRequest) {
+  const razorpay = getRazorpay();
   const INSFORGE_URL = process.env.INSFORGE_URL;
   const INSFORGE_API_KEY = process.env.INSFORGE_API_KEY;
 
