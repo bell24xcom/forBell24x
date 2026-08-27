@@ -143,6 +143,7 @@ async function rfqQualityDashboard() {
     const [
       totalRfqs,
       realActive,
+      verifiedBuyerRfqs,
       seededDemo,
       anonymous,
       draft,
@@ -158,6 +159,18 @@ async function rfqQualityDashboard() {
           isPublic: true,
           status: { in: ['OPEN', 'ACTIVE', 'QUOTED'] },
           createdBy: { not: null },
+        },
+      }),
+      // Verified buyer RFQs — from GST/Udyam/manually verified buyers
+      prisma.rFQ.count({
+        where: {
+          isSeeded: false,
+          isPublic: true,
+          status: { in: ['OPEN', 'ACTIVE', 'QUOTED'] },
+          createdBy: { not: null },
+          user: {
+            verificationStatus: { in: ['GST_VERIFIED', 'UDYAM_VERIFIED', 'MANUAL_VERIFIED'] },
+          },
         },
       }),
       // Demo / seeded RFQs — do NOT count toward supplier-facing inventory
@@ -186,15 +199,16 @@ async function rfqQualityDashboard() {
       generatedAt: now.toISOString(),
       rfqQuality: {
         totalRfqs,
-        realActive,       // safe to show to suppliers
-        seededDemo,       // internal test data
-        anonymous,        // no buyer attached
-        draft,            // unpublished
+        realActive,          // non-seeded public open RFQs with any buyer
+        verifiedBuyerRfqs,   // subset of realActive: buyer is GST/Udyam/manual verified
+        seededDemo,          // internal test data
+        anonymous,           // no buyer attached
+        draft,               // unpublished
         expired: expiredByStatus + expiredByDate,
         closed,
       },
-      note: 'realActive counts non-seeded, public, OPEN/ACTIVE/QUOTED RFQs with a buyer. ' +
-            'Run the full breakdown SQL in rfq_inventory_truth_report.md for group-by detail.',
+      note: 'realActive = non-seeded, public, OPEN/ACTIVE/QUOTED RFQs with any buyer. ' +
+            'verifiedBuyerRfqs = subset where buyer has GST_VERIFIED, UDYAM_VERIFIED, or MANUAL_VERIFIED status.',
     });
   } catch (error) {
     console.error('Admin RFQs quality dashboard error:', error);

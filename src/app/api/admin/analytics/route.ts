@@ -156,11 +156,11 @@ async function founderAnalytics() {
         },
       }),
 
-      // Verified (GST_VERIFIED or MANUAL_VERIFIED)
+      // Verified (GST_VERIFIED, UDYAM_VERIFIED, or MANUAL_VERIFIED)
       prisma.user.count({
         where: {
           role: 'SUPPLIER',
-          verificationStatus: { in: ['GST_VERIFIED', 'MANUAL_VERIFIED'] },
+          verificationStatus: { in: ['GST_VERIFIED', 'UDYAM_VERIFIED', 'MANUAL_VERIFIED'] },
         },
       }),
 
@@ -231,6 +231,64 @@ async function founderAnalytics() {
       prisma.deal.count({ where: { status: 'COMPLETED' } }),
     ]);
 
+    // RFQ Classification breakdown (Phase 4)
+    const [
+      rfqClassVerifiedBuyer,
+      rfqClassUnverifiedBuyer,
+      rfqClassDemo,
+      rfqClassAnonymous,
+      rfqClassExpired,
+      // Verification breakdown (Phase 5)
+      verificationGstVerified,
+      verificationUdyamVerified,
+      verificationManualVerified,
+      verificationRejected,
+      verificationPhoneOnly,
+    ] = await Promise.all([
+      // VERIFIED_BUYER: real RFQ from a business-verified buyer
+      prisma.rFQ.count({
+        where: {
+          isSeeded: false,
+          isPublic: true,
+          status: { in: ['OPEN', 'ACTIVE', 'QUOTED'] },
+          createdBy: { not: null },
+          user: { verificationStatus: { in: ['GST_VERIFIED', 'UDYAM_VERIFIED', 'MANUAL_VERIFIED'] } },
+        },
+      }),
+      // UNVERIFIED_BUYER: real RFQ from phone-only or pending buyer
+      prisma.rFQ.count({
+        where: {
+          isSeeded: false,
+          isPublic: true,
+          status: { in: ['OPEN', 'ACTIVE', 'QUOTED'] },
+          createdBy: { not: null },
+          user: { verificationStatus: { in: ['PHONE_VERIFIED', 'GST_PENDING'] } },
+        },
+      }),
+      // DEMO: seeded test data
+      prisma.rFQ.count({ where: { isSeeded: true } }),
+      // ANONYMOUS: no buyer attached
+      prisma.rFQ.count({ where: { isSeeded: false, createdBy: null } }),
+      // EXPIRED: by status or past expiresAt
+      prisma.rFQ.count({
+        where: {
+          OR: [
+            { status: 'EXPIRED' },
+            {
+              status: { notIn: ['EXPIRED', 'CLOSED', 'COMPLETED', 'CANCELLED', 'ACCEPTED', 'CLOSED_EXTERNAL'] },
+              expiresAt: { not: null, lt: now },
+            },
+          ],
+        },
+      }),
+      // Verification breakdown
+      prisma.user.count({ where: { role: 'SUPPLIER', verificationStatus: 'GST_VERIFIED' } }),
+      prisma.user.count({ where: { role: 'SUPPLIER', verificationStatus: 'UDYAM_VERIFIED' } }),
+      prisma.user.count({ where: { role: 'SUPPLIER', verificationStatus: 'MANUAL_VERIFIED' } }),
+      prisma.user.count({ where: { role: 'SUPPLIER', verificationStatus: 'REJECTED' } }),
+      prisma.user.count({ where: { role: 'SUPPLIER', verificationStatus: 'PHONE_VERIFIED' } }),
+    ]);
+
     // 6. Conversion blockers — evidence-based
     const conversionBlockers: string[] = [];
     if (pendingVerification > 0) {
@@ -293,7 +351,25 @@ async function founderAnalytics() {
       },
       // Q6: Conversion blockers
       conversionBlockers,
-      note: 'profilesCompleted = suppliers with company name set. rfqsAvailable = real non-seeded open RFQs. activeSuppliersLast30d = suppliers who submitted a quote in last 30 days.',
+      // Phase 4: RFQ Classification breakdown
+      rfqClassification: {
+        verifiedBuyerRfq:   rfqClassVerifiedBuyer,    // show prominently
+        unverifiedBuyerRfq: rfqClassUnverifiedBuyer,  // show, no badge
+        demo:               rfqClassDemo,              // hide from supplier feed
+        anonymous:          rfqClassAnonymous,         // no buyer attached
+        expired:            rfqClassExpired,           // hide from active feed
+      },
+      // Phase 5: Full verification status breakdown
+      verificationBreakdown: {
+        gstVerified:     verificationGstVerified,
+        udyamVerified:   verificationUdyamVerified,
+        manualVerified:  verificationManualVerified,
+        phoneOnly:       verificationPhoneOnly,
+        gstPending:      pendingVerification,
+        rejected:        verificationRejected,
+        totalVerified:   verifiedSuppliers,  // gstVerified + udyamVerified + manualVerified
+      },
+      note: 'profilesCompleted = suppliers with company name set. rfqsAvailable = real non-seeded open RFQs. activeSuppliersLast30d = suppliers who submitted a quote in last 30 days. verifiedBuyerRfq = RFQs from GST/Udyam/manual-verified buyers.',
     });
   } catch (error) {
     console.error('Founder analytics error:', error);

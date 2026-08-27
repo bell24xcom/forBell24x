@@ -680,15 +680,17 @@ enum UserRole {
 }
 
 /// Supplier verification level — distinct from the phone-OTP isVerified flag.
-/// PHONE_VERIFIED: OTP registered only (default for all new users).
-/// GST_PENDING:    Supplier submitted GST/Udyam, awaiting admin review.
-/// GST_VERIFIED:   Admin confirmed GST/Udyam number is valid.
-/// MANUAL_VERIFIED: Founder manually verified (e.g. in-person, no GST yet).
-/// REJECTED:       Verification failed or fraudulent documents detected.
+/// PHONE_VERIFIED:  OTP registered only (default for all new users).
+/// GST_PENDING:     Supplier submitted GST/Udyam, awaiting admin review.
+/// GST_VERIFIED:    Admin confirmed GST number is valid via govt GST portal.
+/// UDYAM_VERIFIED:  Admin confirmed Udyam registration number (MSME, no GST required).
+/// MANUAL_VERIFIED: Founder manually verified (in-person, alternate document, or Udyam legacy).
+/// REJECTED:        Verification failed or fraudulent documents detected.
 enum VerificationStatus {
   PHONE_VERIFIED
   GST_PENDING
   GST_VERIFIED
+  UDYAM_VERIFIED
   MANUAL_VERIFIED
   REJECTED
 }
