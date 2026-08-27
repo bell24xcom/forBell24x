@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useSession } from '@/src/app/contexts/AuthContext';
 import { Video, Mic, FileText, MapPin, Clock, DollarSign, Package, AlertTriangle, CheckCircle } from 'lucide-react';
+import VideoPlayer from '@/components/homepage/VideoPlayer';
 import { storeInteraction } from '@/lib/memory-engine';
 import { SITE_URL } from '@/lib/site-url';
 
@@ -200,11 +201,6 @@ export default function RFQDetailPage() {
   const urgency = rfq?.urgency ? URGENCY_CONFIG[rfq.urgency as keyof typeof URGENCY_CONFIG] : URGENCY_CONFIG.NORMAL;
   const rfqType = rfq?.type?.toLowerCase() || 'text';
 
-  // NOTE: the RFQ Prisma model has no `videoUrl` column, and /api/video-rfq
-  // never uploads/stores the recorded video anywhere — it only transcribes
-  // the audio track and discards the file. So rfq.videoUrl is always
-  // undefined today; this schema is a correctly-gated no-op until real
-  // video storage exists, not a fabricated value.
   const videoObjectLd =
     rfqType === 'video' && rfq?.videoUrl
       ? {
@@ -322,6 +318,17 @@ export default function RFQDetailPage() {
               <MetricCard icon={<MapPin size={18} className="text-red-500" />} label="Location" value={rfq.location || 'Pan India'} />
             </div>
           </div>
+
+          {/* Video Player — shown when RFQ includes a video requirement */}
+          {rfq.videoUrl && (
+            <div className="p-6 border-b border-slate-700/50">
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                <Video size={14} className="text-purple-400" />
+                Video Requirement
+              </p>
+              <VideoPlayer videoUrl={rfq.videoUrl} />
+            </div>
+          )}
 
           {/* Details Grid */}
           <div className="p-6">

@@ -93,6 +93,8 @@ export async function GET(request: NextRequest) {
           priority: true,
           estimatedValue: true,
           type: true,
+          videoUrl: true,
+          videoPublicId: true,
           createdAt: true,
           expiresAt: true,
           _count: { select: { quotes: true } },
@@ -106,6 +108,8 @@ export async function GET(request: NextRequest) {
       ...r,
       budget: r.maxBudget || r.estimatedValue || 0,
       quotesCount: r._count?.quotes || 0,
+      videoUrl: r.videoUrl || null,
+      videoPublicId: r.videoPublicId || null,
     }));
 
     return NextResponse.json({

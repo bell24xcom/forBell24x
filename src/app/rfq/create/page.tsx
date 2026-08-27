@@ -1,9 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import AiSparkle from '@/components/ui/AiSparkle';
+
+const MAX_VIDEO_SIZE_BYTES = 50 * 1024 * 1024; // 50MB
 
 type Category = {
   id: number;
@@ -40,6 +42,16 @@ export default function CreateRFQPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+
+  // Video upload state
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [videoUrl, setVideoUrl] = useState('');
+  const [videoPublicId, setVideoPublicId] = useState('');
+  const [videoUploading, setVideoUploading] = useState(false);
+  const [videoUploadProgress, setVideoUploadProgress] = useState(0);
+  const [videoError, setVideoError] = useState('');
+  const videoInputRef = useRef<HTMLInputElement>(null);
+
   const router = useRouter();
 
   // Fetch categories from API on component mount
@@ -75,6 +87,94 @@ export default function CreateRFQPage() {
     });
   };
 
+  const handleVideoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    setVideoError('');
+    setVideoUrl('');
+    setVideoPublicId('');
+    setVideoFile(null);
+    if (!file) return;
+    if (file.type !== 'video/mp4') {
+      setVideoError('Only MP4 files are supported.');
+      return;
+    }
+    if (file.size > MAX_VIDEO_SIZE_BYTES) {
+      setVideoError('Video must be 50MB or smaller.');
+      return;
+    }
+    setVideoFile(file);
+  };
+
+  const handleVideoUpload = async () => {
+    if (!videoFile) return;
+    setVideoUploading(true);
+    setVideoError('');
+    setVideoUploadProgress(0);
+    try {
+      // Step 1: get signed upload credentials
+      const sigRes = await fetch('/api/cloudinary/upload-signature', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ resourceType: 'video' }),
+      });
+      if (!sigRes.ok) {
+        const sigData = await sigRes.json().catch(() => ({}));
+        if (sigRes.status === 401) {
+          setVideoError('Please log in to upload a video.');
+        } else {
+          setVideoError(sigData.error || 'Video upload is not available. Your requirement will be saved without a video.');
+        }
+        setVideoUploading(false);
+        return;
+      }
+      const { signature, timestamp, apiKey, cloudName, folder, uploadUrl } = await sigRes.json();
+
+      // Step 2: upload directly to Cloudinary
+      const body = new FormData();
+      body.append('file', videoFile);
+      body.append('api_key', apiKey);
+      body.append('timestamp', String(timestamp));
+      body.append('signature', signature);
+      body.append('folder', folder);
+
+      const xhr = new XMLHttpRequest();
+      xhr.upload.addEventListener('progress', (ev) => {
+        if (ev.lengthComputable) setVideoUploadProgress(Math.round((ev.loaded / ev.total) * 100));
+      });
+
+      await new Promise<void>((resolve, reject) => {
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            const result = JSON.parse(xhr.responseText);
+            setVideoUrl(result.secure_url);
+            setVideoPublicId(result.public_id);
+            setVideoUploadProgress(100);
+            resolve();
+          } else {
+            reject(new Error(`Upload failed: ${xhr.status}`));
+          }
+        };
+        xhr.onerror = () => reject(new Error('Network error during upload'));
+        xhr.open('POST', uploadUrl);
+        xhr.send(body);
+      });
+    } catch (err: any) {
+      setVideoError(err.message || 'Upload failed. Please try again.');
+    } finally {
+      setVideoUploading(false);
+    }
+  };
+
+  const handleRemoveVideo = () => {
+    setVideoFile(null);
+    setVideoUrl('');
+    setVideoPublicId('');
+    setVideoUploadProgress(0);
+    setVideoError('');
+    if (videoInputRef.current) videoInputRef.current.value = '';
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -85,12 +185,16 @@ export default function CreateRFQPage() {
       // minBudget/maxBudget must be numbers (schema: z.number()) and urgency
       // must match the uppercase enum — the raw formData values are strings
       // and lowercase respectively, which 400 every time otherwise.
-      const payload = {
+      const payload: Record<string, unknown> = {
         ...formData,
         minBudget: formData.minBudget ? Number(formData.minBudget) : undefined,
         maxBudget: formData.maxBudget ? Number(formData.maxBudget) : undefined,
         urgency: URGENCY_MAP[formData.urgency] || 'NORMAL',
       };
+      if (videoUrl) {
+        payload.videoUrl = videoUrl;
+        payload.videoPublicId = videoPublicId;
+      }
       const neonRes = await fetch('/api/rfq/create', {
         method: 'POST',
         credentials: 'include',
@@ -373,7 +477,7 @@ export default function CreateRFQPage() {
                 <label htmlFor="requirements" className="block text-sm font-medium text-slate-300 mb-2">
                   Additional Requirements
                 </label>
-                <textarea 
+                <textarea
                   id="requirements"
                   name="requirements"
                   rows={3}
@@ -383,7 +487,83 @@ export default function CreateRFQPage() {
                   placeholder="Any specific requirements, certifications, quality standards, or preferences..."
                 />
               </div>
-              
+
+              {/* Video Requirement Upload */}
+              <div className="border border-slate-700 rounded-xl p-5 bg-slate-900/40">
+                <div className="flex items-center gap-2 mb-1">
+                  <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                  <label className="text-sm font-medium text-slate-300">Video Requirement <span className="text-slate-500 font-normal">(optional)</span></label>
+                </div>
+                <p className="text-xs text-slate-500 mb-4">Upload an MP4 video showing your requirement. Suppliers will watch before quoting. Max 50MB.</p>
+
+                {videoUrl ? (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3 p-3 bg-green-900/20 border border-green-700/50 rounded-lg">
+                      <svg className="w-5 h-5 text-green-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-green-300 text-sm font-medium">Video uploaded</p>
+                        <p className="text-green-400/70 text-xs truncate">{videoFile?.name}</p>
+                      </div>
+                      <button type="button" onClick={handleRemoveVideo} className="text-slate-400 hover:text-red-400 transition-colors text-xs">Remove</button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <input
+                        ref={videoInputRef}
+                        type="file"
+                        accept="video/mp4"
+                        onChange={handleVideoSelect}
+                        className="hidden"
+                        id="video-upload-input"
+                      />
+                      <label
+                        htmlFor="video-upload-input"
+                        className="cursor-pointer flex items-center gap-2 px-4 py-2.5 bg-slate-800 border border-slate-600 hover:border-purple-500 text-slate-300 hover:text-purple-300 rounded-lg text-sm transition-colors"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                        </svg>
+                        {videoFile ? videoFile.name : 'Choose MP4 file'}
+                      </label>
+                      {videoFile && !videoUploading && (
+                        <button
+                          type="button"
+                          onClick={handleVideoUpload}
+                          className="px-4 py-2.5 bg-purple-700 hover:bg-purple-600 text-white rounded-lg text-sm font-medium transition-colors"
+                        >
+                          Upload Video
+                        </button>
+                      )}
+                    </div>
+
+                    {videoUploading && (
+                      <div className="space-y-1.5">
+                        <div className="flex justify-between text-xs text-slate-400">
+                          <span>Uploading…</span>
+                          <span>{videoUploadProgress}%</span>
+                        </div>
+                        <div className="h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-purple-500 rounded-full transition-all duration-300"
+                            style={{ width: `${videoUploadProgress}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {videoError && (
+                      <p className="text-red-400 text-xs">{videoError}</p>
+                    )}
+                  </div>
+                )}
+              </div>
+
             <div className="space-y-3 pt-4">
               <button
                 type="submit"

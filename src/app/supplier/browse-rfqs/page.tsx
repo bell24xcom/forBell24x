@@ -18,6 +18,8 @@ interface RFQ {
   urgency: 'HIGH' | 'MEDIUM' | 'LOW';
   quotesCount: number;
   createdAt: string;
+  videoUrl?: string | null;
+  videoPublicId?: string | null;
 }
 
 export default function BrowseRFQsPage() {
@@ -235,14 +237,25 @@ export default function BrowseRFQsPage() {
                 className="bg-slate-800/50 border border-slate-700 rounded-xl p-6 hover:border-blue-500 transition-colors"
               >
                 <div className="flex items-center justify-between mb-4">
-                  <span className="inline-flex items-center gap-2 px-3 py-1 bg-blue-900/40 text-blue-300 rounded-full text-sm">
+                  <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${rfq.type === 'VIDEO' ? 'bg-purple-900/40 text-purple-300 border border-purple-700/50' : 'bg-blue-900/40 text-blue-300'}`}>
                     {getTypeIcon(rfq.type)}
-                    {rfq.type || 'TEXT'}
+                    {rfq.type === 'VIDEO' ? '📹 Video Requirement' : rfq.type || 'TEXT'}
                   </span>
                   <span className={`px-3 py-1 rounded-full text-xs font-medium ${getUrgencyColor(rfq.urgency)}`}>
                     {rfq.urgency || 'NORMAL'}
                   </span>
                 </div>
+                {rfq.type === 'VIDEO' && rfq.videoUrl && (
+                  <a
+                    href={`/rfq/${rfq.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 mb-3 px-3 py-2 bg-purple-900/20 border border-purple-700/40 rounded-lg text-purple-300 text-xs hover:bg-purple-900/40 transition-colors"
+                  >
+                    <Video className="w-3.5 h-3.5" />
+                    Watch video before quoting →
+                  </a>
+                )}
 
                 <h3 className="text-lg font-semibold text-white mb-3 line-clamp-2">{rfq.title}</h3>
 

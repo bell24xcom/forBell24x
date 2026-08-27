@@ -57,6 +57,9 @@ export async function GET(request: NextRequest) {
         status:      rfq.status,
         createdBy:   rfq.createdBy,
         user:        rfq.user,
+        type:        rfq.type,
+        videoUrl:    rfq.videoUrl,
+        videoPublicId: rfq.videoPublicId,
       },
     });
   } catch (error) {
