@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import { Search, Filter, MapPin, IndianRupee, Clock, MessageSquare, Mic, Video, FileText, X, CheckCircle } from 'lucide-react';
 import WhatsAppShare from '@/components/ui/WhatsAppShare';
+import { generateVideoThumbnail } from '@/src/lib/cloudinary-client';
 
 interface RFQ {
   id: string;
@@ -250,10 +251,21 @@ export default function BrowseRFQsPage() {
                     href={`/rfq/${rfq.id}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 mb-3 px-3 py-2 bg-purple-900/20 border border-purple-700/40 rounded-lg text-purple-300 text-xs hover:bg-purple-900/40 transition-colors"
+                    className="block mb-3 rounded-lg overflow-hidden border border-purple-700/40 hover:border-purple-500 transition-colors"
                   >
-                    <Video className="w-3.5 h-3.5" />
-                    Watch video before quoting →
+                    {rfq.videoPublicId ? (
+                      <img
+                        src={generateVideoThumbnail(rfq.videoPublicId)}
+                        alt="Video requirement thumbnail"
+                        className="w-full h-36 object-cover bg-slate-900"
+                        loading="lazy"
+                        onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+                      />
+                    ) : null}
+                    <div className="flex items-center gap-2 px-3 py-2 bg-purple-900/20 text-purple-300 text-xs">
+                      <Video className="w-3.5 h-3.5" />
+                      Watch video before quoting →
+                    </div>
                   </a>
                 )}
 
