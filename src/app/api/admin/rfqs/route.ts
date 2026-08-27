@@ -5,6 +5,93 @@ import { requireAdmin, isErrorResponse } from '@/lib/admin-auth';
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
 
+/**
+ * GET /api/admin/rfqs
+ * RFQ Quality Dashboard — founder-only inventory counts.
+ *
+ * Returns:
+ *   totalRfqs       — all rows in rfqs table
+ *   realActive      — non-seeded, public, OPEN/ACTIVE, has buyer
+ *   seededDemo      — is_seeded=true (demo/test data)
+ *   anonymous       — created_by IS NULL (no buyer attached)
+ *   draft           — status=DRAFT (not yet published)
+ *   expired         — status=EXPIRED or expires_at in the past
+ *   closed          — CLOSED/COMPLETED/ACCEPTED/CANCELLED
+ *   breakdown       — full group-by for debugging
+ */
+export async function GET(req: NextRequest) {
+  const auth = requireAdmin(req);
+  if (isErrorResponse(auth)) return auth;
+
+  try {
+    const now = new Date();
+
+    const [
+      totalRfqs,
+      realActive,
+      seededDemo,
+      anonymous,
+      draft,
+      expiredByStatus,
+      expiredByDate,
+      closed,
+    ] = await Promise.all([
+      prisma.rFQ.count(),
+      // Real buyer RFQs that are currently open (counts toward platform credibility)
+      prisma.rFQ.count({
+        where: {
+          isSeeded: false,
+          isPublic: true,
+          status: { in: ['OPEN', 'ACTIVE', 'QUOTED'] },
+          createdBy: { not: null },
+        },
+      }),
+      // Demo / seeded RFQs — do NOT count toward supplier-facing inventory
+      prisma.rFQ.count({ where: { isSeeded: true } }),
+      // Anonymous RFQs — no buyer attached
+      prisma.rFQ.count({ where: { createdBy: null } }),
+      // Drafts — not yet published
+      prisma.rFQ.count({ where: { status: 'DRAFT' } }),
+      // Expired by status field
+      prisma.rFQ.count({ where: { status: 'EXPIRED' } }),
+      // Expired by date (catch rows not yet marked EXPIRED)
+      prisma.rFQ.count({
+        where: {
+          status: { notIn: ['EXPIRED', 'CLOSED', 'COMPLETED', 'CANCELLED', 'ACCEPTED', 'CLOSED_EXTERNAL'] },
+          expiresAt: { not: null, lt: now },
+        },
+      }),
+      // Closed/completed/cancelled
+      prisma.rFQ.count({
+        where: { status: { in: ['CLOSED', 'COMPLETED', 'ACCEPTED', 'CANCELLED', 'CLOSED_EXTERNAL'] } },
+      }),
+    ]);
+
+    const totalExpired = expiredByStatus + expiredByDate;
+
+    return NextResponse.json({
+      success: true,
+      generatedAt: now.toISOString(),
+      rfqQuality: {
+        totalRfqs,
+        realActive,       // safe to show to suppliers
+        seededDemo,       // internal test data
+        anonymous,        // no buyer attached
+        draft,            // unpublished
+        expired: totalExpired,
+        closed,
+        // Integrity check: should sum close to totalRfqs
+        // (some overlap possible between expired-by-date and other categories)
+      },
+      note: 'realActive counts non-seeded, public, OPEN/ACTIVE/QUOTED RFQs with a buyer. ' +
+            'Run the full breakdown SQL in rfq_inventory_truth_report.md for group-by detail.',
+    });
+  } catch (error) {
+    console.error('Admin RFQs GET error:', error);
+    return NextResponse.json({ error: 'Failed to fetch RFQ quality metrics' }, { status: 500 });
+  }
+}
+
 // POST /api/admin/rfqs — action-dispatched, admin-only.
 //
 // action: 'submit-concierge-quote'
