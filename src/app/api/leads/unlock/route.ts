@@ -16,14 +16,27 @@ export async function POST(req: NextRequest) {
       }, { status: 400 });
     }
 
-    // Check if lead exists
-    const lead = await prisma.lead.findUnique({
-      where: { id: leadId }
+    // Find the RFQ (supplier leads feed passes RFQ IDs as leadId)
+    const rfq = await prisma.rFQ.findFirst({
+      where: {
+        id: leadId,
+        isPublic: true,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            company: true,
+            location: true,
+          },
+        },
+      },
     });
 
-    if (!lead) {
+    if (!rfq) {
       return NextResponse.json({
-        error: 'Lead not found'
+        error: 'Requirement not found'
       }, { status: 404 });
     }
 
@@ -40,10 +53,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         success: true,
         lead: {
-          ...lead,
-          contactHidden: false
+          id: rfq.id,
+          buyerName: rfq.user?.name ?? null,
+          buyerCompany: rfq.user?.company ?? null,
+          buyerLocation: rfq.user?.location ?? null,
+          contactHidden: false,
         },
-        message: 'Lead already unlocked'
+        message: 'Requirement already unlocked'
       });
     }
 
@@ -54,11 +70,11 @@ export async function POST(req: NextRequest) {
 
     if (!userCredits || userCredits.credits < 1) {
       return NextResponse.json({
-        error: 'Insufficient credits. Please purchase credits to unlock leads.'
+        error: 'Insufficient credits. Purchase credits to unlock buyer details.'
       }, { status: 400 });
     }
 
-    // Deduct credit and unlock lead
+    // Deduct credit and record unlock
     await prisma.$transaction([
       prisma.userCredits.update({
         where: { userId: supplierId },
@@ -78,24 +94,22 @@ export async function POST(req: NextRequest) {
       })
     ]);
 
-    // Get updated lead details
-    const updatedLead = await prisma.lead.findUnique({
-      where: { id: leadId }
-    });
-
     return NextResponse.json({
       success: true,
       lead: {
-        ...updatedLead,
-        contactHidden: false
+        id: rfq.id,
+        buyerName: rfq.user?.name ?? null,
+        buyerCompany: rfq.user?.company ?? null,
+        buyerLocation: rfq.user?.location ?? null,
+        contactHidden: false,
       },
-      message: 'Lead unlocked successfully! Contact details are now visible.'
+      message: 'Buyer details unlocked successfully.'
     });
 
   } catch (error) {
     console.error('Error unlocking lead:', error);
     return NextResponse.json({
-      error: 'Failed to unlock lead. Please try again.'
+      error: 'Failed to unlock requirement. Please try again.'
     }, { status: 500 });
   }
 }
