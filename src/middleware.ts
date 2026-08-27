@@ -54,7 +54,8 @@ const CSP = `
   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
   img-src 'self' blob: data:
     https://www.google-analytics.com
-    https://*.razorpay.com;
+    https://*.razorpay.com
+    https://res.cloudinary.com;
   font-src 'self' https://fonts.gstatic.com;
   connect-src 'self'
     https://cloudflareinsights.com
@@ -63,8 +64,9 @@ const CSP = `
     https://api.msg91.com
     https://control.msg91.com
     https://api.groq.com
-    https://api.openai.com;
-  media-src 'self' blob:;
+    https://api.openai.com
+    https://api.cloudinary.com;
+  media-src 'self' blob: https://res.cloudinary.com;
   frame-src 'self'
     https://api.razorpay.com
     https://checkout.razorpay.com
