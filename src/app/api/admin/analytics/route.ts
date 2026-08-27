@@ -139,6 +139,9 @@ async function founderAnalytics() {
       unlockedLeads,
       creditGranted,
       suppliersWith0Credits,
+      activeSuppliers30d,
+      dealsTotal,
+      dealsCompleted,
     ] = await Promise.all([
       // 1. How many real suppliers registered?
       prisma.user.count({ where: { role: 'SUPPLIER' } }),
@@ -213,6 +216,19 @@ async function founderAnalytics() {
           OR EXISTS (SELECT 1 FROM user_credits uc WHERE uc.user_id = u.id AND uc.credits = 0)
         )
       `.then(rows => Number(rows[0]?.count ?? 0)),
+
+      // Active suppliers: submitted at least one quote in the last 30 days
+      prisma.quote.groupBy({
+        by: ['supplierId'],
+        where: { createdAt: { gte: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000) } },
+        _count: { supplierId: true },
+      }).then(rows => rows.length),
+
+      // Total deals (quote accepted)
+      prisma.deal.count(),
+
+      // Completed deals (payment processed)
+      prisma.deal.count({ where: { status: 'COMPLETED' } }),
     ]);
 
     // 6. Conversion blockers — evidence-based
@@ -230,6 +246,11 @@ async function founderAnalytics() {
       conversionBlockers.push(`${seededRfqs} seeded/demo RFQs visible in marketplace — GET /api/admin/rfqs for breakdown`);
     }
 
+    // Marketplace activity metrics
+    const supplierActivityRate = suppliersRegistered > 0
+      ? Math.round((activeSuppliers30d / suppliersRegistered) * 100) + '%'
+      : '0%';
+
     return NextResponse.json({
       success: true,
       generatedAt: now.toISOString(),
@@ -244,9 +265,10 @@ async function founderAnalytics() {
         // Verification
         verifiedSuppliers,
         pendingVerification,
-        // Q3: RFQs viewed
-        totalRfqViews,
-        rfqsUnlocked: unlockedLeads,
+        // Q3: RFQs viewed (platform-wide view counter)
+        rfqsAvailable: realActiveRfqs,           // real non-seeded open RFQs
+        rfqsViewed: Number(totalRfqViews),        // cumulative view count across all public RFQs
+        rfqsUnlocked: unlockedLeads,              // supplier unlock actions in leads feed
         // Q4: Quotes submitted
         quotesSubmitted,
         suppliersWhoQuoted: uniqueSupplierQuoters,
@@ -260,10 +282,18 @@ async function founderAnalytics() {
         totalCreditsGranted:  Number(creditGranted?._sum?.credits ?? 0),
         totalCreditsSpent:    Number(creditGranted?._sum?.spent ?? 0),
         suppliersWith0Credits,
+        // Marketplace activity (Phase 5 additions)
+        activeSuppliersLast30d:  activeSuppliers30d,   // unique suppliers who quoted in last 30 days
+        supplierActivityRate,                           // activeSuppliersLast30d / suppliersRegistered
+        dealsTotal,                                     // total deals created (quote accepted)
+        dealsCompleted,                                 // deals with COMPLETED status (payment processed)
+        dealCompletionRate: dealsTotal > 0
+          ? Math.round((dealsCompleted / dealsTotal) * 100) + '%'
+          : '0%',
       },
       // Q6: Conversion blockers
       conversionBlockers,
-      note: 'profilesCompleted = suppliers with company name set. For deeper detail use GET /api/admin/first10.',
+      note: 'profilesCompleted = suppliers with company name set. rfqsAvailable = real non-seeded open RFQs. activeSuppliersLast30d = suppliers who submitted a quote in last 30 days.',
     });
   } catch (error) {
     console.error('Founder analytics error:', error);
