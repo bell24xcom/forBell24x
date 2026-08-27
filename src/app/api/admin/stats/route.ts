@@ -64,11 +64,29 @@ export async function GET(request: NextRequest) {
       prisma.rFQ.count({ where: { status: { in: ['ACTIVE', 'OPEN'] }, expiresAt: { lte: threeDays, gt: now } } }),
     ]);
 
-    const [seededRfqs, realRfqs, importedUnverified, unansweredRealRfqs] = await Promise.all([
+    const [seededRfqs, realRfqs, importedUnverified, unansweredRealRfqs,
+           totalDeals, activeDeals, escrowDeals, recentDeals] = await Promise.all([
       prisma.rFQ.count({ where: { isSeeded: true } }),
       prisma.rFQ.count({ where: { isSeeded: false } }),
       prisma.user.count({ where: { isVerified: false, isActive: true, importedFrom: { not: null } } }),
       prisma.rFQ.count({ where: { status: { in: ['ACTIVE', 'OPEN'] }, quotes: { none: {} }, isSeeded: { not: true } } }),
+      // Deal counts for First Transaction Dashboard
+      prisma.deal.count(),
+      prisma.deal.count({ where: { status: 'ACTIVE' } }),
+      prisma.deal.count({ where: { status: 'ESCROW_LOCKED' } }),
+      prisma.deal.findMany({
+        orderBy: { createdAt: 'desc' },
+        take: 5,
+        select: {
+          id: true,
+          price: true,
+          status: true,
+          createdAt: true,
+          rfq: { select: { title: true } },
+          buyer: { select: { name: true } },
+          supplier: { select: { name: true, company: true } },
+        },
+      }),
     ]);
 
     const volumeResult = await prisma.transaction.aggregate({
@@ -128,6 +146,21 @@ export async function GET(request: NextRequest) {
         },
         trust: { highTrustSuppliers },
         plans: { FREE: plans['FREE'] ?? 0, PRO: plans['PRO'] ?? 0, ENTERPRISE: plans['ENTERPRISE'] ?? 0 },
+        // First Transaction Dashboard (Phase 4)
+        deals: {
+          total: totalDeals,
+          active: activeDeals,
+          escrowLocked: escrowDeals,
+          recentDeals: recentDeals.map(d => ({
+            id: d.id,
+            price: d.price,
+            status: d.status,
+            rfqTitle: d.rfq?.title ?? '—',
+            buyerName: d.buyer?.name ?? '—',
+            supplierName: d.supplier?.company || d.supplier?.name || '—',
+            createdAt: d.createdAt.toISOString(),
+          })),
+        },
         pendingKyc,
         pendingKycReal: Math.max(0, pendingKyc - importedUnverified),
         importedUnverified,
