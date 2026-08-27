@@ -44,7 +44,7 @@ export async function GET(
                 id: true,
                 name: true,
                 company: true,
-                city: true,
+                location: true,
                 trustScore: true,
               },
             },

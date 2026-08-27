@@ -77,10 +77,18 @@ export default function SupplierLeadsPage() {
       const result = await response.json();
 
       if (response.ok) {
-        // Update the lead in the list
-        setLeads(leads.map(lead => 
-          lead.id === leadId 
-            ? { ...lead, unlocked: true, contactHidden: false }
+        // Update the lead in the list with contact details returned from the API
+        setLeads(leads.map(lead =>
+          lead.id === leadId
+            ? {
+                ...lead,
+                unlocked: true,
+                contactHidden: false,
+                buyerName: result.lead?.buyerName ?? lead.buyerName,
+                buyerCompany: result.lead?.buyerCompany ?? lead.buyerCompany,
+                buyerPhone: result.lead?.buyerPhone ?? null,
+                buyerEmail: result.lead?.buyerEmail ?? null,
+              }
             : lead
         ));
         setUserCredits(userCredits - 1);

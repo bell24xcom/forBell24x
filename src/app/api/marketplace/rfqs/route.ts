@@ -35,6 +35,7 @@ export async function GET(request: NextRequest) {
     const where: Parameters<typeof prisma.rFQ.findMany>[0]['where'] = {
       status: { in: ['ACTIVE', 'OPEN'] },
       isPublic: true,
+      isSeeded: false,
     };
 
     if (categoriesParam) {
