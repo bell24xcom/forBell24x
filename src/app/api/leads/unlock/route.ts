@@ -1,10 +1,8 @@
-import { PrismaClient } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
-
-const prisma = new PrismaClient();
 
 export async function POST(req: NextRequest) {
   try {

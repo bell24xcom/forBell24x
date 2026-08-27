@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '20');
     const skip = parseInt(searchParams.get('skip') || '0');
 
-    const where: any = { status };
+    const where: any = { status, isSeeded: false };
     if (category) {
       where.category = category;
     }
