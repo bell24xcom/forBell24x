@@ -81,7 +81,7 @@ The unlock flow itself (RFQ lookup, credit check, deduction, LeadSupplier create
 Classification is computed from existing fields — no new DB column required (backward compatible, no RFQ loss):
 
 | Class | Computed From | Supplier-Visible |
-|-------|--------------|------------------|
+|-------|--------------|-----------------|
 | `VERIFIED_BUYER` | `isSeeded=false, isPublic=true, status IN (OPEN,ACTIVE,QUOTED), createdBy≠null, buyer has GST_VERIFIED/UDYAM_VERIFIED/MANUAL_VERIFIED` | ✅ Yes — prominently |
 | `UNVERIFIED_BUYER` | Same but buyer is `PHONE_VERIFIED` or `GST_PENDING` | ✅ Yes — no badge |
 | `DEMO` | `isSeeded=true` | ❌ Hidden |
@@ -290,7 +290,7 @@ No table schema changes. No data migrations. No column renames. No backfills.
 ## Rollback Plan
 
 | Change | Rollback |
-|--------|----------|
+|--------|---------|
 | `isSeeded: false` filters | Remove the added condition from WHERE clauses |
 | Duplicate quote guard | Remove the `findFirst` + early return block from quote route |
 | PrismaClient singleton | Re-add `new PrismaClient()` (not recommended) |
