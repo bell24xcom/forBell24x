@@ -88,6 +88,11 @@ export async function POST(request: NextRequest) {
           role: 'SUPPLIER',
           isActive: true,
           isVerified: true,
+          // verificationStatus distinguishes phone-OTP (PHONE_VERIFIED) from
+          // business verification (GST_VERIFIED / MANUAL_VERIFIED).
+          // isVerified stays true for backwards compat; verificationStatus is
+          // the authoritative field for supplier onboarding gating.
+          verificationStatus: 'PHONE_VERIFIED',
           trustScore: 30, // base score: phone verified via OTP
           lastLoginAt: new Date(),
         },

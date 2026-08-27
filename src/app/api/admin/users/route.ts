@@ -45,6 +45,7 @@ export async function GET(request: NextRequest) {
         select: {
           id: true, name: true, email: true, phone: true,
           role: true, plan: true, isActive: true, isVerified: true,
+          verificationStatus: true,
           company: true, gstNumber: true, udyamNumber: true,
           trustScore: true, location: true, lastLoginAt: true,
           createdAt: true,
@@ -90,8 +91,9 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ success: false, message: 'userId required' }, { status: 400 });
     }
 
-    // Whitelist safe fields only
-    const allowed = ['name', 'role', 'plan', 'isActive', 'isVerified', 'company', 'location'];
+    // Whitelist safe fields only.
+    // verificationStatus accepts: PHONE_VERIFIED | GST_PENDING | GST_VERIFIED | MANUAL_VERIFIED | REJECTED
+    const allowed = ['name', 'role', 'plan', 'isActive', 'isVerified', 'company', 'location', 'verificationStatus'];
     const safeUpdates = Object.fromEntries(
       Object.entries(updates ?? {}).filter(([k]) => allowed.includes(k))
     );
@@ -99,7 +101,11 @@ export async function PUT(request: NextRequest) {
     const user = await prisma.user.update({
       where: { id: userId },
       data: safeUpdates,
-      select: { id: true, name: true, email: true, phone: true, role: true, plan: true, isActive: true, isVerified: true, trustScore: true },
+      select: {
+        id: true, name: true, email: true, phone: true, role: true, plan: true,
+        isActive: true, isVerified: true, trustScore: true,
+        verificationStatus: true,
+      },
     });
 
     return NextResponse.json({ success: true, user, message: 'User updated' });
