@@ -12,21 +12,22 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const page   = Math.max(1, parseInt(searchParams.get('page')  || '1'));
     const limit  = Math.min(100, parseInt(searchParams.get('limit') || '20'));
-    const role      = searchParams.get('role') as string | null;
-    const search    = searchParams.get('search');
-    const plan      = searchParams.get('plan') as string | null;
-    const kycStatus = searchParams.get('kycStatus') as 'approved' | 'pending' | null;
-    const skip      = (page - 1) * limit;
+    const role               = searchParams.get('role') as string | null;
+    const search             = searchParams.get('search');
+    const plan               = searchParams.get('plan') as string | null;
+    const kycStatus          = searchParams.get('kycStatus') as 'approved' | 'pending' | null;
+    const verificationStatus = searchParams.get('verificationStatus') as string | null;
+    const skip               = (page - 1) * limit;
 
     const where: Record<string, unknown> = {};
     if (role)   where.role = role;
     if (plan)   where.plan = plan;
-    // KYC has only two real states in the current data model: isVerified
-    // true (approved) or false (pending). There is no separate Rejected/
-    // Suspended status tracked yet — isActive is a distinct account-level
-    // flag, not a KYC decision.
+    // kycStatus: legacy filter on the boolean isVerified field
     if (kycStatus === 'approved') where.isVerified = true;
     if (kycStatus === 'pending')  where.isVerified = false;
+    // verificationStatus: precise business-verification filter (Phase 4)
+    // e.g. ?verificationStatus=GST_PENDING for the admin review queue
+    if (verificationStatus) where.verificationStatus = verificationStatus;
     if (search) {
       where.OR = [
         { name:    { contains: search, mode: 'insensitive' } },
@@ -116,7 +117,8 @@ export async function PUT(request: NextRequest) {
 }
 
 // POST /api/admin/users — action-dispatched, admin-only.
-// action: 'review-kyc-document' — verify/reject a single uploaded KYC document.
+// action: 'review-kyc-document'     — verify/reject a single uploaded KYC document.
+// action: 'review-gst-verification' — set verificationStatus (GST_VERIFIED / REJECTED / MANUAL_VERIFIED).
 export async function POST(request: NextRequest) {
   const auth = requireAdmin(request);
   if (isErrorResponse(auth)) return auth;
@@ -126,11 +128,65 @@ export async function POST(request: NextRequest) {
     if (body.action === 'review-kyc-document') {
       return reviewKycDocument(body, auth.userId);
     }
+    if (body.action === 'review-gst-verification') {
+      return reviewGstVerification(body, auth.userId);
+    }
     return NextResponse.json({ success: false, message: 'Unknown action' }, { status: 400 });
   } catch (error) {
     console.error('Admin users POST error:', error);
     return NextResponse.json({ success: false, message: 'Request failed' }, { status: 500 });
   }
+}
+
+async function reviewGstVerification(
+  body: { userId?: string; status?: string; note?: string },
+  adminId: string,
+) {
+  const { userId, status, note } = body;
+  const VALID_STATUSES = ['GST_VERIFIED', 'MANUAL_VERIFIED', 'REJECTED'];
+
+  if (!userId || !status) {
+    return NextResponse.json(
+      { success: false, message: 'userId and status are required' },
+      { status: 400 },
+    );
+  }
+  if (!VALID_STATUSES.includes(status)) {
+    return NextResponse.json(
+      { success: false, message: `status must be one of: ${VALID_STATUSES.join(', ')}` },
+      { status: 400 },
+    );
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, name: true, verificationStatus: true },
+  });
+  if (!user) {
+    return NextResponse.json({ success: false, message: 'User not found' }, { status: 404 });
+  }
+
+  const updated = await prisma.user.update({
+    where: { id: userId },
+    data: { verificationStatus: status as 'GST_VERIFIED' | 'MANUAL_VERIFIED' | 'REJECTED' },
+    select: { id: true, name: true, verificationStatus: true },
+  });
+
+  console.info('[admin/users] review-gst-verification', {
+    adminId,
+    userId,
+    previousStatus: user.verificationStatus,
+    newStatus: status,
+    note: note ?? 'no note',
+  });
+
+  return NextResponse.json({
+    success: true,
+    action: 'review-gst-verification',
+    userId,
+    verificationStatus: updated.verificationStatus,
+    note,
+  });
 }
 
 async function reviewKycDocument(
