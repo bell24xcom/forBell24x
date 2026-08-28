@@ -7,8 +7,9 @@ import { usePathname } from 'next/navigation';
 type NavItem = { href: string; label: string; icon: string; group?: string };
 
 const NAV: NavItem[] = [
-  // Core
-  { href: '/admin',                  label: 'Dashboard',        icon: '▤',  group: 'Intelligence' },
+  // Founder Command Panel — top of nav
+  { href: '/admin/founder-command-panel', label: 'Command Panel', icon: '⚡', group: 'Intelligence' },
+  { href: '/admin',                  label: 'Dashboard',        icon: '▤'  },
   // INTELLIGENCE_LAYER — hidden until Phase D gate opens
   // { href: '/admin/company-dna',      label: 'Company DNA',      icon: '🧬' },
   // INTELLIGENCE_LAYER — hidden until Phase D gate opens
