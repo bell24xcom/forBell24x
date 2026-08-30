@@ -2,8 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin, isErrorResponse } from '@/lib/admin-auth';
 import { sendEmail as _sendEmail } from '@/lib/email';
+import { storeInteraction } from '@/lib/memory-engine';
 import { SITE_URL, SITE_HOST } from '@/lib/site-url';
-const resendService = { sendEmail: ({ to, subject, html }: { to: string; subject: string; html: string }) => _sendEmail(to, subject, html) };
+
+const resendService = {
+  sendEmail: ({ to, subject, html }: { to: string; subject: string; html: string }) =>
+    _sendEmail(to, subject, html),
+};
 
 export const dynamic = 'force-dynamic';
 
@@ -27,7 +32,7 @@ export async function POST(req: NextRequest) {
       where.email = { not: null };
     }
 
-    // Fetch unclaimed suppliers with email who haven't been invited recently
+    // Fetch unclaimed suppliers with email
     const unclaimedWithEmail = await prisma.user.findMany({
       where,
       select: {
@@ -42,6 +47,7 @@ export async function POST(req: NextRequest) {
     });
 
     let sent = 0;
+    const sendErrors: string[] = [];
 
     for (const supplier of unclaimedWithEmail) {
       if (!supplier.email) continue;
@@ -49,6 +55,7 @@ export async function POST(req: NextRequest) {
       const prefs = supplier.preferences as Record<string, unknown> | null;
       const categories: string[] = Array.isArray(prefs?.categories) ? (prefs.categories as string[]) : [];
       const claimUrl = `${SITE_URL}/auth/phone-email?claim=${supplier.id}`;
+      const category = categories[0] || 'your category';
 
       try {
         await resendService.sendEmail({
@@ -58,7 +65,7 @@ export async function POST(req: NextRequest) {
             <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
               <div style="background:linear-gradient(135deg,#EA580C,#F97316);padding:20px 24px;text-align:center;">
                 <h1 style="color:white;margin:0;font-size:22px;">VyaparSethu</h1>
-                <p style="color:#FED7AA;margin:4px 0 0;font-size:14px;">India's B2B Supplier & Buyer Network</p>
+                <p style="color:#FED7AA;margin:4px 0 0;font-size:14px;">India's B2B Supplier &amp; Buyer Network</p>
               </div>
               <div style="padding:28px 24px;background:#f8fafc;">
                 <p style="font-size:16px;color:#1E293B;">Namaste,</p>
@@ -79,10 +86,24 @@ export async function POST(req: NextRequest) {
             </div>
           `,
         });
+
+        // Track invitation in InteractionMemory so funnel analytics can see it
+        await storeInteraction({
+          userId: supplier.id,
+          actionType: 'outreach_sent',
+          source: 'email',
+          metadata: {
+            category,
+            sentAt: new Date().toISOString(),
+            channel: 'email_invitation',
+          },
+        });
+
         sent++;
         // Rate limit: 1 second between sends
         await new Promise(r => setTimeout(r, 1000));
-      } catch {
+      } catch (err) {
+        sendErrors.push(`${supplier.id}: ${err instanceof Error ? err.message : 'unknown'}`);
         // fire-and-forget — one failure doesn't stop the rest
       }
     }
@@ -91,6 +112,7 @@ export async function POST(req: NextRequest) {
       success: true,
       sent,
       total: unclaimedWithEmail.length,
+      errors: sendErrors.slice(0, 5),
       message: `Sent ${sent} invitation emails`,
     });
   } catch (error) {

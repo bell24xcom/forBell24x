@@ -2,9 +2,18 @@
  * POST /api/admin/import-suppliers
  * Bulk import unclaimed supplier profiles for marketplace seeding.
  * Admin only. Max 500 per import.
+ *
+ * Accepts two content types:
+ *   application/json  — { suppliers: SupplierInput[] }
+ *   multipart/form-data — file field "csv" with CSV payload
+ *
+ * CSV expected columns (header row required):
+ *   company, category, city, state, gstNumber, phone, email, description
+ *   Only company, category, city are required.
  */
 import { randomUUID } from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
+import { parse as parseCsv } from 'papaparse';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin, isErrorResponse } from '@/lib/admin-auth';
 
@@ -21,16 +30,66 @@ interface SupplierInput {
   description?: string;
 }
 
+async function parseSuppliersFromRequest(req: NextRequest): Promise<SupplierInput[] | { error: string }> {
+  const contentType = req.headers.get('content-type') || '';
+
+  // ── JSON path ──────────────────────────────────────────────────────────────
+  if (contentType.includes('application/json')) {
+    const body = await req.json();
+    if (!Array.isArray(body.suppliers)) {
+      return { error: 'suppliers array is required in JSON body' };
+    }
+    return body.suppliers as SupplierInput[];
+  }
+
+  // ── CSV multipart path ─────────────────────────────────────────────────────
+  if (contentType.includes('multipart/form-data')) {
+    const form = await req.formData();
+    const file = form.get('csv');
+    if (!file || typeof file === 'string') {
+      return { error: 'Multipart request must include a "csv" file field' };
+    }
+
+    const text = await (file as File).text();
+    const result = parseCsv<Record<string, string>>(text, {
+      header: true,
+      skipEmptyLines: true,
+      transformHeader: h => h.trim().toLowerCase(),
+    });
+
+    if (result.errors.length > 0) {
+      return { error: `CSV parse error: ${result.errors[0].message}` };
+    }
+
+    return result.data.map(row => ({
+      company:     (row.company || '').trim(),
+      category:    (row.category || '').trim(),
+      city:        (row.city || '').trim(),
+      state:       (row.state || '').trim() || undefined,
+      gstNumber:   (row.gstnumber || row.gst_number || row.gst || '').trim() || undefined,
+      phone:       (row.phone || row.mobile || '').trim() || undefined,
+      email:       (row.email || '').trim() || undefined,
+      description: (row.description || row.desc || '').trim() || undefined,
+    }));
+  }
+
+  return { error: 'Unsupported content type. Use application/json or multipart/form-data with a CSV file.' };
+}
+
 export async function POST(req: NextRequest) {
   const auth = requireAdmin(req);
   if (isErrorResponse(auth)) return auth;
 
   try {
-    const body = await req.json();
-    const suppliers: SupplierInput[] = body.suppliers || [];
+    const parsed = await parseSuppliersFromRequest(req);
+    if ('error' in parsed) {
+      return NextResponse.json({ success: false, error: parsed.error }, { status: 400 });
+    }
 
-    if (!Array.isArray(suppliers) || suppliers.length === 0) {
-      return NextResponse.json({ success: false, error: 'suppliers array is required' }, { status: 400 });
+    const suppliers: SupplierInput[] = parsed;
+
+    if (suppliers.length === 0) {
+      return NextResponse.json({ success: false, error: 'No suppliers found in payload' }, { status: 400 });
     }
 
     if (suppliers.length > 500) {

@@ -29,6 +29,7 @@ async function run(req: NextRequest) {
   if (isMonday) jobs.push('/api/cron/weekly-digest', '/api/cron/churn-check');
   jobs.push(
     '/api/cron/supplier-drip',
+    '/api/cron/onboarding-drip',
     '/api/cron/follow-up-due',
     '/api/cron/demand-loop',
     '/api/cron/analyze-behavior',
