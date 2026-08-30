@@ -242,8 +242,10 @@ export async function getDripsDue(): Promise<DripCandidate[]> {
 
     if (isDay3) {
       if (dripSentSet.has(`${supplierId}:drip_day3_sent`)) continue;
-      // Skip if profile is already complete
-      if (!!supplier.company) continue;
+      // Skip if profile is already complete (has description + categories set)
+      const prefs3 = supplier.preferences as Record<string, unknown> | null;
+      const profileComplete = !!(prefs3?.description && Array.isArray(prefs3?.categories) && (prefs3.categories as string[]).length > 0);
+      if (profileComplete) continue;
       const message = buildDripMessage(supplier, category, 'day3');
       const { subject, html } = buildDripEmail(supplier, category, 'day3');
       candidates.push({ supplierId, name: supplier.name ?? '', company: supplier.company, phone: supplier.phone, email: supplier.email ?? null, category, dripType: 'day3', message, waLink: buildWaLink(supplier.phone, message), emailSubject: subject, emailHtml: html, firstContactedAt: contact.createdAt });
