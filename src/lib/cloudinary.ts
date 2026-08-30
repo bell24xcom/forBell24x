@@ -93,6 +93,12 @@ export const UPLOAD_CONFIGS = {
     max_file_size: 50 * 1024 * 1024, // 50MB
     resource_type: 'auto' as const,
   },
+  RFQ_VIDEOS: {
+    folder: 'bell24h/rfq/videos',
+    allowed_formats: ['mp4'],
+    max_file_size: 50 * 1024 * 1024, // 50MB
+    resource_type: 'video' as const,
+  },
 };
 
 // Upload presets for different file types

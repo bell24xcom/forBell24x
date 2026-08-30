@@ -30,7 +30,24 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const validatedData = CreateQuoteSchema.parse(body);
 
-    // 4. Create quote in database
+    // 4. Guard against duplicate quotes from the same supplier on the same RFQ
+    const existingQuote = await prisma.quote.findFirst({
+      where: {
+        rfqId: validatedData.rfqId,
+        supplierId: user.id,
+        status: { notIn: ['WITHDRAWN', 'REJECTED'] },
+      },
+      select: { id: true },
+    });
+
+    if (existingQuote) {
+      return NextResponse.json(
+        { success: false, error: 'You have already submitted a quotation for this requirement', quoteId: existingQuote.id },
+        { status: 409 },
+      );
+    }
+
+    // 5. Create quote in database
     const quote = await prisma.quote.create({
       data: {
         rfqId: validatedData.rfqId,

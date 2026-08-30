@@ -64,3 +64,7 @@ mirror.git/
 .env*.local
 .env.production
 .env*.txt
+
+# Audit and one-off analysis docs — not part of product history
+docs/audits/
+docs/project/

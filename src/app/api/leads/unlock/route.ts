@@ -1,71 +1,104 @@
-import { PrismaClient } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { verifyToken } from '@/lib/jwt';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
 
-const prisma = new PrismaClient();
-
 export async function POST(req: NextRequest) {
   try {
-    const { leadId, supplierId } = await req.json();
+    // 1. Authenticate — supplierId comes from JWT, not the request body
+    const token =
+      req.cookies.get('auth-token')?.value ||
+      req.headers.get('authorization')?.replace('Bearer ', '');
 
-    if (!leadId || !supplierId) {
-      return NextResponse.json({
-        error: 'leadId and supplierId are required'
-      }, { status: 400 });
+    if (!token) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Check if lead exists
-    const lead = await prisma.lead.findUnique({
-      where: { id: leadId }
+    const payload = verifyToken(token);
+    if (!payload) {
+      return NextResponse.json({ error: 'Invalid or expired session' }, { status: 401 });
+    }
+
+    const supplierId = payload.userId;
+
+    // 2. Parse body — only leadId is accepted from the client
+    const { leadId } = await req.json();
+
+    if (!leadId) {
+      return NextResponse.json({ error: 'leadId is required' }, { status: 400 });
+    }
+
+    // 3. Find the RFQ (supplier leads feed passes RFQ IDs as leadId)
+    const rfq = await prisma.rFQ.findFirst({
+      where: {
+        id: leadId,
+        isPublic: true,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            company: true,
+            location: true,
+            phone: true,
+            email: true,
+          },
+        },
+      },
     });
 
-    if (!lead) {
-      return NextResponse.json({
-        error: 'Lead not found'
-      }, { status: 404 });
+    if (!rfq) {
+      return NextResponse.json({ error: 'Requirement not found' }, { status: 404 });
     }
 
-    // Check if already unlocked by this supplier
+    // 4. Check if already unlocked by this supplier
     const existingUnlock = await prisma.leadSupplier.findFirst({
       where: {
         leadId,
         supplierId,
-        unlocked: true
-      }
+        unlocked: true,
+      },
     });
 
     if (existingUnlock) {
       return NextResponse.json({
         success: true,
         lead: {
-          ...lead,
-          contactHidden: false
+          id: rfq.id,
+          buyerName: rfq.user?.name ?? null,
+          buyerCompany: rfq.user?.company ?? null,
+          buyerLocation: rfq.user?.location ?? null,
+          buyerPhone: rfq.user?.phone ?? null,
+          buyerEmail: rfq.user?.email ?? null,
+          contactHidden: false,
         },
-        message: 'Lead already unlocked'
+        message: 'Requirement already unlocked',
       });
     }
 
-    // Check credits
+    // 5. Check credits
     const userCredits = await prisma.userCredits.findUnique({
-      where: { userId: supplierId }
+      where: { userId: supplierId },
     });
 
     if (!userCredits || userCredits.credits < 1) {
-      return NextResponse.json({
-        error: 'Insufficient credits. Please purchase credits to unlock leads.'
-      }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Insufficient credits. Purchase credits to unlock buyer details.' },
+        { status: 400 },
+      );
     }
 
-    // Deduct credit and unlock lead
+    // 6. Deduct credit and record unlock atomically
     await prisma.$transaction([
       prisma.userCredits.update({
         where: { userId: supplierId },
         data: {
           credits: { decrement: 1 },
-          spent: { increment: 1 }
-        }
+          spent: { increment: 1 },
+        },
       }),
       prisma.leadSupplier.create({
         data: {
@@ -73,29 +106,29 @@ export async function POST(req: NextRequest) {
           supplierId,
           unlocked: true,
           unlockedAt: new Date(),
-          credits: 1
-        }
-      })
+          credits: 1,
+        },
+      }),
     ]);
-
-    // Get updated lead details
-    const updatedLead = await prisma.lead.findUnique({
-      where: { id: leadId }
-    });
 
     return NextResponse.json({
       success: true,
       lead: {
-        ...updatedLead,
-        contactHidden: false
+        id: rfq.id,
+        buyerName: rfq.user?.name ?? null,
+        buyerCompany: rfq.user?.company ?? null,
+        buyerLocation: rfq.user?.location ?? null,
+        buyerPhone: rfq.user?.phone ?? null,
+        buyerEmail: rfq.user?.email ?? null,
+        contactHidden: false,
       },
-      message: 'Lead unlocked successfully! Contact details are now visible.'
+      message: 'Buyer details unlocked successfully.',
     });
-
   } catch (error) {
     console.error('Error unlocking lead:', error);
-    return NextResponse.json({
-      error: 'Failed to unlock lead. Please try again.'
-    }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to unlock requirement. Please try again.' },
+      { status: 500 },
+    );
   }
 }

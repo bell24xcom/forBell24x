@@ -88,11 +88,36 @@ export async function POST(request: NextRequest) {
           role: 'SUPPLIER',
           isActive: true,
           isVerified: true,
+          // verificationStatus distinguishes phone-OTP (PHONE_VERIFIED) from
+          // business verification (GST_VERIFIED / MANUAL_VERIFIED).
+          // isVerified stays true for backwards compat; verificationStatus is
+          // the authoritative field for supplier onboarding gating.
+          verificationStatus: 'PHONE_VERIFIED',
           trustScore: 30, // base score: phone verified via OTP
           lastLoginAt: new Date(),
         },
       });
       authLogger.info('New user created', { userId: user.id, phone: `${phone.slice(0, 5)}*****` });
+
+      // Grant onboarding credits to every new supplier.
+      // Amount is env-configurable (ONBOARDING_CREDITS); defaults to 3.
+      // Non-blocking — credit failure must not prevent registration.
+      const onboardingCredits = parseInt(process.env.ONBOARDING_CREDITS ?? '3', 10);
+      if (onboardingCredits > 0) {
+        prisma.userCredits.upsert({
+          where: { userId: user.id },
+          create: {
+            userId: user.id,
+            credits: onboardingCredits,
+            spent: 0,
+          },
+          update: {
+            credits: { increment: onboardingCredits },
+          },
+        }).catch((err: unknown) => {
+          authLogger.error('Failed to grant onboarding credits', { userId: user.id, err });
+        });
+      }
 
       // consent: passing NO_CONSENT_UI until /auth/phone-email (the canonical
       // Header-linked login/register screen this route actually serves)

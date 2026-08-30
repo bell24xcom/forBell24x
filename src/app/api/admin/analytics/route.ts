@@ -13,8 +13,14 @@ export async function GET(req: NextRequest) {
   const auth = requireAdmin(req);
   if (isErrorResponse(auth)) return auth;
 
+  const { searchParams } = new URL(req.url);
+
+  // Founder supplier-conversion view: ?view=founder
+  if (searchParams.get('view') === 'founder') {
+    return founderAnalytics();
+  }
+
   try {
-    const { searchParams } = new URL(req.url);
     const range     = searchParams.get('range') || '7d';
     const now       = new Date();
     const daysMap   = { '1d': 1, '7d': 7, '30d': 30, '90d': 90 } as const;
@@ -103,6 +109,271 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     console.error('Admin analytics error:', error);
     return NextResponse.json({ error: 'Failed to fetch analytics data' }, { status: 500 });
+  }
+}
+
+/**
+ * Founder supplier-conversion analytics.
+ * Answers the 6 success criteria questions:
+ *   1. How many real suppliers registered?
+ *   2. How many completed profiles?
+ *   3. How many viewed RFQs?
+ *   4. How many submitted quotes?
+ *   5. How many RFQs are real?
+ *   6. What prevents supplier conversion today?
+ */
+async function founderAnalytics() {
+  try {
+    const now = new Date();
+
+    const [
+      suppliersRegistered,
+      profilesCompleted,
+      verifiedSuppliers,
+      pendingVerification,
+      quotesSubmitted,
+      uniqueSupplierQuoters,
+      realActiveRfqs,
+      seededRfqs,
+      totalRfqViews,
+      unlockedLeads,
+      creditGranted,
+      suppliersWith0Credits,
+      activeSuppliers30d,
+      dealsTotal,
+      dealsCompleted,
+    ] = await Promise.all([
+      // 1. How many real suppliers registered?
+      prisma.user.count({ where: { role: 'SUPPLIER' } }),
+
+      // 2. How many completed profiles?
+      // Proxy: has company name set (from onboarding)
+      prisma.user.count({
+        where: {
+          role: 'SUPPLIER',
+          company: { not: '' },
+          NOT: { company: null },
+        },
+      }),
+
+      // Verified (GST_VERIFIED, UDYAM_VERIFIED, or MANUAL_VERIFIED)
+      prisma.user.count({
+        where: {
+          role: 'SUPPLIER',
+          verificationStatus: { in: ['GST_VERIFIED', 'UDYAM_VERIFIED', 'MANUAL_VERIFIED'] },
+        },
+      }),
+
+      // Pending review queue
+      prisma.user.count({
+        where: { role: 'SUPPLIER', verificationStatus: 'GST_PENDING' },
+      }),
+
+      // 4. How many quotes submitted?
+      prisma.quote.count(),
+
+      // How many unique suppliers submitted at least one quote?
+      prisma.quote.groupBy({
+        by: ['supplierId'],
+        _count: { supplierId: true },
+      }).then(rows => rows.length),
+
+      // 5. How many RFQs are real?
+      prisma.rFQ.count({
+        where: {
+          isSeeded: false,
+          isPublic: true,
+          status: { in: ['OPEN', 'ACTIVE', 'QUOTED'] },
+          createdBy: { not: null },
+        },
+      }),
+
+      // Seeded/demo RFQs count
+      prisma.rFQ.count({ where: { isSeeded: true } }),
+
+      // 3. How many RFQs viewed? (sum of all views across public RFQs)
+      prisma.rFQ.aggregate({
+        _sum: { views: true },
+        where: { isPublic: true },
+      }).then(r => r._sum.views ?? 0),
+
+      // Unlock actions (RFQs matched via credit unlock)
+      prisma.leadSupplier.count({ where: { unlocked: true } }),
+
+      // Credit activity
+      prisma.userCredits.aggregate({
+        _sum: { credits: true, spent: true },
+      }),
+
+      // Suppliers with 0 credits (potential conversion blocker)
+      // UserCredits has no back-relation on User, so use raw SQL join
+      prisma.$queryRaw<[{ count: bigint }]>`
+        SELECT COUNT(*)::bigint AS count
+        FROM users u
+        WHERE u.role = 'SUPPLIER'
+        AND (
+          NOT EXISTS (SELECT 1 FROM user_credits uc WHERE uc.user_id = u.id)
+          OR EXISTS (SELECT 1 FROM user_credits uc WHERE uc.user_id = u.id AND uc.credits = 0)
+        )
+      `.then(rows => Number(rows[0]?.count ?? 0)),
+
+      // Active suppliers: submitted at least one quote in the last 30 days
+      prisma.quote.groupBy({
+        by: ['supplierId'],
+        where: { createdAt: { gte: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000) } },
+        _count: { supplierId: true },
+      }).then(rows => rows.length),
+
+      // Total deals (quote accepted)
+      prisma.deal.count(),
+
+      // Completed deals (payment processed)
+      prisma.deal.count({ where: { status: 'COMPLETED' } }),
+    ]);
+
+    // RFQ Classification breakdown (Phase 4)
+    const [
+      rfqClassVerifiedBuyer,
+      rfqClassUnverifiedBuyer,
+      rfqClassDemo,
+      rfqClassAnonymous,
+      rfqClassExpired,
+      // Verification breakdown (Phase 5)
+      verificationGstVerified,
+      verificationUdyamVerified,
+      verificationManualVerified,
+      verificationRejected,
+      verificationPhoneOnly,
+    ] = await Promise.all([
+      // VERIFIED_BUYER: real RFQ from a business-verified buyer
+      prisma.rFQ.count({
+        where: {
+          isSeeded: false,
+          isPublic: true,
+          status: { in: ['OPEN', 'ACTIVE', 'QUOTED'] },
+          createdBy: { not: null },
+          user: { verificationStatus: { in: ['GST_VERIFIED', 'UDYAM_VERIFIED', 'MANUAL_VERIFIED'] } },
+        },
+      }),
+      // UNVERIFIED_BUYER: real RFQ from phone-only or pending buyer
+      prisma.rFQ.count({
+        where: {
+          isSeeded: false,
+          isPublic: true,
+          status: { in: ['OPEN', 'ACTIVE', 'QUOTED'] },
+          createdBy: { not: null },
+          user: { verificationStatus: { in: ['PHONE_VERIFIED', 'GST_PENDING'] } },
+        },
+      }),
+      // DEMO: seeded test data
+      prisma.rFQ.count({ where: { isSeeded: true } }),
+      // ANONYMOUS: no buyer attached
+      prisma.rFQ.count({ where: { isSeeded: false, createdBy: null } }),
+      // EXPIRED: by status or past expiresAt
+      prisma.rFQ.count({
+        where: {
+          OR: [
+            { status: 'EXPIRED' },
+            {
+              status: { notIn: ['EXPIRED', 'CLOSED', 'COMPLETED', 'CANCELLED', 'ACCEPTED', 'CLOSED_EXTERNAL'] },
+              expiresAt: { not: null, lt: now },
+            },
+          ],
+        },
+      }),
+      // Verification breakdown
+      prisma.user.count({ where: { role: 'SUPPLIER', verificationStatus: 'GST_VERIFIED' } }),
+      prisma.user.count({ where: { role: 'SUPPLIER', verificationStatus: 'UDYAM_VERIFIED' } }),
+      prisma.user.count({ where: { role: 'SUPPLIER', verificationStatus: 'MANUAL_VERIFIED' } }),
+      prisma.user.count({ where: { role: 'SUPPLIER', verificationStatus: 'REJECTED' } }),
+      prisma.user.count({ where: { role: 'SUPPLIER', verificationStatus: 'PHONE_VERIFIED' } }),
+    ]);
+
+    // 6. Conversion blockers — evidence-based
+    const conversionBlockers: string[] = [];
+    if (pendingVerification > 0) {
+      conversionBlockers.push(`${pendingVerification} supplier(s) awaiting GST review — use POST /api/admin/users review-gst-verification`);
+    }
+    if (suppliersWith0Credits > 0) {
+      conversionBlockers.push(`${suppliersWith0Credits} supplier(s) have 0 credits — grant via POST /api/admin/credits`);
+    }
+    if (realActiveRfqs === 0) {
+      conversionBlockers.push('No real active RFQs — create requirements via buyer account before onboarding next supplier');
+    }
+    if (seededRfqs > 0) {
+      conversionBlockers.push(`${seededRfqs} seeded/demo RFQs visible in marketplace — GET /api/admin/rfqs for breakdown`);
+    }
+
+    // Marketplace activity metrics
+    const supplierActivityRate = suppliersRegistered > 0
+      ? Math.round((activeSuppliers30d / suppliersRegistered) * 100) + '%'
+      : '0%';
+
+    return NextResponse.json({
+      success: true,
+      generatedAt: now.toISOString(),
+      supplierConversion: {
+        // Q1: Registered
+        suppliersRegistered,
+        // Q2: Profile completed (has company set)
+        profilesCompleted,
+        profileCompletionRate: suppliersRegistered > 0
+          ? Math.round((profilesCompleted / suppliersRegistered) * 100) + '%'
+          : '0%',
+        // Verification
+        verifiedSuppliers,
+        pendingVerification,
+        // Q3: RFQs viewed (platform-wide view counter)
+        rfqsAvailable: realActiveRfqs,           // real non-seeded open RFQs
+        rfqsViewed: Number(totalRfqViews),        // cumulative view count across all public RFQs
+        rfqsUnlocked: unlockedLeads,              // supplier unlock actions in leads feed
+        // Q4: Quotes submitted
+        quotesSubmitted,
+        suppliersWhoQuoted: uniqueSupplierQuoters,
+        quoteConversionRate: suppliersRegistered > 0
+          ? Math.round((uniqueSupplierQuoters / suppliersRegistered) * 100) + '%'
+          : '0%',
+        // Q5: Real RFQs
+        realActiveRfqs,
+        seededRfqs,
+        // Credits
+        totalCreditsGranted:  Number(creditGranted?._sum?.credits ?? 0),
+        totalCreditsSpent:    Number(creditGranted?._sum?.spent ?? 0),
+        suppliersWith0Credits,
+        // Marketplace activity (Phase 5 additions)
+        activeSuppliersLast30d:  activeSuppliers30d,   // unique suppliers who quoted in last 30 days
+        supplierActivityRate,                           // activeSuppliersLast30d / suppliersRegistered
+        dealsTotal,                                     // total deals created (quote accepted)
+        dealsCompleted,                                 // deals with COMPLETED status (payment processed)
+        dealCompletionRate: dealsTotal > 0
+          ? Math.round((dealsCompleted / dealsTotal) * 100) + '%'
+          : '0%',
+      },
+      // Q6: Conversion blockers
+      conversionBlockers,
+      // Phase 4: RFQ Classification breakdown
+      rfqClassification: {
+        verifiedBuyerRfq:   rfqClassVerifiedBuyer,    // show prominently
+        unverifiedBuyerRfq: rfqClassUnverifiedBuyer,  // show, no badge
+        demo:               rfqClassDemo,              // hide from supplier feed
+        anonymous:          rfqClassAnonymous,         // no buyer attached
+        expired:            rfqClassExpired,           // hide from active feed
+      },
+      // Phase 5: Full verification status breakdown
+      verificationBreakdown: {
+        gstVerified:     verificationGstVerified,
+        udyamVerified:   verificationUdyamVerified,
+        manualVerified:  verificationManualVerified,
+        phoneOnly:       verificationPhoneOnly,
+        gstPending:      pendingVerification,
+        rejected:        verificationRejected,
+        totalVerified:   verifiedSuppliers,  // gstVerified + udyamVerified + manualVerified
+      },
+      note: 'profilesCompleted = suppliers with company name set. rfqsAvailable = real non-seeded open RFQs. activeSuppliersLast30d = suppliers who submitted a quote in last 30 days. verifiedBuyerRfq = RFQs from GST/Udyam/manual-verified buyers.',
+    });
+  } catch (error) {
+    console.error('Founder analytics error:', error);
+    return NextResponse.json({ error: 'Failed to fetch founder analytics' }, { status: 500 });
   }
 }
 

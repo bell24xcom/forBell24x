@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthenticatedUser } from '@/src/lib/auth-helpers';
+import { sendEmail as _sendEmail } from '@/lib/email';
+import { quoteAcceptedEmail } from '@/lib/emailTemplates';
 import { z } from 'zod';
+
+const resendService = { sendEmail: ({ to, subject, html }: { to: string; subject: string; html: string }) => _sendEmail(to, subject, html) };
 
 const SelectDealSchema = z.object({
   quoteId: z.string(),
@@ -64,6 +68,36 @@ export async function POST(req: NextRequest) {
       return newDeal;
     });
 
+    // Attempt wallet escrow lock — conditional on buyer having sufficient balance.
+    // Non-blocking: if wallet not funded, deal proceeds as ACTIVE (payment via Razorpay checkout).
+    try {
+      const buyerWallet = await prisma.wallet.findUnique({ where: { userId: deal.buyerId } });
+      if (buyerWallet && buyerWallet.balance >= deal.price) {
+        await prisma.$transaction([
+          prisma.wallet.update({
+            where: { id: buyerWallet.id },
+            data: { balance: { decrement: deal.price } },
+          }),
+          prisma.walletTransaction.create({
+            data: {
+              walletId: buyerWallet.id,
+              type: 'ESCROW_LOCK',
+              amount: deal.price,
+              description: `Escrow locked for: ${quote.rfq?.title || 'RFQ'}`,
+              reference: deal.id,
+            },
+          }),
+          prisma.deal.update({
+            where: { id: deal.id },
+            data: { status: 'ESCROW_LOCKED' },
+          }),
+        ]);
+      }
+    } catch (e) {
+      // Wallet lock failure never blocks the deal — buyer pays via Razorpay checkout
+      console.error('[Deal Select] wallet lock failed (non-fatal):', e instanceof Error ? e.message : e);
+    }
+
     // BOM activation: record quote_accepted for both buyer (selected) and
     // supplier (won the deal). Non-blocking — never fails the deal creation.
     try {
@@ -97,6 +131,28 @@ export async function POST(req: NextRequest) {
       }
     } catch (e) {
       console.error('[Deal Select] life-event failed:', e instanceof Error ? e.message : e);
+    }
+
+    // Phase 2 — Supplier Win Notification
+    // Fire-and-forget: notify the winning supplier via email.
+    // Never blocks deal creation or the buyer response.
+    if (quote.supplierId) {
+      try {
+        const [supplier, rfq] = await Promise.all([
+          prisma.user.findUnique({ where: { id: quote.supplierId }, select: { email: true, name: true } }),
+          prisma.rFQ.findUnique({ where: { id: quote.rfqId! }, select: { title: true, isSeeded: true } }),
+        ]);
+        if (supplier?.email && rfq && !rfq.isSeeded) {
+          const template = quoteAcceptedEmail(
+            supplier.name || 'Supplier',
+            rfq.title,
+            Number(deal.price),
+          );
+          resendService.sendEmail({ to: supplier.email, ...template }).catch(console.error);
+        }
+      } catch (e) {
+        console.error('[Deal Select] supplier notification failed (non-fatal):', e instanceof Error ? e.message : e);
+      }
     }
 
     return NextResponse.json({ success: true, deal }, { status: 201 });

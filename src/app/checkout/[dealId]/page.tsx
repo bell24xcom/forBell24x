@@ -52,8 +52,8 @@ export default function CheckoutPage() {
           window.location.href = `/payment/success?dealId=${dealId}&paymentId=${response.razorpay_payment_id}`;
         },
         prefill: {
-          name: "Buyer Name",
-          email: "buyer@example.com",
+          name: deal?.buyer_name || '',
+          contact: deal?.buyer_phone || '',
         },
         theme: { color: "#4F46E5" },
       };

@@ -1,8 +1,8 @@
 /**
  * Supplier Drip Engine
  * ───────────────────────────────────────────────────────
- * Sends timed WhatsApp nudges to suppliers based on when they were
- * first contacted (outreach_sent timestamp), NOT registration date.
+ * Sends timed nudges (email + WhatsApp link) to suppliers based on when they
+ * were first contacted (outreach_sent timestamp), NOT registration date.
  *
  * Drip schedule (days since outreach_sent):
  *   Day 3:  48–96h after outreach_sent, no profile_completed → complete profile
@@ -25,12 +25,108 @@ export interface DripCandidate {
   name: string;
   company: string | null;
   phone: string;
+  email: string | null;
   category: string;
   dripType: DripType;
   message: string;
   waLink: string;
+  emailSubject: string;
+  emailHtml: string;
   firstContactedAt: Date;
 }
+
+// ─── Email drip templates ────────────────────────────────────────────────────
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.vyaparsethu.com';
+
+const BASE_STYLE = 'font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#ffffff;';
+const HEADER_STYLE = 'background:linear-gradient(135deg,#EA580C,#F97316);padding:20px 24px;text-align:center;';
+const BODY_STYLE = 'padding:28px 24px;background:#f8fafc;';
+const FOOTER_STYLE = 'background:#f1f5f9;padding:16px 24px;text-align:center;color:#64748b;font-size:12px;';
+const CTA_STYLE = 'display:inline-block;background:#F97316;color:#ffffff;padding:14px 32px;text-decoration:none;border-radius:8px;font-weight:bold;font-size:16px;';
+const FOOTER_CONTENT = "VyaparSethu · India's B2B Trade Network<br>Formerly Bell24h | Digitex Studio";
+
+function buildDripEmail(
+  supplier: { name: string | null; company: string | null },
+  category: string,
+  type: DripType,
+): { subject: string; html: string } {
+  const name = supplier.name ?? supplier.company ?? 'there';
+  const companyDisplay = supplier.company || name;
+  const dashboardUrl = `${SITE_URL}/supplier/profile/edit`;
+  const rfqUrl = `${SITE_URL}/supplier/browse-rfqs`;
+  const loginUrl = `${SITE_URL}/dashboard`;
+
+  if (type === 'day3') {
+    return {
+      subject: `Complete your VyaparSethu profile — buyers are searching for ${category}`,
+      html: `
+<div style="${BASE_STYLE}">
+  <div style="${HEADER_STYLE}">
+    <h1 style="color:white;margin:0;font-size:22px;">VyaparSethu</h1>
+    <p style="color:#FED7AA;margin:4px 0 0;font-size:14px;">Your profile needs attention</p>
+  </div>
+  <div style="${BODY_STYLE}">
+    <p style="font-size:16px;color:#1E293B;">Hi ${name},</p>
+    <p style="color:#475569;line-height:1.6;">Your <strong>${companyDisplay}</strong> supplier profile on VyaparSethu is live but incomplete. Buyers searching for <strong>${category}</strong> can see your listing, but an incomplete profile gets 80% fewer quote requests.</p>
+    <p style="color:#475569;line-height:1.6;">It takes under 2 minutes to complete.</p>
+    <div style="text-align:center;margin:28px 0;">
+      <a href="${dashboardUrl}" style="${CTA_STYLE}">Complete My Profile →</a>
+    </div>
+    <p style="color:#94A3B8;font-size:13px;">Questions? Reply to this email — we're a small team and we read every message.</p>
+  </div>
+  <div style="${FOOTER_STYLE}">${FOOTER_CONTENT}</div>
+</div>`,
+    };
+  }
+
+  if (type === 'day7') {
+    return {
+      subject: `Buyers need ${category} quotes — your first quote opportunity`,
+      html: `
+<div style="${BASE_STYLE}">
+  <div style="${HEADER_STYLE}">
+    <h1 style="color:white;margin:0;font-size:22px;">VyaparSethu</h1>
+    <p style="color:#FED7AA;margin:4px 0 0;font-size:14px;">New Quotation Requests</p>
+  </div>
+  <div style="${BODY_STYLE}">
+    <p style="font-size:16px;color:#1E293B;">Hi ${name},</p>
+    <p style="color:#475569;line-height:1.6;">Buyers posted new Quotation Requests in <strong>${category}</strong> this week. Your profile is listed but you haven't submitted any quotes yet.</p>
+    <p style="color:#475569;line-height:1.6;">Suppliers who submit their first quote within 7 days close 3× more deals than those who wait.</p>
+    <div style="text-align:center;margin:28px 0;">
+      <a href="${rfqUrl}" style="${CTA_STYLE}">Browse Quotation Requests →</a>
+    </div>
+    <p style="color:#94A3B8;font-size:13px;">Your Trade Account balance: ₹0. No payment needed to browse or quote.</p>
+  </div>
+  <div style="${FOOTER_STYLE}">${FOOTER_CONTENT}</div>
+</div>`,
+    };
+  }
+
+  // day14 — re-engagement
+  return {
+    subject: `We miss you — ${category} buyers are active on VyaparSethu`,
+    html: `
+<div style="${BASE_STYLE}">
+  <div style="${HEADER_STYLE}">
+    <h1 style="color:white;margin:0;font-size:22px;">VyaparSethu</h1>
+    <p style="color:#FED7AA;margin:4px 0 0;font-size:14px;">Come back — opportunities waiting</p>
+  </div>
+  <div style="${BODY_STYLE}">
+    <p style="font-size:16px;color:#1E293B;">Hi ${name},</p>
+    <p style="color:#475569;line-height:1.6;">It's been two weeks since you joined VyaparSethu. Buyers in <strong>${category}</strong> are posting Quotation Requests every day.</p>
+    <p style="color:#475569;line-height:1.6;">Log in to see what's available — no commitment, no payment required.</p>
+    <div style="text-align:center;margin:28px 0;">
+      <a href="${loginUrl}" style="${CTA_STYLE}">See New Opportunities →</a>
+    </div>
+    <p style="color:#94A3B8;font-size:13px;">If you'd prefer not to receive these emails, simply reply "unsubscribe" and we'll remove you.</p>
+  </div>
+  <div style="${FOOTER_STYLE}">${FOOTER_CONTENT}</div>
+</div>`,
+  };
+}
+
+// ─── WhatsApp message builder ─────────────────────────────────────────────────
 
 function buildDripMessage(
   supplier: { name: string | null; company: string | null },
@@ -40,23 +136,23 @@ function buildDripMessage(
   const name = supplier.name ?? supplier.company ?? 'there';
 
   if (type === 'day3') {
-    return `Hi ${name}! Your Bell24h supplier profile is live but incomplete.
+    return `Hi ${name}! Your VyaparSethu supplier profile is live but incomplete.
 Buyers are searching for ${category} suppliers right now.
-Complete your profile in 2 mins: https://bell24h.com/supplier/profile/edit
-- Bell24h Team`;
+Complete your profile in 2 mins: ${SITE_URL}/supplier/profile/edit
+- VyaparSethu Team`;
   }
 
   if (type === 'day7') {
     return `Hi ${name}, good news! A buyer just posted an RFQ in ${category}.
-Your profile is matched but incomplete — you're missing quotes.
-Browse RFQs now: https://bell24h.com/supplier/browse-rfqs
-- Bell24h Team`;
+Your profile is matched but you haven't quoted yet.
+Browse RFQs now: ${SITE_URL}/supplier/browse-rfqs
+- VyaparSethu Team`;
   }
 
-  return `Hi ${name}, we miss you on Bell24h!
+  return `Hi ${name}, we miss you on VyaparSethu!
 ${category} buyers are active this week.
-Login to see new RFQs: https://bell24h.com/dashboard
-- Bell24h Team`;
+Login to see new RFQs: ${SITE_URL}/dashboard
+- VyaparSethu Team`;
 }
 
 function buildWaLink(phone: string, message: string): string {
@@ -64,6 +160,8 @@ function buildWaLink(phone: string, message: string): string {
   const number = cleaned.startsWith('91') ? cleaned : '91' + cleaned;
   return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
 }
+
+// ─── Main export ─────────────────────────────────────────────────────────────
 
 export async function getDripsDue(): Promise<DripCandidate[]> {
   const now = Date.now();
@@ -119,7 +217,7 @@ export async function getDripsDue(): Promise<DripCandidate[]> {
         isActive: true,
         phone: { not: null },
       },
-      select: { id: true, name: true, company: true, phone: true, lastLoginAt: true, preferences: true },
+      select: { id: true, name: true, company: true, phone: true, email: true, lastLoginAt: true, preferences: true },
     }),
   ]);
 
@@ -144,23 +242,26 @@ export async function getDripsDue(): Promise<DripCandidate[]> {
 
     if (isDay3) {
       if (dripSentSet.has(`${supplierId}:drip_day3_sent`)) continue;
-      // Check if profile is complete (company + phone = claimed)
-      const profileComplete = !!supplier.company;
-      if (profileComplete) continue; // Skip if already complete
+      // Skip if profile is already complete (has description + categories set)
+      const prefs3 = supplier.preferences as Record<string, unknown> | null;
+      const profileComplete = !!(prefs3?.description && Array.isArray(prefs3?.categories) && (prefs3.categories as string[]).length > 0);
+      if (profileComplete) continue;
       const message = buildDripMessage(supplier, category, 'day3');
-      candidates.push({ supplierId, name: supplier.name ?? '', company: supplier.company, phone: supplier.phone, category, dripType: 'day3', message, waLink: buildWaLink(supplier.phone, message), firstContactedAt: contact.createdAt });
+      const { subject, html } = buildDripEmail(supplier, category, 'day3');
+      candidates.push({ supplierId, name: supplier.name ?? '', company: supplier.company, phone: supplier.phone, email: supplier.email ?? null, category, dripType: 'day3', message, waLink: buildWaLink(supplier.phone, message), emailSubject: subject, emailHtml: html, firstContactedAt: contact.createdAt });
     } else if (isDay7) {
       if (dripSentSet.has(`${supplierId}:drip_day7_sent`)) continue;
-      if (hasQuotedSet.has(supplierId)) continue; // Already quoted, skip
+      if (hasQuotedSet.has(supplierId)) continue;
       const message = buildDripMessage(supplier, category, 'day7');
-      candidates.push({ supplierId, name: supplier.name ?? '', company: supplier.company, phone: supplier.phone, category, dripType: 'day7', message, waLink: buildWaLink(supplier.phone, message), firstContactedAt: contact.createdAt });
+      const { subject, html } = buildDripEmail(supplier, category, 'day7');
+      candidates.push({ supplierId, name: supplier.name ?? '', company: supplier.company, phone: supplier.phone, email: supplier.email ?? null, category, dripType: 'day7', message, waLink: buildWaLink(supplier.phone, message), emailSubject: subject, emailHtml: html, firstContactedAt: contact.createdAt });
     } else if (isDay14) {
       if (dripSentSet.has(`${supplierId}:drip_day14_sent`)) continue;
-      // Check if inactive for 14+ days
       const lastLogin = supplier.lastLoginAt;
       if (lastLogin && (now - lastLogin.getTime()) < 14 * 86400000) continue;
       const message = buildDripMessage(supplier, category, 'day14');
-      candidates.push({ supplierId, name: supplier.name ?? '', company: supplier.company, phone: supplier.phone, category, dripType: 'day14', message, waLink: buildWaLink(supplier.phone, message), firstContactedAt: contact.createdAt });
+      const { subject, html } = buildDripEmail(supplier, category, 'day14');
+      candidates.push({ supplierId, name: supplier.name ?? '', company: supplier.company, phone: supplier.phone, email: supplier.email ?? null, category, dripType: 'day14', message, waLink: buildWaLink(supplier.phone, message), emailSubject: subject, emailHtml: html, firstContactedAt: contact.createdAt });
     }
   }
 
@@ -176,7 +277,7 @@ export async function logDripSent(supplierId: string, type: DripType): Promise<v
   await storeInteraction({
     userId: supplierId,
     actionType: actionMap[type],
-    source: 'whatsapp',
+    source: 'email',
     metadata: { dripType: type, sentAt: new Date().toISOString() },
   });
 }

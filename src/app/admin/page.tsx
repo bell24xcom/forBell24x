@@ -2,11 +2,22 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
+interface RecentDeal {
+  id: string;
+  price: number;
+  status: string;
+  rfqTitle: string;
+  buyerName: string;
+  supplierName: string;
+  createdAt: string;
+}
+
 interface Stats {
   users:        { total: number; buyers: number; suppliers: number; newToday: number; newThisWeek: number };
   rfqs:         { total: number; active: number; completed: number; cancelled: number; seeded?: number; real?: number };
   quotes:       { total: number; accepted: number; pending: number };
   transactions: { total: number; completed: number; completedVolume: number };
+  deals?:       { total: number; active: number; escrowLocked: number; recentDeals: RecentDeal[] };
   funnel:       { rfqsCreated: number; quotesSubmitted: number; quotesAccepted: number; dealsCompleted: number; conversionRate: string };
   trust:        { highTrustSuppliers: number };
   plans:        { FREE: number; PRO: number; ENTERPRISE: number };
@@ -189,6 +200,49 @@ export default function AdminDashboard() {
           <StatCard label="GMV (completed)"    value={fmtINR(stats.transactions.completedVolume)} color="amber" />
         </div>
       </div>
+
+      {/* First Transaction Status */}
+      {stats.deals && (
+        <div>
+          <h2 className="text-slate-400 text-xs font-semibold uppercase tracking-wider mb-3">
+            First Transaction Dashboard
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
+            <StatCard label="Deals Created"      value={stats.deals.total}        color="indigo" />
+            <StatCard label="Active (Awaiting Payment)" value={stats.deals.active} color="amber" />
+            <StatCard label="Escrow Locked"      value={stats.deals.escrowLocked} color="green" />
+          </div>
+          {stats.deals.recentDeals.length > 0 && (
+            <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-5">
+              <h3 className="text-slate-200 font-semibold text-sm mb-4">Recent Deals</h3>
+              <div className="space-y-3">
+                {stats.deals.recentDeals.map(d => (
+                  <div key={d.id} className="flex items-center justify-between text-sm py-2 border-b border-slate-700/30 last:border-0 gap-4">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-white font-medium truncate">{d.rfqTitle}</p>
+                      <p className="text-slate-500 text-xs">{d.buyerName} → {d.supplierName}</p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="text-indigo-400 font-bold">₹{Number(d.price).toLocaleString('en-IN')}</p>
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                        d.status === 'ESCROW_LOCKED' ? 'bg-green-900/40 text-green-400' :
+                        d.status === 'ACTIVE'        ? 'bg-amber-900/40 text-amber-400' :
+                                                       'bg-slate-700 text-slate-400'
+                      }`}>{d.status}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {stats.deals.total === 0 && (
+            <div className="bg-slate-800/40 border border-dashed border-slate-600 rounded-xl p-6 text-center">
+              <p className="text-slate-400 text-sm">No deals yet — first transaction pending</p>
+              <p className="text-slate-600 text-xs mt-1">Run the Founder Runbook from Sprint-03 Certification</p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Deal Funnel + Plans + Activity Feed */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

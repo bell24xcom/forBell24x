@@ -87,10 +87,17 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Missing payment verification data' }, { status: 400 });
     }
 
+    // VS-SECURITY-P0-CLOSE-01: runtime null guard — replaces unsafe non-null assertion.
+    const keySecret = process.env.RAZORPAY_KEY_SECRET;
+    if (!keySecret) {
+      console.error('[payment/create-order PUT] RAZORPAY_KEY_SECRET is not configured');
+      return NextResponse.json({ success: false, error: 'Payment gateway not configured' }, { status: 500 });
+    }
+
     // Verify signature
     const body = `${razorpay_order_id}|${razorpay_payment_id}`;
     const expectedSignature = crypto
-      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET!)
+      .createHmac('sha256', keySecret)
       .update(body)
       .digest('hex');
 

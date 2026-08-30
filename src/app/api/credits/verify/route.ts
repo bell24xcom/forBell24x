@@ -7,22 +7,27 @@ export const dynamic = 'force-dynamic';
 
 const prisma = new PrismaClient();
 
-const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET;
-
 export async function POST(req: NextRequest) {
   try {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature, purchaseId } = await req.json();
-    
+
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature || !purchaseId) {
-      return NextResponse.json({ 
-        error: 'Missing required payment verification data' 
+      return NextResponse.json({
+        error: 'Missing required payment verification data'
       }, { status: 400 });
     }
-    
+
+    // VS-SECURITY-P0-CLOSE-01: runtime null guard — replaces unsafe non-null assertion.
+    const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET;
+    if (!RAZORPAY_KEY_SECRET) {
+      console.error('[credits/verify] RAZORPAY_KEY_SECRET is not configured');
+      return NextResponse.json({ error: 'Payment gateway not configured' }, { status: 500 });
+    }
+
     // Verify Razorpay signature
     const body = razorpay_order_id + "|" + razorpay_payment_id;
     const expectedSignature = crypto
-      .createHmac('sha256', RAZORPAY_KEY_SECRET!)
+      .createHmac('sha256', RAZORPAY_KEY_SECRET)
       .update(body.toString())
       .digest('hex');
     

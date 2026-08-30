@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
+import { verifyToken, extractToken } from '@/lib/jwt';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
@@ -39,11 +40,26 @@ async function createRazorpayOrder(amount: number) {
 
 export async function POST(req: NextRequest) {
   try {
-    const { userId, package: pkg } = await req.json();
+    // VS-SECURITY-P0-CLOSE-01: derive userId from authenticated JWT, not request body.
+    const token = extractToken(req.headers.get('authorization'), req.cookies.get('auth-token')?.value);
+    if (!token) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
 
-    if (!userId || !pkg || !packages[pkg]) {
+    let jwtPayload: ReturnType<typeof verifyToken>;
+    try {
+      jwtPayload = verifyToken(token);
+    } catch {
+      return NextResponse.json({ error: 'Invalid or expired session' }, { status: 401 });
+    }
+
+    const userId = jwtPayload.userId;
+
+    const { package: pkg } = await req.json();
+
+    if (!pkg || !packages[pkg]) {
       return NextResponse.json({
-        error: 'Invalid request. userId and valid package required.'
+        error: 'Invalid request. Valid package required.'
       }, { status: 400 });
     }
 

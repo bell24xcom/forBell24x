@@ -46,6 +46,22 @@ export async function POST(req: NextRequest) {
     if (description && description.length > 50) trustBonus += 10;
     if (categories.length >= 2) trustBonus += 5;
 
+    // If the supplier submitted a GST or Udyam number, advance verificationStatus
+    // to GST_PENDING so the admin review queue can pick it up.
+    // If no GST/Udyam submitted, leave verificationStatus unchanged (PHONE_VERIFIED).
+    const hasDocumentSubmission = !!(gstNumber?.trim() || udyamNumber?.trim());
+    const verificationStatusUpdate: Record<string, string> = {};
+    if (hasDocumentSubmission) {
+      // Only advance to GST_PENDING — do NOT overwrite MANUAL_VERIFIED, GST_VERIFIED, or REJECTED
+      const current = await prisma.user.findUnique({
+        where: { id: user.userId },
+        select: { verificationStatus: true },
+      });
+      if (current?.verificationStatus === 'PHONE_VERIFIED') {
+        verificationStatusUpdate.verificationStatus = 'GST_PENDING';
+      }
+    }
+
     const updatedUser = await prisma.user.update({
       where: { id: user.userId },
       data: {
@@ -60,8 +76,9 @@ export async function POST(req: NextRequest) {
         },
         // Role should be SUPPLIER for onboarding
         role: 'SUPPLIER',
+        ...verificationStatusUpdate,
       },
-      select: { id: true, company: true, trustScore: true },
+      select: { id: true, company: true, trustScore: true, verificationStatus: true },
     });
 
     // Cap trust score at 100
@@ -95,6 +112,8 @@ export async function POST(req: NextRequest) {
       success: true,
       message: 'Profile setup complete',
       trustScore: Math.min(updatedUser.trustScore, 100),
+      verificationStatus: updatedUser.verificationStatus,
+      pendingVerification: updatedUser.verificationStatus === 'GST_PENDING',
     });
   } catch (error) {
     console.error('Onboarding error:', error);

@@ -28,6 +28,7 @@ export async function GET(
         rfq: { select: { title: true } },
         quote: { select: { deliveryDays: true, timeline: true } },
         supplier: { select: { name: true, company: true } },
+        buyer: { select: { name: true, phone: true } },
       },
     });
 
@@ -50,6 +51,10 @@ export async function GET(
         rfq_title: deal.rfq.title,
         supplier_name: deal.supplier?.company || deal.supplier?.name || 'Supplier',
         status: deal.status,
+        buyer_name: deal.buyer?.name ?? null,
+        // Phone used as contact identifier; email is the generated placeholder
+        // (phone@bell24h.com pattern). Neither is sensitive for Razorpay prefill.
+        buyer_phone: deal.buyer?.phone ?? null,
       },
     });
   } catch (error) {

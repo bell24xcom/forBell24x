@@ -27,10 +27,11 @@ export async function GET(request: NextRequest) {
 
     const supplierId = payload.userId;
 
-    // Fetch public, open RFQs
+    // Fetch public, open RFQs — exclude seeded/demo content
     const rfqs = await prisma.rFQ.findMany({
       where: {
         isPublic: true,
+        isSeeded: false,
         status: { in: ['OPEN', 'ACTIVE'] },
         NOT: { createdBy: supplierId }, // Don't show supplier's own RFQs
       },
