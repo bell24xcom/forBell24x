@@ -3,16 +3,31 @@ import Razorpay from 'razorpay';
 
 export const dynamic = 'force-dynamic';
 
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID!,
-  key_secret: process.env.RAZORPAY_KEY_SECRET!,
-});
+// Constructed lazily, inside the handler — NOT at module scope. Next.js
+// evaluates route modules during `next build`'s page-data-collection step;
+// a top-level `new Razorpay(...)` with a missing key throws at build time,
+// not just at request time, and fails the whole build (confirmed: this is
+// exactly what broke the fix/admin-audit-phase1-4 Vercel build — "Error:
+// `key_id` or `oauthToken` is mandatory" during "Collecting page data").
+// Every other Razorpay call site in this codebase already does it this way
+// (see src/app/api/payment/create-order/route.ts, .../subscribe/route.ts).
+function getRazorpay(): Razorpay | null {
+  const key_id = process.env.RAZORPAY_KEY_ID;
+  const key_secret = process.env.RAZORPAY_KEY_SECRET;
+  if (!key_id || !key_secret) return null;
+  return new Razorpay({ key_id, key_secret });
+}
 
 export async function POST(req: NextRequest) {
   const INSFORGE_URL = process.env.INSFORGE_URL;
   const INSFORGE_API_KEY = process.env.INSFORGE_API_KEY;
 
   try {
+    const razorpay = getRazorpay();
+    if (!razorpay) {
+      return NextResponse.json({ error: 'Razorpay is not configured' }, { status: 500 });
+    }
+
     const { dealId } = await req.json();
 
     // 1. Fetch Deal from InsForge
