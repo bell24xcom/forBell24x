@@ -343,6 +343,21 @@ export default function RFQDetailPage() {
               {/* Right: Buyer Info */}
               <div className="bg-slate-700/30 rounded-xl p-5 border border-slate-700/50">
                 <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Buyer Information</p>
+                {/* Trust indicators — SPRINT-STDV-01 P3 */}
+                {(rfq.isSeeded || rfq.verifiedBuyer) && (
+                  <div className="flex items-center gap-2 mb-3 flex-wrap">
+                    {rfq.isSeeded && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-slate-700/60 text-slate-300 text-xs font-medium rounded-full border border-slate-600">
+                        🧪 Demo RFQ
+                      </span>
+                    )}
+                    {rfq.verifiedBuyer && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-900/40 text-green-300 text-xs font-medium rounded-full border border-green-700/50">
+                        ✓ Verified Buyer
+                      </span>
+                    )}
+                  </div>
+                )}
                 {rfq.user?.name || rfq.user?.company ? (
                   <div className="space-y-3">
                     {rfq.user?.company && (
@@ -367,7 +382,7 @@ export default function RFQDetailPage() {
                 ) : (
                   <div className="flex items-center gap-2 text-slate-500 text-sm">
                     <CheckCircle size={16} className="text-green-500" />
-                    <span>Posted by VyaparSethu Marketplace</span>
+                    <span>Posted by VyaparSethu Trade Network</span>
                   </div>
                 )}
               </div>
@@ -531,6 +546,12 @@ export default function RFQDetailPage() {
                 </div>
                 <p className="text-slate-500 text-sm mt-1">Quote for: <span className="font-medium text-slate-400">{rfq.title}</span></p>
               </div>
+
+              {rfq.isSeeded && (
+                <div className="mx-6 mt-4 flex items-center gap-2 px-3 py-2 bg-amber-50 border border-amber-300 rounded-lg text-amber-800 text-sm">
+                  ⚠️ This is a demo RFQ for testing purposes. Your quote will not reach a real buyer.
+                </div>
+              )}
 
               <div className="p-6 space-y-6">
                 {/* Required Fields */}

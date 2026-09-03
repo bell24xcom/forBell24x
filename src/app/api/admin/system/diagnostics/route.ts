@@ -75,6 +75,10 @@ function scoreColor(score: number): 'green' | 'amber' | 'red' {
   return score >= 80 ? 'green' : score >= 50 ? 'amber' : 'red';
 }
 
+function describeError(err: unknown): string {
+  return err instanceof Error ? err.message : 'Unknown error';
+}
+
 export async function GET(request: NextRequest) {
   const auth = requireAdmin(request);
   if (isErrorResponse(auth)) return auth;
@@ -102,49 +106,75 @@ export async function GET(request: NextRequest) {
   let recordedEventTypes: string[] = [];
   let lastEventAt: string | null = null;
 
+  // Per-metric errors — one failing count must never blank the others.
+  // Populated only for metrics that actually failed; absent (not present as a
+  // key) for anything that succeeded. Additive to the response — existing
+  // consumers reading `health.counts`/`health.bom` are unaffected.
+  const countErrors: Record<string, string> = {};
+
   if (present('DATABASE_URL')) {
+    // Connectivity probe stays isolated from the metric queries below: if
+    // this fails, dbConnected/dbError reflect a real DB-down state and none
+    // of the metric queries below are attempted. If this succeeds but an
+    // individual metric query later fails, dbConnected stays true (the DB is
+    // reachable — only that one metric had a problem) and the failure is
+    // recorded per-key in countErrors instead of wiping every count.
     try {
       const t0 = Date.now();
       await prisma.$queryRaw`SELECT 1`;
       dbLatency = Date.now() - t0;
       dbConnected = true;
+    } catch (err) {
+      dbError = describeError(err);
+    }
 
-      const [
-        users,
-        verifiedSuppliers,
-        rfqs,
-        rfqMemory,
-        quoteMemory,
-        deals,
-        lifeEvents,
-        marketInsights,
-        distinctTypes,
-        latestEvent,
-      ] = await Promise.all([
-        prisma.user.count(),
-        prisma.user.count({ where: { role: 'SUPPLIER', isVerified: true } }),
-        prisma.rFQ.count(),
-        prisma.rfqMemory.count(),
-        prisma.quoteMemory.count(),
-        prisma.deal.count(),
-        prisma.businessLifeEvent.count(),
-        prisma.marketInsight.count(),
-        prisma.businessLifeEvent.findMany({ distinct: ['eventType'], select: { eventType: true } }),
-        prisma.businessLifeEvent.findFirst({ orderBy: { createdAt: 'desc' }, select: { createdAt: true } }),
+    if (dbConnected) {
+      const metricQueries: Array<{ key: keyof typeof counts; run: () => Promise<number> }> = [
+        { key: 'users', run: () => prisma.user.count() },
+        { key: 'verifiedSuppliers', run: () => prisma.user.count({ where: { role: 'SUPPLIER', isVerified: true } }) },
+        { key: 'rfqs', run: () => prisma.rFQ.count() },
+        { key: 'rfqMemory', run: () => prisma.rfqMemory.count() },
+        { key: 'quoteMemory', run: () => prisma.quoteMemory.count() },
+        { key: 'deals', run: () => prisma.deal.count() },
+        { key: 'lifeEvents', run: () => prisma.businessLifeEvent.count() },
+        { key: 'marketInsights', run: () => prisma.marketInsight.count() },
+      ];
+
+      const [countResults, eventCoverageResult, lastEventResult] = await Promise.all([
+        Promise.allSettled(metricQueries.map((m) => m.run())),
+        Promise.allSettled([
+          prisma.businessLifeEvent.findMany({ distinct: ['eventType'], select: { eventType: true } }),
+        ]),
+        Promise.allSettled([
+          prisma.businessLifeEvent.findFirst({ orderBy: { createdAt: 'desc' }, select: { createdAt: true } }),
+        ]),
       ]);
 
-      counts.users = users;
-      counts.verifiedSuppliers = verifiedSuppliers;
-      counts.rfqs = rfqs;
-      counts.rfqMemory = rfqMemory;
-      counts.quoteMemory = quoteMemory;
-      counts.deals = deals;
-      counts.lifeEvents = lifeEvents;
-      counts.marketInsights = marketInsights;
-      recordedEventTypes = distinctTypes.map((d) => d.eventType);
-      lastEventAt = latestEvent?.createdAt.toISOString() ?? null;
-    } catch (err) {
-      dbError = err instanceof Error ? err.message : 'Unknown DB error';
+      countResults.forEach((result, i) => {
+        const { key } = metricQueries[i];
+        if (result.status === 'fulfilled') {
+          counts[key] = result.value;
+        } else {
+          countErrors[key] = describeError(result.reason);
+          console.error(`[System Diagnostics] count query failed for "${key}":`, result.reason);
+        }
+      });
+
+      const [eventCoverageSettled] = eventCoverageResult;
+      if (eventCoverageSettled.status === 'fulfilled') {
+        recordedEventTypes = eventCoverageSettled.value.map((d) => d.eventType);
+      } else {
+        countErrors.eventCoverage = describeError(eventCoverageSettled.reason);
+        console.error('[System Diagnostics] eventType coverage query failed:', eventCoverageSettled.reason);
+      }
+
+      const [lastEventSettled] = lastEventResult;
+      if (lastEventSettled.status === 'fulfilled') {
+        lastEventAt = lastEventSettled.value?.createdAt.toISOString() ?? null;
+      } else {
+        countErrors.lastEventAt = describeError(lastEventSettled.reason);
+        console.error('[System Diagnostics] latest event query failed:', lastEventSettled.reason);
+      }
     }
   } else {
     dbError = 'DATABASE_URL not set';
@@ -204,6 +234,14 @@ export async function GET(request: NextRequest) {
     health: {
       database: { connected: dbConnected, latencyMs: dbLatency, error: dbError },
       counts,
+      // Additive — existing consumers reading only `counts`/`bom` are
+      // unaffected. `degraded` is true when the DB is reachable but one or
+      // more individual metrics failed (see Finding 5,
+      // docs/audits/VS-ADMIN-PRODUCTION-AUDIT-FIX-01.md): lets the UI (and
+      // anyone reading this JSON directly) tell "really zero" apart from
+      // "that one query failed" instead of both looking identical.
+      degraded: Object.keys(countErrors).length > 0,
+      countErrors,
       bom: {
         totalEvents: counts.lifeEvents,
         lastEventAt,

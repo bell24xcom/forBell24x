@@ -35,6 +35,10 @@ interface Diagnostics {
   health: {
     database: { connected: boolean; latencyMs: number | null; error: string | null };
     counts: Record<string, number>;
+    // Optional — older API responses won't have these; a failed individual
+    // metric now degrades gracefully instead of blanking every count.
+    degraded?: boolean;
+    countErrors?: Record<string, string>;
     bom: {
       totalEvents: number;
       lastEventAt: string | null;
@@ -279,7 +283,7 @@ function EnvironmentTab({ data }: { data: Diagnostics }) {
 }
 
 function HealthTab({ data }: { data: Diagnostics }) {
-  const { database, counts, bom } = data.health;
+  const { database, counts, bom, countErrors } = data.health;
   const countEntries: [string, string][] = [
     ['users', 'Users'],
     ['verifiedSuppliers', 'Verified Suppliers'],
@@ -311,14 +315,27 @@ function HealthTab({ data }: { data: Diagnostics }) {
         )}
       </div>
 
-      {/* Counts */}
+      {/* Counts — a failed individual metric shows "—" with a tooltip
+          instead of silently rendering as "0" (indistinguishable from a
+          real zero); every other metric is unaffected. */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {countEntries.map(([key, label]) => (
-          <div key={key} className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-3 text-center">
-            <div className="text-2xl font-bold text-white">{counts[key] ?? 0}</div>
-            <div className="text-slate-500 text-xs mt-1">{label}</div>
-          </div>
-        ))}
+        {countEntries.map(([key, label]) => {
+          const failed = countErrors?.[key];
+          return (
+            <div key={key} className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-3 text-center">
+              <div
+                className={`text-2xl font-bold ${failed ? 'text-amber-400' : 'text-white'}`}
+                title={failed ? `Failed to load: ${failed}` : undefined}
+              >
+                {failed ? '—' : counts[key] ?? 0}
+              </div>
+              <div className="text-slate-500 text-xs mt-1 flex items-center justify-center gap-1">
+                {label}
+                {failed && <AlertCircle className="w-3 h-3 text-amber-400" />}
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       {/* BOM coverage */}

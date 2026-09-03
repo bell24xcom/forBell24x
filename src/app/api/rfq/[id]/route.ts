@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getVerifiedBuyerIds } from '@/src/lib/rfq/trustBadges';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,7 +23,7 @@ export async function GET(request: NextRequest) {
       },
       include: {
         user: {
-          select: { name: true, company: true, location: true },
+          select: { id: true, name: true, company: true, location: true },
         },
       },
     });
@@ -38,25 +39,31 @@ export async function GET(request: NextRequest) {
       data: { views: { increment: 1 } },
     }).catch(() => {});
 
+    // Real, human-reviewed verification — see src/lib/rfq/trustBadges.ts for
+    // why this isn't user.isVerified.
+    const verifiedIds = rfq.user ? await getVerifiedBuyerIds([rfq.user.id]) : new Set<string>();
+
     return NextResponse.json({
       success: true,
       rfq: {
-        id:          rfq.id,
-        slug:        rfq.slug,
-        title:       rfq.title,
-        category:    rfq.category,
-        description: rfq.description,
-        quantity:    rfq.quantity,
-        unit:        rfq.unit,
-        maxBudget:   rfq.maxBudget,
-        timeline:    rfq.timeline,
-        urgency:     rfq.urgency,
-        location:    rfq.location,
-        createdAt:   rfq.createdAt,
-        views:       rfq.views,
-        status:      rfq.status,
-        createdBy:   rfq.createdBy,
-        user:        rfq.user,
+        id:           rfq.id,
+        slug:         rfq.slug,
+        title:        rfq.title,
+        category:     rfq.category,
+        description:  rfq.description,
+        quantity:     rfq.quantity,
+        unit:         rfq.unit,
+        maxBudget:    rfq.maxBudget,
+        timeline:     rfq.timeline,
+        urgency:      rfq.urgency,
+        location:     rfq.location,
+        createdAt:    rfq.createdAt,
+        views:        rfq.views,
+        status:       rfq.status,
+        createdBy:    rfq.createdBy,
+        user:         rfq.user,
+        isSeeded:     rfq.isSeeded,
+        verifiedBuyer: rfq.user ? verifiedIds.has(rfq.user.id) : false,
       },
     });
   } catch (error) {
