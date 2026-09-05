@@ -37,6 +37,7 @@ const NAV: NavItem[] = [
   { href: '/admin/directories/submit', label: 'Crunchbase / G2', icon: '⭐' },
   { href: '/admin/directories',      label: 'Directories',      icon: '🔗' },
   { href: '/admin/outreach',         label: 'WhatsApp Outreach', icon: '📢' },
+  { href: '/admin/whatsapp-cloud-api', label: 'WhatsApp Cloud API (Meta)', icon: '🟢' },
   { href: '/admin/control-panel',    label: 'Control Panel',    icon: '⚙️' },
   { href: '/admin/feature-flags',    label: 'Feature Flags',    icon: '🚩' },
   // System
