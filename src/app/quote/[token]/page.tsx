@@ -21,16 +21,24 @@ export default function PublicQuotePage() {
   });
 
   useEffect(() => {
-    try {
-      const token = params.token as string;
-      if (!token) throw new Error('Invalid Link');
-      
-      // Basic decoding (In production, use JWT verification)
-      const decoded = JSON.parse(atob(token));
-      setContext(decoded);
-    } catch (err) {
+    const token = params.token as string;
+    if (!token) {
       setError('Invalid or expired quote link.');
+      return;
     }
+
+    // Verification is server-side only — this page never decodes the token
+    // itself, it only trusts what /api/quote/verify returns.
+    fetch(`/api/quote/verify?token=${encodeURIComponent(token)}`)
+      .then(res => res.json().then(data => ({ ok: res.ok, data })))
+      .then(({ ok, data }) => {
+        if (!ok || !data.success) {
+          setError('Invalid or expired quote link.');
+          return;
+        }
+        setContext({ rfq_id: data.rfqId, supplier_id: data.supplierId });
+      })
+      .catch(() => setError('Invalid or expired quote link.'));
   }, [params.token]);
 
   const handleSubmit = async (e: React.FormEvent) => {
