@@ -136,19 +136,22 @@ export default function VoiceRFQFeaturePage() {
             </div>
           </div>
 
-          {/* Visual — honest placeholder: no dedicated demo asset exists yet
-              (checked public/ and src/components for one). Uses the same
-              icon set as the rest of the page rather than a fabricated
-              screenshot or video. */}
-          <div className="mb-14 bg-slate-800/30 border border-slate-700/50 rounded-2xl p-10 flex items-center justify-center gap-6" aria-hidden="true">
-            <div className="w-16 h-16 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/30 flex items-center justify-center">
-              <Mic className="w-7 h-7 text-[#D4AF37]" />
-            </div>
-            <div className="flex items-end gap-1 h-10">
-              {[6, 14, 22, 14, 8, 18, 10].map((h, i) => (
-                <span key={i} className="w-1.5 rounded-full bg-[#D4AF37]/40" style={{ height: `${h * 2}px` }} />
-              ))}
-            </div>
+          {/* Visual — H6-11B: real product demo clip added to public/voice-rfq-demo.mp4
+              (branded Speak Requirement walkthrough, ~10s, 1280x720, re-encoded to ~1.5MB).
+              Not autoplayed per the page's own performance rule — poster + native
+              controls, preload="none", so it costs nothing until a visitor clicks play. */}
+          <div className="mb-14 rounded-2xl overflow-hidden border border-slate-700/50 bg-slate-900">
+            <video
+              src="/voice-rfq-demo.mp4"
+              poster="/voice-rfq-demo-poster.jpg"
+              controls
+              preload="none"
+              playsInline
+              className="w-full aspect-video object-cover"
+              aria-label="VyaparSethu Voice RFQ product demo"
+            >
+              Your browser does not support embedded video.
+            </video>
           </div>
 
           {/* How it works */}

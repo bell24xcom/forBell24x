@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { authLogger } from '@/lib/logger';
 import { errorLogger } from '@/lib/errorLogger';
+import { logProviderFailure } from '@/lib/providerFailure';
 
 export const dynamic = 'force-dynamic';
 
@@ -79,6 +80,13 @@ export async function POST(request: NextRequest) {
 
       if (!smsResult.success) {
               authLogger.error('MSG91 send failed', { phone: `${phone.slice(0, 5)}*****`, error: smsResult.error });
+              // Fire-and-forget — never awaited, never blocks/slows this request.
+              logProviderFailure({
+                        provider: 'msg91',
+                        endpoint: 'https://api.msg91.com/api/v5/otp',
+                        errorMessage: smsResult.error || 'Unknown MSG91 error',
+                        recipient: phone,
+              }).catch(() => {});
               return NextResponse.json(
                 {
                             success: false,

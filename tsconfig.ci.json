@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "next-env.d.ts",
+    "src/lib/outreach/**/*.ts",
+    "src/lib/prisma.ts"
+  ],
+  "exclude": ["node_modules", "**/*.test.ts"]
+}

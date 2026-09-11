@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyToken } from '@/lib/jwt';
-import { checkDailyLimit } from '@/lib/orchestration';
+import { checkDailyLimit, onRFQCreated } from '@/lib/orchestration';
 import { storeRFQ, extractRFQMeta } from '@/lib/memory-engine';
 import { agentZero } from '@/lib/agents/agent-zero';
 import { logEvent } from '@/lib/log-event';
@@ -103,6 +103,27 @@ export async function POST(request: NextRequest) {
     }
 
     logEvent({ type: 'rfq_created', meta: { rfqId: savedRFQ.id, category: savedRFQ.category, via: 'voice' } });
+
+    // Same orchestration path as text RFQ: match + notify suppliers.
+    try {
+      const buyer = await prisma.user.findUnique({
+        where: { id: payload.userId },
+        select: { id: true, name: true, email: true },
+      });
+      if (buyer) {
+        await onRFQCreated(
+          {
+            id: savedRFQ.id,
+            title: savedRFQ.title,
+            category: savedRFQ.category,
+            location: savedRFQ.location,
+          },
+          buyer,
+        );
+      }
+    } catch (orchErr) {
+      console.error('[VoiceRFQ] onRFQCreated failed:', orchErr);
+    }
 
     // Trigger Agent Zero (fire-and-forget)
     agentZero({

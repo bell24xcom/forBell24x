@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { resolveClaimTarget } from '@/src/lib/outreach/resolveClaimTarget';
+import { logProviderFailure } from '@/lib/providerFailure';
 
 export const dynamic = 'force-dynamic';
 
@@ -50,19 +52,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, message: 'Valid 10-digit phone required' }, { status: 400 });
     }
 
-    // Look up supplier by claim token
-    const supplier = await prisma.user.findUnique({
-      where: { claimToken: token },
-      select: { id: true, company: true, name: true, isClaimed: true, phone: true },
-    });
+    // H6-13: resolves both the new signed-invitation token format and the
+    // legacy bare-UUID users.claim_token format (H6-12 baseline, unchanged).
+    const target = await resolveClaimTarget(token);
 
-    if (!supplier) {
+    if (!target) {
       return NextResponse.json({ success: false, message: 'Invalid or expired claim link' }, { status: 404 });
     }
 
-    if (supplier.isClaimed) {
+    if (target.isClaimed) {
       return NextResponse.json({ success: false, message: 'This profile has already been claimed' }, { status: 409 });
     }
+
+    const supplier = { id: target.companyId, company: target.company, name: target.name };
 
     // Generate 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -78,7 +80,20 @@ export async function POST(request: NextRequest) {
     const pilotMode = process.env.PILOT_OTP_IN_RESPONSE === 'true';
 
     if (!isDev && !pilotMode) {
-      await sendOtpViaMSG91(phone, otp);
+      const smsResult = await sendOtpViaMSG91(phone, otp);
+      if (!smsResult.success) {
+        // Fire-and-forget — never awaited, never blocks/slows this request.
+        logProviderFailure({
+          provider: 'msg91',
+          endpoint: 'https://api.msg91.com/api/v5/otp',
+          errorMessage: smsResult.error || 'Unknown MSG91 error',
+          recipient: phone,
+        }).catch(() => {});
+        return NextResponse.json(
+          { success: false, message: 'Unable to send OTP SMS. Please try again or contact support.' },
+          { status: 500 }
+        );
+      }
     }
 
     return NextResponse.json({

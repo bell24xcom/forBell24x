@@ -3,13 +3,22 @@ import Link from 'next/link';
 import { SITE_URL } from '@/lib/site-url';
 
 export const metadata: Metadata = {
-  title: 'Founding Supplier Programme | VyaparSethu',
+  // `absolute` — this string already ends in "| VyaparSethu"; without it the
+  // root layout's `template: '%s | VyaparSethu'` appends the suffix a
+  // second time (same fix already applied to /voice-rfq and /learn — see
+  // SEO-01/SEO-02).
+  title: { absolute: 'Founding Supplier Programme | VyaparSethu' },
   description: 'Join VyaparSethu as one of our first 100 verified suppliers. Free profile, priority placement, and permanent Founding Member badge. Limited to 100 suppliers.',
   openGraph: {
     title: 'Founding Supplier Programme | VyaparSethu',
     description: 'Free forever. Priority listing. Permanent Founding Member badge. Limited to 100 suppliers.',
     url: `${SITE_URL}/founding-suppliers`,
     siteName: 'VyaparSethu',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Founding Supplier Programme | VyaparSethu',
+    description: 'Free forever. Priority listing. Permanent Founding Member badge. Limited to 100 suppliers.',
   },
   alternates: { canonical: `${SITE_URL}/founding-suppliers` },
 };

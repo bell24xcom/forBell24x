@@ -1,11 +1,18 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { SITE_URL } from '@/lib/site-url';
+import { faqPageSchema, breadcrumbSchema } from '@/src/lib/schema/faq-schema';
 
 export const metadata: Metadata = {
   title: 'FAQ — VyaparSethu B2B Trade Network India',
   description: 'Answers to the most common questions about VyaparSethu: how Protected Payment works, supplier verification, Trade Confidence Score, GST compliance, and how to post a Requirement.',
   keywords: ['VyaparSethu FAQ', 'B2B marketplace India FAQ', 'protected payment India', 'supplier verification India', 'how to find suppliers India'],
   openGraph: { title: 'Frequently Asked Questions — VyaparSethu', description: 'Everything you need to know about sourcing safely on VyaparSethu.', url: 'https://www.vyaparsethu.com/faq', siteName: 'VyaparSethu' },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Frequently Asked Questions — VyaparSethu',
+    description: 'Everything you need to know about sourcing safely on VyaparSethu.',
+  },
   alternates: { canonical: 'https://www.vyaparsethu.com/faq' },
 };
 
@@ -28,7 +35,7 @@ const FAQS = [
   },
   {
     q: 'What is the Trade Confidence Score™?',
-    a: 'The Trade Confidence Score (0–100) measures how reliable a buyer or supplier is. It\'s calculated from 6 factors: Payment History (30%), On-time Delivery (20%), Response Speed (15%), Repeat Orders (15%), Dispute Rate (10%), and Verification Strength (10%). Scores are updated daily at 2 AM IST using a rolling 90-day window.',
+    a: 'The Trade Confidence Score (0–100) measures how reliable a buyer or supplier is. It\'s calculated from 6 factors: Payment History (30%), On-time Delivery (20%), Response Speed (15%), Repeat Orders (15%), Dispute Rate (10%), and Verification Strength (10%).',
   },
   {
     q: 'What categories does VyaparSethu cover?',
@@ -36,15 +43,15 @@ const FAQS = [
   },
   {
     q: 'How do I post a Requirement (RFQ)?',
-    a: 'There are 3 ways: (1) Speak Requirement — tap the microphone and speak your requirement in Hindi or English; AI transcribes and extracts specifications in 3 seconds. (2) Video Requirement — upload a video explaining your need. (3) Text Requirement — fill in the form with category, quantity, grade, timeline, and delivery location. All 3 are free.',
+    a: 'There are 3 ways: (1) Speak Requirement — tap the microphone and speak your requirement in Hindi or English; AI transcribes what you say and extracts structured specifications for you to review before posting. (2) Video Requirement — upload a video explaining your need. (3) Text Requirement — fill in the form with category, quantity, grade, timeline, and delivery location. All 3 are free.',
   },
   {
     q: 'How quickly do suppliers respond?',
-    a: 'Average time to first quotation on VyaparSethu is under 4 hours. 73% of Requirements receive at least 3 quotations within 24 hours. Urgent Requirements (marked HIGH priority) are also sent as WhatsApp alerts to relevant verified suppliers immediately.',
+    a: 'Verified suppliers in your category can quote as soon as your Requirement is posted. VyaparSethu is built for fast quotation turnaround — you can post a Requirement and start receiving quotations from verified suppliers without waiting on a directory listing or a cold outreach message.',
   },
   {
     q: 'What is the Speak Requirement (Voice RFQ) feature?',
-    a: 'Speak Requirement lets you post a sourcing requirement by speaking — in Hindi, English, or Hinglish. VyaparSethu uses Groq Whisper v3 for transcription and AI to extract category, quantity, grade, location, and timeline. Average time to post: 87 seconds. Works even on slow 4G connections.',
+    a: 'Speak Requirement lets you post a sourcing requirement by speaking — in Hindi, English, or Hinglish. VyaparSethu uses Groq Whisper v3 for transcription and AI to extract category, quantity, grade, location, and timeline. It works over a standard mobile data connection.',
   },
   {
     q: 'How do I become a Verified Supplier on VyaparSethu?',
@@ -73,19 +80,21 @@ const FAQS = [
 ];
 
 export default function FAQPage() {
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: FAQS.map(f => ({
-      '@type': 'Question',
-      name: f.q,
-      acceptedAnswer: { '@type': 'Answer', text: f.a },
-    })),
-  };
+  // SEO-02: FAQPage JSON-LD now built via the shared faqPageSchema() helper
+  // (src/lib/schema/faq-schema.ts) from this page's own FAQS array — the
+  // shared module's voiceRFQFAQ content is a different page's Q&A and is
+  // intentionally not imported here (would no longer match this page's
+  // visible content).
+  const jsonLd = faqPageSchema(FAQS);
+  const breadcrumbLd = breadcrumbSchema([
+    { name: 'Home', url: SITE_URL },
+    { name: 'FAQ', url: `${SITE_URL}/faq` },
+  ]);
 
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
       <div className="min-h-screen bg-[#0F172A]">
         <div className="max-w-3xl mx-auto px-4 py-14">
 

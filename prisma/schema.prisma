@@ -59,6 +59,10 @@ model User {
   companyDnaProfile    CompanyDnaProfile?
   lifeEvents           BusinessLifeEvent[] @relation("CompanyLifeEvents")
   lifeEventsAsActor    BusinessLifeEvent[] @relation("ActorLifeEvents")
+  // H6-13 — Company Profile Claim Outreach
+  outreachRecipient    OutreachRecipient[]
+  claimInvitations     ClaimInvitation[]
+  outreachSuppressions OutreachSuppression[]
 
   @@map("users")
 }
@@ -355,6 +359,24 @@ model ErrorLog {
   createdAt DateTime @default(now())
 
   @@map("error_logs")
+}
+
+/// Third-party provider send failures (MSG91 SMS/OTP today; any future
+/// synchronous provider call can reuse this — deliberately separate from
+/// ErrorLog, which is for our own thrown exceptions, not a provider
+/// rejecting/failing a request). Written + alerted via lib/providerFailure.ts.
+model ProviderFailure {
+  id               String   @id @default(cuid())
+  provider         String
+  endpoint         String
+  errorCode        String?  @map("error_code")
+  errorMessage     String   @map("error_message")
+  // Last 4 digits only — never store the full phone/email here.
+  phoneOrRecipient String?  @map("phone_or_recipient")
+  createdAt        DateTime @default(now())
+
+  @@index([provider, createdAt])
+  @@map("provider_failures")
 }
 
 model FeatureFlag {
@@ -831,4 +853,152 @@ enum NotificationType {
   DEAL_CONFIRMED
   TRANSACTION_UPDATE
   SYSTEM_ALERT
+}
+
+// ─── H6-13 — Company Profile Claim Outreach ────────────────────────────────
+// "Company" = an existing `User` row (role SUPPLIER, isClaimed: false) —
+// there is no separate Company/Business model; this sprint deliberately
+// does not introduce one. Live sending stays gated behind OutreachCampaign
+// .status = LIVE; DRAFT/DRY_RUN/READY never reach a transport provider.
+
+enum OutreachCampaignStatus {
+  DRAFT
+  DRY_RUN
+  READY
+  LIVE
+  PAUSED
+  COMPLETED
+  CANCELLED
+}
+
+enum OutreachChannel {
+  WHATSAPP
+  EMAIL
+  SMS
+}
+
+enum OutreachRecipientState {
+  PENDING
+  ELIGIBLE
+  SUPPRESSED
+  DRY_RUN
+  QUEUED
+  SENT
+  DELIVERED
+  FAILED
+  CLAIMED
+  SKIPPED
+}
+
+enum SuppressionReason {
+  OPT_OUT
+  BOUNCED
+  CLAIMED
+  INELIGIBLE
+}
+
+enum ClaimInvitationStatus {
+  ISSUED
+  VIEWED
+  CLAIMED
+  EXPIRED
+  REVOKED
+}
+
+model OutreachCampaign {
+  id               String                 @id @default(cuid())
+  name             String
+  description      String?
+  campaignType     String                 @default("company_claim") @map("campaign_type")
+  channel          OutreachChannel
+  status           OutreachCampaignStatus @default(DRAFT)
+  messageTemplate  String?                @map("message_template")
+  createdBy        String                 @map("created_by")
+  createdAt        DateTime               @default(now()) @map("created_at")
+  updatedAt        DateTime               @updatedAt @map("updated_at")
+  promotedToLiveAt DateTime?              @map("promoted_to_live_at")
+  promotedToLiveBy String?                @map("promoted_to_live_by")
+  pausedAt         DateTime?              @map("paused_at")
+  cancelledAt      DateTime?              @map("cancelled_at")
+  // Most recent dry-run's aggregate result — surfaced in Admin before
+  // allowing promotion to READY. Re-running dry-run overwrites this.
+  lastDryRunAt     DateTime?              @map("last_dry_run_at")
+  dryRunSummary    Json?                  @map("dry_run_summary")
+
+  recipients       OutreachRecipient[]
+  invitations      ClaimInvitation[]
+
+  @@index([status])
+  @@map("outreach_campaigns")
+}
+
+model OutreachRecipient {
+  id                 String                  @id @default(cuid())
+  campaignId         String                  @map("campaign_id")
+  campaign           OutreachCampaign        @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  companyId          String                  @map("company_id")
+  company            User                    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  channel            OutreachChannel
+  destination        String?
+  state              OutreachRecipientState  @default(PENDING)
+  eligibilityReason  String?                 @map("eligibility_reason")
+  providerMessageId  String?                 @map("provider_message_id")
+  failureReason      String?                 @map("failure_reason")
+  claimInvitationId  String?                 @unique @map("claim_invitation_id")
+  claimInvitation    ClaimInvitation?        @relation(fields: [claimInvitationId], references: [id])
+  createdAt          DateTime                @default(now()) @map("created_at")
+  updatedAt          DateTime                @updatedAt @map("updated_at")
+  queuedAt           DateTime?               @map("queued_at")
+  sentAt             DateTime?               @map("sent_at")
+  deliveredAt        DateTime?               @map("delivered_at")
+  failedAt           DateTime?               @map("failed_at")
+  claimedAt          DateTime?               @map("claimed_at")
+
+  @@unique([campaignId, companyId])
+  @@index([companyId])
+  @@index([state])
+  @@map("outreach_recipients")
+}
+
+// First-class suppression — checked before invitation generation, before
+// dry-run WOULD_SEND classification, and before any live send. Integrates
+// with (does not replace) the existing `OutreachConsentLog.optOutAt`
+// mechanism: the eligibility engine treats either signal as suppressing.
+model OutreachSuppression {
+  id          String              @id @default(cuid())
+  companyId   String?             @map("company_id")
+  company     User?               @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  destination String?
+  channel     OutreachChannel?
+  reason      SuppressionReason
+  source      String
+  createdAt   DateTime            @default(now()) @map("created_at")
+  createdBy   String?             @map("created_by")
+
+  @@index([companyId])
+  @@index([destination])
+  @@map("outreach_suppressions")
+}
+
+// The raw token is never persisted — it is a self-verifying signed JWT
+// (see src/lib/outreach/claimToken.ts) carrying this row's id. The DB
+// remains authoritative at redemption time regardless of signature validity.
+model ClaimInvitation {
+  id              String                 @id @default(cuid())
+  companyId       String                 @map("company_id")
+  company         User                   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  campaignId      String                 @map("campaign_id")
+  campaign        OutreachCampaign       @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  recipient       OutreachRecipient?
+  status          ClaimInvitationStatus  @default(ISSUED)
+  issuedAt        DateTime               @default(now()) @map("issued_at")
+  expiresAt       DateTime               @map("expires_at")
+  viewedAt        DateTime?              @map("viewed_at")
+  consumedAt      DateTime?              @map("consumed_at")
+  revokedAt       DateTime?              @map("revoked_at")
+  claimedByUserId String?                @map("claimed_by_user_id")
+
+  @@index([companyId])
+  @@index([campaignId])
+  @@map("claim_invitations")
 }

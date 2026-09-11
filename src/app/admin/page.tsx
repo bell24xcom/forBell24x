@@ -18,6 +18,7 @@ interface Stats {
   unansweredRealRfqs?: number;
   expiringSoon?: number;
   activity?:    Array<{ type: string; label: string; time: string }>;
+  providerFailures24h?: number;
 }
 
 const fmt    = (n: number) => n.toLocaleString('en-IN');
@@ -121,6 +122,16 @@ export default function AdminDashboard() {
           </button>
         </div>
       </div>
+
+      {/* Provider failure banner — MSG91/etc. send failures in last 24h */}
+      {(stats.providerFailures24h ?? 0) > 0 && (
+        <a href="/admin/errors?tab=provider"
+          className="block bg-red-900/30 border border-red-600/50 rounded-xl px-4 py-3 hover:border-red-500/70 transition-colors">
+          <p className="text-red-300 text-sm font-medium">
+            🔴 {stats.providerFailures24h} provider {stats.providerFailures24h === 1 ? 'failure' : 'failures'} in last 24h — view details
+          </p>
+        </a>
+      )}
 
       {/* Quick Action Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">

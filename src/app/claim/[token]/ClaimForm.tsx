@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Phone, Shield, CheckCircle, ArrowRight, Loader2 } from 'lucide-react';
+import ConsentCheckbox from '@/src/components/legal/ConsentCheckbox';
 
 interface ClaimFormProps {
   token: string;
@@ -19,6 +20,7 @@ export default function ClaimForm({ token, companyName }: ClaimFormProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [resolvedCompany, setResolvedCompany] = useState(companyName);
+  const [consentGiven, setConsentGiven] = useState(false);
 
   async function handleSendOtp(e: React.FormEvent) {
     e.preventDefault();
@@ -50,6 +52,12 @@ export default function ClaimForm({ token, companyName }: ClaimFormProps) {
   async function handleVerifyOtp(e: React.FormEvent) {
     e.preventDefault();
     setError('');
+
+    if (!consentGiven) {
+      setError('Please agree to receive WhatsApp/SMS updates to continue.');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -57,7 +65,7 @@ export default function ClaimForm({ token, companyName }: ClaimFormProps) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ token, phone, otp }),
+        body: JSON.stringify({ token, phone, otp, consent: consentGiven }),
       });
       const data = await res.json();
 
@@ -164,6 +172,10 @@ export default function ClaimForm({ token, companyName }: ClaimFormProps) {
               autoFocus
             />
           </div>
+
+          <ConsentCheckbox id="claim-consent" checked={consentGiven} onChange={setConsentGiven}>
+            I agree to receive business updates, quotation alerts, and account notifications from VyaparSethu via WhatsApp and SMS.
+          </ConsentCheckbox>
 
           <button
             type="submit"
