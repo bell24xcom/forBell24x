@@ -25,6 +25,11 @@ interface RevenueData {
   monthlyRevenue: { month: string; total: number; txnCount: number }[];
   subscriptionEvents: { userId: string | null; metadata: unknown; createdAt: string }[];
   days: number;
+  // Optional — older API responses won't have these. When true, one or more
+  // (not all) of the 6 underlying metrics failed to load; the rest of the
+  // page still renders with real data instead of going fully blank.
+  degraded?: boolean;
+  errors?: Record<string, string>;
 }
 
 function fmt(n: number) {
@@ -82,6 +87,11 @@ export default function RevenuePage() {
       </div>
 
       {error && <div className="bg-red-900/30 border border-red-700/50 text-red-300 px-4 py-3 rounded-xl text-sm">{error}</div>}
+      {data?.degraded && (
+        <div className="bg-amber-900/30 border border-amber-700/50 text-amber-300 px-4 py-3 rounded-xl text-sm">
+          Some revenue metrics failed to load and are showing as empty below ({Object.keys(data.errors ?? {}).join(', ')}). The rest of this page is live data.
+        </div>
+      )}
       {loading && !data && (
         <div className="py-16 flex justify-center">
           <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />

@@ -58,19 +58,20 @@ export async function POST(req: NextRequest) {
             <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
               <div style="background:linear-gradient(135deg,#EA580C,#F97316);padding:20px 24px;text-align:center;">
                 <h1 style="color:white;margin:0;font-size:22px;">VyaparSethu</h1>
-                <p style="color:#FED7AA;margin:4px 0 0;font-size:14px;">India's B2B Supplier & Buyer Network</p>
+                <p style="color:#FED7AA;margin:4px 0 0;font-size:14px;">India's B2B Trade Network</p>
               </div>
               <div style="padding:28px 24px;background:#f8fafc;">
                 <p style="font-size:16px;color:#1E293B;">Namaste,</p>
-                <p style="color:#475569;">We've created a supplier profile for <strong>${supplier.company || 'your business'}</strong> on VyaparSethu${supplier.location ? ` in ${supplier.location}` : ''}.</p>
-                ${categories.length > 0 ? `<p style="color:#475569;">Verified buyers are actively searching for: <strong>${categories.join(', ')}</strong></p>` : ''}
-                <p style="color:#475569;">Claim your free profile to start receiving Quotation Requests from verified buyers across India.</p>
+                <p style="color:#475569;">We've created a business profile for <strong>${supplier.company || 'your business'}</strong> on VyaparSethu${supplier.location ? ` in ${supplier.location}` : ''}${categories.length > 0 ? ` for <strong>${categories.join(', ')}</strong>` : ''}.</p>
+                <p style="color:#475569;">We're building this with Indian suppliers. Your feedback shapes the product.</p>
+                <p style="color:#475569;">Claim your free profile to start receiving Quotation Requests from buyers across India.</p>
                 <div style="text-align:center;margin:28px 0;">
                   <a href="${claimUrl}" style="display:inline-block;background:#F97316;color:white;padding:14px 32px;text-decoration:none;border-radius:8px;font-weight:bold;font-size:16px;">
                     Claim My Profile →
                   </a>
                 </div>
                 <p style="color:#94A3B8;font-size:13px;">This profile was created based on publicly available business information. Claiming is free and takes under 2 minutes.</p>
+                <p style="color:#475569;margin-top:24px;">Regards,<br><strong>Vishal Pendharkar</strong><br>Founder, VyaparSethu</p>
               </div>
               <div style="background:#f1f5f9;padding:16px 24px;text-align:center;color:#64748b;font-size:12px;">
                 VyaparSethu · Digitex Studio · ${SITE_HOST}<br>

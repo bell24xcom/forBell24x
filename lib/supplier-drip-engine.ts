@@ -17,6 +17,7 @@
 
 import { prisma } from '@/lib/prisma';
 import { storeInteraction } from '@/lib/memory-engine';
+import { SITE_URL } from '@/lib/site-url';
 
 export type DripType = 'day3' | 'day7' | 'day14';
 
@@ -32,6 +33,16 @@ export interface DripCandidate {
   firstContactedAt: Date;
 }
 
+const SIGN_OFF = 'Regards,\nVishal Pendharkar\nFounder, VyaparSethu';
+
+// SPRINT-STDV-01: "Buyers are searching for X right now" / "A buyer just
+// posted a Requirement in X" / "X buyers are active this week" were
+// unverified activity claims — this function has no query confirming any of
+// that at send time, only that the supplier hasn't completed their profile
+// or hasn't quoted yet. Replaced with the founder-led framing SPRINT-STDV-01
+// asked for in place of any activity claim we can't back with data.
+const FOUNDER_LINE = "We're building this with Indian suppliers. Your feedback shapes the product.";
+
 function buildDripMessage(
   supplier: { name: string | null; company: string | null },
   category: string,
@@ -40,23 +51,26 @@ function buildDripMessage(
   const name = supplier.name ?? supplier.company ?? 'there';
 
   if (type === 'day3') {
-    return `Hi ${name}! Your Bell24h supplier profile is live but incomplete.
-Buyers are searching for ${category} suppliers right now.
-Complete your profile in 2 mins: https://bell24h.com/supplier/profile/edit
-- Bell24h Team`;
+    return `Hi ${name}! Your VyaparSethu supplier profile is live but incomplete.
+${FOUNDER_LINE}
+Complete your profile in 2 mins: ${SITE_URL}/supplier/profile/edit
+
+${SIGN_OFF}`;
   }
 
   if (type === 'day7') {
-    return `Hi ${name}, good news! A buyer just posted an RFQ in ${category}.
-Your profile is matched but incomplete — you're missing quotes.
-Browse RFQs now: https://bell24h.com/supplier/browse-rfqs
-- Bell24h Team`;
+    return `Hi ${name}, your ${category} profile on VyaparSethu is matched but incomplete — you're missing quotes.
+${FOUNDER_LINE}
+Browse Requirements now: ${SITE_URL}/supplier/browse-rfqs
+
+${SIGN_OFF}`;
   }
 
-  return `Hi ${name}, we miss you on Bell24h!
-${category} buyers are active this week.
-Login to see new RFQs: https://bell24h.com/dashboard
-- Bell24h Team`;
+  return `Hi ${name}, we miss you on VyaparSethu!
+${FOUNDER_LINE}
+Login to see new Requirements: ${SITE_URL}/dashboard
+
+${SIGN_OFF}`;
 }
 
 function buildWaLink(phone: string, message: string): string {

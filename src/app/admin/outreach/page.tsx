@@ -5,6 +5,7 @@ import {
   MessageCircle, RefreshCw, TrendingUp, ExternalLink, Zap, Send,
   X, Check, SkipForward, Phone, AlertTriangle,
 } from 'lucide-react';
+import { buildClaimWhatsAppMessage } from '@/src/lib/outreach/waMessage';
 
 const DAILY_LIMIT = 50;
 const DIALER_KEY  = 'vs_dialer_session';
@@ -50,7 +51,7 @@ interface OutreachStats {
 
 interface Supplier {
   id: string;
-  company: string;
+  company: string | null;
   phone: string | null;
   email: string | null;
   location: string | null;
@@ -264,7 +265,7 @@ function Dialer({
               {(s.company || '?')[0].toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-white font-bold text-lg leading-tight">{s.company}</p>
+              <p className="text-white font-bold text-lg leading-tight">{s.company || 'Unnamed supplier'}</p>
               {s.location && <p className="text-slate-400 text-sm mt-0.5">📍 {s.location}</p>}
               <div className="flex items-center gap-2 mt-1 flex-wrap">
                 <span className="text-xs text-slate-500 font-mono">
@@ -286,9 +287,10 @@ function Dialer({
             </div>
           </div>
 
-          {/* Message preview */}
+          {/* Message preview — built from the same buildClaimWhatsAppMessage()
+              used server-side so this never drifts from what's actually sent. */}
           <div className="bg-slate-800/60 border border-slate-700/50 rounded-xl p-3 mb-4 text-xs text-slate-400 leading-relaxed whitespace-pre-line">
-            {`Namaste! 🙏\n\nYour business "${(s.company && s.company.trim()) ? s.company : 'your business'}" has a verified profile on VyaparSethu — India's B2B Supplier & Buyer Network.\n\nVerified buyers are searching for your products right now.\n\nClaim your FREE profile in 2 minutes:\n${s.claimLink}\n\n— Team VyaparSethu`}
+            {buildClaimWhatsAppMessage(s.company, s.claimLink)}
           </div>
 
           {/* Countdown hint */}
@@ -452,7 +454,7 @@ export default function OutreachPage() {
   const exportCSV = (suppliers: Supplier[]) => {
     const h   = 'company,phone,location,trust_score,claim_link,wa_link';
     const rows = suppliers.map(s =>
-      `"${s.company}","${s.phone ?? ''}","${s.location ?? ''}",${s.trustScore},"${s.claimLink}","${s.waLink ?? ''}"`
+      `"${s.company ?? ''}","${s.phone ?? ''}","${s.location ?? ''}",${s.trustScore},"${s.claimLink}","${s.waLink ?? ''}"`
     );
     const blob = new Blob([[h, ...rows].join('\n')], { type: 'text/csv' });
     const a    = document.createElement('a');

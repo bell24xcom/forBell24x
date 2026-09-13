@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
+import { getVerifiedBuyerIds } from '@/src/lib/rfq/trustBadges';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,6 +19,9 @@ export const dynamic = 'force-dynamic';
  *   ?urgency=HIGH       Filter by urgency (LOW|NORMAL|HIGH|URGENT)
  *   ?page=1             Pagination (default 1)
  *   ?limit=20           Results per page (max 50)
+ *   ?includeDemos=true  Include isSeeded RFQs — excluded by default
+ *                        (SPRINT-STDV-01 P2: nothing previously filtered
+ *                        these out of the supplier-facing list)
  */
 export async function GET(request: NextRequest) {
   try {
@@ -28,13 +33,15 @@ export async function GET(request: NextRequest) {
     const minBudget = searchParams.get('minBudget');
     const maxBudget = searchParams.get('maxBudget');
     const urgency = searchParams.get('urgency');
+    const includeDemos = searchParams.get('includeDemos') === 'true';
     const page = Math.max(1, parseInt(searchParams.get('page') || '1'));
     const limit = Math.min(50, parseInt(searchParams.get('limit') || '20'));
     const skip = (page - 1) * limit;
 
-    const where: Parameters<typeof prisma.rFQ.findMany>[0]['where'] = {
+    const where: Prisma.RFQWhereInput = {
       status: { in: ['ACTIVE', 'OPEN'] },
       isPublic: true,
+      ...(includeDemos ? {} : { isSeeded: false }),
     };
 
     if (categoriesParam) {
@@ -94,17 +101,28 @@ export async function GET(request: NextRequest) {
           type: true,
           createdAt: true,
           expiresAt: true,
+          isSeeded: true,
+          createdBy: true,
+          user: { select: { id: true, name: true, company: true, location: true } },
           _count: { select: { quotes: true } },
         },
       }),
       prisma.rFQ.count({ where }),
     ]);
 
+    // Real, human-reviewed verification — see src/lib/rfq/trustBadges.ts for
+    // why this isn't User.isVerified.
+    const verifiedIds = await getVerifiedBuyerIds(
+      rfqs.map(r => r.user?.id).filter((id): id is string => !!id)
+    );
+
     // Map to frontend-friendly format
     const mapped = rfqs.map(r => ({
       ...r,
       budget: r.maxBudget || r.estimatedValue || 0,
       quotesCount: r._count?.quotes || 0,
+      buyer: r.user,
+      verifiedBuyer: r.user ? verifiedIds.has(r.user.id) : false,
     }));
 
     return NextResponse.json({

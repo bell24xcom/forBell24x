@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { requireAdmin, isErrorResponse } from '@/lib/admin-auth';
 import { randomUUID } from 'crypto';
 import { SITE_URL } from '@/lib/site-url';
+import { buildClaimWhatsAppMessage } from '@/src/lib/outreach/waMessage';
 
 export const dynamic = 'force-dynamic';
 
@@ -115,7 +116,7 @@ export async function POST(req: NextRequest) {
     let apiSent   = 0;
     let apiFailed = 0;
     const results: {
-      id: string; company: string; phone: string | null; location: string | null;
+      id: string; company: string | null; phone: string | null; location: string | null;
       trustScore: number; gstVerified: boolean; udyamVerified: boolean;
       claimLink: string; waLink: string | null; apiSent: boolean;
     }[] = [];
@@ -127,7 +128,13 @@ export async function POST(req: NextRequest) {
         ? `${SITE_URL}/supplier/claim?category=${encodeURIComponent(deepCategory)}&city=${encodeURIComponent(deepCity)}&token=${token}`
         : `${SITE_URL}/claim/${token}`;
       const rawPhone    = (s.phone || '').replace(/\D/g, '').slice(-10);
-      const companyName = (s.company && s.company.trim()) ? s.company : 'your business';
+      // Used only as the {{1}} parameter for the approved Meta WhatsApp
+      // template (external, not controlled by this codebase — audit that
+      // template's wording separately). For the wa.me fallback message we
+      // build below, buildClaimWhatsAppMessage() handles a missing company
+      // name correctly (no quoted placeholder), so this fallback doesn't
+      // need to match it.
+      const companyName = (s.company && s.company.trim()) ? s.company : 'there';
 
       // In dry-run mode: skip DB writes and API calls entirely
       if (!dryRun) {
@@ -185,14 +192,7 @@ export async function POST(req: NextRequest) {
       }
 
       // Always generate wa.me link as fallback / confirmation
-      const msg    = encodeURIComponent(
-        `Namaste! 🙏\n\n` +
-        `Your business "${companyName}" has a verified profile on VyaparSethu — ` +
-        `India's B2B Supplier & Buyer Network.\n\n` +
-        `Verified buyers are searching for your products right now.\n\n` +
-        `Claim your FREE profile in 2 minutes:\n${claimLink}\n\n` +
-        `— Team VyaparSethu\nvyaparsethu.com`
-      );
+      const msg    = encodeURIComponent(buildClaimWhatsAppMessage(s.company, claimLink));
       const waLink = rawPhone.length === 10 ? `https://wa.me/91${rawPhone}?text=${msg}` : null;
 
       // Log day1 send to InteractionMemory for API-sent messages so drip engine tracks correctly
@@ -208,7 +208,10 @@ export async function POST(req: NextRequest) {
       }
 
       results.push({
-        id: s.id, company: companyName, phone: s.phone,
+        // Raw company name (possibly null) — the admin UI's message preview
+        // must build off the same buildClaimWhatsAppMessage() used above so
+        // preview and actually-sent text never diverge.
+        id: s.id, company: s.company, phone: s.phone,
         location: s.location, trustScore: s.trustScore,
         gstVerified: !!s.gstNumber, udyamVerified: !!s.udyamNumber,
         claimLink, waLink, apiSent: thisSentViaApi,

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
-import { Search, Filter, MapPin, IndianRupee, Clock, MessageSquare, Mic, Video, FileText, X, CheckCircle } from 'lucide-react';
+import { Search, Filter, MapPin, IndianRupee, Clock, MessageSquare, Mic, Video, FileText, X, CheckCircle, ShieldCheck, FlaskConical } from 'lucide-react';
 import WhatsAppShare from '@/components/ui/WhatsAppShare';
 
 interface RFQ {
@@ -18,6 +18,10 @@ interface RFQ {
   urgency: 'HIGH' | 'MEDIUM' | 'LOW';
   quotesCount: number;
   createdAt: string;
+  // SPRINT-STDV-01 P3 — trust indicators, see src/lib/rfq/trustBadges.ts
+  buyer: { id: string; name: string | null; company: string | null; location: string | null } | null;
+  verifiedBuyer: boolean;
+  isSeeded: boolean;
 }
 
 export default function BrowseRFQsPage() {
@@ -27,6 +31,7 @@ export default function BrowseRFQsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [showAllCategories, setShowAllCategories] = useState(false);
+  const [showDemos, setShowDemos] = useState(false);
   const [supplierCategories, setSupplierCategories] = useState<string[]>([]);
   const [quoteModal, setQuoteModal] = useState<RFQ | null>(null);
   const [quoteForm, setQuoteForm] = useState({ price: '', deliveryDays: '', notes: '', terms: '' });
@@ -49,13 +54,16 @@ export default function BrowseRFQsPage() {
     const interval = setInterval(fetchRFQs, 60000);
     return () => clearInterval(interval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showAllCategories, categoryKey]);
+  }, [showAllCategories, categoryKey, showDemos]);
 
   const fetchRFQs = async () => {
     try {
       const params = new URLSearchParams({ status: 'active' });
       if (!showAllCategories && supplierCategories.length > 0) {
         params.set('categories', supplierCategories.join(','));
+      }
+      if (showDemos) {
+        params.set('includeDemos', 'true');
       }
       const response = await fetch(`/api/marketplace/rfqs?${params}`, { credentials: 'include' });
       if (response.ok) {
@@ -148,6 +156,10 @@ export default function BrowseRFQsPage() {
             <p className="text-slate-400">Find RFQs matching your business and submit competitive quotes</p>
           </div>
           <div className="flex items-center gap-3 flex-wrap">
+            <label className="flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-lg border border-slate-700 bg-slate-800/50 text-slate-300 cursor-pointer min-h-[44px]">
+              <input type="checkbox" checked={showDemos} onChange={(e) => setShowDemos(e.target.checked)} className="accent-indigo-500" />
+              Show demo RFQs
+            </label>
             {supplierCategories.length > 0 && (
               <button
                 onClick={() => setShowAllCategories(prev => !prev)}
@@ -244,7 +256,26 @@ export default function BrowseRFQsPage() {
                   </span>
                 </div>
 
-                <h3 className="text-lg font-semibold text-white mb-3 line-clamp-2">{rfq.title}</h3>
+                <h3 className="text-lg font-semibold text-white mb-1 line-clamp-2">{rfq.title}</h3>
+                {rfq.buyer?.company && (
+                  <p className="text-slate-400 text-sm mb-3">{rfq.buyer.company}</p>
+                )}
+
+                {/* Trust indicators — SPRINT-STDV-01 P3 */}
+                {(rfq.isSeeded || rfq.verifiedBuyer) && (
+                  <div className="flex items-center gap-2 mb-3 flex-wrap">
+                    {rfq.isSeeded && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-slate-700/60 text-slate-300 text-xs font-medium rounded-full border border-slate-600">
+                        <FlaskConical className="w-3 h-3" /> Demo RFQ
+                      </span>
+                    )}
+                    {rfq.verifiedBuyer && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-900/40 text-green-300 text-xs font-medium rounded-full border border-green-700/50">
+                        <ShieldCheck className="w-3 h-3" /> Verified Buyer
+                      </span>
+                    )}
+                  </div>
+                )}
 
                 <div className="space-y-2 mb-4 text-sm">
                   <div className="flex items-center gap-2 text-slate-300">
@@ -319,6 +350,11 @@ export default function BrowseRFQsPage() {
                 <span>{quoteModal.category}</span>
                 {quoteModal.quantity && <span>Qty: {quoteModal.quantity}</span>}
               </div>
+              {quoteModal.isSeeded && (
+                <div className="mt-3 flex items-center gap-2 px-3 py-2 bg-amber-900/30 border border-amber-700/50 rounded-lg text-amber-300 text-xs">
+                  ⚠️ This is a demo RFQ for testing purposes. Your quote will not reach a real buyer.
+                </div>
+              )}
             </div>
 
             <form onSubmit={handleSubmitQuote} className="p-6 space-y-4">

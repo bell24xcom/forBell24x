@@ -127,19 +127,88 @@ async function submitConciergeQuote(
   });
 }
 
+// Fields the admin RFQ list is actually allowed to sort by — `sortBy` is a
+// raw query param; without a whitelist an unrecognized/invalid value throws
+// a Prisma error instead of failing gracefully (flagged in
+// docs/audits/VS-ADMIN-PRODUCTION-AUDIT-FIX-01.md, Phase 5 #6).
+const SORTABLE_RFQ_FIELDS = new Set([
+  'createdAt', 'updatedAt', 'title', 'status', 'category', 'priority',
+  'maxBudget', 'minBudget', 'views', 'expiresAt',
+]);
+
+// Quote shape returned for a single RFQ's detail view (drawer). Kept out of
+// the list query below — see the `id`-scoped branch of GET.
+const RFQ_DETAIL_QUOTES_INCLUDE = {
+  select: {
+    id: true,
+    price: true,
+    status: true,
+    createdAt: true,
+    supplier: {
+      select: {
+        id: true,
+        name: true,
+        email: true
+      }
+    },
+    deal: {
+      select: {
+        id: true,
+        status: true
+      }
+    }
+  }
+} as const;
+
 export async function GET(req: NextRequest) {
   const auth = requireAdmin(req);
   if (isErrorResponse(auth)) return auth;
 
   try {
     const { searchParams } = new URL(req.url);
+
+    // ── Single-RFQ detail (drawer open / refresh) ──────────────────────────
+    // Loads full quote details (with supplier + deal) for exactly one RFQ,
+    // on demand. The list branch below intentionally never includes quotes —
+    // previously every list page load fetched every quote (with nested
+    // supplier/deal) for every RFQ on the page, unpaginated, even though the
+    // UI only ever shows quotes for one RFQ at a time inside the drawer.
+    const id = searchParams.get('id');
+    if (id) {
+      const rfq = await prisma.rFQ.findUnique({
+        where: { id },
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              phone: true
+            }
+          },
+          quotes: RFQ_DETAIL_QUOTES_INCLUDE,
+          _count: {
+            select: { quotes: true }
+          }
+        }
+      });
+
+      if (!rfq) {
+        return NextResponse.json({ error: 'RFQ not found' }, { status: 404 });
+      }
+
+      return NextResponse.json({ rfq });
+    }
+
+    // ── List ────────────────────────────────────────────────────────────────
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '20');
     const status = searchParams.get('status');
     const category = searchParams.get('category');
     const search = searchParams.get('search');
-    const sortBy = searchParams.get('sortBy') || 'createdAt';
-    const sortOrder = searchParams.get('sortOrder') || 'desc';
+    const sortByParam = searchParams.get('sortBy') || 'createdAt';
+    const sortBy = SORTABLE_RFQ_FIELDS.has(sortByParam) ? sortByParam : 'createdAt';
+    const sortOrder = searchParams.get('sortOrder') === 'asc' ? 'asc' : 'desc';
 
     const skip = (page - 1) * limit;
 
@@ -176,26 +245,8 @@ export async function GET(req: NextRequest) {
               phone: true
             }
           },
-          quotes: {
-            select: {
-              id: true,
-              price: true,
-              status: true,
-              supplier: {
-                select: {
-                  id: true,
-                  name: true,
-                  email: true
-                }
-              },
-              deal: {
-                select: {
-                  id: true,
-                  status: true
-                }
-              }
-            }
-          },
+          // Quotes are intentionally NOT included here — see the `id`-scoped
+          // branch above. The list only needs the count.
           _count: {
             select: { quotes: true }
           }

@@ -1,7 +1,7 @@
 'use client';
 
 import { CheckCircle, Clock, Download, Eye, FileText, Mic, Play, RefreshCw, X, XCircle } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface Quote {
   id: string; price: number; status: string; createdAt: string;
@@ -15,7 +15,13 @@ interface RFQ {
   status: string; urgency: string; timeline: string | null;
   createdAt: string; expiresAt: string | null; type: string | null;
   quantity?: string; // already returned by GET /api/admin/rfqs (include, not select) — just untyped until now
-  _count: { quotes: number }; quotes: Quote[];
+  _count: { quotes: number };
+  // Not present on list rows (GET /api/admin/rfqs) — the list only ever
+  // needs _count.quotes. Populated on demand for exactly one RFQ at a time
+  // via GET /api/admin/rfqs?id=... when its drawer is opened, so the list
+  // page load no longer has to fetch every quote (+ supplier + deal) for
+  // every RFQ on the page just to show a count.
+  quotes?: Quote[];
 }
 interface SupplierOption {
   id: string; name: string; company: string | null; phone: string | null; email: string | null;
@@ -33,6 +39,7 @@ export default function AdminRFQsPage() {
   const [search,     setSearch]     = useState('');
   const [statusF,    setStatusF]    = useState('');
   const [drawer,     setDrawer]     = useState<RFQ | null>(null);
+  const [drawerQuotesLoading, setDrawerQuotesLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [confirm,    setConfirm]    = useState<string | null>(null);
   const [page,       setPage]       = useState(1);
@@ -47,6 +54,48 @@ export default function AdminRFQsPage() {
   const [settleRef,    setSettleRef]    = useState('');
   const [settleLoading, setSettleLoading] = useState(false);
   const [settleMsg,    setSettleMsg]    = useState<{ dealId: string; text: string; ok: boolean } | null>(null);
+
+  // Loads full quote details (with supplier + deal) for exactly one RFQ —
+  // used to open the drawer and to refresh it after an action, instead of
+  // the list response (which no longer carries quotes at all).
+  const fetchRFQDetail = async (id: string): Promise<RFQ | null> => {
+    try {
+      const res = await fetch(`/api/admin/rfqs?id=${encodeURIComponent(id)}`, { credentials: 'include' });
+      const data = await res.json();
+      return data.rfq ?? null;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  };
+
+  // Opens the drawer immediately with the (quote-less) list row, then loads
+  // that RFQ's quotes on demand. drawerRequestId guards against a slower,
+  // earlier fetch (e.g. opening RFQ A then quickly opening RFQ B) landing
+  // after a newer one and clobbering the loading state or the wrong data.
+  const drawerRequestId = useRef(0);
+  const openDrawer = async (rfq: RFQ) => {
+    resetConciergeForm();
+    setDrawer(rfq);
+    setDrawerQuotesLoading(true);
+    const requestId = ++drawerRequestId.current;
+    const detail = await fetchRFQDetail(rfq.id);
+    if (drawerRequestId.current !== requestId) return; // superseded by a newer open
+    setDrawerQuotesLoading(false);
+    if (detail) {
+      setDrawer(prev => (prev && prev.id === rfq.id ? detail : prev));
+    }
+  };
+
+  // Re-fetches just the open drawer's quotes (e.g. after a concierge quote
+  // submission or a deal settlement) without re-fetching the whole list.
+  const refreshDrawerDetail = async () => {
+    if (!drawer) return;
+    const detail = await fetchRFQDetail(drawer.id);
+    if (detail) {
+      setDrawer(prev => (prev && prev.id === detail.id ? detail : prev));
+    }
+  };
 
   const markDealComplete = async (dealId: string) => {
     setSettleLoading(true);
@@ -64,7 +113,7 @@ export default function AdminRFQsPage() {
         setSettleOpenId(null);
         setSettleMethod('');
         setSettleRef('');
-        if (drawer) fetchRFQs(page); // refresh deal.status shown in the drawer's source data
+        if (drawer) refreshDrawerDetail(); // refresh deal.status shown in the drawer's quotes
       } else {
         setSettleMsg({ dealId, text: data.error || 'Failed to record settlement.', ok: false });
       }
@@ -143,7 +192,10 @@ export default function AdminRFQsPage() {
       });
       const data = await res.json();
       if (data.success) {
-        await fetchRFQs(page); // also refreshes the open drawer's quotes list
+        await Promise.all([
+          fetchRFQs(page),        // refreshes the table's quote count
+          refreshDrawerDetail(),  // refreshes the open drawer's quotes list
+        ]);
         resetConciergeForm();
       } else {
         setConciergeMsg({ text: data.error || 'Failed to submit concierge quote.', ok: false });
@@ -167,9 +219,15 @@ export default function AdminRFQsPage() {
         setRfqs(data.rfqs);
         setTotalPages(data.pagination?.pages ?? 1);
         setTotalCount(data.pagination?.total ?? data.rfqs.length);
-        // Keep an open drawer showing fresh data (e.g. its quotes list right
-        // after a concierge quote is submitted) instead of a stale snapshot.
-        setDrawer(prev => prev ? (data.rfqs.find((r: RFQ) => r.id === prev.id) ?? prev) : prev);
+        // Keep an open drawer's non-quote fields (status, _count, etc.) in
+        // sync with the list. List rows never carry `quotes` (see the RFQ
+        // interface) — preserve whatever the drawer already loaded via
+        // refreshDrawerDetail()/openDrawer() instead of clobbering it.
+        setDrawer(prev => {
+          if (!prev) return prev;
+          const fresh = data.rfqs.find((r: RFQ) => r.id === prev.id);
+          return fresh ? { ...fresh, quotes: prev.quotes } : prev;
+        });
       }
     } catch (e) { console.error(e); }
     finally { setLoading(false); setRefreshing(false); }
@@ -291,7 +349,7 @@ export default function AdminRFQsPage() {
                   <td className="px-4 py-3 text-slate-400 text-xs whitespace-nowrap">{fmtDate(rfq.createdAt)}</td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
-                      <button onClick={() => { resetConciergeForm(); setDrawer(rfq); }} title="View" className="text-indigo-400 hover:text-indigo-300 transition-colors min-h-[32px] min-w-[32px] flex items-center justify-center">
+                      <button onClick={() => openDrawer(rfq)} title="View" className="text-indigo-400 hover:text-indigo-300 transition-colors min-h-[32px] min-w-[32px] flex items-center justify-center">
                         <Eye className="w-4 h-4" />
                       </button>
                       <button onClick={() => setConfirm(rfq.id)} title="Close RFQ" className="text-red-400 hover:text-red-300 transition-colors min-h-[32px] min-w-[32px] flex items-center justify-center" disabled={rfq.status !== 'ACTIVE'}>
@@ -514,10 +572,15 @@ export default function AdminRFQsPage() {
                 </div>
               )}
 
-              {/* Quotes */}
+              {/* Quotes — loaded on demand when the drawer opens (not on the
+                  list page load); see fetchRFQDetail/openDrawer above. */}
               <div>
                 <p className="text-slate-500 text-xs mb-2 uppercase tracking-wider">Quotes ({drawer._count.quotes})</p>
-                {drawer.quotes.length === 0 ? (
+                {drawerQuotesLoading ? (
+                  <div className="py-4 flex justify-center">
+                    <div className="w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+                  </div>
+                ) : !drawer.quotes || drawer.quotes.length === 0 ? (
                   <p className="text-slate-300 text-sm">No quotes yet</p>
                 ) : (
                   <div className="space-y-2">

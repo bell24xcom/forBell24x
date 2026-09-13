@@ -86,11 +86,11 @@ export async function GET(request: NextRequest) {
         const productSummary = topRFQ.quantity
           ? `${topRFQ.title} — Qty: ${topRFQ.quantity}${budget}${loc}`
           : `${topRFQ.title}${budget}${loc}`;
-        const whatsapp = `Hi ${name},\n\nWe found your company *${s.company ?? name}* in *${category}* (${city}).\n\nA buyer is looking for:\n👉 ${productSummary}\n\nView requirement:\n${link}\n\n– Team Bell24h`;
+        const whatsapp = `Hi ${name},\n\nWe found your company *${s.company ?? name}* in *${category}* (${city}).\n\nA buyer is looking for:\n👉 ${productSummary}\n\nView requirement:\n${link}\n\nRegards,\nVishal Pendharkar\nFounder, VyaparSethu`;
 
         const email = {
-          subject: `New RFQ Opportunity: ${topRFQ.title} — Bell24h`,
-          body: `Hi ${name},\n\nA buyer on Bell24h is looking for ${topRFQ.title} in ${category}.\n\nQuantity: ${topRFQ.quantity || 'To be discussed'}${budget}${loc}\n\nYou can view full details and submit your quote here:\n${link}\n\nThis is free to quote during our beta phase.\n\n— Bell24h Team\n${SITE_URL}`,
+          subject: `New Requirement Opportunity: ${topRFQ.title} — VyaparSethu`,
+          body: `Hi ${name},\n\nA buyer on VyaparSethu is looking for ${topRFQ.title} in ${category}.\n\nQuantity: ${topRFQ.quantity || 'To be discussed'}${budget}${loc}\n\nYou can view full details and submit your quote here:\n${link}\n\nThis is free to quote during our beta phase.\n\nRegards,\nVishal Pendharkar\nFounder, VyaparSethu\n${SITE_URL}`,
         };
 
         const cleanPhone = s.phone ? s.phone.replace(/\D/g, '').replace(/^91/, '') : null;

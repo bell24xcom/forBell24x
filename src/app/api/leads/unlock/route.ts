@@ -1,18 +1,28 @@
-import { PrismaClient } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { authenticate } from '@/lib/jwt';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
 
-const prisma = new PrismaClient();
-
 export async function POST(req: NextRequest) {
   try {
-    const { leadId, supplierId } = await req.json();
+    // supplierId now comes from the authenticated session, not the request
+    // body — the live UI (src/app/supplier/leads/page.tsx) has only ever
+    // sent { leadId }, so the API previously 400'd on every real request.
+    // Deriving supplierId server-side also closes the separate gap where
+    // any caller could spend another supplier's credits by passing their id.
+    const user = await authenticate(req);
+    if (!user) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
+    const supplierId = user.userId;
 
-    if (!leadId || !supplierId) {
+    const { leadId } = await req.json();
+
+    if (!leadId) {
       return NextResponse.json({
-        error: 'leadId and supplierId are required'
+        error: 'leadId is required'
       }, { status: 400 });
     }
 

@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { requireAdmin, isErrorResponse } from '@/lib/admin-auth';
 import { randomUUID } from 'crypto';
 import { SITE_URL } from '@/lib/site-url';
+import { buildClaimWhatsAppMessage } from '@/src/lib/outreach/waMessage';
 
 export const dynamic = 'force-dynamic';
 
@@ -53,16 +54,12 @@ export async function POST(request: NextRequest) {
       const token = randomUUID();
       const claimLink = `${SITE_URL}/claim/${token}`;
       const phone = supplier.phone?.replace(/\D/g, '').slice(-10) || '';
-      const companyName = supplier.company || supplier.name || 'Your Business';
+      // company falls back to the person's name (not a generic placeholder)
+      // for display purposes — the message text itself uses
+      // buildClaimWhatsAppMessage(), which never quotes a fallback string.
+      const companyName = supplier.company || supplier.name || null;
 
-      const msg = encodeURIComponent(
-        `Namaste! 🙏\n\n` +
-        `Your business "${companyName}" has a verified profile on VyaparSethu — ` +
-        `India's B2B Supplier & Buyer Network.\n\n` +
-        `Verified buyers are searching for your products right now.\n\n` +
-        `Claim your FREE profile in 2 minutes:\n${claimLink}\n\n` +
-        `— Team VyaparSethu\nvyaparsethu.com`
-      );
+      const msg = encodeURIComponent(buildClaimWhatsAppMessage(companyName, claimLink));
 
       const waLink = phone.length === 10
         ? `https://wa.me/91${phone}?text=${msg}`
