@@ -76,9 +76,9 @@ export async function GET(req: NextRequest) {
             },
           },
           claimInvitations: {
-            orderBy: { createdAt: 'desc' },
+            orderBy: { issuedAt: 'desc' },
             take: 1,
-            select: { status: true, createdAt: true, claimedAt: true },
+            select: { status: true, issuedAt: true, consumedAt: true },
           },
         },
       }),

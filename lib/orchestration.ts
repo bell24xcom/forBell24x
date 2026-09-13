@@ -171,8 +171,10 @@ async function findMatchedSuppliers(rfqCategory: string, rfqLocation: string | n
     }
 
     // +2: has previously quoted in the same category
+    // Quote.rfqId is nullable (concierge-sourced quotes may have no linked
+    // RFQ), so q.rfq can be null here — guard before dereferencing it.
     const hasCategory = s.quotes.some(
-      q => q.rfq.category.toLowerCase() === rfqCategory.toLowerCase()
+      q => q.rfq != null && q.rfq.category.toLowerCase() === rfqCategory.toLowerCase()
     );
     if (hasCategory) score += 2;
 

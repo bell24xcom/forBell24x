@@ -3,6 +3,7 @@
  */
 
 import { prisma } from '@/lib/prisma';
+import type { Prisma } from '@prisma/client';
 
 export const DISCOVERY_EVENT_TYPES = [
   'discovery_ingested',
@@ -32,7 +33,7 @@ export function logDiscoveryEvent(
         userId: payload.userId ?? null,
         sessionId: payload.sessionId ?? null,
         source: 'discovery',
-        metadata: payload.metadata ?? undefined,
+        metadata: (payload.metadata as Prisma.InputJsonValue | undefined) ?? undefined,
       },
     })
     .catch((err) => console.error(`[Discovery] logDiscoveryEvent(${actionType}) failed:`, err));
