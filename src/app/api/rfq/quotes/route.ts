@@ -9,6 +9,7 @@ import { prisma } from '@/lib/prisma';
 import { sendEmail as _sendEmail } from '@/lib/email';
 const resendService = { sendEmail: ({ to, subject, html }: { to: string; subject: string; html: string }) => _sendEmail(to, subject, html) };
 import { quoteAcceptedEmail } from '@/lib/emailTemplates';
+import { onQuoteSubmitted, onQuoteAccepted } from '@/lib/orchestration';
 
 export const dynamic = 'force-dynamic';
 
@@ -179,7 +180,26 @@ export async function PUT(request: NextRequest) {
           );
           resendService.sendEmail({ to: supplier.email, ...template }).catch(console.error);
         }
-      } catch { /* email failure must never block the response */ }
+
+        // Orchestration: trust-score bump, auto-opened message thread,
+        // in-app notifications for both parties, and the n8n webhook that
+        // fires WhatsApp/email follow-ups — previously bypassed entirely
+        // by this route, which only sent the direct email above.
+        if (supplier && quote.rfq) {
+          const buyer = await prisma.user.findUnique({
+            where: { id: user.userId },
+            select: { name: true },
+          });
+          await onQuoteAccepted(
+            { id: quote.id, price: Number(quote.price) },
+            { id: quote.rfq.id, title: quote.rfq.title },
+            { id: quote.supplierId!, name: supplier.name, email: supplier.email },
+            { id: user.userId, name: buyer?.name ?? null },
+          );
+        }
+      } catch (orchErr) {
+        console.error('[Quote Accept] onQuoteAccepted failed:', orchErr);
+      }
 
       const escrowLocked = result.deal.status === 'ESCROW_LOCKED';
       return NextResponse.json({
@@ -244,6 +264,34 @@ export async function POST(request: NextRequest) {
         status: 'PENDING',
       },
     });
+
+    // Orchestration: notify the buyer (in-app + email) and confirm to the
+    // supplier — previously never invoked by this route, so the buyer had
+    // no way to know a quote had arrived.
+    try {
+      if (rfq.createdBy) {
+        const [supplier, buyer] = await Promise.all([
+          prisma.user.findUnique({
+            where: { id: user.userId },
+            select: { id: true, name: true, company: true, email: true },
+          }),
+          prisma.user.findUnique({
+            where: { id: rfq.createdBy },
+            select: { id: true, name: true, email: true },
+          }),
+        ]);
+        if (supplier && buyer) {
+          await onQuoteSubmitted(
+            { id: quote.id, price: Number(quote.price), timeline: quote.timeline || 'Not specified' },
+            { id: rfq.id, title: rfq.title, createdBy: rfq.createdBy },
+            supplier,
+            buyer,
+          );
+        }
+      }
+    } catch (orchErr) {
+      console.error('[Quote Create] onQuoteSubmitted failed:', orchErr);
+    }
 
     return NextResponse.json({
       success: true,
