@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Download, CheckSquare, Square, Eye, X, Mail } from 'lucide-react';
+import Link from 'next/link';
+import { Download, CheckSquare, Square, Eye, X, Mail, Route } from 'lucide-react';
 
 interface User {
   id: string; name: string | null; email: string | null; phone: string | null;
@@ -303,6 +304,9 @@ export default function CRMPage() {
                   {/* Actions */}
                   <td className="px-4 py-3">
                     <div className="flex gap-2 items-center flex-wrap">
+                      <Link href={`/admin/crm/${u.id}`} className="text-teal-400 hover:text-teal-300 transition-colors" title="Company journey">
+                        <Route className="w-4 h-4" />
+                      </Link>
                       <button onClick={() => setDrawerUser(u)} className="text-indigo-400 hover:text-indigo-300 transition-colors" title="View details">
                         <Eye className="w-4 h-4" />
                       </button>

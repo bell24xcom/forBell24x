@@ -11,6 +11,11 @@ export const metadata: Metadata = {
     url: `${SITE_URL}/how-it-works`,
     siteName: 'VyaparSethu',
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'How VyaparSethu Works — Verified B2B Trade India',
+    description: 'GST-verified suppliers, Razorpay-protected payments, 24-hour quotations. Free for buyers.',
+  },
   alternates: { canonical: `${SITE_URL}/how-it-works` },
 };
 

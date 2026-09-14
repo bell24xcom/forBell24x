@@ -25,14 +25,56 @@
 
 import { prisma } from '@/lib/prisma';
 import { n8nMarketing } from '@/lib/n8n-trigger';
-async function sendEmail(to: string, subject: string, html: string) {
-  console.log('[EMAIL] Stub — to:', to, 'subject:', subject);
-  return { success: true };
-}
+import { sendEmail } from '@/lib/email';
+import { SITE_URL } from '@/lib/site-url';
+import { createQuoteToken } from '@/lib/quote-token';
+import { sendTemplateMessage } from '@/src/lib/whatsapp/WhatsAppService';
 const resendService = {
   sendEmail: ({ to, subject, html }: { to: string; subject: string; html: string }) =>
     sendEmail(to, subject, html),
 };
+
+
+/**
+ * Meta requires E.164 digits with no leading '+' or zeros. Stored numbers vary
+ * (spaces, +91, 0-prefixed). Assumes India when no country code is present,
+ * matching where every supplier in the current dataset is located.
+ */
+function normalizeE164(raw: string): string {
+  const digits = raw.replace(/\D/g, '');
+  if (digits.length === 10) return `91${digits}`;
+  if (digits.length === 11 && digits.startsWith('0')) return `91${digits.slice(1)}`;
+  return digits;
+}
+
+/** Plain, deliverable HTML — no images, no tracking, one call to action. */
+function supplierRfqEmail(
+  name: string | null,
+  rfq: { title: string; category: string; location: string | null },
+  quoteLink: string
+): string {
+  const who = name ? name.split(' ')[0] : 'there';
+  return `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:24px;">
+  <p style="font-size:16px;color:#111;">Hi ${who},</p>
+  <p style="font-size:16px;color:#111;line-height:1.6;">
+    A buyer has posted a requirement matching your category on VyaparSethu.
+  </p>
+  <table style="width:100%;border-collapse:collapse;margin:20px 0;font-size:15px;">
+    <tr><td style="padding:6px 0;color:#666;">Requirement</td><td style="padding:6px 0;color:#111;"><strong>${rfq.title}</strong></td></tr>
+    <tr><td style="padding:6px 0;color:#666;">Category</td><td style="padding:6px 0;color:#111;">${rfq.category}</td></tr>
+    ${rfq.location ? `<tr><td style="padding:6px 0;color:#666;">Location</td><td style="padding:6px 0;color:#111;">${rfq.location}</td></tr>` : ''}
+  </table>
+  <p style="margin:24px 0;">
+    <a href="${quoteLink}" style="background:#1d4ed8;color:#fff;padding:12px 24px;text-decoration:none;border-radius:6px;font-weight:bold;display:inline-block;">Submit your quote</a>
+  </p>
+  <p style="font-size:13px;color:#666;line-height:1.6;">
+    No account needed — the link opens a quote form directly. It expires in 30 days.
+  </p>
+  <p style="font-size:12px;color:#999;margin-top:32px;">
+    ${SITE_URL.replace(/^https?:\/\//, '')} · Bell Orbit Technologies Pvt Ltd
+  </p>
+</div>`;
+}
 
 const MAX_SUPPLIERS_TO_NOTIFY = 15;
 const MIN_SUPPLIERS_BEFORE_FALLBACK = 5;
@@ -80,6 +122,7 @@ async function findMatchedSuppliers(rfqCategory: string, rfqLocation: string | n
       id: true,
       name: true,
       email: true,
+      phone: true,
       company: true,
       location: true,
       isVerified: true,
@@ -128,8 +171,10 @@ async function findMatchedSuppliers(rfqCategory: string, rfqLocation: string | n
     }
 
     // +2: has previously quoted in the same category
+    // Quote.rfqId is nullable (concierge-sourced quotes may have no linked
+    // RFQ), so q.rfq can be null here — guard before dereferencing it.
     const hasCategory = s.quotes.some(
-      q => q.rfq.category.toLowerCase() === rfqCategory.toLowerCase()
+      q => q.rfq != null && q.rfq.category.toLowerCase() === rfqCategory.toLowerCase()
     );
     if (hasCategory) score += 2;
 
@@ -177,17 +222,70 @@ export async function onRFQCreated(rfq: {
   // 1. Smart supplier matching — category + city + score
   const suppliers = await findMatchedSuppliers(rfq.category, rfq.location);
 
+  // Structured, one-time log (not per-supplier) so a missing template is
+  // visible in observability instead of silently skipping every send.
+  if (!process.env.META_WHATSAPP_RFQ_TEMPLATE) {
+    console.warn('[Orchestration] META_WHATSAPP_RFQ_TEMPLATE not configured — supplier WhatsApp notifications skipped for this RFQ', {
+      rfqId: rfq.id, suppliersMatched: suppliers.length,
+    });
+  }
+
   // 2. In-app notifications for matched suppliers only (not all suppliers)
   await Promise.allSettled(
-    suppliers.map(s =>
-      createNotification(
+    suppliers.map(async s => {
+      // 2a. In-app notification (unchanged) — only visible to suppliers who log in.
+      await createNotification(
         s.id,
         '🔔 New RFQ — Matches Your Profile',
         `"${rfq.title}" · ${rfq.category}${rfq.location ? ` · ${rfq.location}` : ''}. Quote now!`,
         'RFQ_CREATED',
         { rfqId: rfq.id, category: rfq.category, matchScore: s.score }
-      )
-    )
+      );
+
+      // 2b. Outbound contact. Most matched suppliers are pre-built profiles that
+      //     have never logged in, so the in-app row above reaches nobody. These
+      //     two channels are the only ones that actually leave the server.
+      //     Both fail closed and neither may throw — a channel being
+      //     unconfigured must not abort the others or the RFQ response.
+      const quoteLink = `${SITE_URL}/quote/${createQuoteToken(rfq.id, s.id)}`;
+
+      if (s.email) {
+        try {
+          await sendEmail(
+            s.email,
+            `New RFQ: ${rfq.title} (${rfq.category})`,
+            supplierRfqEmail(s.name, rfq, quoteLink)
+          );
+        } catch (err) {
+          console.error('[Orchestration] supplier email failed', { supplierId: s.id, err });
+        }
+      }
+
+      if (s.phone) {
+        const template = process.env.META_WHATSAPP_RFQ_TEMPLATE || 'vyaparsethu_rfq_notification';
+        if (template) {
+          try {
+            const outcome = await sendTemplateMessage(
+              normalizeE164(s.phone),
+              template,
+              process.env.META_WHATSAPP_RFQ_TEMPLATE_LANG || 'en',
+              [{ type: 'body', parameters: [
+                { type: 'text', text: s.name || 'Partner' },
+                { type: 'text', text: rfq.title },
+                { type: 'text', text: quoteLink },
+              ] }]
+            );
+            if (outcome.status !== 'SENT') {
+              console.warn('[Orchestration] supplier WhatsApp not sent', {
+                supplierId: s.id, status: outcome.status,
+              });
+            }
+          } catch (err) {
+            console.error('[Orchestration] supplier WhatsApp threw', { supplierId: s.id, err });
+          }
+        }
+      }
+    })
   );
 
   // 3. Confirm to buyer
@@ -218,7 +316,7 @@ export async function onRFQCreated(rfq: {
       html: `
         <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
           <div style="background:linear-gradient(135deg,#4F46E5,#3B82F6);padding:24px;text-align:center;">
-            <h1 style="color:white;margin:0;font-size:22px;">🔔 Bell24h</h1>
+            <h1 style="color:white;margin:0;font-size:22px;">VyaparSethu</h1>
           </div>
           <div style="padding:30px;background:#f8fafc;">
             <h2 style="color:#1f2937;">Your RFQ is Live!</h2>
@@ -228,14 +326,14 @@ export async function onRFQCreated(rfq: {
               <strong>${rfq.category}</strong>${rfq.location ? ` near <strong>${rfq.location}</strong>` : ''} have been notified.
             </p>
             <div style="text-align:center;margin:24px 0;">
-              <a href="https://bell24h.com/rfq/${rfq.id}"
+              <a href="${SITE_URL}/rfq/${rfq.id}"
                  style="background:#4F46E5;color:white;padding:12px 28px;text-decoration:none;border-radius:6px;font-weight:bold;display:inline-block;">
                 View Your RFQ
               </a>
             </div>
           </div>
           <div style="background:#f3f4f6;padding:16px;text-align:center;color:#6b7280;font-size:12px;">
-            © 2025 Bell24h Technologies Pvt Ltd
+            © 2026 Bell Orbit Technologies Pvt Ltd
           </div>
         </div>
       `,
@@ -328,7 +426,7 @@ export async function onQuoteSubmitted(quote: {
             </div>
           </div>
           <div style="background:#f3f4f6;padding:16px;text-align:center;color:#6b7280;font-size:12px;">
-            © 2025 Bell24h Technologies Pvt Ltd
+            © 2026 Bell Orbit Technologies Pvt Ltd
           </div>
         </div>
       `,
@@ -453,7 +551,7 @@ export async function onQuoteAccepted(quote: {
             </div>
           </div>
           <div style="background:#f3f4f6;padding:16px;text-align:center;color:#6b7280;font-size:12px;">
-            © 2025 Bell24h Technologies Pvt Ltd
+            © 2026 Bell Orbit Technologies Pvt Ltd
           </div>
         </div>
       `,
@@ -585,7 +683,7 @@ export async function onCounterOffer(quote: {
             </div>
           </div>
           <div style="background:#f3f4f6;padding:16px;text-align:center;color:#6b7280;font-size:12px;">
-            © 2025 Bell24h Technologies Pvt Ltd
+            © 2026 Bell Orbit Technologies Pvt Ltd
           </div>
         </div>
       `,

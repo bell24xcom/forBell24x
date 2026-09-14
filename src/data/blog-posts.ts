@@ -82,29 +82,32 @@ If either party crosses this threshold, e-invoicing with IRN generation is manda
   },
   {
     slug: 'voice-rfq-indian-smes',
-    title: 'Speak Your Requirement: How Indian SMEs Are Cutting Procurement Time by 80%',
-    excerpt: 'Typing a detailed Requirement takes 20 minutes. Speaking it takes 90 seconds. VyaparSethu\'s voice requirement feature uses Groq Whisper to transcribe in real time — then AI extracts category, budget, and timeline automatically.',
+    title: 'Speak Your Requirement: How Voice RFQ Works for Indian B2B Buyers',
+    excerpt: 'Typing a detailed Requirement takes time and attention. Speaking it is faster and more natural. VyaparSethu\'s Speak Requirement feature uses Groq Whisper to transcribe what you say, then AI extracts category, budget, and timeline automatically.',
     date: '2026-03-04',
     category: 'Product',
     readTime: '4 min',
     keywords: ['voice RFQ India', 'voice procurement India', 'speak requirement supplier', 'AI procurement India'],
-    body: `The average Indian MSME owner speaks 3 languages, types slowly, and has no time for forms.
+    // SEO-02: rewritten to remove unsupported quantitative claims (fabricated
+    // "80%" time-reduction title, "90 seconds", "3 seconds", "200+ verified
+    // steel suppliers", and an entirely fictional "first pilot suppliers"
+    // results section with invented percentages). No pilot data exists
+    // anywhere in this repository — see
+    // docs/project/SEO-02-CONTENT-INTEGRITY-TECHNICAL-SEO-REPORT.md.
+    // Rewritten to describe the real mechanism only, using the same
+    // claim-safe language already established on /features/voice-rfq.
+    body: `The average Indian MSME owner speaks multiple languages, types slowly, and has no time for forms.
 
 That's why VyaparSethu built the Speak Requirement feature.
 
 **How it works:**
 1. Tap the microphone on VyaparSethu
 2. Speak your requirement in Hindi, English, or Hinglish — "Mujhe 50 MT TMT steel chahiye, IS 1786 Fe 500, Bhiwandi delivery, 15 din mein"
-3. Groq Whisper transcribes in 3 seconds
-4. AI extracts: category (Metals & Alloys), quantity (50 MT), grade (IS 1786 Fe 500), location (Bhiwandi), timeline (15 days)
-5. One tap to post to 200+ verified steel suppliers
+3. Groq Whisper transcribes what you said
+4. AI extracts category, quantity, grade, location, and timeline into structured fields
+5. Review what the AI captured, correct anything it missed, and post to verified suppliers in your category
 
-**Results from our first pilot suppliers:**
-- Average time to post a requirement: **87 seconds** (vs 18 minutes on email)
-- Quote response rate: **73%** (vs 31% on WhatsApp cold messages)
-- Clarification rounds before quote: **0.4** (vs 2.8 on traditional email)
-
-The voice feature works offline for the first 30 seconds, then syncs when connectivity is restored — critical for Bhiwandi godowns and Kalamboli warehouse sites where 4G is patchy.`,
+Speak Requirement works over a standard mobile data connection — useful for Bhiwandi godowns and Kalamboli warehouse sites where connectivity can be inconsistent.`,
   },
   {
     slug: 'questions-to-ask-suppliers',

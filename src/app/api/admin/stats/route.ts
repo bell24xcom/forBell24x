@@ -77,6 +77,14 @@ export async function GET(request: NextRequest) {
     });
     const completedVolume = Number(volumeResult._sum.amount ?? 0);
 
+    // Provider (MSG91/etc.) send failures in the last 24h — backs the
+    // /admin and /admin/errors red banner. Deliberately a plain count query
+    // added to this existing dispatcher route rather than a new /api/
+    // function (Vercel Hobby tier serverless-function limit — see CLAUDE.md).
+    const providerFailures24h = await prisma.providerFailure.count({
+      where: { createdAt: { gte: oneDayAgo } },
+    });
+
     const planDist = await prisma.user.groupBy({ by: ['plan'], _count: { _all: true } });
     const plans    = Object.fromEntries(planDist.map(p => [p.plan, p._count._all]));
 
@@ -135,6 +143,7 @@ export async function GET(request: NextRequest) {
         unansweredRealRfqs,
         expiringSoon,
         activity,
+        providerFailures24h,
       },
     });
   } catch (error) {

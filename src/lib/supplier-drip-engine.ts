@@ -1,18 +1,10 @@
 import { prisma } from '@/lib/prisma';
 import { SITE_URL } from '@/lib/site-url';
+import { buildDripWhatsAppMessage, type DripType } from '@/src/lib/outreach/waMessage';
 
-export type DripType = 'day3' | 'day7' | 'day14';
+export type { DripType };
 
 const DRIP_DAYS: Record<DripType, number> = { day3: 3, day7: 7, day14: 14 };
-
-const DRIP_MESSAGES: Record<DripType, (company: string, link: string) => string> = {
-  day3: (c, l) =>
-    `Hi ${c} 👋 Reminder about your free verified supplier profile on VyaparSethu. Buyers in your cluster are actively posting Requirements. Claim it in 2 min: ${l}`,
-  day7: (c, l) =>
-    `Hi ${c} — It's been a week. Verified buyers are searching your category on VyaparSethu right now. Your profile slot is still reserved: ${l}`,
-  day14: (c, l) =>
-    `Hi ${c} — Last message. We're completing our verified supplier list for your category this week. Claim your free profile before it's offered to a competitor: ${l}`,
-};
 
 export interface DripDue {
   supplierId: string;
@@ -47,9 +39,8 @@ export async function getDripsDue(): Promise<DripDue[]> {
 
     for (const s of suppliers) {
       const claimLink   = s.claimToken ? `${SITE_URL}/claim/${s.claimToken}` : SITE_URL;
-      const companyName = (s.company && s.company.trim()) ? s.company : 'your business';
       const rawPhone    = (s.phone || '').replace(/\D/g, '').slice(-10);
-      const message     = DRIP_MESSAGES[dripType](companyName, claimLink);
+      const message     = buildDripWhatsAppMessage(dripType, s.company, claimLink);
       const waLink      = rawPhone.length === 10
         ? `https://wa.me/91${rawPhone}?text=${encodeURIComponent(message)}`
         : null;

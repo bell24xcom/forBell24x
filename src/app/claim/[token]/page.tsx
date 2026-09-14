@@ -1,7 +1,7 @@
-import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
 import { Building2, MapPin, Star, CheckCircle } from 'lucide-react';
 import ClaimForm from './ClaimForm';
+import { resolveClaimTarget } from '@/src/lib/outreach/resolveClaimTarget';
 
 interface PageProps {
   params: { token: string };
@@ -10,19 +10,9 @@ interface PageProps {
 export default async function ClaimPage({ params }: PageProps) {
   const { token } = params;
 
-  const supplier = await prisma.user.findUnique({
-    where: { claimToken: token },
-    select: {
-      id: true,
-      name: true,
-      company: true,
-      location: true,
-      gstNumber: true,
-      udyamNumber: true,
-      isClaimed: true,
-      claimedAt: true,
-    },
-  });
+  // H6-13: resolves both the new signed-invitation token format and the
+  // legacy bare-UUID users.claim_token format (H6-12 baseline, unchanged).
+  const supplier = await resolveClaimTarget(token);
 
   if (!supplier) {
     notFound();
@@ -36,7 +26,7 @@ export default async function ClaimPage({ params }: PageProps) {
         {/* Logo */}
         <div className="text-center mb-8">
           <span className="text-2xl font-bold text-white">Bell<span className="text-indigo-400">24h</span></span>
-          <p className="text-slate-400 text-sm mt-1">India's AI-Powered B2B Marketplace</p>
+          <p className="text-slate-400 text-sm mt-1">India&apos;s AI-Powered B2B Marketplace</p>
         </div>
 
         <div className="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-6 shadow-xl">
@@ -99,7 +89,7 @@ export default async function ClaimPage({ params }: PageProps) {
               <ClaimForm token={token} companyName={companyName} />
 
               <p className="text-xs text-slate-500 text-center mt-4">
-                By claiming, you agree to Bell24h's{' '}
+                By claiming, you agree to Bell24h&apos;s{' '}
                 <a href="/terms" className="text-indigo-400 hover:underline">Terms of Service</a>.
               </p>
             </>

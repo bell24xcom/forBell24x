@@ -70,6 +70,29 @@ export const voiceRFQFAQ = {
 };
 
 /**
+ * SEO-02: generic FAQPage schema builder. `voiceRFQFAQ` above is
+ * voice-RFQ-specific content — it must not be imported onto a different
+ * page's FAQ section, or the JSON-LD would no longer match that page's
+ * visible content (a schema-validity problem, not just a content one).
+ * This helper is the reusable *shape*, not fixed content: each page passes
+ * its own real, visible Q&A pairs.
+ *
+ * Usage:
+ *   faqPageSchema([{ q: "What is X?", a: "X is..." }, ...])
+ */
+export function faqPageSchema(faqs: { q: string; a: string }[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((f) => ({
+      '@type': 'Question',
+      name: f.q,
+      acceptedAnswer: { '@type': 'Answer', text: f.a },
+    })),
+  };
+}
+
+/**
  * Usage:
  *   breadcrumbSchema([
  *     { name: "Home", url: "https://www.vyaparsethu.com" },

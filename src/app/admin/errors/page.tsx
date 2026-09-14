@@ -21,6 +21,16 @@ interface Summary {
   warn: number;
 }
 
+interface ProviderFailure {
+  id: string;
+  provider: string;
+  endpoint: string;
+  errorCode?: string;
+  errorMessage: string;
+  phoneOrRecipient?: string;
+  createdAt: string;
+}
+
 const SEVERITY_STYLES: Record<string, string> = {
   critical: 'bg-red-100 text-red-800 border-red-300',
   error:    'bg-orange-100 text-orange-800 border-orange-300',
@@ -34,6 +44,7 @@ const SEVERITY_ICON = {
 };
 
 export default function AdminErrorsPage() {
+  const [tab, setTab]           = useState<'errors' | 'provider'>('errors');
   const [logs, setLogs]         = useState<ErrorLog[]>([]);
   const [summary, setSummary]   = useState<Summary>({ critical: 0, error: 0, warn: 0 });
   const [loading, setLoading]   = useState(true);
@@ -42,6 +53,19 @@ export default function AdminErrorsPage() {
   const [page, setPage]         = useState(1);
   const [total, setTotal]       = useState(0);
   const LIMIT = 50;
+
+  // Provider (MSG91/etc.) send failures — separate table from ErrorLog.
+  // See prisma/schema.prisma's ProviderFailure model + lib/providerFailure.ts.
+  const [providerLogs, setProviderLogs]     = useState<ProviderFailure[]>([]);
+  const [providerLoading, setProviderLoading] = useState(true);
+  const [providerTotal, setProviderTotal]   = useState(0);
+  const [providerLast24h, setProviderLast24h] = useState(0);
+
+  // Deep-link support: /admin/errors?tab=provider (used by the /admin banner)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('tab') === 'provider') setTab('provider');
+  }, []);
 
   const fetchLogs = useCallback(async () => {
     setLoading(true);
@@ -66,7 +90,29 @@ export default function AdminErrorsPage() {
     }
   }, [page, severity]);
 
-  useEffect(() => { fetchLogs(); }, [fetchLogs]);
+  const fetchProviderLogs = useCallback(async () => {
+    setProviderLoading(true);
+    try {
+      const params = new URLSearchParams({ source: 'provider', page: String(page), limit: String(LIMIT) });
+      const res = await fetch(`/api/admin/errors?${params}`, {
+        headers: { Authorization: `Bearer ${document.cookie.match(/admin-token=([^;]+)/)?.[1] ?? ''}` },
+        credentials: 'include',
+      });
+      if (!res.ok) throw new Error('Unauthorised');
+      const data = await res.json();
+      setProviderLogs(data.logs ?? []);
+      setProviderTotal(data.pagination?.total ?? 0);
+      setProviderLast24h(data.summary?.last24h ?? 0);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setProviderLoading(false);
+    }
+  }, [page]);
+
+  useEffect(() => {
+    if (tab === 'errors') fetchLogs(); else fetchProviderLogs();
+  }, [tab, fetchLogs, fetchProviderLogs]);
 
   const clearOld = async () => {
     if (!confirm('Delete all error logs older than 30 days?')) return;
@@ -77,6 +123,17 @@ export default function AdminErrorsPage() {
   const deleteOne = async (id: string) => {
     await fetch(`/api/admin/errors?id=${id}`, { method: 'DELETE', credentials: 'include' });
     setLogs(prev => prev.filter(l => l.id !== id));
+  };
+
+  const clearOldProvider = async () => {
+    if (!confirm('Delete all provider failure logs older than 30 days?')) return;
+    await fetch('/api/admin/errors?source=provider', { method: 'DELETE', credentials: 'include' });
+    fetchProviderLogs();
+  };
+
+  const deleteOneProvider = async (id: string) => {
+    await fetch(`/api/admin/errors?source=provider&id=${id}`, { method: 'DELETE', credentials: 'include' });
+    setProviderLogs(prev => prev.filter(l => l.id !== id));
   };
 
   return (
@@ -91,13 +148,13 @@ export default function AdminErrorsPage() {
         </div>
         <div style={{ display: 'flex', gap: '12px' }}>
           <button
-            onClick={fetchLogs}
+            onClick={tab === 'errors' ? fetchLogs : fetchProviderLogs}
             style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: '#1e293b', border: '1px solid #334155', borderRadius: '8px', color: '#e2e8f0', cursor: 'pointer', fontSize: '14px' }}
           >
             <RefreshCw style={{ width: 14, height: 14 }} /> Refresh
           </button>
           <button
-            onClick={clearOld}
+            onClick={tab === 'errors' ? clearOld : clearOldProvider}
             style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', background: '#7f1d1d', border: 'none', borderRadius: '8px', color: '#fca5a5', cursor: 'pointer', fontSize: '14px' }}
           >
             <Trash2 style={{ width: 14, height: 14 }} /> Clear Old
@@ -105,6 +162,93 @@ export default function AdminErrorsPage() {
         </div>
       </div>
 
+      {/* Tabs */}
+      <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
+        {([['errors', 'App Errors'], ['provider', `Provider Failures${providerLast24h > 0 ? ` (${providerLast24h})` : ''}`]] as const).map(([key, label]) => (
+          <button
+            key={key}
+            onClick={() => { setTab(key); setPage(1); }}
+            style={{
+              padding: '8px 16px', borderRadius: '8px', fontSize: '13px', fontWeight: 600, cursor: 'pointer',
+              background: tab === key ? '#3b82f6' : '#1e293b',
+              color: tab === key ? '#fff' : '#94a3b8',
+              border: '1px solid #334155',
+            }}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {tab === 'provider' ? (
+        <>
+          {/* Provider failure list */}
+          {providerLoading ? (
+            <div style={{ textAlign: 'center', padding: '60px', color: '#64748b' }}>Loading...</div>
+          ) : providerLogs.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '60px', color: '#64748b' }}>
+              <AlertCircle style={{ width: 40, height: 40, margin: '0 auto 12px', opacity: 0.3 }} />
+              <p>No provider failures logged.</p>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {providerLogs.map(pf => (
+                <div key={pf.id} style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '10px', overflow: 'hidden' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '14px 16px' }}>
+                    <span style={{
+                      padding: '2px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase',
+                      background: '#7f1d1d', color: '#fca5a5', flexShrink: 0,
+                    }}>
+                      {pf.provider}
+                    </span>
+                    <code style={{ fontSize: '12px', color: '#818cf8', background: '#312e81', padding: '2px 6px', borderRadius: '4px', flexShrink: 0 }}>
+                      {pf.errorCode ?? 'no-code'}
+                    </code>
+                    <span style={{ fontSize: '13px', color: '#e2e8f0', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {pf.errorMessage}
+                    </span>
+                    {pf.phoneOrRecipient && (
+                      <span style={{ fontSize: '12px', color: '#64748b', flexShrink: 0 }}>{pf.phoneOrRecipient}</span>
+                    )}
+                    <span style={{ fontSize: '12px', color: '#64748b', flexShrink: 0 }}>
+                      {new Date(pf.createdAt).toLocaleString('en-IN', { dateStyle: 'short', timeStyle: 'short' })}
+                    </span>
+                    <button
+                      onClick={() => deleteOneProvider(pf.id)}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', padding: '4px', flexShrink: 0 }}
+                    >
+                      <Trash2 style={{ width: 14, height: 14 }} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {providerTotal > LIMIT && (
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginTop: '24px' }}>
+              <button
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={page === 1}
+                style={{ padding: '8px 20px', background: '#1e293b', border: '1px solid #334155', borderRadius: '8px', color: '#e2e8f0', cursor: 'pointer', opacity: page === 1 ? 0.4 : 1 }}
+              >
+                Previous
+              </button>
+              <span style={{ lineHeight: '36px', fontSize: '14px', color: '#94a3b8' }}>
+                Page {page} of {Math.ceil(providerTotal / LIMIT)}
+              </span>
+              <button
+                onClick={() => setPage(p => p + 1)}
+                disabled={page >= Math.ceil(providerTotal / LIMIT)}
+                style={{ padding: '8px 20px', background: '#1e293b', border: '1px solid #334155', borderRadius: '8px', color: '#e2e8f0', cursor: 'pointer', opacity: page >= Math.ceil(providerTotal / LIMIT) ? 0.4 : 1 }}
+              >
+                Next
+              </button>
+            </div>
+          )}
+        </>
+      ) : (
+      <>
       {/* Summary Cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '24px' }}>
         {[
@@ -251,6 +395,8 @@ export default function AdminErrorsPage() {
           n8n Webhook → Filter (severity=critical) → Telegram/Slack.
         </p>
       </div>
+      </>
+      )}
     </div>
   );
 }

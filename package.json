@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "prisma migrate resolve --rolled-back 0002_leads_dpdp || true && prisma migrate deploy && prisma generate && next build",
+    "build:ci": "prisma generate && next build",
+    "typecheck:ci": "tsc --noEmit -p tsconfig.ci.json",
     "vercel-build": "prisma migrate resolve --rolled-back 0002_leads_dpdp || true && prisma migrate deploy && prisma generate && next build",
     "db:migrate": "prisma migrate resolve --rolled-back 0002_leads_dpdp || true && prisma migrate deploy",
     "start": "next start",
@@ -14,6 +16,7 @@
     "lint": "next lint",
     "compile": "hardhat compile",
     "test": "hardhat test",
+    "test:outreach": "node --test src/lib/outreach/*.test.ts",
     "test:bell24h-os": "node --test src/lib/bell24h-os/*.test.ts",
     "test:jwt-fail-closed": "node --test src/lib/jwt.test.ts",
     "deploy:polygon": "hardhat run scripts/deploy.js --network polygon",
@@ -63,6 +66,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.10",
     "eslint": "^8.0.0",
     "eslint-config-next": "14.0.0",
     "hardhat": "^2.17.0",

@@ -1,12 +1,14 @@
 /**
- * Admin CRM API — full user management with plan/role/status controls.
- * GET  /api/admin/crm?search=&role=&plan=&page=&limit=
+ * Admin CRM API — user management + per-company journey timeline.
+ * GET  /api/admin/crm?userId=           — company profile + unified timeline
+ * GET  /api/admin/crm?search=&role=&plan=&page=&limit=  — user list
  * PUT  /api/admin/crm  { userId, action: 'activate'|'deactivate'|'setPlan'|'setRole', value }
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin, isErrorResponse } from '@/lib/admin-auth';
+import { buildCrmJourney } from '@/src/lib/crm/company-timeline';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,6 +18,20 @@ export async function GET(request: NextRequest) {
 
   try {
     const { searchParams } = new URL(request.url);
+    const userId = searchParams.get('userId');
+
+    // Per-company CRM timeline mode
+    if (userId) {
+      const journey = await buildCrmJourney(
+        userId,
+        Math.min(200, parseInt(searchParams.get('limit') || '100', 10)),
+      );
+      if (!journey) {
+        return NextResponse.json({ success: false, message: 'Company not found' }, { status: 404 });
+      }
+      return NextResponse.json({ success: true, ...journey });
+    }
+
     const page   = Math.max(1, parseInt(searchParams.get('page')   || '1'));
     const limit  = Math.min(100, parseInt(searchParams.get('limit') || '25'));
     const role   = searchParams.get('role');

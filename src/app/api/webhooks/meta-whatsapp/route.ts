@@ -15,6 +15,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyHandshake, verifySignature, extractDeliveryStatuses } from '@/src/lib/whatsapp/webhook';
 import { logger } from '@/lib/logger';
+import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
@@ -46,13 +47,44 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
   }
 
+  // 1. Audit log raw verified webhook payload
+  try {
+    await prisma.webhook.create({
+      data: {
+        eventType: 'meta_whatsapp_delivery_status',
+        payload: (payload as object) ?? {},
+        status: 'processed',
+      },
+    });
+  } catch (dbErr) {
+    logger.warn('[meta-whatsapp webhook] failed to log raw webhook to db', { err: dbErr });
+  }
+
   const statuses = extractDeliveryStatuses(payload);
   if (statuses.length > 0) {
     logger.info('[meta-whatsapp webhook] delivery statuses received', { count: statuses.length });
+
+    // 2. Persist delivery lifecycle status to outreach recipients if matched
+    for (const s of statuses) {
+      try {
+        const stateMapping =
+          s.status === 'delivered' ? 'DELIVERED' :
+          s.status === 'read' ? 'DELIVERED' :
+          s.status === 'failed' ? 'FAILED' : 'SENT';
+
+        await prisma.outreachRecipient.updateMany({
+          where: { providerMessageId: s.messageId },
+          data: {
+            state: stateMapping,
+            deliveredAt: s.status === 'delivered' || s.status === 'read' ? new Date(s.timestamp) : undefined,
+            failedAt: s.status === 'failed' ? new Date(s.timestamp) : undefined,
+          },
+        });
+      } catch (recipientErr) {
+        logger.warn('[meta-whatsapp webhook] failed to update recipient state', { messageId: s.messageId, err: recipientErr });
+      }
+    }
   }
 
-  // Idempotent no-op: readiness only. No DB write, no business action.
-  // A future sprint wires this into a delivery-status store once the
-  // integration is live and a storage decision has been made.
   return NextResponse.json({ received: true, statusCount: statuses.length });
 }

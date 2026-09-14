@@ -1,16 +1,9 @@
 # Bell24H Deployment
 # Vercel handles auto-deployment when connected to the GitHub repo.
-# No GitHub Actions workflow needed — Vercel deploys on every push to main.
+# This workflow verifies the production build compiles in CI without a live DB.
 #
 # Previous setup: Oracle VM at 80.225.192.248 (expired Feb 2026)
 # Current setup: Vercel (https://vercel.com)
-#
-# To set up:
-# 1. Go to https://vercel.com/new
-# 2. Import bell24xcom/forBell24x
-# 3. Set environment variables in Vercel dashboard
-# 4. Add bell24h.com as custom domain
-# 5. Vercel auto-deploys on push to main
 
 name: Verify Build
 
@@ -23,6 +16,13 @@ on:
 jobs:
   build-check:
     runs-on: ubuntu-latest
+    env:
+      NODE_ENV: production
+      NEXT_PUBLIC_SITE_URL: https://www.bell24h.com
+      # Required by prisma/schema.prisma; migrate deploy is skipped in build:ci.
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/ci?schema=public
+      DIRECT_URL: postgresql://ci:ci@localhost:5432/ci?schema=public
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -40,10 +40,7 @@ jobs:
         run: npx prisma generate
 
       - name: Build
-        run: npm run build
-        env:
-          NODE_ENV: production
-          NEXT_PUBLIC_SITE_URL: https://www.bell24h.com
+        run: npm run build:ci
 
       - name: Build Status
         if: success()

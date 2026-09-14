@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { storeRFQ, extractRFQMeta } from '@/lib/memory-engine';
 import { agentZero } from '@/lib/agents/agent-zero';
 import { verifyToken } from '@/lib/jwt';
+import { onRFQCreated } from '@/lib/orchestration';
 
 // "₹2.5L" / "₹50,000" / "100000" / "2L - 5L" → integer
 function extractBudgetNumber(budgetStr: string): number {
@@ -287,6 +288,29 @@ JSON (all fields required, use null if not mentioned):
           companyId: userId ?? undefined,
           metadata: { ...meta.metadata, via: 'video', source: 'video_rfq' },
         }).catch((e) => console.error('[VideoRFQ] storeRFQ error:', e));
+
+        // Same orchestration path as text RFQ when buyer is authenticated.
+        if (userId) {
+          prisma.user
+            .findUnique({
+              where: { id: userId },
+              select: { id: true, name: true, email: true },
+            })
+            .then((buyer) => {
+              if (!buyer) return;
+              return onRFQCreated(
+                {
+                  id: savedRFQ.id,
+                  title: savedRFQ.title,
+                  category: savedRFQ.category,
+                  location: savedRFQ.location,
+                },
+                buyer,
+              );
+            })
+            .catch((e) => console.error('[VideoRFQ] onRFQCreated failed:', e));
+        }
+
         agentZero({ ...savedRFQ, urgency: savedRFQ.urgency as string }).catch((e) =>
           console.error('[VideoRFQ] agentZero error:', e),
         );

@@ -8,7 +8,8 @@ type NavItem = { href: string; label: string; icon: string; group?: string };
 
 const NAV: NavItem[] = [
   // Core
-  { href: '/admin',                  label: 'Dashboard',        icon: '▤',  group: 'Intelligence' },
+  { href: '/admin/cockpit',          label: 'Founder Cockpit',  icon: '⌘',  group: 'Intelligence' },
+  { href: '/admin',                  label: 'Dashboard',        icon: '▤' },
   // INTELLIGENCE_LAYER — hidden until Phase D gate opens
   // { href: '/admin/company-dna',      label: 'Company DNA',      icon: '🧬' },
   // INTELLIGENCE_LAYER — hidden until Phase D gate opens
@@ -37,6 +38,7 @@ const NAV: NavItem[] = [
   { href: '/admin/directories/submit', label: 'Crunchbase / G2', icon: '⭐' },
   { href: '/admin/directories',      label: 'Directories',      icon: '🔗' },
   { href: '/admin/outreach',         label: 'WhatsApp Outreach', icon: '📢' },
+  { href: '/admin/whatsapp/ops',     label: 'WhatsApp Ops',      icon: '📲' },
   { href: '/admin/whatsapp-cloud-api', label: 'WhatsApp Cloud API (Meta)', icon: '🟢' },
   { href: '/admin/control-panel',    label: 'Control Panel',    icon: '⚙️' },
   { href: '/admin/feature-flags',    label: 'Feature Flags',    icon: '🚩' },
@@ -49,6 +51,14 @@ const NAV: NavItem[] = [
   { href: '/admin/errors',           label: 'Error Logs',       icon: '🐛' },
   { href: '/admin/compliance',       label: 'Compliance',       icon: '🛡️' },
   // Data
+  { href: '/admin/discovery/command-center', label: 'Discovery Command', icon: '⌘', group: 'Data' },
+  { href: '/admin/discovery',        label: 'Discovery Engine', icon: '🔭', group: 'Data' },
+  { href: '/admin/discovery/intelligence', label: 'Discovery Intelligence', icon: '🧠', group: 'Data' },
+  { href: '/admin/discovery/invitation', label: 'Invitation Engine', icon: '✉️', group: 'Data' },
+  { href: '/admin/discovery/insights', label: 'Discovery CRM Insights', icon: '📊', group: 'Data' },
+  { href: '/admin/discovery/trust', label: 'Trust Score Engine', icon: '🛡️', group: 'Data' },
+  { href: '/admin/discovery/health', label: 'Discovery Health', icon: '📡', group: 'Data' },
+  { href: '/admin/discovery/readiness', label: 'Discovery Readiness', icon: '✅', group: 'Data' },
   { href: '/admin/import',           label: 'Import Suppliers', icon: '📥', group: 'Data' },
   { href: '/admin/seed-rfqs',        label: 'Seed RFQs',        icon: '🌱' },
   { href: '/admin/launch-metrics',   label: 'Launch Metrics',   icon: '🚀' },

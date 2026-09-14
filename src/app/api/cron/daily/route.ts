@@ -33,6 +33,7 @@ async function run(req: NextRequest) {
     '/api/cron/demand-loop',
     '/api/cron/analyze-behavior',
     '/api/cron/update-insights',
+    '/api/cron/trust-scores',
   );
 
   // Run sequentially so DB load is spread and logs are ordered
