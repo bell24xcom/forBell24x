@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { generateSecureId } from '@/lib/security';
+import { onQuoteSubmitted } from '@/lib/orchestration';
 
 export const dynamic = 'force-dynamic';
 
@@ -83,6 +84,43 @@ export async function POST(req: NextRequest) {
           price: parsedPrice,
         }),
       }).catch(console.error);
+    }
+
+    // 4. Orchestration: in-app + email notification to the buyer, and a
+    // confirmation to the supplier — previously never invoked by this
+    // route (only the raw n8n webhook above fired). This route accepts an
+    // optional, unauthenticated supplier_id, so it's guarded: skipped
+    // entirely if the RFQ or supplier can't be resolved, never blocking
+    // the response above.
+    try {
+      if (supplier_id) {
+        const [rfq, supplier] = await Promise.all([
+          prisma.rFQ.findUnique({
+            where: { id: rfq_id },
+            select: { id: true, title: true, createdBy: true },
+          }),
+          prisma.user.findUnique({
+            where: { id: supplier_id },
+            select: { id: true, name: true, company: true, email: true },
+          }),
+        ]);
+        if (rfq?.createdBy && supplier) {
+          const buyer = await prisma.user.findUnique({
+            where: { id: rfq.createdBy },
+            select: { id: true, name: true, email: true },
+          });
+          if (buyer) {
+            await onQuoteSubmitted(
+              { id: quote.id, price: parsedPrice, timeline: quote.timeline || `${parsedDeliveryDays} days` },
+              { id: rfq.id, title: rfq.title, createdBy: rfq.createdBy },
+              supplier,
+              buyer,
+            );
+          }
+        }
+      }
+    } catch (orchErr) {
+      console.error('[Quote-API] onQuoteSubmitted failed:', orchErr);
     }
 
     return NextResponse.json({ success: true, quote_id: quote.id });

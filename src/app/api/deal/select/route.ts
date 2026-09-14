@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthenticatedUser } from '@/src/lib/auth-helpers';
 import { z } from 'zod';
+import { onQuoteAccepted } from '@/lib/orchestration';
 
 const SelectDealSchema = z.object({
   quoteId: z.string(),
@@ -97,6 +98,31 @@ export async function POST(req: NextRequest) {
       }
     } catch (e) {
       console.error('[Deal Select] life-event failed:', e instanceof Error ? e.message : e);
+    }
+
+    // Orchestration: trust-score bump, auto-opened message thread, in-app
+    // notifications for both parties, and the n8n webhook that fires
+    // WhatsApp/email follow-ups — previously never invoked by this route,
+    // the real endpoint the buyer-facing UI calls to accept a quote.
+    try {
+      const supplier = await prisma.user.findUnique({
+        where: { id: quote.supplierId! },
+        select: { id: true, name: true, email: true },
+      });
+      const buyer = await prisma.user.findUnique({
+        where: { id: user.id },
+        select: { name: true },
+      });
+      if (supplier) {
+        await onQuoteAccepted(
+          { id: quote.id, price: quote.price },
+          { id: quote.rfq.id, title: quote.rfq.title },
+          supplier,
+          { id: user.id, name: buyer?.name ?? null },
+        );
+      }
+    } catch (orchErr) {
+      console.error('[Deal Select] onQuoteAccepted failed:', orchErr);
     }
 
     return NextResponse.json({ success: true, deal }, { status: 201 });
