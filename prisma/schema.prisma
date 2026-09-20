@@ -919,6 +919,47 @@ enum MatchApprovalStatus {
   EXPIRED
 }
 
+// WhatsApp Certification (Part C). Send-side tracking that previously did
+// not exist anywhere in this codebase — the Meta messageId returned by a
+// successful send was discarded immediately, making it impossible to
+// correlate a later delivery/read/failed webhook event back to the RFQ or
+// supplier that triggered it. See lib/orchestration.ts's notifySupplierForRFQ
+// (writer) and src/app/api/webhooks/meta-whatsapp/route.ts (updater, keyed
+// on metaMessageId).
+enum WhatsAppSendStatus {
+  REQUESTED
+  SENT
+  NOT_CONFIGURED
+  META_ERROR
+}
+
+model WhatsAppSendLog {
+  id              String             @id @default(cuid())
+  rfqId           String?            @map("rfq_id")
+  supplierId      String?            @map("supplier_id")
+  matchApprovalId String?            @map("match_approval_id")
+  templateName    String             @map("template_name")
+  // Last 4 digits only — never the full phone number, matching the masking
+  // convention already used in WhatsAppService.ts's safeLogMeta.
+  phoneRedacted   String             @map("phone_redacted")
+  metaMessageId   String?            @unique @map("meta_message_id")
+  status          WhatsAppSendStatus @default(REQUESTED)
+  errorCode       String?            @map("error_code")
+  errorMessage    String?            @map("error_message")
+  sentAt          DateTime           @default(now()) @map("sent_at")
+  // Populated later by the inbound webhook, matched on meta_message_id.
+  deliveryStatus  String?            @map("delivery_status")
+  deliveredAt     DateTime?          @map("delivered_at")
+  readAt          DateTime?          @map("read_at")
+  failedAt        DateTime?          @map("failed_at")
+  failureReason   String?            @map("failure_reason")
+  createdAt       DateTime           @default(now()) @map("created_at")
+
+  @@index([rfqId])
+  @@index([status])
+  @@map("whatsapp_send_logs")
+}
+
 model MatchApproval {
   id                     String              @id @default(cuid())
   rfqId                  String              @map("rfq_id")

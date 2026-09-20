@@ -44,12 +44,27 @@ export function verifySignature(rawBody: string, signatureHeader: string | null)
   return crypto.timingSafeEqual(expectedBuf, providedBuf);
 }
 
+/** A single error Meta attaches to a 'failed' status object. */
+export interface NormalizedDeliveryError {
+  code?: string;
+  title?: string;
+  message?: string;
+  details?: string;
+}
+
 /** Normalized delivery-status shape extracted from a verified Meta webhook payload. */
 export interface NormalizedDeliveryStatus {
   messageId: string;
   status: 'sent' | 'delivered' | 'read' | 'failed';
   recipientRedacted: string;
   timestamp: string;
+  /**
+   * WhatsApp Certification (Part C). Meta's `errors[]` array, present on a
+   * 'failed' status — previously dropped entirely, which is why this
+   * session's earlier root-cause investigation had to read raw DB payloads
+   * by hand to find error 131047. Empty array when absent.
+   */
+  errors: NormalizedDeliveryError[];
 }
 
 /** Extracts delivery statuses from a Meta webhook payload. Never throws on malformed input. */
@@ -64,11 +79,20 @@ export function extractDeliveryStatuses(payload: unknown): NormalizedDeliverySta
         for (const s of statuses) {
           if (!s?.id || !s?.status) continue;
           const recipient = String(s.recipient_id ?? '');
+          const errors: NormalizedDeliveryError[] = Array.isArray(s.errors)
+            ? s.errors.map((e: any) => ({
+                code: e?.code != null ? String(e.code) : undefined,
+                title: e?.title,
+                message: e?.message,
+                details: e?.error_data?.details,
+              }))
+            : [];
           out.push({
             messageId: String(s.id),
             status: s.status,
             recipientRedacted: recipient.length > 4 ? `***${recipient.slice(-4)}` : '***',
             timestamp: s.timestamp ? new Date(Number(s.timestamp) * 1000).toISOString() : new Date().toISOString(),
+            errors,
           });
         }
       }

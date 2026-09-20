@@ -21,6 +21,7 @@ import { prisma } from '@/lib/prisma';
 import type { Prisma } from '@prisma/client';
 import { requireAdmin, isErrorResponse } from '@/lib/admin-auth';
 import { releaseApprovedNotifications } from '@/lib/orchestration';
+import { getCertificationOverview } from '@/lib/certification';
 
 export const dynamic = 'force-dynamic';
 
@@ -35,6 +36,12 @@ export async function GET(req: NextRequest) {
   if (isErrorResponse(auth)) return auth;
 
   try {
+    const view = req.nextUrl.searchParams.get('view');
+    if (view === 'certifications') {
+      const certifications = await getCertificationOverview();
+      return NextResponse.json({ success: true, certifications });
+    }
+
     const id = req.nextUrl.searchParams.get('id');
 
     if (id) {
@@ -178,7 +185,8 @@ export async function POST(req: NextRequest) {
 
     await releaseApprovedNotifications(
       approval.rfq,
-      suppliers.map((s) => ({ ...s, score: scoreById.get(s.id) }))
+      suppliers.map((s) => ({ ...s, score: scoreById.get(s.id) })),
+      approval.id
     );
 
     await prisma.matchApproval.update({

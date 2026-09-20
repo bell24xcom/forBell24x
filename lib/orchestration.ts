@@ -252,15 +252,25 @@ async function findMatchedSuppliers(rfqCategory: string, rfqLocation: string | n
   };
 }
 
+/** Last 4 digits only — never the full phone number. Matches WhatsAppService.ts's safeLogMeta. */
+function maskPhone(phone: string): string {
+  return phone.length > 4 ? `***${phone.slice(-4)}` : '***';
+}
+
 /**
  * Sends the in-app + email + WhatsApp notification set for one supplier
  * about one RFQ. Shared by the normal auto-notify path (onRFQCreated) and
  * the founder-approval release path (releaseApprovedNotifications) so both
  * routes exercise identical, single-source send logic.
+ *
+ * matchApprovalId is only set when called from the approval-release path —
+ * it links the resulting WhatsAppSendLog row back to the founder decision
+ * that authorized it, for certification/audit purposes (Part C/B).
  */
 async function notifySupplierForRFQ(
   rfq: { id: string; title: string; category: string; location: string | null },
-  s: { id: string; name: string | null; email: string | null; phone: string | null; score?: number }
+  s: { id: string; name: string | null; email: string | null; phone: string | null; score?: number },
+  matchApprovalId?: string
 ) {
   await createNotification(
     s.id,
@@ -302,6 +312,26 @@ async function notifySupplierForRFQ(
           supplierId: s.id, status: outcome.status,
         });
       }
+
+      // WhatsApp Certification (Part C) — send-side tracking. Fire-and-forget,
+      // never blocks the notify flow; the messageId captured here is what
+      // lets the inbound webhook (src/app/api/webhooks/meta-whatsapp/route.ts)
+      // later correlate a delivery/read/failed event back to this RFQ/supplier.
+      prisma.whatsAppSendLog
+        .create({
+          data: {
+            rfqId: rfq.id,
+            supplierId: s.id,
+            matchApprovalId: matchApprovalId ?? null,
+            templateName: template,
+            phoneRedacted: maskPhone(s.phone!),
+            metaMessageId: outcome.status === 'SENT' ? outcome.messageId ?? null : null,
+            status: outcome.status,
+            errorCode: outcome.status === 'META_ERROR' ? outcome.errorCode ?? null : null,
+            errorMessage: outcome.status === 'META_ERROR' ? outcome.errorMessage ?? null : null,
+          },
+        })
+        .catch((err) => console.error('[Orchestration] WhatsAppSendLog write failed:', err));
     } catch (err) {
       console.error('[Orchestration] supplier WhatsApp threw', { supplierId: s.id, err });
     }
@@ -367,9 +397,10 @@ async function createPendingMatchApproval(
  */
 export async function releaseApprovedNotifications(
   rfq: { id: string; title: string; category: string; location: string | null },
-  selectedSuppliers: Array<{ id: string; name: string | null; email: string | null; phone: string | null; score?: number }>
+  selectedSuppliers: Array<{ id: string; name: string | null; email: string | null; phone: string | null; score?: number }>,
+  matchApprovalId?: string
 ): Promise<void> {
-  await Promise.allSettled(selectedSuppliers.map(s => notifySupplierForRFQ(rfq, s)));
+  await Promise.allSettled(selectedSuppliers.map(s => notifySupplierForRFQ(rfq, s, matchApprovalId)));
 }
 
 // ─── Event: RFQ Created ──────────────────────────────────────────────────────

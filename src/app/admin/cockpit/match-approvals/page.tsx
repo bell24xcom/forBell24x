@@ -11,6 +11,7 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
+import { Video, Download } from 'lucide-react';
 import {
   CockpitShell,
   CockpitPanel,
@@ -55,9 +56,40 @@ interface Counts {
   certificationTests: number;
 }
 
+interface CertificationRecord {
+  rfqId: string;
+  rfqTitle: string;
+  category: string;
+  location: string | null;
+  videoUrl: string | null;
+  stage: 'PENDING_APPROVAL' | 'REJECTED' | 'APPROVED' | 'NOTIFICATION_SENT' | 'QUOTE_RECEIVED' | 'CERTIFIED';
+  matchApprovalId: string | null;
+  matchApprovalStatus: string | null;
+  isCertificationTest: boolean;
+  sendCount: number;
+  deliveredOrReadCount: number;
+  failedCount: number;
+  quoteCount: number;
+  lastEventAt: string;
+}
+
 const STATUS_TABS = ['PENDING_FOUNDER_APPROVAL', 'APPROVED', 'REJECTED', 'ALL'] as const;
+const MAIN_TABS = ['Approval Queue', 'Marketplace Certification'] as const;
+
+const STAGE_COLOR: Record<CertificationRecord['stage'], string> = {
+  PENDING_APPROVAL: 'border-amber-700/50 bg-amber-900/20 text-amber-300',
+  REJECTED: 'border-red-700/50 bg-red-900/20 text-red-300',
+  APPROVED: 'border-blue-700/50 bg-blue-900/20 text-blue-300',
+  NOTIFICATION_SENT: 'border-indigo-700/50 bg-indigo-900/20 text-indigo-300',
+  QUOTE_RECEIVED: 'border-cyan-700/50 bg-cyan-900/20 text-cyan-300',
+  CERTIFIED: 'border-emerald-700/50 bg-emerald-900/20 text-emerald-300',
+};
 
 export default function MatchApprovalsPage() {
+  const [mainTab, setMainTab] = useState<(typeof MAIN_TABS)[number]>('Approval Queue');
+  const [certifications, setCertifications] = useState<CertificationRecord[]>([]);
+  const [certLoading, setCertLoading] = useState(false);
+  const [certError, setCertError] = useState('');
   const [status, setStatus] = useState<(typeof STATUS_TABS)[number]>('PENDING_FOUNDER_APPROVAL');
   const [approvals, setApprovals] = useState<Approval[]>([]);
   const [counts, setCounts] = useState<Counts | null>(null);
@@ -88,6 +120,25 @@ export default function MatchApprovalsPage() {
   useEffect(() => {
     load();
   }, [load]);
+
+  const loadCertifications = useCallback(async () => {
+    setCertLoading(true);
+    setCertError('');
+    try {
+      const res = await fetch('/api/admin/match-approvals?view=certifications', { credentials: 'include' });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error || 'Failed to load certifications');
+      setCertifications(data.certifications ?? []);
+    } catch (e) {
+      setCertError(e instanceof Error ? e.message : 'Failed to load certifications');
+    } finally {
+      setCertLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (mainTab === 'Marketplace Certification') loadCertifications();
+  }, [mainTab, loadCertifications]);
 
   function toggleSupplier(approvalId: string, supplierId: string) {
     setSelectedBySupplier((prev) => {
@@ -187,6 +238,23 @@ export default function MatchApprovalsPage() {
         ))}
       </div>
 
+      <div className="flex gap-2 flex-wrap border-b border-slate-700/50 pb-3">
+        {MAIN_TABS.map((t) => (
+          <button
+            key={t}
+            type="button"
+            onClick={() => setMainTab(t)}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+              mainTab === t ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            {t}
+          </button>
+        ))}
+      </div>
+
+      {mainTab === 'Approval Queue' ? (
+      <>
       <div className="flex gap-2 flex-wrap">
         {STATUS_TABS.map((t) => (
           <button
@@ -326,6 +394,69 @@ export default function MatchApprovalsPage() {
           </div>
         )}
       </CockpitPanel>
+      </>
+      ) : (
+        <CockpitPanel>
+          <CockpitSectionLabel>Marketplace Certification — RFQ → Match → Approval → WhatsApp → Quote</CockpitSectionLabel>
+          {certError && <CockpitError message={certError} onRetry={loadCertifications} />}
+          {certLoading ? (
+            <CockpitFallback message="Loading…" />
+          ) : certifications.length === 0 ? (
+            <CockpitFallback message="No RFQ has entered the observable pipeline yet (no MatchApproval or WhatsApp send recorded)." />
+          ) : (
+            <div className="space-y-3">
+              {certifications.map((c) => (
+                <div key={c.rfqId} className="border border-slate-700/50 rounded-lg p-4 space-y-2">
+                  <div className="flex items-center justify-between gap-3 flex-wrap">
+                    <div>
+                      <p className="text-white font-medium text-sm">
+                        {c.rfqTitle}
+                        {c.isCertificationTest && (
+                          <span className="ml-2 text-[10px] px-1.5 py-0.5 rounded bg-purple-900/40 text-purple-300 border border-purple-700/50">
+                            certification test
+                          </span>
+                        )}
+                      </p>
+                      <p className="text-slate-400 text-xs mt-0.5">
+                        {c.category}{c.location ? ` · ${c.location}` : ''} · {new Date(c.lastEventAt).toLocaleString()}
+                      </p>
+                    </div>
+                    <span className={`px-2 py-1 rounded-md text-[11px] font-semibold border ${STAGE_COLOR[c.stage]}`}>
+                      {c.stage.replace(/_/g, ' ')}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-wrap gap-4 text-xs text-slate-400">
+                    <span>WhatsApp sent: <span className="text-slate-200">{c.sendCount}</span></span>
+                    <span>Delivered/Read: <span className="text-emerald-300">{c.deliveredOrReadCount}</span></span>
+                    <span>Failed: <span className="text-red-300">{c.failedCount}</span></span>
+                    <span>Quotes: <span className="text-cyan-300">{c.quoteCount}</span></span>
+                  </div>
+
+                  {c.videoUrl && (
+                    <div className="pt-2 space-y-2">
+                      <p className="text-slate-400 text-xs font-semibold flex items-center gap-1.5">
+                        <Video className="w-3.5 h-3.5 text-purple-400" /> Submitted video
+                      </p>
+                      <div className="relative rounded-lg overflow-hidden bg-black aspect-video max-w-sm">
+                        <video src={c.videoUrl} controls className="w-full h-full object-contain" />
+                      </div>
+                      <a
+                        href={c.videoUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-xs text-indigo-400 hover:text-indigo-300"
+                      >
+                        <Download className="w-3.5 h-3.5" /> Download / open original
+                      </a>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </CockpitPanel>
+      )}
     </CockpitShell>
   );
 }
