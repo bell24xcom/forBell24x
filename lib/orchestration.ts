@@ -334,6 +334,28 @@ async function notifySupplierForRFQ(
         .catch((err) => console.error('[Orchestration] WhatsAppSendLog write failed:', err));
     } catch (err) {
       console.error('[Orchestration] supplier WhatsApp threw', { supplierId: s.id, err });
+
+      // PR61 remediation: an exception thrown by sendTemplateMessage (as
+      // opposed to one of its typed outcomes) previously left NO
+      // WhatsAppSendLog row at all — a real send attempt would vanish
+      // without a trace. Recorded here as META_ERROR (no dedicated enum
+      // value added, per this task's "do not change WhatsApp API
+      // integration" scope) with errorCode UNCAUGHT_EXCEPTION so it stays
+      // distinguishable from a typed Meta API rejection.
+      prisma.whatsAppSendLog
+        .create({
+          data: {
+            rfqId: rfq.id,
+            supplierId: s.id,
+            matchApprovalId: matchApprovalId ?? null,
+            templateName: template,
+            phoneRedacted: maskPhone(s.phone!),
+            status: 'META_ERROR',
+            errorCode: 'UNCAUGHT_EXCEPTION',
+            errorMessage: err instanceof Error ? err.message : String(err),
+          },
+        })
+        .catch((logErr) => console.error('[Orchestration] WhatsAppSendLog write failed (exception path):', logErr));
     }
   }
 }
