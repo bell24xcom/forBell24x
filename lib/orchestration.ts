@@ -166,6 +166,18 @@ async function findMatchedSuppliers(rfqCategory: string, rfqLocation: string | n
         take: 30, // enough to infer category history
       },
     },
+    // PR61 remediation: this query previously had no orderBy, so with
+    // 1300+ active suppliers and only 200 read, Postgres's default row
+    // order silently excluded every supplier created after a fixed point
+    // in time (confirmed: only suppliers created before 2026-06-20 were
+    // ever returned — all 9 suppliers created since then were invisible
+    // to matching regardless of how well they'd score). Ordering by
+    // createdAt desc guarantees newly onboarded suppliers are always
+    // considered; it does not fully solve the underlying "only 200 of
+    // 1300+ suppliers are ever sampled" limitation, which needs a
+    // relevance-based pre-filter (by category/location) to fix properly —
+    // out of scope here.
+    orderBy: { createdAt: 'desc' },
     take: 200, // read more so we can score and pick best 15
   }).catch(() => []);
 
