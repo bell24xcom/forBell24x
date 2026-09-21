@@ -135,8 +135,9 @@ interface MatchResult {
   /** Every scored candidate — the founder-approval candidate pool. */
   allScored: ScoredSupplierCandidate[];
   /**
-   * True when fewer than MIN_SUPPLIERS_BEFORE_FALLBACK candidates scored
-   * above zero. Previously this fell back to notifying up to
+   * True when fewer than MIN_SUPPLIERS_BEFORE_FALLBACK candidates are
+   * relevant matches (category/location/city/quote history — not merely
+   * verified or trusted). Previously this fell back to notifying up to
    * MAX_SUPPLIERS_TO_NOTIFY suppliers regardless of relevance — Marketplace
    * Safety Framework (Option B) instead routes this case to founder
    * approval and notifies no one automatically.
@@ -183,9 +184,14 @@ async function findMatchedSuppliers(rfqCategory: string, rfqLocation: string | n
 
   type SupplierRow = typeof allSuppliers[number];
 
-  // Scoring function
-  function scoreSupplier(s: SupplierRow): number {
+  // Scoring function. `relevant` is true only when the supplier matches the
+  // RFQ itself (category, location, city, or same-category quote history).
+  // Baseline signals (trust, verified, accepted quote) raise `score` for
+  // ranking but must never make a supplier count as a relevant match, or a
+  // pool of merely-verified suppliers would bypass founder approval.
+  function scoreSupplier(s: SupplierRow): { score: number; relevant: boolean } {
     let score = 0;
+    let relevant = false;
 
     // Parse preferences safely
     const prefs = (s.preferences as { categories?: string[]; cities?: string[] } | null) ?? {};
@@ -195,13 +201,17 @@ async function findMatchedSuppliers(rfqCategory: string, rfqLocation: string | n
     // +3: supplier explicitly selected this category in their profile
     if (prefCategories.some(cat => cat.includes(rfqCategory.toLowerCase()) || rfqCategory.toLowerCase().includes(cat))) {
       score += 3;
+      relevant = true;
     }
 
     // +3: location field match
     if (rfqLocation && s.location) {
       const rfqCity = rfqLocation.toLowerCase().trim();
       const supCity = s.location.toLowerCase().trim();
-      if (supCity.includes(rfqCity) || rfqCity.includes(supCity)) score += 3;
+      if (supCity.includes(rfqCity) || rfqCity.includes(supCity)) {
+        score += 3;
+        relevant = true;
+      }
     }
 
     // +2: supplier explicitly covers this city in preferences
@@ -209,6 +219,7 @@ async function findMatchedSuppliers(rfqCategory: string, rfqLocation: string | n
       const rfqCity = rfqLocation.toLowerCase().trim();
       if (prefCities.some(city => city.includes(rfqCity) || rfqCity.includes(city))) {
         score += 2;
+        relevant = true;
       }
     }
 
@@ -218,7 +229,10 @@ async function findMatchedSuppliers(rfqCategory: string, rfqLocation: string | n
     const hasCategory = s.quotes.some(
       q => q.rfq != null && q.rfq.category.toLowerCase() === rfqCategory.toLowerCase()
     );
-    if (hasCategory) score += 2;
+    if (hasCategory) {
+      score += 2;
+      relevant = true;
+    }
 
     // +2: high trust score (≥ 70) — proven quality supplier
     if ((s.trustScore ?? 0) >= 70) score += 2;
@@ -229,11 +243,11 @@ async function findMatchedSuppliers(rfqCategory: string, rfqLocation: string | n
     // +1: has at least one accepted quote (proven)
     if (s.quotes.some(q => q.status === 'ACCEPTED')) score += 1;
 
-    return score;
+    return { score, relevant };
   }
 
   const scored = allSuppliers
-    .map(s => ({ ...s, score: scoreSupplier(s) }))
+    .map(s => ({ ...s, ...scoreSupplier(s) }))
     .sort((a, b) => b.score - a.score);
 
   const allScored: ScoredSupplierCandidate[] = scored.map(s => ({
@@ -253,7 +267,11 @@ async function findMatchedSuppliers(rfqCategory: string, rfqLocation: string | n
   // Marketplace Safety Framework (Option B): a thin/emerging category
   // no longer silently overflows into an unrelated pool of real suppliers.
   // It routes to founder approval instead — see createPendingMatchApproval.
-  if (nonZero.length < MIN_SUPPLIERS_BEFORE_FALLBACK) {
+  // Gated on RELEVANT matches, not nonZero: baseline-only suppliers (verified,
+  // trust >= 70, accepted quote) score > 0 for any RFQ and would otherwise
+  // keep this count above the minimum and skip approval entirely.
+  const relevantCount = scored.filter(s => s.relevant).length;
+  if (relevantCount < MIN_SUPPLIERS_BEFORE_FALLBACK) {
     return { selected: [], allScored, usedFallback: true };
   }
 
