@@ -144,6 +144,7 @@ model RFQ {
   categoryRel    Category?     @relation(fields: [categoryId], references: [id])
   user           User?         @relation(fields: [createdBy], references: [id])
   transactions   Transaction[]
+  matchApprovals MatchApproval[]
 
   @@map("rfqs")
 }
@@ -903,6 +904,86 @@ enum ClaimInvitationStatus {
   CLAIMED
   EXPIRED
   REVOKED
+}
+
+// Marketplace Safety Framework (Option B — Founder Approval Required).
+// Created only when RFQ supplier matching falls back to a low-confidence
+// pool (fewer than the minimum relevant matches — see
+// lib/orchestration.ts's MIN_SUPPLIERS_BEFORE_FALLBACK). No supplier is
+// notified for the underlying RFQ until a founder reviews candidatePool
+// and explicitly selects who to notify. See MARKETPLACE_SAFETY_IMPLEMENTATION_PLAN.
+enum MatchApprovalStatus {
+  PENDING_FOUNDER_APPROVAL
+  APPROVED
+  REJECTED
+  EXPIRED
+}
+
+// WhatsApp Certification (Part C). Send-side tracking that previously did
+// not exist anywhere in this codebase — the Meta messageId returned by a
+// successful send was discarded immediately, making it impossible to
+// correlate a later delivery/read/failed webhook event back to the RFQ or
+// supplier that triggered it. See lib/orchestration.ts's notifySupplierForRFQ
+// (writer) and src/app/api/webhooks/meta-whatsapp/route.ts (updater, keyed
+// on metaMessageId).
+enum WhatsAppSendStatus {
+  REQUESTED
+  SENT
+  NOT_CONFIGURED
+  META_ERROR
+}
+
+model WhatsAppSendLog {
+  id              String             @id @default(cuid())
+  rfqId           String?            @map("rfq_id")
+  supplierId      String?            @map("supplier_id")
+  matchApprovalId String?            @map("match_approval_id")
+  templateName    String             @map("template_name")
+  // Last 4 digits only — never the full phone number, matching the masking
+  // convention already used in WhatsAppService.ts's safeLogMeta.
+  phoneRedacted   String             @map("phone_redacted")
+  metaMessageId   String?            @unique @map("meta_message_id")
+  status          WhatsAppSendStatus @default(REQUESTED)
+  errorCode       String?            @map("error_code")
+  errorMessage    String?            @map("error_message")
+  sentAt          DateTime           @default(now()) @map("sent_at")
+  // Populated later by the inbound webhook, matched on meta_message_id.
+  deliveryStatus  String?            @map("delivery_status")
+  deliveredAt     DateTime?          @map("delivered_at")
+  readAt          DateTime?          @map("read_at")
+  failedAt        DateTime?          @map("failed_at")
+  failureReason   String?            @map("failure_reason")
+  createdAt       DateTime           @default(now()) @map("created_at")
+
+  @@index([rfqId])
+  @@index([status])
+  @@map("whatsapp_send_logs")
+}
+
+model MatchApproval {
+  id                     String              @id @default(cuid())
+  rfqId                  String              @map("rfq_id")
+  rfq                    RFQ                 @relation(fields: [rfqId], references: [id], onDelete: Cascade)
+  status                 MatchApprovalStatus @default(PENDING_FOUNDER_APPROVAL)
+  // Full scored candidate list at match time (id, name, company, score,
+  // hasPhone, hasEmail) — snapshotted so a founder's later review reflects
+  // conditions at RFQ-creation time even if supplier data changes after.
+  candidatePool          Json                @map("candidate_pool")
+  selectedSupplierIds    String[]            @default([]) @map("selected_supplier_ids")
+  // Tags a founder-run approval as a deliberate single-supplier
+  // certification test rather than real marketplace activity — powers the
+  // Founder Cockpit's "Certification Tests" metric.
+  isCertificationTest    Boolean             @default(false) @map("is_certification_test")
+  reviewedBy             String?             @map("reviewed_by")
+  reviewedAt             DateTime?           @map("reviewed_at")
+  rejectionReason        String?             @map("rejection_reason")
+  notificationReleasedAt DateTime?           @map("notification_released_at")
+  expiresAt              DateTime            @map("expires_at")
+  createdAt              DateTime            @default(now()) @map("created_at")
+
+  @@index([status])
+  @@index([rfqId])
+  @@map("match_approvals")
 }
 
 model OutreachCampaign {

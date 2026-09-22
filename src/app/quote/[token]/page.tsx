@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Send, CheckCircle, Clock, IndianRupee, ShieldCheck } from 'lucide-react';
+import { Send, CheckCircle, Clock, IndianRupee, ShieldCheck, Video } from 'lucide-react';
 
 export default function PublicQuotePage() {
   const params = useParams();
@@ -13,6 +13,7 @@ export default function PublicQuotePage() {
   
   // State for decoded data
   const [context, setContext] = useState<{ rfq_id: string; supplier_id: string } | null>(null);
+  const [rfqInfo, setRfqInfo] = useState<{ title: string; category: string; location: string | null; videoUrl: string | null } | null>(null);
 
   const [formData, setFormData] = useState({
     price: '',
@@ -37,6 +38,7 @@ export default function PublicQuotePage() {
           return;
         }
         setContext({ rfq_id: data.rfqId, supplier_id: data.supplierId });
+        if (data.rfq) setRfqInfo(data.rfq);
       })
       .catch(() => setError('Invalid or expired quote link.'));
   }, [params.token]);
@@ -92,8 +94,26 @@ export default function PublicQuotePage() {
         <div className="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl">
           <div className="p-6 md:p-8 border-b border-slate-800 bg-slate-900/50">
             <h2 className="text-xl font-bold mb-1">Submit Your Quote</h2>
-            <p className="text-slate-400 text-sm">Fill in your best price and timeline for this RFQ.</p>
+            {rfqInfo ? (
+              <p className="text-slate-400 text-sm">
+                <span className="text-white font-semibold">{rfqInfo.title}</span> · {rfqInfo.category}
+                {rfqInfo.location ? ` · ${rfqInfo.location}` : ''}
+              </p>
+            ) : (
+              <p className="text-slate-400 text-sm">Fill in your best price and timeline for this RFQ.</p>
+            )}
           </div>
+
+          {rfqInfo?.videoUrl && (
+            <div className="p-6 md:p-8 border-b border-slate-800 bg-black/30">
+              <p className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                <Video className="w-3.5 h-3.5 text-purple-400" /> Buyer&apos;s requirement video
+              </p>
+              <div className="relative rounded-xl overflow-hidden bg-black aspect-video max-w-md">
+                <video src={rfqInfo.videoUrl} controls className="w-full h-full object-contain" />
+              </div>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-6">
             {error && (

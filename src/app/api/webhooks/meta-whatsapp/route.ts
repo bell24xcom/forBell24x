@@ -1,16 +1,19 @@
 /**
- * Meta WhatsApp Cloud API webhook — readiness endpoint (H6-12).
+ * Meta WhatsApp Cloud API webhook.
  *
  * GET  — Meta's subscription verification handshake (hub.mode / hub.verify_token / hub.challenge).
  * POST — inbound delivery-status / message events.
  *
- * As of H6-12, META_WHATSAPP_WEBHOOK_VERIFY_TOKEN and META_WHATSAPP_APP_SECRET
- * are NOT configured in this deployment. Both handlers therefore reject
- * (403 / 401) rather than trust unverified traffic — this endpoint is
- * readiness infrastructure only, not yet activated in Meta's dashboard.
+ * Both handlers reject (403 / 401) whenever META_WHATSAPP_WEBHOOK_VERIFY_TOKEN
+ * / META_WHATSAPP_APP_SECRET are unset — never trusts unverified traffic.
+ * Confirmed live and correctly signature-gated in production this session
+ * (real delivery-status rows exist in the `webhooks` table).
  *
- * No business action (RFQ update, notification, etc.) is triggered from
- * this route — it only normalizes and logs delivery-status events.
+ * No RFQ/notification business action is triggered from this route. It
+ * normalizes and logs delivery-status events, updates OutreachRecipient
+ * state, and (Part C — WhatsApp Certification) correlates each event back
+ * to the WhatsAppSendLog row that recorded the original send, by
+ * meta_message_id.
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyHandshake, verifySignature, extractDeliveryStatuses } from '@/src/lib/whatsapp/webhook';
@@ -83,6 +86,26 @@ export async function POST(req: NextRequest) {
       } catch (recipientErr) {
         logger.warn('[meta-whatsapp webhook] failed to update recipient state', { messageId: s.messageId, err: recipientErr });
       }
+
+      // 3. WhatsApp Certification (Part C) — correlate back to the send-side
+      // log by meta_message_id. Fire-and-forget: a missing/unmatched log
+      // row (e.g. the RFQ send path predates this feature) must never make
+      // this route fail or delay its 200 response to Meta.
+      const firstError = s.errors[0];
+      prisma.whatsAppSendLog
+        .updateMany({
+          where: { metaMessageId: s.messageId },
+          data: {
+            deliveryStatus: s.status,
+            deliveredAt: s.status === 'delivered' ? new Date(s.timestamp) : undefined,
+            readAt: s.status === 'read' ? new Date(s.timestamp) : undefined,
+            failedAt: s.status === 'failed' ? new Date(s.timestamp) : undefined,
+            failureReason: firstError
+              ? `${firstError.code ?? ''} ${firstError.title ?? ''}: ${firstError.details ?? firstError.message ?? ''}`.trim()
+              : undefined,
+          },
+        })
+        .catch((err) => logger.warn('[meta-whatsapp webhook] failed to update WhatsAppSendLog', { messageId: s.messageId, err }));
     }
   }
 

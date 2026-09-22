@@ -6,6 +6,7 @@ import { useSession } from '@/src/app/contexts/AuthContext';
 import { Video, Mic, FileText, MapPin, Clock, DollarSign, Package, AlertTriangle, CheckCircle } from 'lucide-react';
 import { storeInteraction } from '@/lib/memory-engine';
 import { SITE_URL } from '@/lib/site-url';
+import { VideoAttachment } from '@/src/components/rfq/VideoAttachment';
 
 const URGENCY_CONFIG = {
   LOW:      { bg: 'bg-blue-100',    text: 'text-blue-800',  border: 'border-blue-200',  label: 'Low Priority' },
@@ -200,11 +201,11 @@ export default function RFQDetailPage() {
   const urgency = rfq?.urgency ? URGENCY_CONFIG[rfq.urgency as keyof typeof URGENCY_CONFIG] : URGENCY_CONFIG.NORMAL;
   const rfqType = rfq?.type?.toLowerCase() || 'text';
 
-  // NOTE: the RFQ Prisma model has no `videoUrl` column, and /api/video-rfq
-  // never uploads/stores the recorded video anywhere — it only transcribes
-  // the audio track and discards the file. So rfq.videoUrl is always
-  // undefined today; this schema is a correctly-gated no-op until real
-  // video storage exists, not a fabricated value.
+  // Correction: RFQ.videoUrl / videoPublicId are real Prisma columns and are
+  // populated whenever a video is attached — via the mobile Video RFQ
+  // screen's direct-Cloudinary-upload path, or via the video-attachment-only
+  // flow (Marketplace Certification Sprint, Part D — VideoAttachment.tsx),
+  // neither of which requires the AI transcription path in /api/video-rfq.
   const videoObjectLd =
     rfqType === 'video' && rfq?.videoUrl
       ? {
@@ -373,6 +374,26 @@ export default function RFQDetailPage() {
               </div>
             </div>
           </div>
+
+          {/* Requirement video — visible to anyone viewing the RFQ; attach/replace/delete owner-only */}
+          {(rfq.videoUrl || isOwner) && (
+            <div className="p-6 border-t border-slate-700/50">
+              {isOwner ? (
+                <VideoAttachment rfqId={rfq.id} initialVideoUrl={rfq.videoUrl} onChange={(url) => setRFQ({ ...rfq, videoUrl: url })} />
+              ) : (
+                rfq.videoUrl && (
+                  <div className="space-y-2">
+                    <p className="text-slate-300 text-sm font-semibold flex items-center gap-2">
+                      <Video className="w-4 h-4 text-purple-400" /> Requirement video
+                    </p>
+                    <div className="relative rounded-lg overflow-hidden bg-black aspect-video max-w-md">
+                      <video src={rfq.videoUrl} controls className="w-full h-full object-contain" />
+                    </div>
+                  </div>
+                )
+              )}
+            </div>
+          )}
 
           {/* Quotes Section — visible only to the buyer who owns this RFQ */}
           {isOwner && (
