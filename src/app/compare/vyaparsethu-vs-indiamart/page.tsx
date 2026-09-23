@@ -1,11 +1,12 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { OG_DEFAULTS } from '@/lib/og-defaults'
 
 export const metadata: Metadata = {
   title: 'VyaparSethu vs IndiaMART — Which Is Better for B2B Sourcing in India?',
   description: 'Detailed comparison of VyaparSethu and IndiaMART for B2B sourcing in India. See how Protected Payment, verified suppliers, and Trade Confidence Score set VyaparSethu apart.',
   keywords: ['VyaparSethu vs IndiaMART', 'IndiaMART alternative India', 'B2B sourcing India comparison', 'protected payment B2B India', 'best B2B marketplace India 2026'],
-  openGraph: {
+  openGraph: { ...OG_DEFAULTS,
     title: 'VyaparSethu vs IndiaMART — B2B Sourcing Comparison 2026',
     description: 'See how VyaparSethu compares to IndiaMART on payment safety, supplier verification, and trade speed.',
     url: 'https://www.vyaparsethu.com/compare/vyaparsethu-vs-indiamart',

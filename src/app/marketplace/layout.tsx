@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { OG_DEFAULTS } from '@/lib/og-defaults'
 
 export const metadata: Metadata = {
   title: 'Requirement Marketplace — Browse Active Trade Requests | VyaparSethu',
@@ -6,7 +7,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/marketplace',
   },
-  openGraph: {
+  openGraph: { ...OG_DEFAULTS,
     title: 'B2B Requirement Marketplace | VyaparSethu',
     description: 'Browse active trade requests and submit quotes. Steel, chemicals, machinery, textiles and more.',
     url: '/marketplace',

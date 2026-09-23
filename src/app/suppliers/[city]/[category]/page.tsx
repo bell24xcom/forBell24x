@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { CITIES, CATEGORY_META, getAllCityCategoryPairs } from '@/src/data/city-category-seo';
 import { prisma } from '@/lib/prisma';
 import { CityCategorySeoRankLoader } from '@/src/components/seo/CityCategorySeoRankLoader';
+import { OG_DEFAULTS } from '@/lib/og-defaults'
 
 interface Props { params: { city: string; category: string } }
 
@@ -24,7 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: { absolute: `${seoTitle} | VyaparSethu` },
     description,
     keywords: [...cat.keywords, `suppliers in ${city.name}`, `${city.name} ${cat.name.toLowerCase()}`],
-    openGraph: { title: seoTitle, description, url: `https://www.vyaparsethu.com/suppliers/${params.city}/${params.category}`, siteName: 'VyaparSethu' },
+    openGraph: { ...OG_DEFAULTS, title: seoTitle, description, url: `https://www.vyaparsethu.com/suppliers/${params.city}/${params.category}`, siteName: 'VyaparSethu' },
     alternates: { canonical: `https://www.vyaparsethu.com/suppliers/${params.city}/${params.category}` },
   };
 }

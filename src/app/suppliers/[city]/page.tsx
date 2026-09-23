@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { CITIES, CATEGORY_META } from '@/src/data/city-category-seo';
+import { OG_DEFAULTS } from '@/lib/og-defaults'
 
 interface Props { params: { city: string } }
 
@@ -17,7 +18,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: { absolute: seoTitle }, description,
     keywords: [`suppliers in ${city.name}`, `${city.name} manufacturers`, `B2B sourcing ${city.name}`, `industrial suppliers ${city.name} ${city.state}`],
-    openGraph: {
+    openGraph: { ...OG_DEFAULTS,
       title: seoTitle,
       description,
       url: `https://www.vyaparsethu.com/suppliers/${params.city}`,

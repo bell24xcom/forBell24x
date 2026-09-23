@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import { SITE_URL } from '@/lib/site-url';
+import { OG_DEFAULTS } from '@/lib/og-defaults'
 
 export const revalidate = 300; // cache 5 minutes
 
@@ -9,7 +10,7 @@ export const metadata: Metadata = {
   title: 'All Trade Categories',
   description: "Explore 450+ B2B trade categories — Metals, Textiles, Chemicals, Packaging, Electronics, Machinery and more. Find verified Indian suppliers on VyaparSethu. Post free.",
   alternates: { canonical: `${SITE_URL}/categories` },
-  openGraph: {
+  openGraph: { ...OG_DEFAULTS,
     title: 'All Trade Categories | VyaparSethu',
     description: "Explore 450+ B2B trade categories — Metals, Textiles, Chemicals, Packaging, Electronics, Machinery and more. Find verified Indian suppliers on VyaparSethu. Post free.",
     url: `${SITE_URL}/categories`,

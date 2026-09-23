@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Mic, Volume2, ClipboardCheck } from 'lucide-react';
 import { SITE_URL } from '@/lib/site-url';
 import { voiceRFQFAQ, breadcrumbSchema } from '@/src/lib/schema/faq-schema';
+import { OG_DEFAULTS } from '@/lib/og-defaults'
 
 // H6-11A: this page previously described Speak Requirement as
 // "Coming Soon — Beta — join the waitlist." That's no longer true —
@@ -30,7 +31,7 @@ export const metadata: Metadata = {
   title: { absolute: 'Voice RFQ India — Post B2B Requirements by Speaking | VyaparSethu' },
   description: "Post your B2B requirement by speaking naturally. VyaparSethu uses AI speech recognition and requirement extraction to turn your spoken requirement into a structured RFQ.",
   keywords: ['voice rfq india', 'speak requirement b2b', 'voice b2b procurement india', 'hindi voice rfq', 'voice enabled b2b platform india'],
-  openGraph: {
+  openGraph: { ...OG_DEFAULTS,
     title: 'Voice RFQ India — Post B2B Requirements by Speaking',
     description: 'Speak your requirement naturally. AI transcribes it, extracts the details, and gets it ready to post to verified suppliers.',
     url: `${SITE_URL}/features/voice-rfq`,

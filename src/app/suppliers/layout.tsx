@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { SITE_URL } from '@/lib/site-url';
+import { OG_DEFAULTS } from '@/lib/og-defaults'
 
 // `page.tsx` is 'use client' (live supplier search/filter UI) and cannot
 // export metadata itself, so it silently inherited the root layout's
@@ -14,7 +15,7 @@ export const metadata: Metadata = {
   description:
     'Browse GST and Udyam verified B2B suppliers across India by category and location. Post a Requirement and get competitive quotes with Protected Payment.',
   alternates: { canonical: `${SITE_URL}/suppliers` },
-  openGraph: {
+  openGraph: { ...OG_DEFAULTS,
     title: 'Find Verified B2B Suppliers in India | VyaparSethu',
     description: 'Browse GST and Udyam verified B2B suppliers across India by category and location.',
     url: `${SITE_URL}/suppliers`,
