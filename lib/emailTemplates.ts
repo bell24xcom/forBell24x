@@ -1,5 +1,5 @@
 /**
- * Bell24h transactional email templates.
+ * VyaparSethu transactional email templates.
  * All templates use inline styles for maximum email client compatibility.
  */
 
@@ -9,7 +9,7 @@ const BODY_STYLE = `padding: 28px 24px; background: #f8fafc;`;
 const FOOTER_STYLE = `background: #f1f5f9; padding: 16px 24px; text-align: center; color: #64748b; font-size: 12px;`;
 const CTA_STYLE = `display: inline-block; background: #2563EB; color: #ffffff; padding: 12px 28px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 15px; margin: 16px 0;`;
 const CARD_STYLE = `background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px 20px; margin: 16px 0;`;
-const FOOTER_CONTENT = `Bell24h · India's AI-Powered B2B Procurement Platform<br>Digitex Studio | GSTIN: 27AAAPP9753F2ZF<br><a href="https://bell24h.com" style="color: #2563EB; text-decoration: none;">bell24h.com</a>`;
+const FOOTER_CONTENT = `VyaparSethu · India's AI-Powered B2B Procurement Platform<br>Digitex Studio | GSTIN: 27AAAPP9753F2ZF<br><a href="https://bell24h.com" style="color: #2563EB; text-decoration: none;">bell24h.com</a>`;
 
 export function quoteReceivedEmail(buyerName: string, rfqTitle: string, supplierName: string, supplierCompany: string, price: number) {
   return {
@@ -17,7 +17,7 @@ export function quoteReceivedEmail(buyerName: string, rfqTitle: string, supplier
     html: `
 <div style="${BASE_STYLE}">
   <div style="${HEADER_STYLE}">
-    <h1 style="color: white; margin: 0; font-size: 22px;">🔔 Bell24h</h1>
+    <h1 style="color: white; margin: 0; font-size: 22px;">🔔 VyaparSethu</h1>
     <p style="color: #bfdbfe; margin: 4px 0 0; font-size: 14px;">New Quote Received</p>
   </div>
   <div style="${BODY_STYLE}">
@@ -31,7 +31,7 @@ export function quoteReceivedEmail(buyerName: string, rfqTitle: string, supplier
       <p style="margin: 0 0 4px; color: #64748b; font-size: 13px;">QUOTED PRICE</p>
       <p style="color: #16a34a; font-size: 28px; font-weight: bold; margin: 0;">₹${price.toLocaleString('en-IN')}</p>
     </div>
-    <p style="color: #475569; font-size: 14px;">Review the quote, compare with others, and accept when ready. Your payment is protected by Bell24h escrow.</p>
+    <p style="color: #475569; font-size: 14px;">Review the quote, compare with others, and accept when ready. Your payment is protected by VyaparSethu escrow.</p>
     <div style="text-align: center;">
       <a href="https://bell24h.com/dashboard/quotes" style="${CTA_STYLE}">View Quote →</a>
     </div>
@@ -47,7 +47,7 @@ export function quoteAcceptedEmail(supplierName: string, rfqTitle: string, price
     html: `
 <div style="${BASE_STYLE}">
   <div style="${HEADER_STYLE}">
-    <h1 style="color: white; margin: 0; font-size: 22px;">🔔 Bell24h</h1>
+    <h1 style="color: white; margin: 0; font-size: 22px;">🔔 VyaparSethu</h1>
     <p style="color: #bfdbfe; margin: 4px 0 0; font-size: 14px;">Quote Accepted!</p>
   </div>
   <div style="${BODY_STYLE}">
@@ -78,14 +78,14 @@ export function dealCompletedEmail(name: string, rfqTitle: string, amount: numbe
     html: `
 <div style="${BASE_STYLE}">
   <div style="${HEADER_STYLE}">
-    <h1 style="color: white; margin: 0; font-size: 22px;">🔔 Bell24h</h1>
+    <h1 style="color: white; margin: 0; font-size: 22px;">🔔 VyaparSethu</h1>
     <p style="color: #bfdbfe; margin: 4px 0 0; font-size: 14px;">Deal Completed ✓</p>
   </div>
   <div style="${BODY_STYLE}">
     <h2 style="color: #1e293b; margin-top: 0;">Hi ${name || 'there'},</h2>
     <p style="color: #475569; font-size: 15px; line-height: 1.6;">
       ${isBuyer
-        ? 'Your deal has been marked as completed. Thank you for using Bell24h!'
+        ? 'Your deal has been marked as completed. Thank you for using VyaparSethu!'
         : `The buyer has confirmed delivery. Your payment of ₹${amount.toLocaleString('en-IN')} has been released to your wallet.`
       }
     </p>
@@ -106,11 +106,11 @@ export function dealCompletedEmail(name: string, rfqTitle: string, amount: numbe
 
 export function welcomeEmail(name: string, phone: string) {
   return {
-    subject: 'Welcome to Bell24h — Your B2B Marketplace',
+    subject: 'Welcome to VyaparSethu — Your B2B Marketplace',
     html: `
 <div style="${BASE_STYLE}">
   <div style="${HEADER_STYLE}">
-    <h1 style="color: white; margin: 0; font-size: 22px;">🚀 Welcome to Bell24h!</h1>
+    <h1 style="color: white; margin: 0; font-size: 22px;">🚀 Welcome to VyaparSethu!</h1>
   </div>
   <div style="${BODY_STYLE}">
     <h2 style="color: #1e293b; margin-top: 0;">Hi ${name || 'there'}! 👋</h2>
@@ -118,7 +118,7 @@ export function welcomeEmail(name: string, phone: string) {
       Welcome to India's AI-powered B2B procurement platform. Your account is ready.
     </p>
     <div style="${CARD_STYLE}">
-      <p style="margin: 0 0 12px; font-size: 14px; color: #1e293b; font-weight: bold;">What you can do on Bell24h:</p>
+      <p style="margin: 0 0 12px; font-size: 14px; color: #1e293b; font-weight: bold;">What you can do on VyaparSethu:</p>
       <ul style="color: #475569; font-size: 14px; line-height: 2; margin: 0; padding-left: 20px;">
         <li>🎤 Post RFQs using Voice, Video, or Text</li>
         <li>🤖 Get AI-matched with verified suppliers</li>

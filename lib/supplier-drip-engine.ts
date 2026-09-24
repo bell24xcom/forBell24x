@@ -40,23 +40,23 @@ function buildDripMessage(
   const name = supplier.name ?? supplier.company ?? 'there';
 
   if (type === 'day3') {
-    return `Hi ${name}! Your Bell24h supplier profile is live but incomplete.
+    return `Hi ${name}! Your VyaparSethu supplier profile is live but incomplete.
 Buyers are searching for ${category} suppliers right now.
 Complete your profile in 2 mins: https://bell24h.com/supplier/profile/edit
-- Bell24h Team`;
+- VyaparSethu Team`;
   }
 
   if (type === 'day7') {
     return `Hi ${name}, good news! A buyer just posted an RFQ in ${category}.
 Your profile is matched but incomplete — you're missing quotes.
 Browse RFQs now: https://bell24h.com/supplier/browse-rfqs
-- Bell24h Team`;
+- VyaparSethu Team`;
   }
 
-  return `Hi ${name}, we miss you on Bell24h!
+  return `Hi ${name}, we miss you on VyaparSethu!
 ${category} buyers are active this week.
 Login to see new RFQs: https://bell24h.com/dashboard
-- Bell24h Team`;
+- VyaparSethu Team`;
 }
 
 function buildWaLink(phone: string, message: string): string {

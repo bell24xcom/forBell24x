@@ -1,5 +1,5 @@
 /**
- * Bell24h Orchestration Engine — v3
+ * VyaparSethu Orchestration Engine — v3
  *
  * Event-driven orchestration for all B2B marketplace actions.
  *
@@ -652,7 +652,7 @@ export async function onQuoteSubmitted(quote: {
       html: `
         <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
           <div style="background:linear-gradient(135deg,#4F46E5,#3B82F6);padding:24px;text-align:center;">
-            <h1 style="color:white;margin:0;font-size:22px;">📥 New Quote — Bell24h</h1>
+            <h1 style="color:white;margin:0;font-size:22px;">📥 New Quote — VyaparSethu</h1>
           </div>
           <div style="padding:30px;background:#f8fafc;">
             <h2 style="color:#1f2937;">You received a quote!</h2>
@@ -786,7 +786,7 @@ export async function onQuoteAccepted(quote: {
       html: `
         <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
           <div style="background:linear-gradient(135deg,#10B981,#059669);padding:24px;text-align:center;">
-            <h1 style="color:white;margin:0;font-size:22px;">🎉 Deal Won — Bell24h</h1>
+            <h1 style="color:white;margin:0;font-size:22px;">🎉 Deal Won — VyaparSethu</h1>
           </div>
           <div style="padding:30px;background:#f8fafc;">
             <h2 style="color:#1f2937;">Congratulations!</h2>
@@ -919,7 +919,7 @@ export async function onCounterOffer(quote: {
       html: `
         <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
           <div style="background:linear-gradient(135deg,#F59E0B,#D97706);padding:24px;text-align:center;">
-            <h1 style="color:white;margin:0;font-size:22px;">🔄 Counter Offer — Bell24h</h1>
+            <h1 style="color:white;margin:0;font-size:22px;">🔄 Counter Offer — VyaparSethu</h1>
           </div>
           <div style="padding:30px;background:#f8fafc;">
             <h2 style="color:#1f2937;">New Counter Offer</h2>
