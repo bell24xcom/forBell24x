@@ -67,10 +67,10 @@ export async function GET(req: NextRequest) {
       prisma.$queryRaw<Array<{ date: string; count: bigint }>>(
         Prisma.sql`
           SELECT
-            TO_CHAR(created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD') AS date,
+            TO_CHAR("createdAt" AT TIME ZONE 'UTC', 'YYYY-MM-DD') AS date,
             COUNT(*) AS count
           FROM rfqs
-          WHERE created_at >= ${since}
+          WHERE "createdAt" >= ${since}
           GROUP BY date ORDER BY date ASC
         `
       ),
