@@ -42,7 +42,7 @@ function buildMessage(
 
   return `Hi ${supplier.name ?? supplier.company},
 
-${urgencyPrefix}A new buyer on Bell24h needs:
+${urgencyPrefix}A new buyer on VyaparSethu needs:
 
 📦 ${rfq.title}
 📍 ${rfq.category}
@@ -53,7 +53,7 @@ ${urgencyPrefix}A new buyer on Bell24h needs:
 View details & submit your quote:
 https://www.bell24h.com/rfq/${rfq.id}
 
-— Bell24h Marketplace
+— VyaparSethu Marketplace
 India's fastest B2B RFQ platform`;
 }
 

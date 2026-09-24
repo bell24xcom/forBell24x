@@ -1,8 +1,8 @@
 /**
- * Bell24h Knowledge Base
+ * VyaparSethu Knowledge Base
  * ─────────────────────
  * Structured index of all planning docs, automation flows, and system
- * knowledge from the Bell24h / Digitex ecosystem.
+ * knowledge from the VyaparSethu / Digitex ecosystem.
  *
  * Sources:
  *  - ./docs/*.md
@@ -64,7 +64,7 @@ const rfqLogic: KBEntry[] = [
 1. Supplier submits quote (price, quantity, timeline, terms)
 2. Buyer sees all quotes in /dashboard/quotes
 3. Buyer clicks "Accept Quote" → Deal created with escrow
-4. Payment locked in Bell24h escrow until delivery confirmed
+4. Payment locked in VyaparSethu escrow until delivery confirmed
 5. On confirmation, payment released to supplier
 6. Wallet transaction recorded in WalletTransaction table`,
     tags: ['quote', 'deal', 'escrow', 'wallet', 'rfq-lifecycle'],
@@ -122,7 +122,7 @@ const marketing: KBEntry[] = [
 TARGET: First 50 suppliers per category (100 total)
 CHANNEL: WhatsApp + LinkedIn + Email
 MESSAGE TEMPLATE:
-"Hi {name}, a new verified buyer just posted an RFQ for {product} in {location} on Bell24h. View details: {link}"
+"Hi {name}, a new verified buyer just posted an RFQ for {product} in {location} on VyaparSethu. View details: {link}"
 
 PACE: 50-100 messages/day
 CONVERSION TARGET: 10-15 profile claims in Week 1
@@ -261,7 +261,7 @@ OUTPUT: top 10 suppliers with scores + contact data`,
 INPUT: { rfq, suppliers[] }
 
 MESSAGE GENERATION:
-Template: "Hi {supplier_name}, a new verified buyer on Bell24h needs {product} — {quantity} {unit}. Budget: {budget}. Timeline: {timeline}. View & quote: {link}"
+Template: "Hi {supplier_name}, a new verified buyer on VyaparSethu needs {product} — {quantity} {unit}. Budget: {budget}. Timeline: {timeline}. View & quote: {link}"
 
 Personalization by type:
 - HIGH urgency: add "URGENT requirement — "
@@ -328,11 +328,11 @@ const compliance: KBEntry[] = [
     id: 'comp-001',
     type: 'compliance',
     title: 'Razorpay Escrow Flow',
-    summary: 'Buyer pays into Bell24h escrow → held until delivery → released to supplier',
+    summary: 'Buyer pays into VyaparSethu escrow → held until delivery → released to supplier',
     content: `Escrow payment flow:
 1. Buyer accepts quote → Deal created
 2. Buyer initiates payment → Razorpay
-3. Funds held in Bell24h RazorPay escrow account
+3. Funds held in VyaparSethu RazorPay escrow account
 4. Status: TRANSACTION_PENDING in escrow table
 5. Supplier ships goods + shares tracking
 6. Buyer confirms delivery OR 7-day auto-confirm
