@@ -18,14 +18,14 @@ export async function GET(req: NextRequest) {
     const days  = Math.min(90, Math.max(1, parseInt(req.nextUrl.searchParams.get('days') ?? '30')));
     const since = new Date(Date.now() - days * 86400000);
 
-    const [
-      allTimeDeposits,
-      periodDeposits,
-      planDistribution,
-      recentTxns,
-      monthlyRevenue,
-      subscriptionEvents,
-    ] = await Promise.all([
+    // Cockpit accuracy fix: this previously used Promise.all, so a single
+    // failing query (e.g. the raw-SQL bug below) rejected the whole
+    // endpoint with a 500 and the founder saw nothing at all.
+    // Promise.allSettled lets one section fail without taking the other
+    // five down — the response now reports real data where a query
+    // succeeded and an explicit `failedSections` list for what didn't,
+    // rather than an opaque total failure.
+    const results = await Promise.allSettled([
 
       // All-time wallet credits
       prisma.walletTransaction.aggregate({
@@ -61,16 +61,23 @@ export async function GET(req: NextRequest) {
         },
       }),
 
-      // Monthly revenue (last 6 months)
+      // Monthly revenue (last 6 months).
+      // Bug fix: WalletTransaction.createdAt has no @map in schema.prisma,
+      // so its real column is the quoted camelCase identifier "createdAt"
+      // — confirmed against information_schema.columns on the actual
+      // wallet_transactions table (production). The previous unquoted
+      // created_at referenced a column that doesn't exist, so this query
+      // — and therefore, under the old Promise.all, the entire endpoint —
+      // failed on every single call.
       prisma.$queryRaw<Array<{ month: string; total: number; txn_count: number }>>(
         Prisma.sql`
           SELECT
-            TO_CHAR(created_at AT TIME ZONE 'UTC', 'YYYY-MM') AS month,
+            TO_CHAR("createdAt" AT TIME ZONE 'UTC', 'YYYY-MM') AS month,
             SUM(amount)::float                                  AS total,
             COUNT(*)::int                                       AS txn_count
           FROM wallet_transactions
           WHERE type = 'CREDIT'
-            AND created_at >= NOW() - INTERVAL '6 months'
+            AND "createdAt" >= NOW() - INTERVAL '6 months'
           GROUP BY month
           ORDER BY month ASC
         `
@@ -88,8 +95,56 @@ export async function GET(req: NextRequest) {
       }),
     ]);
 
+    const [
+      allTimeDepositsResult,
+      periodDepositsResult,
+      planDistributionResult,
+      recentTxnsResult,
+      monthlyRevenueResult,
+      subscriptionEventsResult,
+    ] = results;
+
+    const sectionNames = [
+      'allTimeDeposits', 'periodDeposits', 'planDistribution',
+      'recentTransactions', 'monthlyRevenue', 'subscriptionEvents',
+    ] as const;
+    const failedSections = results
+      .map((r, i) => (r.status === 'rejected' ? sectionNames[i] : null))
+      .filter((name): name is (typeof sectionNames)[number] => name !== null);
+
+    if (failedSections.length > 0) {
+      // Logged per-section so a real DB outage is diagnosable from logs,
+      // not just visible as a generic "some data missing" response.
+      results.forEach((r, i) => {
+        if (r.status === 'rejected') {
+          console.error(`[Revenue API] section "${sectionNames[i]}" failed:`, r.reason);
+        }
+      });
+    }
+
+    const allTimeDeposits = allTimeDepositsResult.status === 'fulfilled'
+      ? allTimeDepositsResult.value
+      : { _sum: { amount: null }, _count: { _all: 0 } };
+    const periodDeposits = periodDepositsResult.status === 'fulfilled'
+      ? periodDepositsResult.value
+      : { _sum: { amount: null }, _count: { _all: 0 } };
+    const planDistribution = planDistributionResult.status === 'fulfilled'
+      ? planDistributionResult.value
+      : [];
+    const recentTxns = recentTxnsResult.status === 'fulfilled'
+      ? recentTxnsResult.value
+      : [];
+    const monthlyRevenue = monthlyRevenueResult.status === 'fulfilled'
+      ? monthlyRevenueResult.value
+      : [];
+    const subscriptionEvents = subscriptionEventsResult.status === 'fulfilled'
+      ? subscriptionEventsResult.value
+      : [];
+
     return NextResponse.json({
       success: true,
+      partial: failedSections.length > 0,
+      failedSections,
       days,
       allTimeRevenue:     allTimeDeposits._sum.amount ?? 0,
       allTimeDeposits:    allTimeDeposits._count._all,
@@ -123,7 +178,10 @@ export async function GET(req: NextRequest) {
       })),
     });
   } catch (error) {
-    console.error('[Revenue API] error:', error);
+    // Only reachable now for errors outside the six tracked queries (e.g.
+    // a malformed `days` param edge case) — the queries themselves can no
+    // longer take this whole handler down.
+    console.error('[Revenue API] unexpected error:', error);
     return NextResponse.json({ success: false, error: 'Failed to load revenue data' }, { status: 500 });
   }
 }
