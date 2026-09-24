@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthenticatedUser, hasRole } from '@/src/lib/auth-helpers';
+import { isQuotableRfqStatus } from '@/lib/rfq-quotable-status';
 import { z } from 'zod';
 
 const CreateQuoteSchema = z.object({
@@ -30,7 +31,19 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const validatedData = CreateQuoteSchema.parse(body);
 
-    // 4. Create quote in database
+    // 4. Verify the RFQ exists and is still quoteable
+    const rfq = await prisma.rFQ.findUnique({ where: { id: validatedData.rfqId }, select: { status: true } });
+    if (!rfq) {
+      return NextResponse.json({ success: false, error: 'RFQ not found' }, { status: 404 });
+    }
+    if (!isQuotableRfqStatus(rfq.status)) {
+      return NextResponse.json(
+        { success: false, error: `This RFQ is no longer accepting quotes (status: ${rfq.status}).` },
+        { status: 409 }
+      );
+    }
+
+    // 5. Create quote in database
     const quote = await prisma.quote.create({
       data: {
         rfqId: validatedData.rfqId,

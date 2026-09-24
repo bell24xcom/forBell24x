@@ -42,6 +42,12 @@ jobs:
       - name: Outreach unit tests
         run: npm run test:outreach
 
+      - name: Quote-token security unit tests
+        run: npm run test:quote-token
+
+      - name: PR63 marketplace security regression suite
+        run: npm run test:security
+
       # D-ENG-05 (docs/SEO_DECISIONS.md) — CLAUDE.md's documented "<=12
       # serverless functions" rule is unverified against the actual Vercel
       # plan/ceiling and contradicted by the 200+ route.ts files already in

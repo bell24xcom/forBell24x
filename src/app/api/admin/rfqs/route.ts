@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin, isErrorResponse } from '@/lib/admin-auth';
+import { RFQStatus } from '@prisma/client';
+import { validateRfqUpdate } from '@/lib/rfq-update-whitelist';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
@@ -255,9 +257,18 @@ export async function PUT(req: NextRequest) {
       }, { status: 400 });
     }
 
+    const validation = validateRfqUpdate(updates, Object.values(RFQStatus));
+    if (!validation.ok) {
+      return NextResponse.json({ error: validation.error }, { status: validation.status });
+    }
+
+    // validateRfqUpdate() is deliberately Prisma-agnostic (see
+    // lib/rfq-update-whitelist.ts), so `status` comes back as a plain
+    // string; the cast is safe here because validation.ok already
+    // confirmed it's one of Object.values(RFQStatus).
     const updatedRfq = await prisma.rFQ.update({
       where: { id: rfqId },
-      data: updates,
+      data: validation.safeUpdates as { status?: RFQStatus; expiresAt?: Date },
       include: {
         user: {
           select: {

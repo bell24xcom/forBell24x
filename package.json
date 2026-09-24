@@ -17,6 +17,8 @@
     "compile": "hardhat compile",
     "test": "hardhat test",
     "test:outreach": "node --test src/lib/outreach/*.test.ts",
+    "test:quote-token": "node --test lib/quote-token.test.ts",
+    "test:security": "node --test tests/security/*.test.ts",
     "test:bell24h-os": "node --test src/lib/bell24h-os/*.test.ts",
     "test:jwt-fail-closed": "node --test src/lib/jwt.test.ts",
     "deploy:polygon": "hardhat run scripts/deploy.js --network polygon",
