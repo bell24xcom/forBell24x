@@ -9,6 +9,7 @@ import { getProductRecords } from '@/src/data/product-intelligence-catalog';
 import { getIndustryRecords } from '@/src/data/industry-intelligence-catalog';
 import type { PulseSummary } from '@/src/lib/bom/business-pulse';
 import type { ProductIntelligenceRecord } from '@/src/lib/product-intelligence/types';
+import type { IndustryIntelligenceRecord } from '@/src/lib/industry-intelligence/types';
 
 interface Props { params: { slug: string } }
 
@@ -94,22 +95,42 @@ function buildClusterJsonLd(cluster: IndustrialClusterRecord, products: ProductI
 }
 
 export default async function IndustrialClusterPage({ params }: Props) {
-  if (!FLAGS.INTELLIGENCE_ENABLED) {
-    notFound();
-  }
-
+  // SEO fix (PR61 remediation, D1): page EXISTENCE is separated from
+  // INTELLIGENCE ACTIVATION. Previously the whole page 404'd whenever
+  // FLAGS.INTELLIGENCE_ENABLED was false — not because the slug was
+  // invalid, but because the flag gated everything, including real,
+  // static content (name/description/location) that has nothing to do
+  // with the gated intelligence layer. A genuinely invalid slug still
+  // 404s below; a valid one always renders its static content, and only
+  // the three intelligence-dependent sections (Pulse, Product
+  // Intelligence, Industry Intelligence) individually check the flag.
   const cluster = INDUSTRIAL_CLUSTERS[params.slug];
   if (!cluster) notFound();
 
-  const pulse = await getClusterPulse(params.slug, 7);
-  const activity = highlights(pulse.summary);
-  const [productsMap, industriesMap] = await Promise.all([
-    getProductRecords(cluster.relatedProductSlugs),
-    getIndustryRecords(cluster.relatedIndustrySlugs),
-  ]);
-  const clusterProducts = cluster.relatedProductSlugs.map(slug => productsMap.get(slug) ?? null);
-  const clusterIndustries = cluster.relatedIndustrySlugs.map(slug => industriesMap.get(slug) ?? null);
-  const resolvedProducts = clusterProducts.filter((p): p is ProductIntelligenceRecord => p !== null);
+  const intelligenceEnabled = FLAGS.INTELLIGENCE_ENABLED;
+
+  // Skip the intelligence computation entirely when disabled — not just
+  // the rendering — so nothing gated is fetched, computed, or has a
+  // chance to leak into JSON-LD before Phase D opens.
+  let activity: { label: string; icon: string }[] = [];
+  let trendingCategories: string[] = [];
+  let clusterProducts: (ProductIntelligenceRecord | null)[] = [];
+  let clusterIndustries: (IndustryIntelligenceRecord | null)[] = [];
+  let resolvedProducts: ProductIntelligenceRecord[] = [];
+
+  if (intelligenceEnabled) {
+    const pulse = await getClusterPulse(params.slug, 7);
+    activity = highlights(pulse.summary);
+    trendingCategories = pulse.trendingCategories;
+    const [productsMap, industriesMap] = await Promise.all([
+      getProductRecords(cluster.relatedProductSlugs),
+      getIndustryRecords(cluster.relatedIndustrySlugs),
+    ]);
+    clusterProducts = cluster.relatedProductSlugs.map(slug => productsMap.get(slug) ?? null);
+    clusterIndustries = cluster.relatedIndustrySlugs.map(slug => industriesMap.get(slug) ?? null);
+    resolvedProducts = clusterProducts.filter((p): p is ProductIntelligenceRecord => p !== null);
+  }
+
   const { placeSchema, productListSchema, breadcrumbSchema } = buildClusterJsonLd(cluster, resolvedProducts);
 
   return (
@@ -143,7 +164,12 @@ export default async function IndustrialClusterPage({ params }: Props) {
 
         <section className="mb-12">
           <h2 className="text-white font-semibold text-lg mb-5">Business Pulse — This Week</h2>
-          {activity.length > 0 ? (
+          {!intelligenceEnabled ? (
+            <p className="text-slate-400 text-sm bg-slate-800/30 border border-slate-700/40 rounded-xl p-6">
+              Coming soon — live cluster activity unlocks once VyaparSethu reaches its
+              verified-supplier milestone for this phase.
+            </p>
+          ) : activity.length > 0 ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
               {activity.map(h => (
                 <div key={h.label} className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-4 flex items-center gap-3">
@@ -157,11 +183,11 @@ export default async function IndustrialClusterPage({ params }: Props) {
               Cluster pulse is building — verified suppliers onboarding in {cluster.city ?? cluster.name}.
             </p>
           )}
-          {pulse.trendingCategories.length > 0 && (
+          {intelligenceEnabled && trendingCategories.length > 0 && (
             <div className="mt-4">
               <p className="text-slate-500 text-xs mb-2">Trending categories</p>
               <div className="flex flex-wrap gap-2">
-                {pulse.trendingCategories.map(c => (
+                {trendingCategories.map(c => (
                   <span key={c} className="text-xs px-3 py-1 rounded-full border border-slate-600 text-slate-300">{c}</span>
                 ))}
               </div>
@@ -172,40 +198,52 @@ export default async function IndustrialClusterPage({ params }: Props) {
         {cluster.relatedProductSlugs.length > 0 && (
           <section className="mb-12">
             <h2 className="text-white font-semibold text-lg mb-5">Key Products in this Cluster</h2>
-            <div className="grid sm:grid-cols-2 gap-4">
-              {cluster.relatedProductSlugs.map((slug, i) => {
-                const p = clusterProducts[i];
-                if (!p) return null;
-                return (
-                  <Link
-                    key={slug}
-                    href={`/product-intelligence/${slug}`}
-                    className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-5 hover:border-[#D4AF37]/40 transition-colors"
-                  >
-                    <h3 className="text-white font-medium text-sm">{p.name}</h3>
-                    <p className="text-slate-400 text-xs mt-2 line-clamp-2">{p.description}</p>
-                  </Link>
-                );
-              })}
-            </div>
+            {!intelligenceEnabled ? (
+              <p className="text-slate-400 text-sm bg-slate-800/30 border border-slate-700/40 rounded-xl p-6">
+                Coming soon.
+              </p>
+            ) : (
+              <div className="grid sm:grid-cols-2 gap-4">
+                {cluster.relatedProductSlugs.map((slug, i) => {
+                  const p = clusterProducts[i];
+                  if (!p) return null;
+                  return (
+                    <Link
+                      key={slug}
+                      href={`/product-intelligence/${slug}`}
+                      className="bg-slate-800/40 border border-slate-700/50 rounded-xl p-5 hover:border-[#D4AF37]/40 transition-colors"
+                    >
+                      <h3 className="text-white font-medium text-sm">{p.name}</h3>
+                      <p className="text-slate-400 text-xs mt-2 line-clamp-2">{p.description}</p>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
           </section>
         )}
 
         {cluster.relatedIndustrySlugs.length > 0 && (
           <section className="mb-12">
             <h2 className="text-white font-semibold text-lg mb-5">Industries</h2>
-            <div className="space-y-3">
-              {cluster.relatedIndustrySlugs.map((slug, i) => {
-                const ind = clusterIndustries[i];
-                if (!ind) return null;
-                return (
-                  <div key={slug} className="bg-slate-800/30 border border-slate-700/40 rounded-lg px-4 py-3">
-                    <p className="text-white text-sm font-medium">{ind.name}</p>
-                    <p className="text-slate-400 text-xs mt-1">{ind.description.slice(0, 120)}…</p>
-                  </div>
-                );
-              })}
-            </div>
+            {!intelligenceEnabled ? (
+              <p className="text-slate-400 text-sm bg-slate-800/30 border border-slate-700/40 rounded-xl p-6">
+                Coming soon.
+              </p>
+            ) : (
+              <div className="space-y-3">
+                {cluster.relatedIndustrySlugs.map((slug, i) => {
+                  const ind = clusterIndustries[i];
+                  if (!ind) return null;
+                  return (
+                    <div key={slug} className="bg-slate-800/30 border border-slate-700/40 rounded-lg px-4 py-3">
+                      <p className="text-white text-sm font-medium">{ind.name}</p>
+                      <p className="text-slate-400 text-xs mt-1">{ind.description.slice(0, 120)}…</p>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </section>
         )}
 
