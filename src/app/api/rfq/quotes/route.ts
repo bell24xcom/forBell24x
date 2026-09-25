@@ -6,9 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticate } from '@/lib/jwt';
 import { prisma } from '@/lib/prisma';
-import { sendEmail as _sendEmail } from '@/lib/email';
-const resendService = { sendEmail: ({ to, subject, html }: { to: string; subject: string; html: string }) => _sendEmail(to, subject, html) };
-import { quoteAcceptedEmail } from '@/lib/emailTemplates';
+import { acceptQuote } from '@/lib/quote-acceptance';
 
 export const dynamic = 'force-dynamic';
 
@@ -102,91 +100,25 @@ export async function PUT(request: NextRequest) {
     }
 
     if (action === 'accept') {
-      // Use a transaction for atomicity
-      const result = await prisma.$transaction(async (tx) => {
-        // 1. Accept this quote
-        const accepted = await tx.quote.update({
-          where: { id: quoteId },
-          data: { status: 'ACCEPTED', isAccepted: true },
-        });
-
-        // 2. Reject all other pending quotes for this RFQ
-        await tx.quote.updateMany({
-          where: {
-            rfqId: quote.rfqId!,
-            id: { not: quoteId },
-            status: 'PENDING',
-          },
-          data: { status: 'REJECTED' },
-        });
-
-        // 3. Create Deal
-        const deal = await tx.deal.create({
-          data: {
-            rfqId: quote.rfqId!,
-            quoteId: quoteId,
-            buyerId: user.userId,
-            supplierId: quote.supplierId!,
-            price: quote.price,
-            status: 'ACTIVE',
-          },
-        });
-
-        // 4. Update RFQ status
-        await tx.rFQ.update({
-          where: { id: quote.rfqId! },
-          data: { status: 'ACCEPTED', acceptedAt: new Date() },
-        });
-
-        // 5. Escrow lock: deduct deal amount from buyer wallet if sufficient balance
-        const buyerWallet = await tx.wallet.findUnique({ where: { userId: user.userId } });
-        let dealStatus = 'ACTIVE';
-        if (buyerWallet && buyerWallet.balance >= quote.price) {
-          await tx.wallet.update({
-            where: { userId: user.userId },
-            data: { balance: { decrement: quote.price } },
-          });
-          await tx.walletTransaction.create({
-            data: {
-              walletId: buyerWallet.id,
-              type: 'ESCROW_LOCK',
-              amount: quote.price,
-              description: `Escrow locked for: ${quote.rfq?.title || 'RFQ'}`,
-              reference: deal.id,
-            },
-          });
-          dealStatus = 'ESCROW_LOCKED';
-          await tx.deal.update({
-            where: { id: deal.id },
-            data: { status: 'ESCROW_LOCKED' },
-          });
-        }
-
-        return { accepted, deal: { ...deal, status: dealStatus } };
+      // Shared acceptance path (lib/quote-acceptance.ts): Deal, RFQ lock, competing
+      // quote rejection, notifications (including the supplier email) and audit
+      // trail. Escrow lock stays specific to this route and runs in the same transaction.
+      const result = await acceptQuote({
+        quoteId,
+        actor: { id: user.userId, role: user.role },
+        source: 'rfq-quotes',
+        lockEscrow: true,
       });
 
-      // Fire-and-forget: notify supplier via email
-      try {
-        const supplier = await prisma.user.findUnique({
-          where: { id: quote.supplierId! },
-          select: { email: true, name: true },
-        });
-        if (supplier?.email) {
-          const template = quoteAcceptedEmail(
-            supplier.name || 'Supplier',
-            quote.rfq?.title || 'your RFQ',
-            Number(quote.price),
-          );
-          resendService.sendEmail({ to: supplier.email, ...template }).catch(console.error);
-        }
-      } catch { /* email failure must never block the response */ }
+      if (!result.ok) {
+        return NextResponse.json({ error: result.error, code: result.code }, { status: result.status });
+      }
 
-      const escrowLocked = result.deal.status === 'ESCROW_LOCKED';
       return NextResponse.json({
         success: true,
-        quote: { id: result.accepted.id, status: result.accepted.status },
+        quote: { id: result.quote.id, status: result.quote.status },
         deal: { id: result.deal.id, price: result.deal.price, status: result.deal.status },
-        message: escrowLocked
+        message: result.escrowLocked
           ? `Quote accepted! ₹${result.deal.price.toLocaleString('en-IN')} held in escrow until delivery.`
           : 'Quote accepted! Deal created — add funds to your wallet to pay.',
       });

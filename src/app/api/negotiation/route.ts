@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { authenticate } from '@/lib/jwt';
 import { prisma } from '@/lib/prisma';
 import { Bell24hAIClient } from '@/lib/ai-client';
+import { acceptQuote } from '@/lib/quote-acceptance';
 
 export const dynamic = 'force-dynamic';
 
@@ -64,27 +65,26 @@ export async function POST(request: NextRequest) {
 
     // Handle different actions
     if (action === 'accept') {
-      // Update quote status to ACCEPTED
-      const updatedQuote = await prisma.quote.update({
-        where: { id: quoteId },
-        data: { status: 'ACCEPTED' },
+      // Acceptance must never bypass Deal creation, and a supplier can never
+      // accept their own quote: both are enforced by the shared acceptance path.
+      const result = await acceptQuote({
+        quoteId,
+        actor: { id: user.userId, role: user.role },
+        source: 'negotiation',
       });
+
+      if (!result.ok) {
+        return NextResponse.json(
+          { success: false, error: result.error, code: result.code },
+          { status: result.status }
+        );
+      }
 
       return NextResponse.json({
         success: true,
         action: 'accept',
-        quote: {
-          id: updatedQuote.id,
-          rfqId: updatedQuote.rfqId,
-          supplierId: updatedQuote.supplierId,
-          price: updatedQuote.price,
-          quantity: updatedQuote.quantity,
-          timeline: updatedQuote.timeline,
-          description: updatedQuote.description,
-          terms: updatedQuote.terms,
-          status: updatedQuote.status,
-          createdAt: updatedQuote.createdAt,
-        },
+        deal: { id: result.deal.id, price: result.deal.price, status: result.deal.status },
+        quote: result.quote,
       });
     } else if (action === 'reject') {
       // Update quote status to REJECTED

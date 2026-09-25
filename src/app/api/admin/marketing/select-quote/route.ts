@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 import { requireAdmin, isErrorResponse } from '@/lib/admin-auth';
+import { acceptQuote } from '@/lib/quote-acceptance';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,49 +14,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'rfqId and quoteId required' }, { status: 400 });
     }
 
-    const quote = await prisma.quote.findFirst({
-      where: { id: quoteId, rfqId },
-      include: { rfq: true },
+    // Same acceptance path as the buyer routes. The RFQ ends ACCEPTED (not
+    // CLOSED) like every other acceptance; see lib/quote-acceptance.ts.
+    const result = await acceptQuote({
+      quoteId,
+      expectedRfqId: rfqId,
+      actor: { id: auth.userId, role: 'ADMIN' },
+      source: 'admin-select-quote',
     });
 
-    if (!quote?.rfq) {
-      return NextResponse.json({ error: 'Quote not found' }, { status: 404 });
-    }
-    if (!quote.supplierId) {
-      return NextResponse.json({ error: 'Quote has no supplier' }, { status: 400 });
+    if (!result.ok) {
+      return NextResponse.json({ error: result.error, code: result.code }, { status: result.status });
     }
 
-    const buyerId = quote.rfq.createdBy;
-    if (!buyerId) {
-      return NextResponse.json({ error: 'RFQ has no buyer — cannot create deal' }, { status: 400 });
-    }
-
-    const deal = await prisma.$transaction(async tx => {
-      const newDeal = await tx.deal.create({
-        data: {
-          rfqId,
-          quoteId,
-          buyerId,
-          supplierId: quote.supplierId!,
-          price: quote.price,
-          status: 'ACTIVE',
-        },
-      });
-
-      await tx.quote.update({
-        where: { id: quoteId },
-        data: { status: 'ACCEPTED', isAccepted: true },
-      });
-
-      await tx.rFQ.update({
-        where: { id: rfqId },
-        data: { status: 'CLOSED' },
-      });
-
-      return newDeal;
-    });
-
-    return NextResponse.json({ success: true, dealId: deal.id });
+    return NextResponse.json({ success: true, dealId: result.deal.id });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Selection failed';
     console.error('[Admin Marketing select-quote]', message);
