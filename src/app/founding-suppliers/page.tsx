@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { SITE_URL } from '@/lib/site-url';
+import { OG_DEFAULTS } from '@/lib/og-defaults'
 
 export const metadata: Metadata = {
   // `absolute` — this string already ends in "| VyaparSethu"; without it the
@@ -9,7 +10,7 @@ export const metadata: Metadata = {
   // SEO-01/SEO-02).
   title: { absolute: 'Founding Supplier Programme | VyaparSethu' },
   description: 'Join VyaparSethu as one of our first 100 verified suppliers. Free profile, priority placement, and permanent Founding Member badge. Limited to 100 suppliers.',
-  openGraph: {
+  openGraph: { ...OG_DEFAULTS,
     title: 'Founding Supplier Programme | VyaparSethu',
     description: 'Free forever. Priority listing. Permanent Founding Member badge. Limited to 100 suppliers.',
     url: `${SITE_URL}/founding-suppliers`,

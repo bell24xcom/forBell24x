@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { GLOSSARY_TERMS, getTermBySlug, getRelatedTerms } from '@/src/data/glossary';
+import { OG_DEFAULTS } from '@/lib/og-defaults'
 
 interface Props { params: { term: string } }
 
@@ -23,7 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description,
     keywords: term.keywords,
     alternates: { canonical },
-    openGraph: {
+    openGraph: { ...OG_DEFAULTS,
       title,
       description,
       url: canonical,

@@ -3,12 +3,13 @@ import { Metadata } from 'next';
 import { prisma } from '@/lib/prisma';
 import { SITE_URL } from '@/lib/site-url';
 import MarketplaceClient from './MarketplaceClient';
+import { OG_DEFAULTS } from '@/lib/og-defaults'
 
 export const metadata: Metadata = {
   title: 'B2B Marketplace — Verified Indian Suppliers',
   description: "Browse active B2B requirements from verified Indian buyers. Submit quotes on Steel, Textiles, Chemicals, Machinery and more. Win new business on VyaparSethu.",
   alternates: { canonical: `${SITE_URL}/marketplace` },
-  openGraph: {
+  openGraph: { ...OG_DEFAULTS,
     title: 'B2B Marketplace | VyaparSethu',
     description: "Browse active B2B requirements from verified Indian buyers. Submit quotes on Steel, Textiles, Chemicals, Machinery and more. Win new business on VyaparSethu.",
     url: `${SITE_URL}/marketplace`,

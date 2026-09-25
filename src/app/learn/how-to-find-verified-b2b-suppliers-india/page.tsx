@@ -1,12 +1,13 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { SITE_URL } from '@/lib/site-url';
+import { OG_DEFAULTS } from '@/lib/og-defaults'
 
 export const metadata: Metadata = {
   title: 'How to Find Verified B2B Suppliers in India — 7-Step Guide',
   description: 'Step-by-step guide to finding verified B2B suppliers in India: GSTIN check, Udyam verification, sample orders, and how to use VyaparSethu to source from pre-verified suppliers safely.',
   keywords: ['how to find verified suppliers india', 'b2b supplier verification india', 'find supplier india', 'verified supplier india', 'gstin supplier check india'],
-  openGraph: {
+  openGraph: { ...OG_DEFAULTS,
     title: 'How to Find Verified B2B Suppliers in India | VyaparSethu',
     description: '7-step guide to finding and verifying B2B suppliers in India — GSTIN check, Udyam, sample orders, and VyaparSethu\'s pre-verified supplier network.',
     url: `${SITE_URL}/learn/how-to-find-verified-b2b-suppliers-india`,

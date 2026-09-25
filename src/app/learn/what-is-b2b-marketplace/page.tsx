@@ -1,12 +1,13 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { SITE_URL } from '@/lib/site-url';
+import { OG_DEFAULTS } from '@/lib/og-defaults'
 
 export const metadata: Metadata = {
   title: 'What is a B2B Marketplace? Complete Guide for Indian Businesses',
   description: 'A B2B marketplace connects verified buyers and suppliers for bulk orders, competitive quotes, and protected payments. Learn how B2B marketplaces work, how they differ from B2C, and which platform is right for your Indian business.',
   keywords: ['what is b2b marketplace', 'b2b marketplace india', 'b2b marketplace meaning', 'b2b portal india', 'b2b buying platform india'],
-  openGraph: {
+  openGraph: { ...OG_DEFAULTS,
     title: 'What is a B2B Marketplace? | VyaparSethu',
     description: 'A B2B marketplace connects verified buyers and suppliers for bulk orders, competitive quotes, and protected payments.',
     url: `${SITE_URL}/learn/what-is-b2b-marketplace`,

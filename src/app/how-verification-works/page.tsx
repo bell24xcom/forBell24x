@@ -1,11 +1,12 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { SITE_URL } from '@/lib/site-url';
+import { OG_DEFAULTS } from '@/lib/og-defaults'
 
 export const metadata: Metadata = {
   title: 'Supplier Verification — How It Works | VyaparSethu',
   description: 'Every supplier on VyaparSethu is GST-verified and Udyam-registered before their profile goes live. No fake listings. No self-reported data.',
-  openGraph: {
+  openGraph: { ...OG_DEFAULTS,
     title: 'Supplier Verification — How It Works | VyaparSethu',
     description: 'GST + Udyam verified against government portals. Profile reviewed by our team. 24-48 hour approval.',
     url: `${SITE_URL}/how-verification-works`,

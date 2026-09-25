@@ -1,11 +1,12 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { SITE_URL } from '@/lib/site-url';
+import { OG_DEFAULTS } from '@/lib/og-defaults'
 
 export const metadata: Metadata = {
   title: 'Press & Media — VyaparSethu | India\'s Verified B2B Marketplace',
   description: 'Press releases, media kit, and news about VyaparSethu — India\'s verified B2B marketplace for MSME buyers and suppliers.',
-  openGraph: {
+  openGraph: { ...OG_DEFAULTS,
     title: 'Press & Media | VyaparSethu',
     description: 'Press releases, media kit, and news about VyaparSethu — India\'s verified B2B marketplace.',
     url: `${SITE_URL}/press`,

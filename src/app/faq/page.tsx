@@ -2,12 +2,13 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { SITE_URL } from '@/lib/site-url';
 import { faqPageSchema, breadcrumbSchema } from '@/src/lib/schema/faq-schema';
+import { OG_DEFAULTS } from '@/lib/og-defaults'
 
 export const metadata: Metadata = {
   title: 'FAQ — VyaparSethu B2B Trade Network India',
   description: 'Answers to the most common questions about VyaparSethu: how Protected Payment works, supplier verification, Trade Confidence Score, GST compliance, and how to post a Requirement.',
   keywords: ['VyaparSethu FAQ', 'B2B marketplace India FAQ', 'protected payment India', 'supplier verification India', 'how to find suppliers India'],
-  openGraph: { title: 'Frequently Asked Questions — VyaparSethu', description: 'Everything you need to know about sourcing safely on VyaparSethu.', url: 'https://www.vyaparsethu.com/faq', siteName: 'VyaparSethu' },
+  openGraph: { ...OG_DEFAULTS, title: 'Frequently Asked Questions — VyaparSethu', description: 'Everything you need to know about sourcing safely on VyaparSethu.', url: 'https://www.vyaparsethu.com/faq', siteName: 'VyaparSethu' },
   twitter: {
     card: 'summary_large_image',
     title: 'Frequently Asked Questions — VyaparSethu',

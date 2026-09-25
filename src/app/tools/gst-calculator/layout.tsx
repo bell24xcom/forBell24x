@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { OG_DEFAULTS } from '@/lib/og-defaults'
 
 export const metadata: Metadata = {
   title: 'GST Invoice Value Calculator & Tax Invoice Breakdown | VyaparSethu',
@@ -15,7 +16,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://www.vyaparsethu.com/tools/gst-calculator',
   },
-  openGraph: {
+  openGraph: { ...OG_DEFAULTS,
     title: 'B2B GST Calculator — India | VyaparSethu',
     description:
       'Calculate CGST, SGST, IGST and total invoice value for any B2B tax invoice. Instant breakdown for Indian MSMEs.',
