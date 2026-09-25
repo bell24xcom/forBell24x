@@ -109,7 +109,8 @@ export default function DiscoveryPage() {
       if (claimedFilter === 'claimed') params.set('claimed', 'true');
       if (claimedFilter === 'unclaimed') params.set('claimed', 'false');
 
-      const [discRes, campRes] = await Promise.all([
+      // loadOsStatus() sets its own state and resolves void, so its slot is skipped.
+      const [discRes, , campRes] = await Promise.all([
         fetch(`/api/admin/discovery?${params}`, { credentials: 'include' }).then((r) => r.json()),
         loadOsStatus(),
         fetch('/api/admin/outreach-campaigns', { credentials: 'include' }).then((r) => r.json()),
