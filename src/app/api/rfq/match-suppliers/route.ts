@@ -11,12 +11,18 @@
  *   Base               → 10 pts (always)
  */
 import { NextRequest, NextResponse } from 'next/server';
+import { authenticate } from '@/lib/jwt';
 import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
   try {
+    const user = await authenticate(req);
+    if (!user) {
+      return NextResponse.json({ success: false, error: 'Authentication required' }, { status: 401 });
+    }
+
     const { rfqId } = await req.json();
 
     if (!rfqId) {
@@ -25,11 +31,15 @@ export async function POST(req: NextRequest) {
 
     const rfq = await prisma.rFQ.findUnique({
       where: { id: rfqId },
-      select: { id: true, title: true, category: true, location: true, maxBudget: true, urgency: true },
+      select: { id: true, title: true, category: true, location: true, maxBudget: true, urgency: true, createdBy: true },
     });
 
     if (!rfq) {
       return NextResponse.json({ success: false, error: 'RFQ not found' }, { status: 404 });
+    }
+
+    if (rfq.createdBy !== user.userId && user.role !== 'ADMIN') {
+      return NextResponse.json({ success: false, error: 'Forbidden: only the RFQ owner can match suppliers' }, { status: 403 });
     }
 
     // Fetch candidate suppliers — no schema fields invented
@@ -49,7 +59,6 @@ export async function POST(req: NextRequest) {
           id:         true,
           name:       true,
           company:    true,
-          phone:      true,
           location:   true,
           isVerified: true,
           trustScore: true,
@@ -70,7 +79,6 @@ export async function POST(req: NextRequest) {
           id:         true,
           name:       true,
           company:    true,
-          phone:      true,
           location:   true,
           isVerified: true,
           trustScore: true,
@@ -127,7 +135,6 @@ export async function POST(req: NextRequest) {
         id:         s.id,
         name:       s.name    || s.company || 'Supplier',
         company:    s.company || '',
-        phone:      s.phone   || '',
         location:   s.location || '',
         isVerified: s.isVerified,
         trustScore: s.trustScore,

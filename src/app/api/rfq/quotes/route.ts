@@ -24,6 +24,17 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'RFQ ID is required' }, { status: 400 });
     }
 
+    const rfq = await prisma.rFQ.findUnique({
+      where: { id: rfqId },
+      select: { createdBy: true },
+    });
+    if (!rfq) {
+      return NextResponse.json({ error: 'RFQ not found' }, { status: 404 });
+    }
+    if (rfq.createdBy !== user.userId && user.role !== 'ADMIN') {
+      return NextResponse.json({ error: 'Forbidden: only the RFQ owner can view its quotes' }, { status: 403 });
+    }
+
     const quotes = await prisma.quote.findMany({
       where: { rfqId },
       include: {
@@ -32,8 +43,6 @@ export async function GET(request: NextRequest) {
             id: true,
             name: true,
             company: true,
-            email: true,
-            phone: true,
             trustScore: true,
             location: true,
           },

@@ -7,6 +7,9 @@
  *   ?limit=50       max results (capped at 100)
  *   ?status=ACTIVE  filter by status
  *   ?search=steel   search in title/category
+ *
+ * External dependency unknown. Route intentionally remains public (no auth);
+ * buyer contact details (phone) are never returned.
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
@@ -57,7 +60,6 @@ export async function GET(request: NextRequest) {
             select: {
               name:    true,
               company: true,
-              phone:   true,
               location: true,
             },
           },
@@ -85,7 +87,6 @@ export async function GET(request: NextRequest) {
       buyer: {
         name:     r.user.company || r.user.name || 'Unknown',
         location: r.user.location || r.location || '',
-        phone:    r.user.phone,
       },
       createdAt:  r.createdAt.toISOString(),
       expiresAt:  r.expiresAt?.toISOString() ?? null,
