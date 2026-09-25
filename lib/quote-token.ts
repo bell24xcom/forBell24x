@@ -106,3 +106,25 @@ export function verifyQuoteToken(token: string | null | undefined): QuoteTokenPa
 
   return payload;
 }
+
+export interface ResolvedQuoteIdentity {
+  rfqId: string;
+  supplierId: string;
+}
+
+/**
+ * The ONLY sanctioned way for a quote-submission endpoint to learn which
+ * (rfq, supplier) pair a request is for. Returns null on any missing,
+ * malformed, tampered, or expired token — callers MUST treat null as
+ * "reject the request" and MUST NOT fall back to a client-supplied
+ * rfq_id/supplier_id. (Security fix, PR61 remediation: POST
+ * /api/marketing/quote previously trusted client-supplied rfq_id/
+ * supplier_id fields directly with no proof of possession of the signed
+ * link, letting anyone submit a quote as any supplier for any RFQ.)
+ */
+export function resolveQuoteIdentityFromToken(token: unknown): ResolvedQuoteIdentity | null {
+  if (typeof token !== 'string' || !token) return null;
+  const payload = verifyQuoteToken(token);
+  if (!payload) return null;
+  return { rfqId: payload.rfqId, supplierId: payload.supplierId };
+}

@@ -71,6 +71,39 @@ export async function GET(request: NextRequest) {
       prisma.rFQ.count({ where: { status: { in: ['ACTIVE', 'OPEN'] }, quotes: { none: {} }, isSeeded: { not: true } } }),
     ]);
 
+    // Trade Funnel accuracy fix (Phase C). The funnel section reused the
+    // all-time realRfqs/totalQuotes/acceptedQuotes/completedTx counts above
+    // regardless of `range` — the UI's 1d/7d/30d/90d selector changed
+    // state and refetched, but every funnel number stayed identical
+    // because nothing downstream ever applied `since`. These four queries
+    // are funnel-specific and date-scoped; the pre-existing variables
+    // above (used by stats.rfqs/quotes/transactions, the all-time summary
+    // cards elsewhere on the dashboard) are left exactly as they were.
+    //
+    // Seeded-exclusion note: applied to RFQs and completed transactions
+    // (Transaction.rfqId is a required, non-nullable relation, so filtering
+    // through it is always safe). NOT applied to quotesSubmitted/
+    // quotesAccepted — Quote.rfqId is nullable (concierge-sourced quotes
+    // may have no linked RFQ, per lib/orchestration.ts's own comment on
+    // this exact nullability), and a Prisma relation filter on a nullable
+    // FK would incorrectly exclude those real, legitimately-RFQ-less
+    // quotes rather than just seeded ones. Date-scoped only for now — a
+    // real seeded-exclusion for quotes needs a join that tolerates
+    // rfqId: null, which is a separate, slightly larger change.
+    const [
+      funnelRfqsCreated,
+      funnelQuotesSubmitted,
+      funnelQuotesAccepted,
+      funnelDealsCompleted,
+    ] = await Promise.all([
+      prisma.rFQ.count({ where: { createdAt: { gte: since }, isSeeded: false } }),
+      prisma.quote.count({ where: { createdAt: { gte: since } } }),
+      prisma.quote.count({ where: { createdAt: { gte: since }, status: 'ACCEPTED' } }),
+      prisma.transaction.count({
+        where: { createdAt: { gte: since }, status: 'COMPLETED', rfq: { isSeeded: false } },
+      }),
+    ]);
+
     const volumeResult = await prisma.transaction.aggregate({
       _sum: { amount: true },
       where: { status: 'COMPLETED' },
@@ -128,11 +161,11 @@ export async function GET(request: NextRequest) {
         quotes:       { total: totalQuotes, accepted: acceptedQuotes, pending: pendingQuotes },
         transactions: { total: totalTx, completed: completedTx, completedVolume },
         funnel: {
-          rfqsCreated:     realRfqs,
-          quotesSubmitted: totalQuotes,
-          quotesAccepted:  acceptedQuotes,
-          dealsCompleted:  completedTx,
-          conversionRate:  realRfqs > 0 ? ((completedTx / realRfqs) * 100).toFixed(1) : '0',
+          rfqsCreated:     funnelRfqsCreated,
+          quotesSubmitted: funnelQuotesSubmitted,
+          quotesAccepted:  funnelQuotesAccepted,
+          dealsCompleted:  funnelDealsCompleted,
+          conversionRate:  funnelRfqsCreated > 0 ? ((funnelDealsCompleted / funnelRfqsCreated) * 100).toFixed(1) : '0',
         },
         trust: { highTrustSuppliers },
         plans: { FREE: plans['FREE'] ?? 0, PRO: plans['PRO'] ?? 0, ENTERPRISE: plans['ENTERPRISE'] ?? 0 },

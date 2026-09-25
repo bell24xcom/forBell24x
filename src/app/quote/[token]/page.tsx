@@ -49,13 +49,17 @@ export default function PublicQuotePage() {
 
     setLoading(true);
     try {
+      // Security fix (PR61 remediation): the API now derives (rfqId,
+      // supplierId) only from the signed token itself — it never trusts
+      // rfq_id/supplier_id from the request body. Send the raw token
+      // (already verified once above via /api/quote/verify, purely for
+      // display) instead of the values decoded from that response.
       const res = await fetch('/api/marketing/quote', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
-          rfq_id: context.rfq_id,
-          supplier_id: context.supplier_id
+          token: params.token,
         })
       });
 

@@ -38,7 +38,7 @@ export async function classifyLead(rawText: string): Promise<{
     const response = await aiClient.createChatCompletion('text', [
       {
         role: 'system',
-        content: `You are a B2B procurement classifier for Indian marketplace Bell24h. Extract structured data from informal lead text. Reply with JSON only.
+        content: `You are a B2B procurement classifier for Indian marketplace VyaparSethu. Extract structured data from informal lead text. Reply with JSON only.
 
 Categories: ${CATEGORIES.join(', ')}
 
@@ -158,7 +158,7 @@ export async function generateContent(rfqId: string): Promise<GeneratedContent |
   const link = `https://www.bell24h.com/rfq/${rfq.id}`;
 
   const linkedin = [
-    `🔴 New B2B RFQ on Bell24h`,
+    `🔴 New B2B RFQ on VyaparSethu`,
     ``,
     `📦 ${rfq.title}`,
     `📍 Category: ${rfq.category}`,
@@ -169,10 +169,10 @@ export async function generateContent(rfqId: string): Promise<GeneratedContent |
     `Suppliers — quote directly (free during beta):`,
     link,
     ``,
-    `#B2B #Procurement #${rfq.category.replace(/\s+/g, '')} #Bell24h #IndianManufacturing`,
+    `#B2B #Procurement #${rfq.category.replace(/\s+/g, '')} #VyaparSethu #IndianManufacturing`,
   ].filter(Boolean).join('\n');
 
-  const whatsapp = `*New RFQ Alert — Bell24h* 🔔\n\n` +
+  const whatsapp = `*New RFQ Alert — VyaparSethu* 🔔\n\n` +
     `*${rfq.title}*\n` +
     `Category: ${rfq.category} | Location: ${loc}\n` +
     (budget ? `Budget: ${budget}\n` : '') +
@@ -180,7 +180,7 @@ export async function generateContent(rfqId: string): Promise<GeneratedContent |
 
   const blogSnippet = `**${rfq.title}** — A buyer in ${loc} is actively sourcing ${rfq.category.toLowerCase()} products` +
     (budget ? ` with a budget of ${budget}` : '') +
-    `. Submit your quote on Bell24h: ${link}`;
+    `. Submit your quote on VyaparSethu: ${link}`;
 
   const twitterX = `🔴 Live RFQ: ${rfq.title} (${rfq.category}, ${loc})` +
     (budget ? ` | Budget: ${budget}` : '') +

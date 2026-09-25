@@ -47,6 +47,23 @@ const nextConfig = {
       // "Marketplace" breadcrumb destination from /rfq/[id].
       { source: '/rfq/compare-quotes', destination: '/rfq', permanent: true },
       { source: '/rfq-compare', destination: '/rfq', permanent: true },
+      // /services has no index page — only subpaths exist (/services/logistics,
+      // /services/verification, etc.) — so the bare URL 404s. Nothing in the
+      // app links to it (verified via repo-wide search for '/services'), but
+      // Google Search Console keeps finding it, presumably from stale/external
+      // crawl history. Redirecting rather than building a new index page,
+      // since there's no real content to put there.
+      { source: '/services', destination: '/how-it-works', permanent: true },
+      // Dead category slugs, still linked live from src/data/city-category-seo.ts
+      // (feeds /suppliers/[city]/[category] pages) — none of these three exist
+      // as real Category rows in the DB (verified). Redirecting to the closest
+      // real, active category rather than leaving a 404 on a genuinely-linked
+      // page. mining-minerals and hvac-refrigeration were investigated too and
+      // have zero references anywhere in the codebase — left as 404s, not
+      // redirected, since there's no live link to fix and no invented target.
+      { source: '/categories/pipes-fittings', destination: '/categories/plumbing-supplies', permanent: true },
+      { source: '/categories/leather-footwear', destination: '/categories/footwear', permanent: true },
+      { source: '/categories/chemicals-petrochemicals', destination: '/categories/chemicals', permanent: true },
     ];
   },
   async headers() {

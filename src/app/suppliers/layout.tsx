@@ -1,28 +1,8 @@
-import type { Metadata } from 'next';
-import { SITE_URL } from '@/lib/site-url';
-import { OG_DEFAULTS } from '@/lib/og-defaults'
-
-// `page.tsx` is 'use client' (live supplier search/filter UI) and cannot
-// export metadata itself, so it silently inherited the root layout's
-// title/description/canonical (i.e. declared the homepage as its own
-// canonical). Verified live 8 Aug 2026: /suppliers served the homepage's
-// <title> and <link rel="canonical" href="https://www.vyaparsethu.com">
-// despite being a distinct, sitemapped, footer-linked directory page —
-// exactly the kind of self-declared-wrong-canonical Google flags as
-// "Duplicate, Google chose different canonical than user."
-export const metadata: Metadata = {
-  title: { absolute: 'Find Verified B2B Suppliers in India | VyaparSethu' },
-  description:
-    'Browse GST and Udyam verified B2B suppliers across India by category and location. Post a Requirement and get competitive quotes with Protected Payment.',
-  alternates: { canonical: `${SITE_URL}/suppliers` },
-  openGraph: { ...OG_DEFAULTS,
-    title: 'Find Verified B2B Suppliers in India | VyaparSethu',
-    description: 'Browse GST and Udyam verified B2B suppliers across India by category and location.',
-    url: `${SITE_URL}/suppliers`,
-    siteName: 'VyaparSethu',
-  },
-};
-
+// SEO fix (Task 2, SEO_PHASE_2_SSR_AND_SITEMAP): metadata used to live here
+// as a static export because page.tsx was 'use client' and couldn't export
+// metadata itself. page.tsx is now an async Server Component with its own
+// generateMetadata (varying by ?page=N, with a correct self-referencing
+// canonical per page), so this layout goes back to being a plain passthrough.
 export default function SuppliersLayout({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
