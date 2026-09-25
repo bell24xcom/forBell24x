@@ -1,6 +1,8 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
+import { SITE_URL } from '@/lib/site-url';
+import { OG_DEFAULTS } from '@/lib/og-defaults';
 import RFQDetailClient from './RFQDetailClient';
 
 /**
@@ -91,9 +93,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description,
     robots: indexable ? { index: true, follow: true } : { index: false, follow: true },
     openGraph: {
+      ...OG_DEFAULTS,
       title,
       description,
-      siteName: 'VyaparSethu',
+      url: `${SITE_URL}/rfq/${params.id}`,
     },
   };
 }
