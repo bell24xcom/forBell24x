@@ -39,12 +39,30 @@ test('A2. valid token: phone resolved from the response under alternate field na
     { success: true, phone: '9876543210' },
     { status: 'success', data: { mobile: '9876543210' } },
     { type: 'success', identifier: '919876543210' },
+    { type: 'success', number: '9876543210' },      // TS third-party adapter's field list
+    { type: 'success', msisdn: '919876543210' },      // TS third-party adapter's field list
+    { type: 'success', data: { identifier: '919876543210' } }, // Java third-party adapter's nesting
+    { type: 'success', message: '919876543210' },    // confirmed real pattern: message IS the phone on some MSG91 accounts
   ]) {
     const fetchImpl = (async () => jsonResponse(200, body)) as unknown as typeof fetch;
     const result = await verifyMsg91AccessToken(fakeToken(), { fetchImpl, authKey: 'k' });
     assert.equal(result.ok, true, JSON.stringify(body));
     assert.equal(result.phone, '9876543210', JSON.stringify(body));
   }
+});
+
+test('A4. valid token: type comparison is case-insensitive', async () => {
+  const fetchImpl = (async () => jsonResponse(200, { type: 'Success', mobile: '9876543210' })) as unknown as typeof fetch;
+  const result = await verifyMsg91AccessToken(fakeToken(), { fetchImpl, authKey: 'k' });
+  assert.equal(result.ok, true);
+});
+
+test('A5. confirmed real rejection shape (logged on this deployment 2026-09-27T13:40:23Z): { message, type, code }, no data', async () => {
+  const fetchImpl = (async () => jsonResponse(200, { message: 'Access token expired', type: 'error', code: 'invalid' })) as unknown as typeof fetch;
+  const result = await verifyMsg91AccessToken(fakeToken(), { fetchImpl, authKey: 'k' });
+  assert.equal(result.ok, false);
+  assert.equal(result.code, 'invalid_token');
+  assert.deepEqual(result.responseShape?.sort(), ['code', 'message', 'type']);
 });
 
 test('A3. valid token: phone falls back to the token payload only after MSG91 confirms success', async () => {
