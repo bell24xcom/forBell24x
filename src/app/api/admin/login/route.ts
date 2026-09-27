@@ -59,8 +59,11 @@ export async function POST(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
-  // Admin logout — clear the cookie
+  // Admin logout — clear both session cookies. An OTP-widget admin login
+  // sets both admin-token and auth-token (see otp/widget-verify/route.ts),
+  // so clearing only one here would leave the other valid.
   const response = NextResponse.json({ success: true, message: 'Logged out' });
   response.cookies.delete('admin-token');
+  response.cookies.delete('auth-token');
   return response;
 }
