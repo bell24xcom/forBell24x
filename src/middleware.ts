@@ -17,7 +17,7 @@ const OTP_WINDOW = 10 * 60 * 1000; // 10 minutes
 const OTP_MAX = 5;
 const otpCache = new Map<string, { count: number; start: number }>();
 
-const OTP_PATHS = ['/api/auth/send-otp', '/api/auth/otp/send', '/api/auth/verify-otp', '/api/auth/otp/verify'];
+const OTP_PATHS = ['/api/auth/send-otp', '/api/auth/otp/send', '/api/auth/verify-otp', '/api/auth/otp/verify', '/api/auth/otp/widget-verify'];
 
 function isRateLimited(ip: string): boolean {
   const now = Date.now();

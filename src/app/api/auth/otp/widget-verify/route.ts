@@ -3,13 +3,15 @@ import { prisma } from '@/lib/prisma';
 import { generateToken } from '@/lib/jwt';
 import { authLogger } from '@/lib/logger';
 import { recordSignupConsent, NO_CONSENT_UI } from '@/src/lib/consent/recordSignupConsent';
+import { verifyMsg91AccessToken, normalizePhone, phonesMismatch } from '@/lib/msg91-widget';
 
 export const dynamic = 'force-dynamic';
 
-function normalizePhone(raw: string): string | null {
-  const cleaned = raw.replace(/[\s\-\(\)]/g, '').replace(/^\+91/, '').replace(/^91/, '');
-  return /^\d{10}$/.test(cleaned) ? cleaned : null;
-}
+const VERIFY_ERROR_MESSAGES: Record<string, string> = {
+  invalid_token: 'Invalid verification token',
+  phone_unresolved: 'Could not verify a phone number for this token',
+  service_unavailable: 'Verification service unavailable. Please try again shortly.',
+};
 
 export async function POST(request: NextRequest) {
   let step = 'init';
@@ -17,24 +19,41 @@ export async function POST(request: NextRequest) {
     step = 'parse';
     const body = await request.json();
     const accessToken = body.accessToken?.toString() || '';
-    const rawPhone   = body.phone?.toString() || '';
-    const phone      = normalizePhone(rawPhone);
+    const bodyPhone = normalizePhone(body.phone?.toString() || '');
 
-    if (!phone) {
+    if (!accessToken) {
       return NextResponse.json(
-        { success: false, message: 'Valid 10-digit phone number required' },
-        { status: 400 }
+        { success: false, code: 'invalid_token', message: 'Verification token required' },
+        { status: 401 }
       );
     }
 
-    // Validate token looks like a JWT (3 dot-separated parts, min length)
-    step = 'token-check';
-    const jwtParts = accessToken.split('.');
-    if (jwtParts.length !== 3 || accessToken.length < 50) {
+    // Server-side MSG91 verification is the ONLY source of truth for phone
+    // ownership -- a client-supplied token proves nothing on its own. Fail
+    // closed on every non-verified outcome, before any database access.
+    step = 'msg91-verify';
+    const verification = await verifyMsg91AccessToken(accessToken);
+
+    if (!verification.ok || !verification.phone) {
+      authLogger.warn('Widget OTP verification failed', {
+        code: verification.code,
+        responseShape: verification.responseShape,
+      });
       return NextResponse.json(
-        { success: false, message: 'Invalid verification token' },
-        { status: 400 }
+        { success: false, code: verification.code, message: VERIFY_ERROR_MESSAGES[verification.code] },
+        { status: 401 }
       );
+    }
+
+    const phone = verification.phone;
+
+    // The request body's phone is never trusted for identity -- only used
+    // to detect and log a mismatch against what MSG91 actually verified.
+    if (phonesMismatch(bodyPhone, phone)) {
+      authLogger.warn('Widget OTP phone mismatch: request body phone differs from MSG91-verified phone', {
+        bodyPhoneLast4: bodyPhone!.slice(-4),
+        verifiedPhoneLast4: phone.slice(-4),
+      });
     }
 
     // Find or create user
