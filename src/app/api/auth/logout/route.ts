@@ -8,14 +8,20 @@ export async function POST() {
     message: 'Logout successful'
   });
 
-  // Clear the httpOnly auth-token cookie (set by /api/auth/otp/verify)
-  response.cookies.set('auth-token', '', {
+  const cookieOpts = {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    sameSite: 'lax' as const,
     maxAge: 0,
     path: '/',
-  });
+  };
+
+  // Clear BOTH session cookies. An OTP-widget admin login sets both
+  // auth-token and admin-token (see otp/widget-verify/route.ts) -- this
+  // route previously cleared only auth-token, leaving admin-token valid
+  // and the admin session effectively alive after "logout".
+  response.cookies.set('auth-token', '', cookieOpts);
+  response.cookies.set('admin-token', '', cookieOpts);
 
   return response;
 }

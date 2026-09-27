@@ -145,20 +145,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return () => { cancelled = true; };
   }, [isLoginPage]);
 
-  const handleLogout = () => {
-    // Clear auth/admin cookies across host + registrable-domain variants,
-    // derived from the CURRENT hostname so logout works on any domain
-    // (bell24h.com today, vyaparsethu.com after cutover).
-    const host = window.location.hostname;
-    const parts = host.split('.');
-    const baseDomain = parts.length > 2 ? parts.slice(-2).join('.') : host;
-    const domains = host === 'localhost' ? [''] : ['', host, baseDomain, `.${baseDomain}`];
-    domains.forEach(domain => {
-      const d = domain ? `; domain=${domain}` : '';
-      document.cookie = `auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT${d}`;
-      document.cookie = `admin-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT${d}`;
-    });
-    window.location.href = '/auth/phone-email';
+  const handleLogout = async () => {
+    // auth-token and admin-token are both httpOnly -- document.cookie can
+    // never read or clear them from the client, so the previous
+    // implementation here was a no-op against the cookies that actually
+    // gate access, and clicking Logout left the session fully valid.
+    // Only a server response can clear an httpOnly cookie.
+    try {
+      await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+    } catch {
+      // Best-effort: still redirect even if the network call fails, so
+      // the user isn't stuck with no way out.
+    }
+    window.location.href = '/admin/login';
   };
 
   // Bug 3 — render login page without admin shell or sidebar
