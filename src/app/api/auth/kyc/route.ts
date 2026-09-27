@@ -4,9 +4,13 @@ import { verifyToken, extractToken } from '@/lib/jwt';
 
 export const dynamic = 'force-dynamic';
 
-// ─── Trust Score Calculation ─────────────────────────────────────────────────
-// Score reflects how authentic / complete a supplier profile is.
-// All KYC fields are OPTIONAL — providing more raises the score.
+// ─── KYC Completeness Score (informational only) ─────────────────────────────
+// This is NOT the Trade Confidence Score / `User.trustScore`. That field is
+// computed exclusively by the nightly batch job (src/lib/trust-batch.ts, via
+// the daily Vercel Cron) per CLAUDE.md's hard rule: "Never compute Trust Score
+// real-time (use daily cron only)". This function only estimates how complete
+// a submitted KYC profile is, for immediate UI feedback to the user — it must
+// never be written to `User.trustScore`.
 //
 // Base 30  → phone OTP verified (set at login)
 // +10      → company name provided
@@ -16,7 +20,7 @@ export const dynamic = 'force-dynamic';
 // +20      → Udyam Aadhar number provided  (MSME registration)
 // +5       → both GST + Udyam together (bonus)
 // ─────────────────────────────────────────────────────────────────────────────
-function calculateTrustScore(user: {
+function calculateKycCompletenessScore(user: {
   name?: string | null;
   company?: string | null;
   location?: string | null;
@@ -88,8 +92,9 @@ export async function POST(request: NextRequest) {
     const updatedUdyam   = kycData.udyamNumber || currentUser.udyamNumber;
     const updatedLocation = kycData.location   || currentUser.location;
 
-    // Calculate new trust score from merged profile
-    const newTrustScore = calculateTrustScore({
+    // Informational only — see calculateKycCompletenessScore doc comment.
+    // Must NOT be written to User.trustScore (that's cron-only).
+    const kycCompletenessScore = calculateKycCompletenessScore({
       name: updatedName,
       company: updatedCompany,
       location: updatedLocation,
@@ -107,7 +112,8 @@ export async function POST(request: NextRequest) {
         gstNumber: updatedGST,
         udyamNumber: updatedUdyam,
         location: updatedLocation,
-        trustScore: newTrustScore,
+        // trustScore is intentionally NOT written here — it is recomputed
+        // exclusively by the nightly batch cron (src/lib/trust-batch.ts).
         // isVerified stays false until admin explicitly approves KYC
         isVerified: false,
         preferences: {
@@ -137,9 +143,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'KYC submitted. Your trust score has been updated.',
+      message: 'KYC submitted. Your Trade Confidence Score will update in the next nightly recalculation.',
       user: updatedUser,
-      trustScore: newTrustScore,
+      kycCompletenessScore,
       scoreBreakdown: {
         phoneVerified: 30,
         nameUpdated:   (updatedName && !updatedName.startsWith('User ')) ? 5 : 0,

@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { aiClient } from '@/lib/ai-client';
 import { prisma } from '@/lib/prisma';
+import { FLAGS } from '@/src/lib/feature-flags';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
+
+// Phase D gate (CLAUDE.md): intelligence features stay off until 100 verified
+// suppliers exist, even when FLAGS.INTELLIGENCE_ENABLED is true.
+const INTELLIGENCE_SUPPLIER_GATE = 100;
 
 interface RFQData {
   text?: string;
@@ -62,6 +67,15 @@ export async function POST(request: NextRequest) {
     // Get text content from any source
     const textContent = rfqData.text || rfqData.audioTranscript || rfqData.videoTranscript || '';
     
+    // Phase D gate: real supplier count decides whether the intelligence layer
+    // (NVIDIA semantic matching + SHAP/LIME explainability) may run at all.
+    const verifiedSupplierCount = await prisma.user.count({
+      where: { role: 'SUPPLIER', isVerified: true },
+    });
+    const intelligenceEnabled =
+      FLAGS.INTELLIGENCE_ENABLED && verifiedSupplierCount >= INTELLIGENCE_SUPPLIER_GATE;
+    const shapEnabled = intelligenceEnabled && FLAGS.SHAP_ENABLED;
+
     // Fetch real suppliers from DB, ordered by trust score descending (performance-driven routing)
     const dbSuppliers = await prisma.user.findMany({
       where: { role: 'SUPPLIER', isActive: true },
@@ -104,34 +118,48 @@ export async function POST(request: NextRequest) {
       }, { status: 404 });
     }
 
-    // AI Matching Algorithm
-    const matchingResults = await performAIMatching(rfqData, suppliers, textContent);
-    
-    // Generate SHAP explanations
-    const shapExplanations = generateSHAPExplanations(rfqData, matchingResults[0]);
-    
-    // Generate LIME explanations
-    const limeExplanations = generateLIMEExplanations(rfqData, matchingResults[0]);
-    
-    // Calculate perplexity score for text complexity
-    const perplexityScore = calculatePerplexityScore(textContent);
+    // Core supplier matching always runs — this is base marketplace functionality,
+    // not a gated "intelligence" feature. Only the NVIDIA semantic-matching path
+    // (and everything derived from it below) is gated.
+    const matchingResults = intelligenceEnabled
+      ? await performAIMatching(rfqData, suppliers, textContent)
+      : await performAlgorithmicMatching(rfqData, suppliers, textContent);
+
+    // SHAP/LIME/perplexity explainability: gated separately per CLAUDE.md
+    // ("All SHAP features gated behind FLAGS.SHAP_ENABLED"). These currently
+    // return fixed placeholder values regardless of the actual match (see
+    // generateSHAPExplanations/generateLIMEExplanations) — gating prevents
+    // that placeholder output from being presented to users as real
+    // explainability ahead of the real implementation.
+    const aiAnalysis = shapEnabled
+      ? (() => {
+          const perplexityScore = calculatePerplexityScore(textContent);
+          return {
+            shap: generateSHAPExplanations(rfqData, matchingResults[0]),
+            lime: generateLIMEExplanations(rfqData, matchingResults[0]),
+            perplexity: {
+              score: perplexityScore,
+              normalizedScore: Math.min(100, Math.max(0, 100 - perplexityScore * 2)),
+              category: perplexityScore < 20 ? 'low' : perplexityScore < 40 ? 'medium' : 'high',
+              interpretation: getPerplexityInterpretation(perplexityScore)
+            },
+            modelConfidence: calculateModelConfidence(matchingResults),
+            dataQuality: assessDataQuality(rfqData, textContent)
+          };
+        })()
+      : null;
 
     return NextResponse.json({
       success: true,
       data: {
         rfqId: `RFQ_${Date.now()}`,
         matches: matchingResults,
-        aiAnalysis: {
-          shap: shapExplanations,
-          lime: limeExplanations,
-          perplexity: {
-            score: perplexityScore,
-            normalizedScore: Math.min(100, Math.max(0, 100 - perplexityScore * 2)),
-            category: perplexityScore < 20 ? 'low' : perplexityScore < 40 ? 'medium' : 'high',
-            interpretation: getPerplexityInterpretation(perplexityScore)
-          },
-          modelConfidence: calculateModelConfidence(matchingResults),
-          dataQuality: assessDataQuality(rfqData, textContent)
+        aiAnalysis,
+        intelligenceGate: {
+          enabled: intelligenceEnabled,
+          shapEnabled,
+          verifiedSuppliers: verifiedSupplierCount,
+          requiredVerifiedSuppliers: INTELLIGENCE_SUPPLIER_GATE,
         },
         processingTime: Date.now() - Date.now(),
         timestamp: new Date().toISOString()
@@ -159,7 +187,10 @@ async function performAIMatching(rfqData: RFQData, suppliers: SupplierProfile[],
     console.warn('NVIDIA AI matching unavailable, using algorithmic fallback:', err);
   }
 
-  // Algorithmic fallback
+  return performAlgorithmicMatching(rfqData, suppliers, textContent);
+}
+
+async function performAlgorithmicMatching(rfqData: RFQData, suppliers: SupplierProfile[], textContent: string): Promise<MatchingResult[]> {
   const results: MatchingResult[] = [];
 
   for (const supplier of suppliers) {
