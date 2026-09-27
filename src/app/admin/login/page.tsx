@@ -119,6 +119,13 @@ export default function AdminLoginPage() {
       })
       const data = await res.json()
       if (data.success) {
+        // /api/admin/login's response has no `user` object (it's an
+        // env-credentialed admin with no DB row) — store only what's true,
+        // matching the shape /api/auth/me's own 'admin' shortcut returns.
+        // This makes the very first post-login admin page instant instead
+        // of waiting on the /api/auth/me round trip that admin/layout.tsx
+        // would otherwise fall back to.
+        localStorage.setItem('bell24h_user', JSON.stringify({ role: 'ADMIN', email, name: email }))
         router.push('/admin/dashboard')
       } else {
         setError(data.message || data.error || 'Invalid credentials')

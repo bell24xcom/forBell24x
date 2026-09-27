@@ -63,14 +63,17 @@ export default function AdminDashboard() {
   const fetchStats = useCallback(async () => {
     setLoading(true);
     setError('');
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
     try {
-      const res  = await fetch(`/api/admin/stats?range=${range}`, { credentials: 'include' });
+      const res  = await fetch(`/api/admin/stats?range=${range}`, { credentials: 'include', signal: controller.signal });
       const data = await res.json();
       if (data.success) setStats(data.stats);
       else setError(data.message || 'Failed to load stats');
     } catch {
       setError('Network error');
     } finally {
+      clearTimeout(timeout);
       setLoading(false);
     }
   }, [range]);
