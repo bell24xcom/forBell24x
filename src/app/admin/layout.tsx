@@ -75,7 +75,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const isLoginPage = pathname === '/admin/login';
 
   useEffect(() => {
-    // Bug 3 — skip auth check on the login page
+    // Bug 3 — skip auth check on the login page.
+    //
+    // Depends on isLoginPage (not []): this layout instance persists across
+    // the client-side router.push('/admin/dashboard') that follows a
+    // successful /admin/login (Next.js keeps a shared layout mounted across
+    // navigations between sibling routes under it — it does not remount).
+    // With an empty dependency array this effect only ever ran ONCE, at
+    // whatever path the layout first mounted on. Landing on /admin/login
+    // first — the normal case right after login — made isLoginPage true at
+    // that single run, so checkAdmin() was skipped and never called again,
+    // leaving authChecked stuck at false (endless "Checking admin
+    // access...") for the rest of the session on every subsequent /admin/*
+    // page, with no further requests and no error.
     if (isLoginPage) return;
     let cancelled = false;
 
@@ -131,7 +143,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
     checkAdmin();
     return () => { cancelled = true; };
-  }, []);
+  }, [isLoginPage]);
 
   const handleLogout = () => {
     // Clear auth/admin cookies across host + registrable-domain variants,
