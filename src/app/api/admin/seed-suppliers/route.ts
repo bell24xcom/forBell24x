@@ -85,6 +85,7 @@ export async function POST(req: NextRequest) {
           isActive: true,
           isVerified: true,
           isClaimed: true,
+          claimedAt: new Date(), // MA-01: a claimed account must carry claimed_at (30 seed rows were created without it)
           trustScore: s.trustScore,
           gstNumber: s.gst,
           importedFrom: 'admin_seed',

@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticate } from '@/lib/jwt';
 import { prisma } from '@/lib/prisma';
-import { sendEmail as _sendEmail } from '@/lib/email';
-const resendService = { sendEmail: ({ to, subject, html }: { to: string; subject: string; html: string }) => _sendEmail(to, subject, html) };
-import { quoteReceivedEmail } from '@/lib/emailTemplates';
+import { notifyQuoteCreated } from '@/lib/quote-notify-runtime';
 import { storeQuote } from '@/lib/memory-engine';
 
 export const dynamic = 'force-dynamic';
@@ -147,25 +145,9 @@ export async function POST(request: NextRequest) {
       data: { status: 'QUOTED' },
     }).catch(() => {}); // Ignore if already updated
 
-    // Fire-and-forget: notify buyer via email (skip for seeded/demo RFQs)
-    if (!rfq.isSeeded) {
-      try {
-        const [supplier, buyer] = await Promise.all([
-          prisma.user.findUnique({ where: { id: user.userId }, select: { name: true, company: true } }),
-          prisma.user.findUnique({ where: { id: rfq.createdBy! }, select: { email: true, name: true } }),
-        ]);
-        if (buyer?.email) {
-          const template = quoteReceivedEmail(
-            buyer.name || 'Buyer',
-            rfq.title,
-            supplier?.name || '',
-            supplier?.company || '',
-            parseFloat(String(price)),
-          );
-          resendService.sendEmail({ to: buyer.email, ...template }).catch(console.error);
-        }
-      } catch { /* email failure must never block the response */ }
-    }
+    // MA-01: one helper alerts the buyer (in-app notification + email + n8n) and skips seeded/demo RFQs.
+    // Previously this route sent only an email and never created the in-app QUOTE_RECEIVED notification.
+    notifyQuoteCreated(quote.id, 'supplier-quotes');
 
     return NextResponse.json({
       success: true,

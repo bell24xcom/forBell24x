@@ -11,6 +11,9 @@ export const DISCOVERY_EVENT_TYPES = [
   'outreach_queued',
   'invitation_sent',
   'profile_claimed',
+  // MA-01: pipeline stages that had no recorded event
+  'claim_link_opened', // legacy bare-token claim link opened (signed invitations record claim_invitations.viewed_at)
+  'profile_completed', // supplier finished onboarding (first completion only)
 ] as const;
 
 export type DiscoveryEventType = (typeof DISCOVERY_EVENT_TYPES)[number];

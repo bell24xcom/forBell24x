@@ -395,6 +395,7 @@ export default function FounderCockpitPage() {
             { href: '/admin/discovery/readiness', label: 'Discovery Readiness', desc: 'READY/PARTIAL/MISSING' },
             { href: '/admin/cockpit/crm-timeline', label: 'CRM Timeline', desc: 'Platform activity' },
             { href: '/admin/crm', label: 'Company Journey', desc: 'Per-company CRM' },
+            { href: '/admin/cockpit/marketplace-activation', label: 'Marketplace Activation', desc: 'Pipeline & KPIs' },
             { href: '/admin/cockpit/supplier-intelligence', label: 'Supplier Intel', desc: 'Trust & deals' },
             { href: '/admin/cockpit/buyer-intelligence', label: 'Buyer Intel', desc: 'Demand & funnel' },
             { href: '/admin/cockpit/rfq-pipeline', label: 'RFQ Pipeline', desc: 'Stage board' },

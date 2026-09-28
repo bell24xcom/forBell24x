@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { requireAdmin, isErrorResponse } from '@/lib/admin-auth';
 import { RFQStatus } from '@prisma/client';
 import { validateRfqUpdate } from '@/lib/rfq-update-whitelist';
+import { notifyQuoteCreated } from '@/lib/quote-notify-runtime';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
@@ -120,6 +121,9 @@ async function submitConciergeQuote(
       sourcingNote: sourcingNote.trim(),
     },
   });
+
+  // MA-01: tell the buyer, labelled as staff-sourced (the notification helper reads quote.source) — fire-and-forget.
+  notifyQuoteCreated(quote.id, 'admin-concierge');
 
   return NextResponse.json({
     success: true,

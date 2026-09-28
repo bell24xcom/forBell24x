@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getAuthenticatedUser, hasRole } from '@/src/lib/auth-helpers';
 import { isQuotableRfqStatus } from '@/lib/rfq-quotable-status';
+import { notifyQuoteCreated } from '@/lib/quote-notify-runtime';
 import { z } from 'zod';
 
 const CreateQuoteSchema = z.object({
@@ -56,6 +57,9 @@ export async function POST(req: NextRequest) {
         status: 'PENDING',
       },
     });
+
+    // MA-01: alert the buyer — fire-and-forget, never affects the response.
+    notifyQuoteCreated(quote.id, 'quote');
 
     return NextResponse.json({ success: true, quote }, { status: 201 });
   } catch (error) {

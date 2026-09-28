@@ -612,26 +612,32 @@ export async function onQuoteSubmitted(quote: {
   id: string;
   name: string | null;
   email: string | null;
-}) {
+}, opts: { staffSourced?: boolean } = {}) {
   const supplierLabel = supplier.company || supplier.name || 'A supplier';
+  const staffSourced = opts.staffSourced === true;
 
-  // 1. Notify buyer
+  // 1. Notify buyer. A concierge (staff-sourced) quote is labelled as such — it must not look like organic supplier
+  //    activity (see the note on POST /api/admin/rfqs).
   await createNotification(
     buyer.id,
-    '📥 New Quote Received',
-    `${supplierLabel} quoted ₹${quote.price.toLocaleString('en-IN')} for "${rfq.title}". Review now.`,
+    staffSourced ? '📥 New Quote Received (staff-sourced)' : '📥 New Quote Received',
+    staffSourced
+      ? `Bell24h staff sourced a quote from ${supplierLabel} of ₹${quote.price.toLocaleString('en-IN')} for "${rfq.title}" on the supplier's behalf. Review now.`
+      : `${supplierLabel} quoted ₹${quote.price.toLocaleString('en-IN')} for "${rfq.title}". Review now.`,
     'QUOTE_RECEIVED',
-    { rfqId: rfq.id, quoteId: quote.id, supplierId: supplier.id }
+    { rfqId: rfq.id, quoteId: quote.id, supplierId: supplier.id, ...(staffSourced ? { staffSourced: true } : {}) }
   );
 
-  // 2. Confirm to supplier
-  await createNotification(
-    supplier.id,
-    '✅ Quote Sent to Buyer',
-    `Your quote of ₹${quote.price.toLocaleString('en-IN')} · ${quote.timeline} for "${rfq.title}" is under review.`,
-    'SUCCESS',
-    { rfqId: rfq.id, quoteId: quote.id }
-  );
+  // 2. Confirm to supplier — only when the supplier actually submitted the quote themselves.
+  if (!staffSourced) {
+    await createNotification(
+      supplier.id,
+      '✅ Quote Sent to Buyer',
+      `Your quote of ₹${quote.price.toLocaleString('en-IN')} · ${quote.timeline} for "${rfq.title}" is under review.`,
+      'SUCCESS',
+      { rfqId: rfq.id, quoteId: quote.id }
+    );
+  }
 
   // 3. n8n
   safeN8N(() =>
@@ -671,9 +677,9 @@ export async function onQuoteSubmitted(quote: {
               </div>
             </div>
             <div style="text-align:center;margin:24px 0;">
-              <a href="https://bell24h.com/negotiation"
+              <a href="${SITE_URL}/rfq/${rfq.id}"
                  style="background:#4F46E5;color:white;padding:12px 28px;text-decoration:none;border-radius:6px;font-weight:bold;display:inline-block;">
-                Accept / Counter / Reject
+                Review Quote
               </a>
             </div>
           </div>

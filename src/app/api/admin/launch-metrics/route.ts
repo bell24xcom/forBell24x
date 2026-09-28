@@ -4,11 +4,16 @@
  * and the sprint's hard north-star metric (Trust Velocity).
  * The /admin/launch-metrics page calls /api/admin/outreach-stats directly;
  * this route is available for external tooling / future dashboard widgets.
+ *
+ * MA-01: `?include=activation` adds the marketplace activation block (KPIs, supplier health, RFQ readiness, outreach
+ * performance, alerts) and the supplier pipeline it is derived from. `&includeSeed=1` includes seed accounts. The
+ * existing fields are unchanged; if the activation block cannot be computed it is null with `activationError`.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin, isErrorResponse } from '@/lib/admin-auth';
+import { computeActivationDashboard } from '@/src/lib/discovery/pipeline';
 
 export const dynamic = 'force-dynamic';
 
@@ -48,6 +53,17 @@ export async function GET(req: NextRequest) {
       outreachActions.map(a => [a.actionType, a._count._all])
     );
 
+    let activationBlock: Record<string, unknown> = {};
+    if ((req.nextUrl.searchParams.get('include') ?? '').split(',').includes('activation')) {
+      try {
+        const { pipeline, activation } = await computeActivationDashboard({ includeSeed: req.nextUrl.searchParams.get('includeSeed') === '1' });
+        activationBlock = { activation, pipeline };
+      } catch (err) {
+        console.error('[Launch Metrics] activation failed', err);
+        activationBlock = { activation: null, activationError: err instanceof Error ? err.message : 'activation failed' };
+      }
+    }
+
     return NextResponse.json({
       success: true,
       days,
@@ -75,6 +91,7 @@ export async function GET(req: NextRequest) {
         subscriptions: actionMap['subscription_activated'] ?? 0,
         waClicks:      actionMap['whatsapp_click']         ?? 0,
       },
+      ...activationBlock,
     });
   } catch (error: any) {
     console.error('[Launch Metrics]', error);

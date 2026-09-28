@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { resolveQuoteIdentityFromToken } from '@/lib/quote-token';
 import { isQuotableRfqStatus } from '@/lib/rfq-quotable-status';
+import { notifyQuoteCreated } from '@/lib/quote-notify-runtime';
 
 export const dynamic = 'force-dynamic';
 
@@ -74,6 +75,9 @@ export async function POST(req: NextRequest) {
         status: 'PENDING',
       },
     });
+
+    // MA-01: alert the buyer (in-app + email) — fire-and-forget, never affects the response.
+    notifyQuoteCreated(quote.id, 'marketing-quote');
 
     // Audit log — fire-and-forget, never blocks the response. Records who
     // (the token-verified supplierId) quoted what (rfqId) via this public

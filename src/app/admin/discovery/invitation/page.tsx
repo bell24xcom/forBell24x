@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { DiscoveryPageShell, MetricGrid, DataTable } from '@/src/components/admin/discovery/DiscoveryPageShell';
+import { PipelineOverview, SeedToggle } from '@/src/components/admin/marketplace/PipelinePanels';
+import type { PipelineResult } from '@/src/lib/discovery/pipeline-core';
 
 interface InvitationMetrics {
   invitations: { status: string; count: number }[];
@@ -22,6 +24,8 @@ interface InvitationMetrics {
 
 export default function InvitationEnginePage() {
   const [data, setData] = useState<InvitationMetrics | null>(null);
+  const [pipeline, setPipeline] = useState<PipelineResult | null>(null);
+  const [includeSeed, setIncludeSeed] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -29,16 +33,17 @@ export default function InvitationEnginePage() {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('/api/admin/discovery/invitation', { credentials: 'include' });
+      const res = await fetch(`/api/admin/discovery/invitation?include=pipeline${includeSeed ? '&includeSeed=1' : ''}`, { credentials: 'include' });
       const json = await res.json();
       if (!json.success) throw new Error(json.error || 'Failed to load');
       setData(json.metrics);
+      setPipeline(json.pipeline ?? null);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Load failed');
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [includeSeed]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -54,6 +59,16 @@ export default function InvitationEnginePage() {
     >
       {data && (
         <div className="space-y-6">
+          {pipeline && (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h2 className="text-white font-semibold">Supplier onboarding pipeline (all supplier accounts)</h2>
+                <SeedToggle includeSeed={includeSeed} onChange={setIncludeSeed} />
+              </div>
+              <PipelineOverview pipeline={pipeline} />
+              <p className="text-slate-500 text-xs">The panels below count only discovery-sourced suppliers (admin_import and discovery:*), as before.</p>
+            </div>
+          )}
           <MetricGrid
             items={[
               { label: 'Claimed', value: data.claimSummary.claimed },

@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import { Building2, MapPin, Star, CheckCircle } from 'lucide-react';
 import ClaimForm from './ClaimForm';
 import { resolveClaimTarget } from '@/src/lib/outreach/resolveClaimTarget';
+import { logDiscoveryEvent } from '@/src/lib/discovery/events';
 
 interface PageProps {
   params: { token: string };
@@ -16,6 +17,13 @@ export default async function ClaimPage({ params }: PageProps) {
 
   if (!supplier) {
     notFound();
+  }
+
+  // MA-01: signed invitations already stamp claim_invitations.viewed_at when resolved; legacy bare-token links
+  // recorded nothing, so record the open here. Fire-and-forget. Note: a link-preview bot that renders the page also
+  // counts as an open, so treat this as "link opened", not "read by the supplier".
+  if (supplier.source === 'legacy' && !supplier.isClaimed) {
+    logDiscoveryEvent('claim_link_opened', { userId: supplier.companyId, metadata: { source: 'legacy' } });
   }
 
   const companyName = supplier.company || supplier.name || 'Your Business';

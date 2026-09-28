@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authenticate } from '@/lib/jwt';
 import { prisma } from '@/lib/prisma';
+import { logDiscoveryEvent } from '@/src/lib/discovery/events';
 
 export const dynamic = 'force-dynamic';
 
@@ -63,6 +64,11 @@ export async function POST(req: NextRequest) {
       },
       select: { id: true, company: true, trustScore: true },
     });
+
+    // MA-01: pipeline event for the PROFILE_COMPLETED stage — first completion only, fire-and-forget.
+    if (existingPrefs.onboardingComplete !== true) {
+      logDiscoveryEvent('profile_completed', { userId: user.userId, metadata: { categories: Array.isArray(categories) ? categories.length : 0 } });
+    }
 
     // Cap trust score at 100
     if (updatedUser.trustScore > 100) {

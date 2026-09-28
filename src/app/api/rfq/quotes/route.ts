@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { authenticate } from '@/lib/jwt';
 import { prisma } from '@/lib/prisma';
 import { acceptQuote } from '@/lib/quote-acceptance';
+import { notifyQuoteCreated } from '@/lib/quote-notify-runtime';
 
 export const dynamic = 'force-dynamic';
 
@@ -185,6 +186,9 @@ export async function POST(request: NextRequest) {
         status: 'PENDING',
       },
     });
+
+    // MA-01: alert the buyer — fire-and-forget, never affects the response.
+    notifyQuoteCreated(quote.id, 'rfq-quotes');
 
     return NextResponse.json({
       success: true,
