@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { SITE_URL } from '@/lib/site-url';
+import { OG_DEFAULTS } from '@/lib/og-defaults'
 
 export const metadata: Metadata = {
   // `absolute` — this string already ends in "| VyaparSethu"; without it the
@@ -9,7 +10,7 @@ export const metadata: Metadata = {
   // VyaparSethu".
   title: { absolute: 'Learn B2B Procurement — Guides for Indian SMEs | VyaparSethu' },
   description: 'Free B2B procurement guides for Indian SMEs: what is a B2B marketplace, how to find verified suppliers, GST procurement guide, RFQ templates, and more.',
-  openGraph: {
+  openGraph: { ...OG_DEFAULTS,
     title: 'B2B Procurement Learning Hub | VyaparSethu',
     description: 'Free guides on B2B marketplace, supplier verification, procurement process, and GST compliance for Indian MSMEs.',
     url: `${SITE_URL}/learn`,

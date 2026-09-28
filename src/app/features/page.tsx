@@ -1,11 +1,12 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { SITE_URL } from '@/lib/site-url';
+import { OG_DEFAULTS } from '@/lib/og-defaults'
 
 export const metadata: Metadata = {
   title: 'Features — Voice RFQ, Protected Payment, Verified Suppliers | VyaparSethu',
   description: 'VyaparSethu features: voice-enabled B2B requirement posting in Hindi, GSTIN-verified supplier network, Protected Payment via Razorpay, and Trade Confidence Score.',
-  openGraph: { title: 'VyaparSethu Features', url: `${SITE_URL}/features`, siteName: 'VyaparSethu' },
+  openGraph: { ...OG_DEFAULTS, title: 'VyaparSethu Features', url: `${SITE_URL}/features`, siteName: 'VyaparSethu' },
   alternates: { canonical: `${SITE_URL}/features` },
 };
 

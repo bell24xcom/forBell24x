@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: { absolute: "VyaparSethu — India's B2B Marketplace" },
   description: "VyaparSethu — India's verified B2B marketplace. Post requirements via voice, video or text. GST & Udyam verified suppliers. Protected payments. 24h quotations.",
   alternates: { canonical: 'https://www.vyaparsethu.com' },
-  openGraph: {
+  openGraph: { ...OG_DEFAULTS,
     title: "VyaparSethu — India's B2B Marketplace",
     description: "VyaparSethu — India's verified B2B marketplace. Post requirements via voice, video or text. GST & Udyam verified suppliers. Protected payments. 24h quotations.",
     url: 'https://www.vyaparsethu.com',
@@ -23,6 +23,7 @@ import HowItWorks from '@/components/homepage/HowItWorks'
 import FinalCTA from '@/components/homepage/FinalCTA'
 import BrandVideoSection from '@/src/components/marketing/BrandVideoSection'
 import WhyVyaparSethu from '@/src/components/homepage/WhyVyaparSethu'
+import { OG_DEFAULTS } from '@/lib/og-defaults'
 
 const faqLd = {
   '@context': 'https://schema.org',

@@ -1,13 +1,14 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { GLOSSARY_TERMS, GLOSSARY_CATEGORIES } from '@/src/data/glossary';
+import { OG_DEFAULTS } from '@/lib/og-defaults'
 
 export const metadata: Metadata = {
   title: 'B2B Trade Glossary — MSME, HSN, GST, RFQ & More | VyaparSethu',
   description: 'Plain-language explanations of Indian B2B trade terms: MSME, HSN codes, GST invoices, RFQ, Purchase Orders, Protected Payment, Trade Credit, and more. For buyers and suppliers.',
   keywords: ['B2B trade glossary India', 'MSME meaning', 'HSN code', 'GST invoice', 'RFQ meaning', 'trade terms India'],
   alternates: { canonical: 'https://www.vyaparsethu.com/glossary' },
-  openGraph: {
+  openGraph: { ...OG_DEFAULTS,
     title: 'B2B Trade Glossary | VyaparSethu',
     description: 'Plain-language explanations of Indian B2B trade terms every buyer and supplier should know.',
     url: 'https://www.vyaparsethu.com/glossary',

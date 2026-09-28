@@ -1,11 +1,12 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { SITE_URL } from '@/lib/site-url';
+import { OG_DEFAULTS } from '@/lib/og-defaults'
 
 export const metadata: Metadata = {
   title: 'Media Kit — Brand Assets | VyaparSethu',
   description: 'Download VyaparSethu brand assets, logos, and company information for press and editorial use.',
-  openGraph: {
+  openGraph: { ...OG_DEFAULTS,
     title: 'Media Kit — Brand Assets | VyaparSethu',
     description: 'Brand assets, founder bio, and company fact sheet for VyaparSethu — India\'s verified B2B marketplace.',
     url: `${SITE_URL}/media-kit`,

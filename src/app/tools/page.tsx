@@ -1,12 +1,13 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { SITE_URL } from '@/lib/site-url';
+import { OG_DEFAULTS } from '@/lib/og-defaults'
 
 export const metadata: Metadata = {
   title: 'Free B2B Tools — HSN Lookup, GST Calculator & More | VyaparSethu',
   description: 'Free tools for Indian B2B buyers and suppliers: HSN code lookup with GST rates, B2B GST calculator (CGST/SGST/IGST), packaging cost estimator, and more.',
   keywords: ['HSN code lookup India', 'GST calculator India B2B', 'B2B tools India', 'packaging cost calculator', 'trade tools India'],
-  openGraph: { title: 'Free B2B Trade Tools — VyaparSethu', description: 'Free tools for Indian B2B sourcing: HSN lookup, GST calculator, and more.', url: 'https://www.vyaparsethu.com/tools', siteName: 'VyaparSethu' },
+  openGraph: { ...OG_DEFAULTS, title: 'Free B2B Trade Tools — VyaparSethu', description: 'Free tools for Indian B2B sourcing: HSN lookup, GST calculator, and more.', url: 'https://www.vyaparsethu.com/tools', siteName: 'VyaparSethu' },
   alternates: { canonical: 'https://www.vyaparsethu.com/tools' },
 };
 

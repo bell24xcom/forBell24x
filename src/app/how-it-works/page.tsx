@@ -1,11 +1,12 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { SITE_URL } from '@/lib/site-url';
+import { OG_DEFAULTS } from '@/lib/og-defaults'
 
 export const metadata: Metadata = {
   title: 'How VyaparSethu Works — Verified B2B Trade India',
   description: 'Learn how VyaparSethu connects verified MSME buyers and suppliers with GST-verified profiles, Razorpay-protected payments, and 24-hour quotations. Free for buyers.',
-  openGraph: {
+  openGraph: { ...OG_DEFAULTS,
     title: 'How VyaparSethu Works — Verified B2B Trade India',
     description: 'GST-verified suppliers, Razorpay-protected payments, 24-hour quotations. Free for buyers.',
     url: `${SITE_URL}/how-it-works`,

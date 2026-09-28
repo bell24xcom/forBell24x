@@ -1,12 +1,13 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { SITE_URL } from '@/lib/site-url';
+import { OG_DEFAULTS } from '@/lib/og-defaults'
 
 export const metadata: Metadata = {
   title: 'B2B Procurement Guide India 2026 — RFQ, MOQ, GST, Payment Terms Explained',
   description: 'Complete B2B procurement guide for Indian SMEs: what is RFQ, MOQ, GST invoice, credit period, protected payment, and supplier verification — with step-by-step sourcing process.',
   keywords: ['b2b procurement guide india', 'b2b procurement platform', 'rfq india guide', 'b2b buying india', 'procurement terms india', 'msme procurement'],
-  openGraph: {
+  openGraph: { ...OG_DEFAULTS,
     title: 'B2B Procurement Guide India 2026 | VyaparSethu',
     description: 'Complete procurement guide for Indian SMEs — RFQ, MOQ, GST invoice, credit terms, Protected Payment, supplier verification explained.',
     url: `${SITE_URL}/learn/b2b-procurement-guide-india`,

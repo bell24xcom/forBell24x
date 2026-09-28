@@ -1,11 +1,12 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { SITE_URL } from '@/lib/site-url';
+import { OG_DEFAULTS } from '@/lib/og-defaults'
 
 export const metadata: Metadata = {
   title: 'Protected Payment — How It Works | VyaparSethu',
   description: 'VyaparSethu uses Razorpay-protected payments to keep your money safe until delivery is confirmed. No advance payment fraud. No buyer defaults.',
-  openGraph: {
+  openGraph: { ...OG_DEFAULTS,
     title: 'Protected Payment — How It Works | VyaparSethu',
     description: 'Razorpay holds your payment in an RBI-regulated nodal account until delivery is confirmed.',
     url: `${SITE_URL}/how-payment-works`,

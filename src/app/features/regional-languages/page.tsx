@@ -2,12 +2,13 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { SITE_URL } from '@/lib/site-url';
 import WaitlistForm from '@/src/components/features/WaitlistForm';
+import { OG_DEFAULTS } from '@/lib/og-defaults'
 
 export const metadata: Metadata = {
   title: 'B2B Procurement in Hindi and Indian Regional Languages | VyaparSethu',
   description: 'VyaparSethu supports Hindi-language B2B procurement via voice input — the first B2B Trade Network designed for Tier 2 and Tier 3 city SMEs who operate in their regional language. Coming Soon.',
   keywords: ['hindi b2b marketplace', 'regional language b2b india', 'hindi procurement platform', 'b2b in hindi india', 'tier 2 city b2b supplier india'],
-  openGraph: {
+  openGraph: { ...OG_DEFAULTS,
     title: 'B2B Procurement in Hindi | VyaparSethu',
     description: 'Hindi voice input for B2B requirements. Post requirements in Hindi — verified suppliers respond in 24 hours. Beta — Coming Soon.',
     url: `${SITE_URL}/features/regional-languages`,

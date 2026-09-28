@@ -5,6 +5,7 @@ import { CITIES, CATEGORY_META } from '@/src/data/city-category-seo';
 import { getAreaPulse } from '@/src/lib/bom/business-pulse';
 import { nearbyAreas } from '@/src/lib/bom/location';
 import type { PulseSummary } from '@/src/lib/bom/business-pulse';
+import { OG_DEFAULTS } from '@/lib/og-defaults'
 
 interface Props { params: { area: string } }
 
@@ -28,7 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       `B2B trade ${city.name}`,
       `${city.name} suppliers`,
     ],
-    openGraph: {
+    openGraph: { ...OG_DEFAULTS,
       title: seoTitle,
       description,
       url: `https://www.vyaparsethu.com/location/${params.area}`,

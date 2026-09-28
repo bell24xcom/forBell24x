@@ -1,12 +1,13 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { BLOG_POSTS, BLOG_CATEGORIES } from '@/src/data/blog-posts';
+import { OG_DEFAULTS } from '@/lib/og-defaults'
 
 export const metadata: Metadata = {
   title: 'Blog — B2B Procurement Guides for Indian MSMEs',
   description: 'Practical guides on supplier sourcing, GST compliance, trade credit, protected payment, and building smarter supply chains in India.',
   keywords: ['B2B procurement India', 'supplier sourcing guide', 'MSME procurement tips', 'GST compliance B2B'],
-  openGraph: {
+  openGraph: { ...OG_DEFAULTS,
     title: 'VyaparSethu Blog — B2B Procurement Guides for Indian MSMEs',
     description: 'Practical guides on supplier sourcing, GST compliance, trade credit, and building smarter supply chains in India.',
     url: 'https://www.vyaparsethu.com/blog',

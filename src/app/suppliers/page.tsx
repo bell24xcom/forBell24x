@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import { SITE_URL } from '@/lib/site-url';
+import { OG_DEFAULTS } from '@/lib/og-defaults';
 import type { SupplierPreferences } from '@/src/lib/supplier-products';
 import SuppliersClient, { type SupplierCard, type SuppliersPagination } from './SuppliersClient';
 
@@ -45,7 +46,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
     title: { absolute: title },
     description,
     alternates: { canonical },
-    openGraph: {
+    openGraph: { ...OG_DEFAULTS,
       title,
       description,
       url: canonical,
