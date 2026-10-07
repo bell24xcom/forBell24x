@@ -1,10 +1,12 @@
 ﻿import { Metadata } from 'next';
 import LegalPage from '@/src/components/legal/LegalPage';
 import { LEGAL_ENTITY, POLICY_LAST_UPDATED } from '@/src/lib/legal';
+import { SITE_URL } from '@/lib/site-url';
 
 export const metadata: Metadata = {
   title: `Privacy Policy | ${LEGAL_ENTITY.platform}`,
   description: 'How VyaparSethu collects, uses, and protects your personal data under the Digital Personal Data Protection Act 2023.',
+  alternates: { canonical: `${SITE_URL}/privacy` },
 };
 
 export default function PrivacyPolicyPage() {

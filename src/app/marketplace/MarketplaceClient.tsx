@@ -115,7 +115,8 @@ export default function MarketplaceClient({ initialRfqs, initialTotal }: Props) 
       {/* Hero */}
       <div className="bg-slate-800/60 border-b border-slate-700/50 py-12">
         <div className="max-w-6xl mx-auto px-6">
-          <h1 className="text-3xl font-bold mb-2">B2B Marketplace</h1>
+          {/* h2: the page's single h1 is the server-rendered, always-present heading in page.tsx */}
+          <h2 className="text-3xl font-bold mb-2">B2B Marketplace</h2>
           <p className="text-slate-400 mb-6">Browse active RFQs and submit your quotes</p>
 
           {/* Search */}
