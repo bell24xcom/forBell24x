@@ -1,9 +1,11 @@
 ﻿import { Metadata } from 'next';
 import LegalPage from '@/src/components/legal/LegalPage';
 import { LEGAL_ENTITY, POLICY_LAST_UPDATED } from '@/src/lib/legal';
+import { SITE_URL } from '@/lib/site-url';
 
 export const metadata: Metadata = {
   title: `Terms & Conditions | ${LEGAL_ENTITY.platform}`,
+  alternates: { canonical: `${SITE_URL}/terms` },
 };
 
 export default function TermsPage() {

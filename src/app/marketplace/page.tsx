@@ -94,6 +94,11 @@ export default async function MarketplacePage() {
       {itemListLd && (
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListLd) }} />
       )}
+    {/* Server-rendered so it is always present, even while MarketplaceClient's
+        own heading is inside a Suspense boundary and may not resolve in the
+        first HTML flush a crawler captures. Visually hidden: MarketplaceClient
+        already shows its own "B2B Marketplace" heading (now an h2) in the hero. */}
+    <h1 className="sr-only">B2B Marketplace — Active RFQs from Verified Indian Buyers</h1>
     <Suspense fallback={
       <div className="min-h-screen bg-[#0F172A] flex items-center justify-center">
         <div className="text-center">

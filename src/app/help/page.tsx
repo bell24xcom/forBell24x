@@ -1,4 +1,10 @@
 import Link from 'next/link';
+import { Metadata } from 'next';
+import { SITE_URL } from '@/lib/site-url';
+
+export const metadata: Metadata = {
+  alternates: { canonical: `${SITE_URL}/help` },
+};
 
 export default function HelpPage() {
   const helpTopics = [
