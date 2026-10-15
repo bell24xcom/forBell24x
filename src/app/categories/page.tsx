@@ -17,33 +17,45 @@ export const metadata: Metadata = {
   },
 };
 
+// Used only when the database is unreachable. No supplier or RFQ count is
+// knowable in that state, so none is claimed here — see DisplayCategory's
+// rfqCount comment for why a fabricated number would be a data-integrity
+// defect, not a reasonable placeholder.
 const FALLBACK_CATEGORIES = [
-  { slug: 'textiles-garments', title: 'Textiles & Garments', icon: '👕', suppliers: 2400 },
-  { slug: 'pharmaceuticals', title: 'Pharmaceuticals', icon: '💊', suppliers: 1800 },
-  { slug: 'agricultural-products', title: 'Agricultural Products', icon: '🌾', suppliers: 3200 },
-  { slug: 'automotive-parts', title: 'Automotive Parts', icon: '🚗', suppliers: 1500 },
-  { slug: 'it-services', title: 'IT Services', icon: '💻', suppliers: 2100 },
-  { slug: 'gems-jewelry', title: 'Gems & Jewelry', icon: '💎', suppliers: 900 },
-  { slug: 'handicrafts', title: 'Handicrafts', icon: '🎨', suppliers: 1100 },
-  { slug: 'machinery-equipment', title: 'Machinery & Equipment', icon: '⚙️', suppliers: 1700 },
-  { slug: 'chemicals', title: 'Chemicals', icon: '🧪', suppliers: 1400 },
-  { slug: 'food-processing', title: 'Food Processing', icon: '🍽️', suppliers: 2000 },
-  { slug: 'construction', title: 'Construction', icon: '🏗️', suppliers: 2800 },
-  { slug: 'metals-steel', title: 'Metals & Steel', icon: '🔩', suppliers: 1900 },
-  { slug: 'plastics', title: 'Plastics', icon: '🔄', suppliers: 1300 },
-  { slug: 'paper-packaging', title: 'Paper & Packaging', icon: '📦', suppliers: 1000 },
-  { slug: 'rubber', title: 'Rubber', icon: '🛞', suppliers: 800 },
-  { slug: 'ceramics', title: 'Ceramics', icon: '🏺', suppliers: 600 },
-  { slug: 'glass', title: 'Glass', icon: '🪟', suppliers: 500 },
-  { slug: 'wood', title: 'Wood', icon: '🪵', suppliers: 1200 },
-  { slug: 'leather', title: 'Leather', icon: '👜', suppliers: 1600 },
+  { slug: 'textiles-garments', title: 'Textiles & Garments', icon: '👕' },
+  { slug: 'pharmaceuticals', title: 'Pharmaceuticals', icon: '💊' },
+  { slug: 'agricultural-products', title: 'Agricultural Products', icon: '🌾' },
+  { slug: 'automotive-parts', title: 'Automotive Parts', icon: '🚗' },
+  { slug: 'it-services', title: 'IT Services', icon: '💻' },
+  { slug: 'gems-jewelry', title: 'Gems & Jewelry', icon: '💎' },
+  { slug: 'handicrafts', title: 'Handicrafts', icon: '🎨' },
+  { slug: 'machinery-equipment', title: 'Machinery & Equipment', icon: '⚙️' },
+  { slug: 'chemicals', title: 'Chemicals', icon: '🧪' },
+  { slug: 'food-processing', title: 'Food Processing', icon: '🍽️' },
+  { slug: 'construction', title: 'Construction', icon: '🏗️' },
+  { slug: 'metals-steel', title: 'Metals & Steel', icon: '🔩' },
+  { slug: 'plastics', title: 'Plastics', icon: '🔄' },
+  { slug: 'paper-packaging', title: 'Paper & Packaging', icon: '📦' },
+  { slug: 'rubber', title: 'Rubber', icon: '🛞' },
+  { slug: 'ceramics', title: 'Ceramics', icon: '🏺' },
+  { slug: 'glass', title: 'Glass', icon: '🪟' },
+  { slug: 'wood', title: 'Wood', icon: '🪵' },
+  { slug: 'leather', title: 'Leather', icon: '👜' },
 ];
 
 type DisplayCategory = {
   slug: string;
   title: string;
   icon: string;
-  suppliers: number;
+  // This is an RFQ count, not a supplier count — the schema's Category
+  // model has no supplier relation (only `rfqs: RFQ[]`; suppliers are
+  // Users with no category association at all), so a real per-category
+  // supplier count cannot currently be queried. Previously this field was
+  // named `suppliers` and rendered as "{n}+ suppliers", which displayed
+  // RFQ-demand activity as if it were a verified supplier count — a
+  // data-integrity defect. Named and labeled honestly instead of inventing
+  // a conversion factor between the two.
+  rfqCount: number;
 };
 
 async function getCategories(): Promise<DisplayCategory[]> {
@@ -62,14 +74,16 @@ async function getCategories(): Promise<DisplayCategory[]> {
         slug: c.slug,
         title: c.name,
         icon: c.icon || '📦',
-        suppliers: c._count.rfqs, // use RFQ count as activity proxy until supplierCount column exists
+        rfqCount: c._count.rfqs,
       }));
     }
   } catch {
     // DB unavailable — fall through to hardcoded
   }
 
-  return FALLBACK_CATEGORIES;
+  // rfqCount: 0 renders the existing "Be the first..." empty state below —
+  // an honest unavailable state rather than a fabricated number.
+  return FALLBACK_CATEGORIES.map(c => ({ ...c, rfqCount: 0 }));
 }
 
 export default async function CategoriesPage({
@@ -171,7 +185,7 @@ export default async function CategoriesPage({
                 {cat.title}
               </h3>
               <p className="text-slate-500 text-sm mt-1">
-                {cat.suppliers > 0 ? `${cat.suppliers.toLocaleString()}+ suppliers` : 'Be the first supplier →'}
+                {cat.rfqCount > 0 ? `${cat.rfqCount.toLocaleString()} active RFQ${cat.rfqCount !== 1 ? 's' : ''}` : 'Post the first RFQ →'}
               </p>
             </Link>
           ))}
