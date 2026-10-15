@@ -55,7 +55,12 @@ type DisplayCategory = {
   // RFQ-demand activity as if it were a verified supplier count — a
   // data-integrity defect. Named and labeled honestly instead of inventing
   // a conversion factor between the two.
-  rfqCount: number;
+  //
+  // null specifically means "unknown" (the database query failed or was
+  // unreachable), distinct from a verified 0. Collapsing both to 0 would
+  // imply "no RFQs" when the true state is "couldn't check" — database
+  // unavailability does not prove a category has zero RFQs.
+  rfqCount: number | null;
 };
 
 async function getCategories(): Promise<DisplayCategory[]> {
@@ -81,9 +86,10 @@ async function getCategories(): Promise<DisplayCategory[]> {
     // DB unavailable — fall through to hardcoded
   }
 
-  // rfqCount: 0 renders the existing "Be the first..." empty state below —
-  // an honest unavailable state rather than a fabricated number.
-  return FALLBACK_CATEGORIES.map(c => ({ ...c, rfqCount: 0 }));
+  // rfqCount: null — the database couldn't be queried, so the real count is
+  // unknown. This is deliberately NOT 0: a DB outage doesn't mean a category
+  // has no RFQs, and rendering 0 would assert that as if it were verified.
+  return FALLBACK_CATEGORIES.map(c => ({ ...c, rfqCount: null }));
 }
 
 export default async function CategoriesPage({
@@ -185,7 +191,11 @@ export default async function CategoriesPage({
                 {cat.title}
               </h3>
               <p className="text-slate-500 text-sm mt-1">
-                {cat.rfqCount > 0 ? `${cat.rfqCount.toLocaleString()} active RFQ${cat.rfqCount !== 1 ? 's' : ''}` : 'Post the first RFQ →'}
+                {cat.rfqCount === null
+                  ? 'RFQ count unavailable'
+                  : cat.rfqCount > 0
+                    ? `${cat.rfqCount.toLocaleString()} active RFQ${cat.rfqCount !== 1 ? 's' : ''}`
+                    : 'Post the first RFQ →'}
               </p>
             </Link>
           ))}
