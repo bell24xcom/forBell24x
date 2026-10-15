@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "prisma migrate resolve --rolled-back 0002_leads_dpdp || true && prisma migrate deploy && prisma generate && next build",
+  "buildCommand": "if [ \"$VERCEL_ENV\" = \"production\" ]; then prisma migrate resolve --rolled-back 0002_leads_dpdp || true && prisma migrate deploy; else echo \"Skipping migrations (VERCEL_ENV=$VERCEL_ENV)\"; fi && prisma generate && next build",
   "outputDirectory": ".next",
   "installCommand": "npm install --legacy-peer-deps",
   "devCommand": "npm run dev",
