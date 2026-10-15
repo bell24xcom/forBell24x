@@ -8,7 +8,7 @@
     "build": "prisma migrate resolve --rolled-back 0002_leads_dpdp || true && prisma migrate deploy && prisma generate && next build",
     "build:ci": "prisma generate && next build",
     "typecheck:ci": "tsc --noEmit -p tsconfig.ci.json",
-    "vercel-build": "if [ \"$VERCEL_ENV\" = \"production\" ]; then prisma migrate resolve --rolled-back 0002_leads_dpdp || true && prisma migrate deploy; else echo \"Skipping Prisma migrations: VERCEL_ENV='$VERCEL_ENV' is not 'production'. Migrations only run for Production deployments.\"; fi && prisma generate && next build",
+    "vercel-build": "if [ \"$VERCEL_ENV\" = \"production\" ]; then prisma migrate resolve --rolled-back 0002_leads_dpdp || true && prisma migrate deploy; else echo \"Skipping migrations (VERCEL_ENV=$VERCEL_ENV)\"; fi && prisma generate && next build",
     "db:migrate": "prisma migrate resolve --rolled-back 0002_leads_dpdp || true && prisma migrate deploy",
     "start": "next start",
     "db:push": "prisma db push --accept-data-loss",
