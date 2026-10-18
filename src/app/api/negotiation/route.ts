@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { authenticate } from '@/lib/jwt';
 import { prisma } from '@/lib/prisma';
 import { Bell24hAIClient } from '@/lib/ai-client';
+import { isNegotiationActionAuthorized } from '@/lib/negotiation-authorization';
 
 export const dynamic = 'force-dynamic';
 
@@ -51,11 +52,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if user is authorized (buyer or supplier)
+    // Check if user is authorized for this action (buyer-only for accept;
+    // buyer or supplier for reject/counter — see lib/negotiation-authorization.ts)
     const isBuyer = quote.rfq.createdBy === user.userId;
     const isSupplier = quote.supplierId === user.userId;
 
-    if (!isBuyer && !isSupplier) {
+    if (!isNegotiationActionAuthorized(action, { isBuyer, isSupplier })) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 403 }
