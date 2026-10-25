@@ -1,4 +1,12 @@
 import Link from 'next/link';
+import { Metadata } from 'next';
+import { SITE_URL } from '@/lib/site-url';
+
+export const metadata: Metadata = {
+  title: 'How to Buy — Post RFQ, Review Quotes, Complete Deals | VyaparSethu',
+  description: 'Step-by-step guide for buyers: Post RFQ, review quotes, complete deals',
+  alternates: { canonical: `${SITE_URL}/help/how-to-buy` },
+};
 
 export default function HowToBuyPage() {
   const steps = [

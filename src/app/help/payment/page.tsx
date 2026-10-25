@@ -1,4 +1,12 @@
 import Link from 'next/link';
+import { Metadata } from 'next';
+import { SITE_URL } from '@/lib/site-url';
+
+export const metadata: Metadata = {
+  title: 'Payments & Billing Help | VyaparSethu',
+  description: 'Payment methods, escrow system, platform fees, refunds, and wallet',
+  alternates: { canonical: `${SITE_URL}/help/payment` },
+};
 
 export default function PaymentHelpPage() {
   return (

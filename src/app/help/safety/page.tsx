@@ -1,4 +1,12 @@
 import Link from 'next/link';
+import { Metadata } from 'next';
+import { SITE_URL } from '@/lib/site-url';
+
+export const metadata: Metadata = {
+  title: 'Safety & Security | VyaparSethu',
+  description: 'Best practices, red flags to watch, dispute resolution, fraud prevention',
+  alternates: { canonical: `${SITE_URL}/help/safety` },
+};
 
 export default function SafetyPage() {
   return (

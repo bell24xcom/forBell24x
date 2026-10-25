@@ -64,6 +64,20 @@ const nextConfig = {
       { source: '/categories/pipes-fittings', destination: '/categories/plumbing-supplies', permanent: true },
       { source: '/categories/leather-footwear', destination: '/categories/footwear', permanent: true },
       { source: '/categories/chemicals-petrochemicals', destination: '/categories/chemicals', permanent: true },
+      // agriculture-farming is a different case from the three above: it's
+      // seeded as an intended category (prisma/seed-categories.ts) and still
+      // referenced live from src/data/city-category-seo.ts, but absent from
+      // the actual production Category table -- Search Console flagged
+      // /categories/agriculture-farming (a genuine 404) as "crawled, not
+      // indexed". Redirecting to the closest real, relevant category rather
+      // than leaving a 404 on a page Google has already crawled. Note: the
+      // same gap also 404s every /suppliers/[city]/agriculture-farming page
+      // generated from city-category-seo.ts -- out of scope here (none of
+      // those URLs were in the reported indexing issue, and fixing all of
+      // them needs either seeding the category into the database or
+      // enumerating every affected city, both separate, approval-gated
+      // decisions, not a single safe redirect).
+      { source: '/categories/agriculture-farming', destination: '/categories/agriculture', permanent: true },
     ];
   },
   async headers() {

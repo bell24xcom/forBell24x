@@ -48,6 +48,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/press`,                       lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6  },
     { url: `${siteUrl}/media-kit`,                   lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6  },
     { url: `${siteUrl}/help`,                        lastModified: new Date(), changeFrequency: 'monthly', priority: 0.5  },
+    // Help sub-pages — real, substantive, server-rendered content, but never
+    // enumerated here. Each had zero page-level metadata (now fixed), which
+    // left it silently inheriting the root layout's `canonical: '/'` and
+    // telling Google it was a duplicate of the homepage — the confirmed cause
+    // of /help/how-to-buy's "Crawled - currently not indexed" status.
+    { url: `${siteUrl}/help/how-to-buy`,             lastModified: new Date(), changeFrequency: 'monthly', priority: 0.5  },
+    { url: `${siteUrl}/help/how-to-sell`,            lastModified: new Date(), changeFrequency: 'monthly', priority: 0.5  },
+    { url: `${siteUrl}/help/faq`,                    lastModified: new Date(), changeFrequency: 'monthly', priority: 0.5  },
+    { url: `${siteUrl}/help/payment`,                lastModified: new Date(), changeFrequency: 'monthly', priority: 0.5  },
+    { url: `${siteUrl}/help/safety`,                 lastModified: new Date(), changeFrequency: 'monthly', priority: 0.5  },
     { url: `${siteUrl}/terms`,                       lastModified: new Date(), changeFrequency: 'yearly',  priority: 0.3  },
     { url: `${siteUrl}/refund-policy`,               lastModified: new Date(), changeFrequency: 'yearly',  priority: 0.3  },
     { url: `${siteUrl}/cookies`,                     lastModified: new Date(), changeFrequency: 'yearly',  priority: 0.3  },
