@@ -30,7 +30,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/how-verification-works`,      lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8  },
     { url: `${siteUrl}/voice-rfq`,                   lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.9  },
     { url: `${siteUrl}/video-rfq`,                   lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.9  },
-    { url: `${siteUrl}/rfq/create`,                  lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.9  },
+    // /rfq/create is deliberately NOT listed here: it's gated by middleware's
+    // PROTECTED_USER_PATHS (src/middleware.ts), so every unauthenticated
+    // request — including Googlebot — 307-redirects to /auth/phone-email,
+    // which robots.txt disallows. Submitting it in the sitemap told Google to
+    // prioritize crawling a URL it can never actually reach, which is the
+    // confirmed cause of the "Blocked by robots.txt" GSC validation failure
+    // for this URL (GSC Phase, Oct 2026).
     { url: `${siteUrl}/suppliers`,                   lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.85 },
     { url: `${siteUrl}/location`,                    lastModified: new Date(), changeFrequency: 'daily',   priority: 0.86 },
     { url: `${siteUrl}/industrial-cluster`,          lastModified: new Date(), changeFrequency: 'daily',   priority: 0.87 },
