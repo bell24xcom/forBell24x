@@ -1,4 +1,12 @@
 import Link from 'next/link';
+import { Metadata } from 'next';
+import { SITE_URL } from '@/lib/site-url';
+
+export const metadata: Metadata = {
+  title: 'Frequently Asked Questions | VyaparSethu',
+  description: 'Get answers to common questions about VyaparSethu, RFQs, payments, and more',
+  alternates: { canonical: `${SITE_URL}/help/faq` },
+};
 
 export default function FAQPage() {
   const faqs = [

@@ -71,7 +71,12 @@ export default async function CityCategory({ params }: Props) {
     name: `${cat.name} Suppliers in ${city.fullName}`,
     description: `Verified ${cat.name} suppliers and manufacturers in ${city.fullName}`,
     url: `https://www.vyaparsethu.com/suppliers/${params.city}/${params.category}`,
-    numberOfItems: suppliers.length || 10,
+    // Was `suppliers.length || 10` — `||` falls through to the hardcoded 10
+    // whenever the real count is 0 (falsy), so a page with zero suppliers
+    // claimed 10 in its structured data while the rendered page simultaneously
+    // showed an honest "be the first supplier" empty state. The real count,
+    // including zero, is always correct here.
+    numberOfItems: suppliers.length,
     itemListElement: suppliers.slice(0, 5).map((s, i) => ({
       '@type': 'ListItem',
       position: i + 1,

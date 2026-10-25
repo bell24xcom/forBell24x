@@ -1,4 +1,12 @@
 import Link from 'next/link';
+import { Metadata } from 'next';
+import { SITE_URL } from '@/lib/site-url';
+
+export const metadata: Metadata = {
+  title: 'How to Sell — Browse RFQs, Submit Quotes, Win Deals | VyaparSethu',
+  description: 'Step-by-step guide for suppliers: Browse RFQs, submit quotes, win deals',
+  alternates: { canonical: `${SITE_URL}/help/how-to-sell` },
+};
 
 export default function HowToSellPage() {
   const steps = [

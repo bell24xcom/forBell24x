@@ -221,8 +221,8 @@ Structural applications. Grades: E250, E350 (IS 2062). Thickness: 5mm to 100mm+.
 
 Prices vary with global iron ore costs. Always get 3+ quotes on the same day for accurate comparison.
 
-**How to get 5 quotes in 24 hours on VyaparSethu:**
-Post a Speak Requirement — say the grade, quantity, and delivery location. Our matching engine sends your requirement to 200+ verified steel suppliers in Kalamboli, Bhiwandi, and Taloja. Average response: 4.2 quotes in 18 hours.`,
+**How to request quotes on VyaparSethu:**
+Post a Speak Requirement — say the grade, quantity, and delivery location. Our matching engine routes your requirement to verified steel suppliers in Kalamboli, Bhiwandi, and Taloja.`,
   },
   {
     slug: 'corrugated-packaging-buyers-guide',
@@ -309,7 +309,7 @@ Used in footwear, automotive upholstery, and furniture. Being replaced by water-
 **Navi Mumbai adhesives cluster:**
 Taloja and Rabale MIDC in Navi Mumbai house India's highest concentration of specialty adhesive manufacturers, including global players and licensed Indian producers.
 
-Post your adhesive Requirement on VyaparSethu specifying substrates and performance specs — our system routes to 80+ verified adhesive and sealant suppliers in the Navi Mumbai cluster.`,
+Post your adhesive Requirement on VyaparSethu specifying substrates and performance specs — our system routes to verified adhesive and sealant suppliers in the Navi Mumbai cluster.`,
   },
   {
     slug: 'b2b-marketplace-vs-direct-sourcing',
