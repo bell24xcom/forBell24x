@@ -799,7 +799,7 @@ This is the gap that digital B2B platforms are trying to close.
 
 | Platform | Strengths | Weaknesses |
 | --- | --- | --- |
-| IndiaMART | Largest supplier directory; 100M+ listings | Self-reported data; no payment protection; high middleman ratio |
+| IndiaMART | Largest supplier directory | Self-reported data; no payment protection; high middleman ratio |
 | TradeIndia | Strong in industrial categories | Smaller than IndiaMART; similar unverified listing model |
 | Amazon Business India | Reliable logistics; GST invoices | Limited to catalogued SKUs; poor for custom/bulk industrial goods |
 | VyaparSethu | GST-verified suppliers; Protected Payment; Competitive Quoting | Early stage; growing supplier base |
@@ -830,7 +830,7 @@ VyaparSethu's Protected Payment mechanism uses Razorpay's RBI-regulated payment 
 
 **Verified Matching: Why Supplier Verification Matters More Than Listings**
 
-A B2B platform with 10 million unverified listings is less useful than one with 500 verified suppliers. IndiaMART has more listings; VyaparSethu has fewer but verified ones.
+A B2B platform with a large base of unverified listings is less useful, per lead, than one with fewer but genuinely verified suppliers. IndiaMART has more listings; VyaparSethu has fewer but verified ones.
 
 VyaparSethu's supplier verification process:
 1. GSTIN verification against the government GST portal (automatic)
@@ -919,7 +919,7 @@ Limitation: Smaller supplier base than established directories (growing).
 
 **#2 — IndiaMART**
 
-The largest B2B directory in India with 15.3 million supplier listings across 100,000+ product categories. IndiaMART is unrivalled for discovery — if you need to find suppliers in any niche category, IndiaMART will have listings.
+India's largest B2B directory by supplier listings. IndiaMART is unrivalled for discovery — if you need to find suppliers in any niche category, IndiaMART will have listings.
 
 - Supplier Verification: ❌ Self-reported; no GSTIN verification required
 - Payment Protection: ❌ None — all transactions handled off-platform
