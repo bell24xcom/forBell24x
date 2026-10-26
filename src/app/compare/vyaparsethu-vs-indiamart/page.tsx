@@ -84,7 +84,7 @@ export default function ComparisonPage() {
             </div>
             <div className="bg-slate-800/40 border border-slate-700/50 rounded-2xl p-7">
               <div className="text-slate-300 font-bold text-lg mb-3">IndiaMART</div>
-              <p className="text-slate-400 text-sm leading-relaxed mb-4">Best for: <strong className="text-slate-300">discovering</strong> suppliers in niche categories. No payment protection; negotiate and pay offline. Established network of 8M+ suppliers.</p>
+              <p className="text-slate-400 text-sm leading-relaxed mb-4">Best for: <strong className="text-slate-300">discovering</strong> suppliers in niche categories. No payment protection; negotiate and pay offline. An established, large supplier directory.</p>
               <ul className="space-y-2 text-sm text-slate-400">
                 <li className="flex items-start gap-2"><span className="text-slate-500 mt-0.5">→</span> Large supplier directory</li>
                 <li className="flex items-start gap-2"><span className="text-red-400 mt-0.5">✗</span> No payment protection</li>
@@ -121,7 +121,7 @@ export default function ComparisonPage() {
           <div className="bg-slate-800/30 border border-slate-700/50 rounded-xl p-6 mb-10">
             <h3 className="text-white font-semibold mb-2">The honest take</h3>
             <p className="text-slate-400 text-sm leading-relaxed">
-              VyaparSethu is not trying to replace IndiaMART as a discovery directory — IndiaMART's network of 8M suppliers is too large to compete with head-on. VyaparSethu fills the gap IndiaMART deliberately leaves: <strong className="text-slate-300">what happens after you find a supplier</strong>. Payment protection, verified trust scores, dispute resolution, and SLA guarantees are the features IndiaMART has never built — because their revenue model depends on suppliers paying listing fees, not on buyers transacting safely.
+              VyaparSethu is not trying to replace IndiaMART as a discovery directory — IndiaMART's established supplier network is too large to compete with head-on. VyaparSethu fills the gap IndiaMART deliberately leaves: <strong className="text-slate-300">what happens after you find a supplier</strong>. Payment protection, verified trust scores, dispute resolution, and SLA guarantees are the features IndiaMART has never built — because their revenue model depends on suppliers paying listing fees, not on buyers transacting safely.
             </p>
           </div>
 
