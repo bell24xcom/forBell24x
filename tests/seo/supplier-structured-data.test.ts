@@ -7,24 +7,38 @@
  * showed an honest "be the first supplier" empty state (confirmed on
  * /suppliers/agra/apparel-fashion).
  *
- * This page is an async Server Component with a real Prisma call and no
- * existing component-render test harness in this repo (every other test
- * in tests/security and lib/*.test.ts tests pure functions or route
- * handlers via mock.module, not rendered React components) -- introducing
- * a new rendering test dependency for one arithmetic fix isn't justified.
- * This asserts the exact source pattern instead: the dangerous `|| 10`
- * fallback is gone, and the real count is used unconditionally.
+ * Strengthened (independent review, 2026-10-26) from a source-text-only
+ * check to a genuine runtime one: `CityCategory` is an async Server
+ * Component -- calling it directly returns a plain, inspectable React
+ * element tree (no react-dom render needed, since `jsonLd` is already a
+ * finished plain object by the time it's embedded as a <script>'s
+ * dangerouslySetInnerHTML). Mocking @/lib/prisma lets this exercise the
+ * real component function with a real (empty) supplier result, not just
+ * grep the source for a pattern.
  */
-import { test } from 'node:test';
+import { test, mock, before } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
 
-test('/suppliers/[city]/[category] numberOfItems uses the real supplier count, not a hardcoded fallback', () => {
-  const source = readFileSync(
-    join(__dirname, '../../src/app/suppliers/[city]/[category]/page.tsx'),
-    'utf8',
-  );
-  assert.doesNotMatch(source, /numberOfItems:\s*suppliers\.length\s*\|\|\s*10/);
-  assert.match(source, /numberOfItems:\s*suppliers\.length\s*,/);
+mock.module('@/lib/prisma', {
+  namedExports: {
+    prisma: {
+      user: { findMany: async () => [] },
+    },
+  },
+});
+
+let CityCategory: (props: { params: { city: string; category: string } }) => Promise<any>;
+
+before(async () => {
+  ({ default: CityCategory } = await import('../../src/app/suppliers/[city]/[category]/page.tsx'));
+});
+
+test('a city/category page with zero real suppliers reports numberOfItems: 0 in its JSON-LD, not a hardcoded 10', async () => {
+  const element = await CityCategory({ params: { city: 'agra', category: 'apparel-fashion' } });
+  // The component returns <>{jsonLdScript}{breadcrumbsScript}{...}</> -- the
+  // first child is the jsonLd <script dangerouslySetInnerHTML>.
+  const jsonLdScript = element.props.children[0];
+  assert.equal(jsonLdScript.type, 'script');
+  const jsonLd = JSON.parse(jsonLdScript.props.dangerouslySetInnerHTML.__html);
+  assert.equal(jsonLd.numberOfItems, 0, 'zero real suppliers must report 0, never a hardcoded fallback');
 });
