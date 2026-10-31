@@ -134,7 +134,7 @@ JSON format (all fields required, use null if not mentioned):
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'llama-3.1-70b-versatile',
+          model: 'llama-3.3-70b-versatile',
           messages: [{ role: 'user', content: extractionPrompt }],
           max_tokens: 500,
           temperature: 0.1,

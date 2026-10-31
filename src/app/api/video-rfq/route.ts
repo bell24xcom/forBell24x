@@ -198,7 +198,7 @@ JSON (all fields required, use null if not mentioned):
         method: 'POST',
         headers: { Authorization: `Bearer ${groqKey}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'llama-3.1-70b-versatile',
+          model: 'llama-3.3-70b-versatile',
           messages: [{ role: 'user', content: extractionPrompt }],
           max_tokens: 600,
           temperature: 0.1,
