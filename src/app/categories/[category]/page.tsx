@@ -10,7 +10,11 @@ interface CategoryPageProps {
   };
 }
 
-export const revalidate = 300; // cache 5 minutes
+export const revalidate = 3600; // cache 1 hour (see categories index for rationale)
+
+// No generateStaticParams: it would run Prisma queries during `next build`,
+// which is unverified for Preview builds (see audit report). Pages render on
+// first request and are cached for an hour by revalidate above.
 
 async function getCategory(slug: string) {
   // Query the incoming slug directly. A previous SLUG_ALIASES map rewrote slugs
