@@ -40,7 +40,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${siteUrl}/suppliers`,                   lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.85 },
     { url: `${siteUrl}/location`,                    lastModified: new Date(), changeFrequency: 'daily',   priority: 0.86 },
     { url: `${siteUrl}/industrial-cluster`,          lastModified: new Date(), changeFrequency: 'daily',   priority: 0.87 },
-    // INTELLIGENCE_LAYER — excluded from sitemap until Phase D gate opens
     { url: `${siteUrl}/blog`,                        lastModified: new Date(), changeFrequency: 'weekly',  priority: 0.8  },
     { url: `${siteUrl}/pricing`,                     lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7  },
     { url: `${siteUrl}/about`,                       lastModified: new Date(), changeFrequency: 'monthly', priority: 0.65 },
@@ -67,13 +66,33 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // ONLY as a genuine fallback when the DB query throws (build-time DB outage) —
   // it is NOT unioned in on success (it contained dead slugs like
   // 'packaging-materials' that the sitemap was advertising as 404s to Googlebot).
+  //
+  // Crawl-budget fix (GSC "Discovered - currently not indexed", Oct 2026): the
+  // category table has 454 active rows, 66% of this sitemap's ~686 total
+  // entries. A random sample of 19 confirmed 100% render the identical
+  // "Be the first to post an RFQ" empty state (zero real content) with no
+  // noindex of their own (src/app/categories/[category]/page.tsx sets only a
+  // canonical, unconditionally index,follow for all 454 regardless of
+  // content). Submitting hundreds of near-identical, empty pages dilutes
+  // crawl priority for everything else in the sitemap.
+  //
+  // Fix: always include top-level (parentId === null) categories -- these are
+  // the broad verticals meant to stay discoverable regardless of current
+  // activity, exactly matching src/app/categories/page.tsx's own existing
+  // hub-page rule (`where: { parentId: null }`) for which categories it links
+  // directly. Only include a CHILD category once it has real content (at
+  // least one RFQ). The page itself is unchanged and still reachable by
+  // anyone who clicks through from its parent -- this only stops actively
+  // submitting hundreds of empty leaf pages to Google for crawling.
   let categorySlugs = CATEGORY_SLUGS
   try {
     const dbCategories = await prisma.category.findMany({
       where: { isActive: true },
-      select: { slug: true },
+      select: { slug: true, parentId: true, _count: { select: { rfqs: true } } },
     })
-    categorySlugs = dbCategories.map(c => c.slug)
+    categorySlugs = dbCategories
+      .filter((c: { parentId: number | null; _count: { rfqs: number } }) => c.parentId === null || c._count.rfqs > 0)
+      .map((c: { slug: string }) => c.slug)
   } catch {
     // DB unavailable at build time — fall back to the static list
   }
@@ -180,8 +199,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: 'daily' as const,
     priority: 0.84,
   }))
-
-  // INTELLIGENCE_LAYER — excluded from sitemap until Phase D gate opens
 
   // City×Category landing pages (/suppliers/[city]/[category])
   const cityCategoryPages: MetadataRoute.Sitemap = getAllCityCategoryPairs().map(({ city, category }) => ({

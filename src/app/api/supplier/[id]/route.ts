@@ -13,8 +13,15 @@ export async function GET(
     const supplierId = params.id;
 
     const [userRecord, wonQuotes, totalQuotes, dealsCompleted] = await Promise.all([
-      prisma.user.findUnique({
-        where: { id: supplierId },
+      // Was `findUnique({ where: { id: supplierId } })` -- looked up by id
+      // alone, with no check that the id actually belongs to a public,
+      // claimed, active supplier. Any valid user id (a buyer's included)
+      // returned this profile data. Matches the same role/isClaimed/isActive
+      // filter already used to decide who gets a /supplier/{id} sitemap
+      // entry in the first place (src/app/sitemap.ts) and who appears in
+      // /suppliers/[city]/[category] listings.
+      prisma.user.findFirst({
+        where: { id: supplierId, role: 'SUPPLIER', isClaimed: true, isActive: true },
         select: {
           id: true,
           name: true,
