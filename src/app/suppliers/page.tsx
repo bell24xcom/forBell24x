@@ -21,7 +21,7 @@ export const revalidate = 3600;
 const PAGE_SIZE = 24;
 
 interface Props {
-  searchParams: { page?: string };
+  searchParams: Promise<{ page?: string }>;
 }
 
 function parsePage(searchParams: Props['searchParams']): number {
@@ -29,7 +29,8 @@ function parsePage(searchParams: Props['searchParams']): number {
   return Number.isFinite(n) && n > 0 ? n : 1;
 }
 
-export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const searchParams = await props.searchParams;
   const page = parsePage(searchParams);
   const canonical = page > 1 ? `${SITE_URL}/suppliers?page=${page}` : `${SITE_URL}/suppliers`;
   const title =
@@ -109,7 +110,8 @@ async function getSuppliers(page: number): Promise<{
   };
 }
 
-export default async function SuppliersPage({ searchParams }: Props) {
+export default async function SuppliersPage(props: Props) {
+  const searchParams = await props.searchParams;
   const page = parsePage(searchParams);
   const { suppliers, pagination } = await getSuppliers(page);
 

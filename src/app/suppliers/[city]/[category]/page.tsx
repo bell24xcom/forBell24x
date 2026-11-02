@@ -5,13 +5,14 @@ import { CITIES, CATEGORY_META, getAllCityCategoryPairs } from '@/src/data/city-
 import { prisma } from '@/lib/prisma';
 import { CityCategorySeoRankLoader } from '@/src/components/seo/CityCategorySeoRankLoader';
 
-interface Props { params: { city: string; category: string } }
+interface Props { params: Promise<{ city: string; category: string }> }
 
 export async function generateStaticParams() {
   return getAllCityCategoryPairs();
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const params = await props.params;
   const city = CITIES[params.city];
   const cat  = CATEGORY_META[params.category];
   if (!city || !cat) return { title: 'Not Found' };
@@ -39,7 +40,8 @@ function formatSupplierLocation(location: string | null, cityName: string, state
   return base.toLowerCase().includes(state.toLowerCase()) ? base : `${base}, ${state}`;
 }
 
-export default async function CityCategory({ params }: Props) {
+export default async function CityCategory(props: Props) {
+  const params = await props.params;
   const city = CITIES[params.city];
   const cat  = CATEGORY_META[params.category];
   if (!city || !cat) notFound();

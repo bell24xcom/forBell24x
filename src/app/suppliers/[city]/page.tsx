@@ -3,13 +3,14 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { CITIES, CATEGORY_META } from '@/src/data/city-category-seo';
 
-interface Props { params: { city: string } }
+interface Props { params: Promise<{ city: string }> }
 
 export async function generateStaticParams() {
   return Object.keys(CITIES).map(city => ({ city }));
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const params = await props.params;
   const city = CITIES[params.city];
   if (!city) return { title: 'Not Found' };
   const seoTitle = `B2B Suppliers in ${city.name} | VyaparSethu`;
@@ -28,7 +29,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default function CityPage({ params }: Props) {
+export default async function CityPage(props: Props) {
+  const params = await props.params;
   const city = CITIES[params.city];
   if (!city) notFound();
 

@@ -8,11 +8,12 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://www.vyaparsethu.com/supplier/claim' },
 };
 
-export default function SupplierClaimPage({
-  searchParams,
-}: {
-  searchParams: { category?: string; city?: string; token?: string };
-}) {
+export default async function SupplierClaimPage(
+  props: {
+    searchParams: Promise<{ category?: string; city?: string; token?: string }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const { category, city, token } = searchParams;
 
   return (

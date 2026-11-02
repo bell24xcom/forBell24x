@@ -2,17 +2,23 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { buildSupplierMetadata, fetchSupplierForSeo, supplierJsonLd } from '@/src/lib/supplier-seo';
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+export async function generateMetadata(props: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const params = await props.params;
   return buildSupplierMetadata(params.id);
 }
 
-export default async function SupplierProfileLayout({
-  children,
-  params,
-}: {
-  children: React.ReactNode;
-  params: { id: string };
-}) {
+export default async function SupplierProfileLayout(
+  props: {
+    children: React.ReactNode;
+    params: Promise<{ id: string }>;
+  }
+) {
+  const params = await props.params;
+
+  const {
+    children
+  } = props;
+
   const data = await fetchSupplierForSeo(params.id);
   // Verified live (8 Aug 2026): a nonexistent id rendered the client page's
   // "Supplier not found" copy but the route still answered HTTP 200 — a

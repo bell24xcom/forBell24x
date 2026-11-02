@@ -21,7 +21,7 @@ export const revalidate = 3600;
 const INDEXABLE_STATUSES = new Set(['ACTIVE', 'OPEN', 'QUOTED']);
 
 interface Props {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 // Public, non-personal RFQ fields only — no `user` relation selected.
@@ -65,7 +65,8 @@ function isIndexable(rfq: NonNullable<Awaited<ReturnType<typeof getSafeRFQ>>>): 
   );
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const params = await props.params;
   const rfq = await getSafeRFQ(params.id);
   if (!rfq) return { title: 'Requirement Not Found | VyaparSethu' };
 
@@ -98,7 +99,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function RFQDetailPage({ params }: Props) {
+export default async function RFQDetailPage(props: Props) {
+  const params = await props.params;
   const rfq = await getSafeRFQ(params.id);
 
   if (!rfq) {

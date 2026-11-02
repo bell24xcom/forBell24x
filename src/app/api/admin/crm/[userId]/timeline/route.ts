@@ -8,10 +8,8 @@ import { buildCrmJourney } from '@/src/lib/crm/company-timeline';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { userId: string } },
-) {
+export async function GET(req: NextRequest, props: { params: Promise<{ userId: string }> }) {
+  const params = await props.params;
   const auth = requireAdmin(req);
   if (isErrorResponse(auth)) return auth;
 
