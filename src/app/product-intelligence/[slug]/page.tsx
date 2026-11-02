@@ -5,7 +5,7 @@ import { getProductRecord, listProductSlugs } from '@/src/data/product-intellige
 import { buildProductIntelligenceMetadata, buildProductJsonLd } from '@/src/lib/product-intelligence/seo';
 import { getProductClusters, getRelatedProducts } from '@/src/lib/product-intelligence/engine';
 
-interface Props { params: { slug: string } }
+interface Props { params: Promise<{ slug: string }> }
 
 export const revalidate = 3600;
 
@@ -14,11 +14,13 @@ export async function generateStaticParams() {
   return slugs.map(slug => ({ slug }));
 }
 
-export async function generateMetadata({ params }: Props) {
+export async function generateMetadata(props: Props) {
+  const params = await props.params;
   return buildProductIntelligenceMetadata(params.slug);
 }
 
-export default async function ProductIntelligencePage({ params }: Props) {
+export default async function ProductIntelligencePage(props: Props) {
+  const params = await props.params;
   if (!FLAGS.INTELLIGENCE_ENABLED) {
     notFound();
   }

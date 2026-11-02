@@ -2,11 +2,13 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { buildProductMetadata, fetchSupplierForSeo, productJsonLd } from '@/src/lib/supplier-seo';
 
-export async function generateMetadata({ params }: { params: { id: string; slug: string } }) {
+export async function generateMetadata(props: { params: Promise<{ id: string; slug: string }> }) {
+  const params = await props.params;
   return buildProductMetadata(params.id, params.slug);
 }
 
-export default async function SupplierProductPage({ params }: { params: { id: string; slug: string } }) {
+export default async function SupplierProductPage(props: { params: Promise<{ id: string; slug: string }> }) {
+  const params = await props.params;
   const data = await fetchSupplierForSeo(params.id);
   if (!data) notFound();
 

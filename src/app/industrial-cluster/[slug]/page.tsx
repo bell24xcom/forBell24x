@@ -11,7 +11,7 @@ import type { PulseSummary } from '@/src/lib/bom/business-pulse';
 import type { ProductIntelligenceRecord } from '@/src/lib/product-intelligence/types';
 import type { IndustryIntelligenceRecord } from '@/src/lib/industry-intelligence/types';
 
-interface Props { params: { slug: string } }
+interface Props { params: Promise<{ slug: string }> }
 
 export const revalidate = 3600;
 
@@ -19,7 +19,8 @@ export async function generateStaticParams() {
   return listClusterSlugs().map(slug => ({ slug }));
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const params = await props.params;
   const cluster = INDUSTRIAL_CLUSTERS[params.slug];
   if (!cluster) return { title: 'Not Found' };
   const title = `${cluster.name} — Industrial Cluster Intelligence | VyaparSethu`;
@@ -94,7 +95,8 @@ function buildClusterJsonLd(cluster: IndustrialClusterRecord, products: ProductI
   return { placeSchema, productListSchema, breadcrumbSchema };
 }
 
-export default async function IndustrialClusterPage({ params }: Props) {
+export default async function IndustrialClusterPage(props: Props) {
+  const params = await props.params;
   // SEO fix (PR61 remediation, D1): page EXISTENCE is separated from
   // INTELLIGENCE ACTIVATION. Previously the whole page 404'd whenever
   // FLAGS.INTELLIGENCE_ENABLED was false — not because the slug was

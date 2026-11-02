@@ -4,10 +4,11 @@ import ClaimForm from './ClaimForm';
 import { resolveClaimTarget } from '@/src/lib/outreach/resolveClaimTarget';
 
 interface PageProps {
-  params: { token: string };
+  params: Promise<{ token: string }>;
 }
 
-export default async function ClaimPage({ params }: PageProps) {
+export default async function ClaimPage(props: PageProps) {
+  const params = await props.params;
   const { token } = params;
 
   // H6-13: resolves both the new signed-invitation token format and the

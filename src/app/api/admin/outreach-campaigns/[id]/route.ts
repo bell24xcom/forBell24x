@@ -19,7 +19,8 @@ import type { CampaignStatus } from '@/src/lib/outreach/campaignStateMachine';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const auth = requireAdmin(req);
   if (isErrorResponse(auth)) return auth;
 
@@ -38,7 +39,8 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   return NextResponse.json({ success: true, campaign });
 }
 
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const auth = requireAdmin(req);
   if (isErrorResponse(auth)) return auth;
 

@@ -5,14 +5,15 @@ import { getPostBySlug, BLOG_POSTS } from '@/src/data/blog-posts';
 import BlogCapture from '@/src/components/capture/BlogCapture';
 
 interface Props {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 export async function generateStaticParams() {
   return BLOG_POSTS.map(post => ({ slug: post.slug }));
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const params = await props.params;
   const post = getPostBySlug(params.slug);
   if (!post) return { title: 'Post Not Found' };
   const titleStr = post.title.length > 45 ? post.title.slice(0, 42) + '...' : post.title;
@@ -37,7 +38,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default function BlogPostPage({ params }: Props) {
+export default async function BlogPostPage(props: Props) {
+  const params = await props.params;
   const post = getPostBySlug(params.slug);
   if (!post) notFound();
 

@@ -6,7 +6,7 @@ import { getAreaPulse } from '@/src/lib/bom/business-pulse';
 import { nearbyAreas } from '@/src/lib/bom/location';
 import type { PulseSummary } from '@/src/lib/bom/business-pulse';
 
-interface Props { params: { area: string } }
+interface Props { params: Promise<{ area: string }> }
 
 export const revalidate = 3600;
 
@@ -14,7 +14,8 @@ export async function generateStaticParams() {
   return Object.keys(CITIES).map(area => ({ area }));
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const params = await props.params;
   const city = CITIES[params.area];
   if (!city) return { title: 'Not Found' };
   const seoTitle = `Business Pulse — ${city.name} Industrial Cluster | VyaparSethu`;
@@ -64,7 +65,8 @@ function activePulseHighlights(summary: PulseSummary): { label: string; icon: st
   return items;
 }
 
-export default async function LocationPulsePage({ params }: Props) {
+export default async function LocationPulsePage(props: Props) {
+  const params = await props.params;
   const city = CITIES[params.area];
   if (!city) notFound();
 

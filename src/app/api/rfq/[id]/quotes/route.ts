@@ -4,10 +4,8 @@ import { getAuthenticatedUser } from '@/src/lib/auth-helpers';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     const user = getAuthenticatedUser(request);
     if (!user) {

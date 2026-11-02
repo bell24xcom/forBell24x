@@ -92,11 +92,12 @@ async function getCategories(): Promise<DisplayCategory[]> {
   return FALLBACK_CATEGORIES.map(c => ({ ...c, rfqCount: null }));
 }
 
-export default async function CategoriesPage({
-  searchParams,
-}: {
-  searchParams?: { q?: string };
-}) {
+export default async function CategoriesPage(
+  props: {
+    searchParams?: Promise<{ q?: string }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const allCategories = await getCategories();
   const query = searchParams?.q?.toLowerCase().trim() ?? '';
   const categories = query

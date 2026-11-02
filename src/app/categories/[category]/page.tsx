@@ -5,9 +5,9 @@ import { notFound } from 'next/navigation';
 import { SITE_URL } from '@/lib/site-url';
 
 interface CategoryPageProps {
-  params: {
+  params: Promise<{
     category: string;
-  };
+  }>;
 }
 
 export const revalidate = 300; // cache 5 minutes
@@ -60,7 +60,8 @@ async function getCategory(slug: string) {
   }
 }
 
-export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
+export async function generateMetadata(props: CategoryPageProps): Promise<Metadata> {
+  const params = await props.params;
   const category = await getCategory(params.category);
 
   // Canonical points at the category's real DB slug so any variant request
@@ -111,7 +112,8 @@ function timeAgo(date: Date): string {
   return `${Math.floor(sec / 86400)} days ago`;
 }
 
-export default async function CategoryPage({ params }: CategoryPageProps) {
+export default async function CategoryPage(props: CategoryPageProps) {
+  const params = await props.params;
   const category = await getCategory(params.category);
 
   if (!category || !category.isActive) {

@@ -3,13 +3,14 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { GLOSSARY_TERMS, getTermBySlug, getRelatedTerms } from '@/src/data/glossary';
 
-interface Props { params: { term: string } }
+interface Props { params: Promise<{ term: string }> }
 
 export async function generateStaticParams() {
   return GLOSSARY_TERMS.map(t => ({ term: t.slug }));
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const params = await props.params;
   const term = getTermBySlug(params.term);
   if (!term) return { title: 'Not Found' };
 
@@ -35,7 +36,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export const revalidate = 86400;
 
-export default function GlossaryTermPage({ params }: Props) {
+export default async function GlossaryTermPage(props: Props) {
+  const params = await props.params;
   const term = getTermBySlug(params.term);
   if (!term) notFound();
 

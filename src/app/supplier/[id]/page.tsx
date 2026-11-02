@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Building2, MapPin, Shield, Package, Calendar, Award, Star, CheckCircle } from 'lucide-react';
@@ -38,7 +38,8 @@ interface SupplierData {
   };
 }
 
-export default function PublicSupplierPage({ params }: { params: { id: string } }) {
+export default function PublicSupplierPage(props: { params: Promise<{ id: string }> }) {
+  const params = use(props.params);
   const router = useRouter();
   const [supplier, setSupplier] = useState<SupplierData | null>(null);
   const [loading, setLoading] = useState(true);

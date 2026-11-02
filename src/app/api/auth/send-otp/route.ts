@@ -1,3 +1,4 @@
 // Canonical OTP send endpoint: /api/auth/otp/send
 // This route delegates to the canonical handler for backward compatibility.
-export { POST } from '@/src/app/api/auth/otp/send/route';
+export { /* @next-codemod-error `POST` export is re-exported. Check if this component uses `params` or `searchParams`*/
+POST } from '@/src/app/api/auth/otp/send/route';

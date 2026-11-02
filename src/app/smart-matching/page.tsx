@@ -16,7 +16,7 @@ export default async function SmartMatchingPage() {
     notFound();
   }
 
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const token = cookieStore.get('admin-token')?.value ?? cookieStore.get('auth-token')?.value;
   if (!token) notFound();
 
