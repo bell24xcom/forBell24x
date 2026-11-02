@@ -24,6 +24,9 @@
     "test:seo-sitemap": "tsx --test --experimental-test-module-mocks tests/seo/sitemap-category-filter.test.ts",
     "test:seo-claims": "tsx --test tests/seo/unsourced-claims.test.ts",
     "test:supplier-id-route": "tsx --test --experimental-test-module-mocks src/app/api/supplier/supplier-id-route-test.test.ts",
+    "test:payment-auth": "node --test lib/payment-authorization.test.ts",
+    "test:payment-route": "tsx --test --experimental-test-module-mocks src/app/api/monetization/pay/route.test.ts",
+    "test:payment-concurrency": "tsx --test src/app/api/monetization/pay/route.concurrency.test.ts",
     "deploy:polygon": "hardhat run scripts/deploy.js --network polygon",
     "deploy:mumbai": "hardhat run scripts/deploy.js --network polygonMumbai",
     "verify:polygon": "hardhat verify --network polygon",
@@ -72,11 +75,14 @@
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.10",
+    "embedded-postgres": "^18.6.0-beta.19",
     "eslint": "^8.0.0",
     "eslint-config-next": "14.0.0",
     "hardhat": "^2.17.0",
     "hardhat-gas-reporter": "^1.0.9",
-    "solidity-coverage": "^0.8.5"
+    "pg": "^8.23.1",
+    "solidity-coverage": "^0.8.5",
+    "tsx": "^4.23.15"
   },
   "keywords": [
     "blockchain",
