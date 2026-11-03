@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
-import { prisma } from '@/lib/prisma';
+import { verifyAndCreditWalletTopup } from '@/src/lib/payments/razorpay-wallet-intent';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,8 +14,24 @@ export async function POST(request: NextRequest) {
     const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
     if (!webhookSecret) return NextResponse.json({ status: 'skipped', reason: 'not configured' });
 
+    // Timing-safe comparison, ported from the fix/seo-indexing-issues branch
+    // (mirrors the pattern in Bell24h-OS's own requireServiceAuth.ts) -- a
+    // plain `!==` on hex strings leaks timing information proportional to
+    // how many leading characters match. Reject anything that isn't a
+    // well-formed SHA-256 hex digest before comparing anything (a malformed
+    // header should never reach a crypto call at all), then compare
+    // fixed-length digests of both strings rather than the raw hex directly,
+    // since timingSafeEqual throws on unequal-length buffers -- hashing both
+    // sides first makes the two buffers always exactly 32 bytes each,
+    // so there is no length-mismatch case left to handle.
     const expectedSignature = crypto.createHmac('sha256', webhookSecret).update(body).digest('hex');
-    if (expectedSignature !== signature) return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
+    const isWellFormedSha256Hex = (value: string) => /^[0-9a-f]{64}$/i.test(value);
+    const digest = (value: string) => crypto.createHash('sha256').update(value, 'utf8').digest();
+    const signaturesMatch =
+      isWellFormedSha256Hex(signature) &&
+      digest(expectedSignature).length === digest(signature).length &&
+      crypto.timingSafeEqual(digest(expectedSignature), digest(signature));
+    if (!signaturesMatch) return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
 
     const event = JSON.parse(body);
     const eventType = event.event;
@@ -26,31 +42,48 @@ export async function POST(request: NextRequest) {
 
     if (eventType === 'payment.captured') {
       const paymentId = paymentEntity.id;
-      const amountInRupees = paymentEntity.amount / 100;
+      const orderId = paymentEntity.order_id;
 
       // Wallet Credit (Neon/Prisma) — the only reachable path. An earlier
       // "marketplace deal via InsForge" branch lived here, keyed off
       // notes.deal_id; removed (H6-10A) after confirming no live order-
       // creation code ever sets that field — every real order created by
       // this app sets notes.userId (WALLET_DEPOSIT) instead, so that branch
-      // could never execute. This branch, the actually-executing one, is
-      // unchanged.
-      if (notes.userId) {
+      // could never execute.
+      //
+      // Phase 11 (2026-11-03): this now goes through the same
+      // verifyAndCreditWalletTopup used by the two client-facing routes,
+      // instead of its own ad hoc `findFirst`-then-write idempotency check.
+      // That check was a read-then-write race (two near-simultaneous
+      // deliveries of the same event — Razorpay does retry webhooks — could
+      // both pass `findFirst` before either committed); the shared helper's
+      // atomic `updateMany(status: PENDING -> PAID)` closes that race. The
+      // credited amount is still the PaymentIntent's stored amount, not
+      // paymentEntity.amount — if the two ever disagree, that's a signal
+      // worth investigating, not something to silently average.
+      if (notes.userId && orderId) {
         const userId = notes.userId;
-        const existing = await prisma.walletTransaction.findFirst({ where: { reference: paymentId } });
-        if (existing) return NextResponse.json({ status: 'already_processed' });
+        const result = await verifyAndCreditWalletTopup({
+          userId,
+          orderId,
+          paymentId,
+          signature: null,
+          trustedSource: true,
+        });
 
-        let wallet = await prisma.wallet.findUnique({ where: { userId } });
-        if (!wallet) wallet = await prisma.wallet.create({ data: { userId, balance: 0 } });
-
-        await prisma.$transaction([
-          prisma.wallet.update({ where: { id: wallet.id }, data: { balance: { increment: amountInRupees } } }),
-          prisma.walletTransaction.create({
-            data: { walletId: wallet.id, type: 'CREDIT', amount: amountInRupees, reference: paymentId, description: 'Razorpay Wallet Deposit' }
-          }),
-        ]);
-
-        return NextResponse.json({ status: 'wallet_credited' });
+        if (result.outcome === 'CREDITED') {
+          if (result.amount !== Number(paymentEntity.amount)) {
+            console.error(
+              `[WEBHOOK] Amount mismatch for order ${orderId}: intent=${result.amount} webhook=${paymentEntity.amount}`,
+            );
+          }
+          return NextResponse.json({ status: 'wallet_credited' });
+        }
+        if (result.outcome === 'ALREADY_PROCESSED') {
+          return NextResponse.json({ status: 'already_processed' });
+        }
+        console.error(`[WEBHOOK] payment.captured for order ${orderId} did not credit: ${result.outcome}`);
+        return NextResponse.json({ status: 'not_credited', reason: result.outcome });
       }
     }
 
