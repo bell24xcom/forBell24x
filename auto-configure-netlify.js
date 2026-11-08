@@ -22,7 +22,6 @@ const envVars = {
   // API Keys
   MSG91_AUTH_KEY: '468517Ak5rJ0vb7NDV68c24863P1',
   MSG91_SENDER_ID: 'BELL24H',
-  RESEND_API_KEY: 're_dGNCnq2P_9Rc29SZYvTCasdhvLCQG2Zx4',
   FROM_EMAIL: 'noreply@bell24h.com',
 
   // Payment (Razorpay) - Update these with your actual keys
