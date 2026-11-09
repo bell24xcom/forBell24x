@@ -64,3 +64,18 @@ mirror.git/
 .env*.local
 .env.production
 .env*.txt
+
+# P0 credential-exposure containment (2026-11-09): .vercel-env-vars.txt was
+# tracked since this repo's initial commit and contained real DATABASE_URL,
+# RAZORPAY_KEY_ID/SECRET, and NEXTAUTH_SECRET values -- untracked and
+# removed in this same change. This pattern is intentionally broader than
+# the one file removed, to also catch any future "copy these into the
+# Vercel dashboard" helper file using the same naming convention. This does
+# NOT cover the other, separately-tracked credential-bearing files found
+# during the same investigation (env-list.txt, .env.neon,
+# .env.production.protected-backup, gitkraken.env, the Google OAuth
+# client_secret_*.json, several .env.local.backup.* files, and duplicates
+# under _archive/) -- those remain tracked and require their own,
+# separate containment decision; see
+# VYAPARSETHU_P0_CREDENTIAL_EXPOSURE_CONTAINMENT_REPORT.md.
+.vercel-env*.txt
