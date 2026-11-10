@@ -66,7 +66,6 @@ function buildEnvChecks(): EnvCheck[] {
     { key: 'GSC_SITE_URL', label: 'Search Console property', group: 'SEO & Google', severity: 'recommended', configured: present('GSC_SITE_URL') },
 
     // Media / Email
-    { key: 'RESEND_API_KEY', label: 'Resend (transactional email)', group: 'Media & Email', severity: 'optional', configured: present('RESEND_API_KEY') },
     { key: 'CLOUDINARY_URL', label: 'Cloudinary (media)', group: 'Media & Email', severity: 'optional', configured: present('CLOUDINARY_URL', 'CLOUDINARY_API_KEY') },
   ];
 }
