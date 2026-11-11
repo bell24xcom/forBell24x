@@ -56,6 +56,7 @@ model User {
   buyerTransactions    Transaction[]  @relation("BuyerTransactions")
   supplierTransactions Transaction[]  @relation("SupplierTransactions")
   wallet               Wallet?
+  paymentIntents       PaymentIntent[]
   companyDnaProfile    CompanyDnaProfile?
   lifeEvents           BusinessLifeEvent[] @relation("CompanyLifeEvents")
   lifeEventsAsActor    BusinessLifeEvent[] @relation("ActorLifeEvents")
@@ -332,6 +333,41 @@ model WalletTransaction {
   wallet      Wallet   @relation(fields: [walletId], references: [id])
 
   @@map("wallet_transactions")
+}
+
+// Server-trusted record of a Razorpay order created for this app, persisted
+// at creation time so verification never has to trust a client-supplied
+// amount/currency. `status` only ever transitions PENDING -> PAID via a
+// single conditional `updateMany` (status: PENDING in the WHERE clause),
+// which is what makes verification idempotent under concurrent/duplicate
+// requests -- see src/lib/payments/razorpay-wallet-intent.ts.
+model PaymentIntent {
+  id          String              @id @default(cuid())
+  userId      String              @map("user_id")
+  purpose     PaymentIntentPurpose
+  orderId     String              @unique @map("order_id")
+  paymentId   String?             @unique @map("payment_id")
+  amount      Int                 @map("amount_paise")
+  currency    String              @default("INR")
+  status      PaymentIntentStatus @default(PENDING)
+  planKey     String?             @map("plan_key")
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  user        User                @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@map("payment_intents")
+}
+
+enum PaymentIntentPurpose {
+  WALLET_DEPOSIT
+  SUBSCRIPTION
+}
+
+enum PaymentIntentStatus {
+  PENDING
+  PAID
+  FAILED
 }
 
 model Message {

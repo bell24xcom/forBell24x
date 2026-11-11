@@ -4,6 +4,7 @@ import { authenticate } from '@/lib/jwt';
 import { prisma } from '@/lib/prisma';
 import { storeInteraction } from '@/lib/memory-engine';
 import { SITE_URL } from '@/lib/site-url';
+import { verifyAndCreditWalletTopup } from '@/src/lib/payments/razorpay-wallet-intent';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,7 +32,7 @@ export async function POST(request: NextRequest) {
 
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature, amount, plan } = await request.json();
 
-    if (!razorpay_order_id || !amount || amount <= 0) {
+    if (!razorpay_order_id) {
       return NextResponse.json({ success: false, error: 'Missing required fields' }, { status: 400 });
     }
 
@@ -39,36 +40,33 @@ export async function POST(request: NextRequest) {
       razorpay_order_id.startsWith('order_test_') &&
       process.env.NODE_ENV !== 'production';
 
-    if (!isTestMode) {
-      // Verify Razorpay signature
-      if (!razorpay_payment_id || !razorpay_signature) {
-        return NextResponse.json({ success: false, error: 'Missing payment verification data' }, { status: 400 });
-      }
-
-      const keySecret = process.env.RAZORPAY_KEY_SECRET;
-      if (!keySecret) {
-        return NextResponse.json({ success: false, error: 'Payment gateway not configured' }, { status: 500 });
-      }
-
-      const body = `${razorpay_order_id}|${razorpay_payment_id}`;
-      const expectedSignature = crypto
-        .createHmac('sha256', keySecret)
-        .update(body)
-        .digest('hex');
-
-      if (expectedSignature !== razorpay_signature) {
-        return NextResponse.json({ success: false, error: 'Payment verification failed — invalid signature' }, { status: 400 });
-      }
-    }
-
-    // Ensure wallet exists before transaction block
-    let wallet = await prisma.wallet.findUnique({ where: { userId: user.userId } });
-    if (!wallet) {
-      wallet = await prisma.wallet.create({ data: { userId: user.userId, balance: 0 } });
-    }
-
     // ── SUBSCRIPTION PLAN ACTIVATION ─────────────────────────────────────
+    // Not yet migrated to the PaymentIntent model (Phase 11 scoped this pass
+    // to the wallet-deposit paths only — see
+    // docs/audits/PHASE_11_RAZORPAY_LIFECYCLE_ENGINEERING_REPORT_2026-11-03.md,
+    // "identified but not fixed this phase"). This branch still trusts the
+    // client-supplied `amount` for its own logging/BOM metadata (it does not
+    // drive any monetary credit) and still has no idempotency guard against
+    // the same signature being replayed to repeatedly extend planExpiresAt.
     if (plan) {
+      if (!amount || amount <= 0) {
+        return NextResponse.json({ success: false, error: 'Missing required fields' }, { status: 400 });
+      }
+      if (!isTestMode) {
+        if (!razorpay_payment_id || !razorpay_signature) {
+          return NextResponse.json({ success: false, error: 'Missing payment verification data' }, { status: 400 });
+        }
+        const keySecret = process.env.RAZORPAY_KEY_SECRET;
+        if (!keySecret) {
+          return NextResponse.json({ success: false, error: 'Payment gateway not configured' }, { status: 500 });
+        }
+        const body = `${razorpay_order_id}|${razorpay_payment_id}`;
+        const expectedSignature = crypto.createHmac('sha256', keySecret).update(body).digest('hex');
+        if (expectedSignature !== razorpay_signature) {
+          return NextResponse.json({ success: false, error: 'Payment verification failed — invalid signature' }, { status: 400 });
+        }
+      }
+
       const planKey = plan.toLowerCase();
       const userPlan = PLAN_MAP[planKey] ?? 'PRO';
       const now = new Date();
@@ -135,50 +133,65 @@ export async function POST(request: NextRequest) {
     }
 
     // ── WALLET CREDIT ─────────────────────────────────────────────────────
-    // Credit wallet + log transaction atomically — both succeed or both fail
-    await prisma.$transaction([
-      prisma.wallet.update({
-        where: { id: wallet.id },
-        data: { balance: { increment: amount } },
-      }),
-      prisma.walletTransaction.create({
-        data: {
-          walletId: wallet.id,
-          type: 'CREDIT',
-          amount,
-          description: isTestMode
-            ? `Test deposit of ₹${amount.toLocaleString('en-IN')}`
-            : `Razorpay deposit of ₹${amount.toLocaleString('en-IN')}`,
-          reference: razorpay_payment_id || razorpay_order_id,
-        },
-      }),
-    ]);
+    // Amount/currency come from the PaymentIntent persisted at order-creation
+    // time, never from this request body — see
+    // src/lib/payments/razorpay-wallet-intent.ts. This also closes the
+    // missing-idempotency gap: a repeated call with the same payment_id is a
+    // no-op, not a repeat credit.
+    if (!razorpay_payment_id) {
+      return NextResponse.json({ success: false, error: 'Missing payment verification data' }, { status: 400 });
+    }
 
-    // BOM activation: wallet deposit completed
-    import('@/src/lib/bom/life-events')
-      .then(({ recordLifeEventAsync }) =>
-        recordLifeEventAsync({
-          companyId: user.userId,
-          eventType: 'payment_completed',
-          actorId: user.userId,
-          metadata: { kind: 'wallet_deposit', amount, reference: razorpay_payment_id || razorpay_order_id, testMode: isTestMode },
-          outcome: 'wallet_credited',
-          source: 'razorpay',
-          confidence: 1,
-        }),
-      )
-      .catch(() => {});
-
-    // Re-fetch updated balance
-    const updated = await prisma.wallet.findUnique({ where: { userId: user.userId } });
-
-    return NextResponse.json({
-      success: true,
-      type: 'wallet',
-      balance: updated?.balance ?? wallet.balance,
-      message: `₹${amount.toLocaleString('en-IN')} added to wallet${isTestMode ? ' (test mode)' : ''}`,
-      testMode: isTestMode,
+    const result = await verifyAndCreditWalletTopup({
+      userId: user.userId,
+      orderId: razorpay_order_id,
+      paymentId: razorpay_payment_id,
+      signature: razorpay_signature ?? null,
     });
+
+    if (result.outcome === 'CREDITED' || result.outcome === 'ALREADY_PROCESSED') {
+      const amountRupees = result.outcome === 'CREDITED' ? result.amount / 100 : amount ?? 0;
+
+      if (result.outcome === 'CREDITED') {
+        import('@/src/lib/bom/life-events')
+          .then(({ recordLifeEventAsync }) =>
+            recordLifeEventAsync({
+              companyId: user.userId,
+              eventType: 'payment_completed',
+              actorId: user.userId,
+              metadata: { kind: 'wallet_deposit', amount: amountRupees, reference: razorpay_payment_id, testMode: isTestMode },
+              outcome: 'wallet_credited',
+              source: 'razorpay',
+              confidence: 1,
+            }),
+          )
+          .catch(() => {});
+      }
+
+      return NextResponse.json({
+        success: true,
+        type: 'wallet',
+        balance: result.outcome === 'CREDITED' ? result.balance : undefined,
+        message: result.outcome === 'ALREADY_PROCESSED'
+          ? 'Payment already processed'
+          : `₹${amountRupees.toLocaleString('en-IN')} added to wallet${isTestMode ? ' (test mode)' : ''}`,
+        testMode: isTestMode,
+        alreadyProcessed: result.outcome === 'ALREADY_PROCESSED',
+      });
+    }
+
+    switch (result.outcome) {
+      case 'NOT_FOUND':
+        return NextResponse.json({ success: false, error: 'No matching order found' }, { status: 404 });
+      case 'FORBIDDEN':
+        return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 });
+      case 'INVALID_SIGNATURE':
+        return NextResponse.json({ success: false, error: 'Payment verification failed — invalid signature' }, { status: 400 });
+      case 'PAYMENT_ID_CONFLICT':
+        return NextResponse.json({ success: false, error: 'Payment verification failed' }, { status: 409 });
+      default:
+        return NextResponse.json({ success: false, error: 'Payment verification failed' }, { status: 500 });
+    }
   } catch (error) {
     console.error('Payment verify error:', error);
     return NextResponse.json({ success: false, error: 'Payment verification failed' }, { status: 500 });
