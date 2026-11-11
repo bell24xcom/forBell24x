@@ -25,6 +25,7 @@
     "test:seo-claims": "tsx --test tests/seo/unsourced-claims.test.ts",
     "test:supplier-id-route": "tsx --test --experimental-test-module-mocks src/app/api/supplier/supplier-id-route-test.test.ts",
     "test:payment-auth": "node --test lib/payment-authorization.test.ts",
+    "test:negotiation-auth": "node --test lib/negotiation-authorization.test.ts",
     "test:payment-route": "tsx --test --experimental-test-module-mocks src/app/api/monetization/pay/route.test.ts",
     "test:payment-concurrency": "tsx --test src/app/api/monetization/pay/route.concurrency.test.ts",
     "deploy:polygon": "hardhat run scripts/deploy.js --network polygon",
