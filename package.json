@@ -29,6 +29,8 @@
     "test:payment-concurrency": "tsx --test src/app/api/monetization/pay/route.concurrency.test.ts",
     "test:razorpay-intent": "node --test lib/razorpay-payment-intent.test.ts",
     "test:razorpay-wallet-lifecycle": "tsx --test --experimental-test-module-mocks src/app/api/payment/razorpay-wallet-lifecycle.test.ts",
+    "test:razorpay-webhook": "tsx --test --experimental-test-module-mocks src/app/api/payment/webhook/route.test.ts",
+    "test:wallet-concurrency": "tsx --test src/lib/payments/razorpay-wallet-concurrency.test.ts",
     "deploy:polygon": "hardhat run scripts/deploy.js --network polygon",
     "deploy:mumbai": "hardhat run scripts/deploy.js --network polygonMumbai",
     "verify:polygon": "hardhat verify --network polygon",

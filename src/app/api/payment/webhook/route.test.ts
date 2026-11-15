@@ -52,51 +52,83 @@ let walletIdCounter = 0;
 let txnIdCounter = 0;
 let transactionThrows: Error | null = null;
 
+const prismaMockOps = {
+  paymentIntent: {
+    findUnique: async ({ where }: { where: { orderId: string } }) =>
+      intents.find((i) => i.orderId === where.orderId) ?? null,
+    updateMany: async ({ where, data }: { where: { orderId: string; status: string }; data: Record<string, any> }) => {
+      const matches = intents.filter((i) => i.orderId === where.orderId && i.status === where.status);
+      for (const row of matches) Object.assign(row, data);
+      return { count: matches.length };
+    },
+    create: async ({ data }: { data: Record<string, any> }) => {
+      intentIdCounter += 1;
+      const row: IntentRow = { id: `intent_${intentIdCounter}`, status: 'PENDING', ...data };
+      intents.push(row);
+      return row;
+    },
+  },
+  // Mocks the single `tx.$queryRaw` call in razorpay-wallet-intent.ts --
+  // see the matching comment in razorpay-wallet-lifecycle.test.ts.
+  $queryRaw: async (_strings: TemplateStringsArray, id: string, userId: string) => {
+    const existing = wallets.find((w) => w.userId === userId);
+    if (existing) return [];
+    walletIdCounter += 1;
+    wallets.push({ id, userId, balance: 0 });
+    return [{ id }];
+  },
+  wallet: {
+    findUnique: async ({ where }: { where: { userId: string } }) =>
+      wallets.find((w) => w.userId === where.userId) ?? null,
+    create: async ({ data }: { data: { userId: string; balance: number } }) => {
+      walletIdCounter += 1;
+      const row = { id: `wallet_${walletIdCounter}`, ...data };
+      wallets.push(row);
+      return row;
+    },
+    upsert: async ({ where, create }: { where: { userId: string }; create: { userId: string; balance: number }; update: Record<string, unknown> }) => {
+      const existing = wallets.find((w) => w.userId === where.userId);
+      if (existing) return existing;
+      walletIdCounter += 1;
+      const row = { id: `wallet_${walletIdCounter}`, userId: create.userId, balance: create.balance };
+      wallets.push(row);
+      return row;
+    },
+    update: async ({ where, data }: { where: { id: string }; data: { balance: { increment: number } } }) => {
+      const row = wallets.find((w) => w.id === where.id);
+      if (!row) throw new Error('wallet not found');
+      row.balance += data.balance.increment;
+      return row;
+    },
+  },
+  walletTransaction: {
+    create: async ({ data }: { data: Record<string, any> }) => {
+      txnIdCounter += 1;
+      const row = { id: `wtxn_${txnIdCounter}`, walletId: data.walletId, reference: data.reference ?? null };
+      walletTxns.push(row);
+      return row;
+    },
+  },
+};
+
 mock.module('@/lib/prisma', {
   namedExports: {
     prisma: {
-      paymentIntent: {
-        findUnique: async ({ where }: { where: { orderId: string } }) =>
-          intents.find((i) => i.orderId === where.orderId) ?? null,
-        updateMany: async ({ where, data }: { where: { orderId: string; status: string }; data: Record<string, any> }) => {
-          const matches = intents.filter((i) => i.orderId === where.orderId && i.status === where.status);
-          for (const row of matches) Object.assign(row, data);
-          return { count: matches.length };
-        },
-        create: async ({ data }: { data: Record<string, any> }) => {
-          intentIdCounter += 1;
-          const row: IntentRow = { id: `intent_${intentIdCounter}`, status: 'PENDING', ...data };
-          intents.push(row);
-          return row;
-        },
-      },
-      wallet: {
-        findUnique: async ({ where }: { where: { userId: string } }) =>
-          wallets.find((w) => w.userId === where.userId) ?? null,
-        create: async ({ data }: { data: { userId: string; balance: number } }) => {
-          walletIdCounter += 1;
-          const row = { id: `wallet_${walletIdCounter}`, ...data };
-          wallets.push(row);
-          return row;
-        },
-        update: async ({ where, data }: { where: { id: string }; data: { balance: { increment: number } } }) => {
-          const row = wallets.find((w) => w.id === where.id);
-          if (!row) throw new Error('wallet not found');
-          row.balance += data.balance.increment;
-          return row;
-        },
-      },
-      walletTransaction: {
-        create: async ({ data }: { data: Record<string, any> }) => {
-          txnIdCounter += 1;
-          const row = { id: `wtxn_${txnIdCounter}`, walletId: data.walletId, reference: data.reference ?? null };
-          walletTxns.push(row);
-          return row;
-        },
-      },
-      $transaction: async (ops: Promise<unknown>[]) => {
+      ...prismaMockOps,
+      // Interactive-callback-form $transaction (TASK 38B Fix A restructure
+      // -- see the matching comment in razorpay-wallet-lifecycle.test.ts
+      // for why this mock has no real rollback semantics). `transactionThrows`
+      // is checked BEFORE the callback runs, so in this mock a thrown
+      // transaction leaves whatever the callback had already mutated as-is;
+      // the route's own updateMany-then-upsert-then-create ordering means
+      // the only mutation that could have happened before a forced throw in
+      // these tests is none, since `transactionThrows` fires at the
+      // $transaction boundary itself. Rollback of a PARTIAL in-callback
+      // mutation can only be proven against real Postgres -- see
+      // src/lib/payments/razorpay-wallet-concurrency.test.ts.
+      $transaction: async (fn: (tx: typeof prismaMockOps) => Promise<unknown>) => {
         if (transactionThrows) throw transactionThrows;
-        return Promise.all(ops);
+        return fn(prismaMockOps);
       },
     },
   },
@@ -282,20 +314,59 @@ test('a transaction-write failure returns a safe error envelope, not a false "wa
   seedPendingIntent();
   transactionThrows = new Error('P2024: Timed out fetching a new connection from the pool at host db-internal.prod.local');
   const res = await POST(webhookRequest(capturedEvent()));
-  // Always 200 for Razorpay (deliberate, documented in source) -- but the
-  // body must say 'error', never claim success.
-  assert.equal(res.status, 200);
+  // TASK 38B Fix B: this is no longer "always 200 for Razorpay" -- that was
+  // the anti-pattern this fix closes. A thrown, non-JSON-parse error here
+  // means the event was never durably processed and there is no recovery
+  // mechanism of our own, so this now returns 500 to let Razorpay's own
+  // documented retry schedule be the actual recovery path. See the route's
+  // own catch block for the full rationale and the malformed-body
+  // (deterministic, still-200) counter-case below.
+  assert.equal(res.status, 500);
   const json = await res.json();
   assert.equal(json.status, 'error');
   assert.ok(!JSON.stringify(json).includes('db-internal.prod.local'), 'raw DB error must never reach the response body');
+  // TASK 38B Fix A: the claim, wallet upsert, and credit are now one
+  // transaction, so a failure must leave the intent exactly where it
+  // started (PENDING) -- never stranded as PAID with no credit applied.
+  // In this mock the throw happens at the $transaction boundary before the
+  // callback runs at all, so this assertion is necessarily true here; the
+  // real-stakes version of this claim (a throw AFTER the claim commits
+  // inside the same real transaction still rolls the claim back) is proven
+  // against real Postgres in src/lib/payments/razorpay-wallet-concurrency.test.ts, not
+  // provable in this mock -- see the $transaction mock's own comment above.
+  assert.equal(intents[0].status, 'PENDING', 'intent must not be stranded as PAID when the credit transaction fails');
+  assert.equal(wallets.length, 0, 'no wallet should be created when the transaction fails');
 });
 
-test('a malformed JSON body is rejected safely, not a 500 crash', async () => {
+test('a transaction failure can be safely retried: a subsequent delivery with no forced failure credits exactly once', async () => {
+  seedPendingIntent();
+  transactionThrows = new Error('simulated transient failure');
+  const failed = await POST(webhookRequest(capturedEvent()));
+  assert.equal((await failed.json()).status, 'error');
+  assert.equal(intents[0].status, 'PENDING');
+
+  transactionThrows = null;
+  const retried = await POST(webhookRequest(capturedEvent()));
+  const retriedJson = await retried.json();
+  assert.equal(retriedJson.status, 'wallet_credited');
+  assert.equal(wallets[0].balance, 500);
+  assert.equal(walletTxns.length, 1, 'exactly one credit after the failed attempt plus one successful retry');
+});
+
+test('a malformed JSON body is acknowledged (200), not retried, unlike other failures (TASK 38B Fix B)', async () => {
   const body = 'not valid json{{{';
   const req = new NextRequest('http://localhost/api/payment/webhook', {
     method: 'POST', headers: { 'x-razorpay-signature': sign(body) }, body,
   });
   const res = await POST(req);
-  assert.equal(res.status, 200); // reaches the catch block, always-200-for-Razorpay
-  assert.equal((await res.json()).status, 'error');
+  // Deliberately still 200, unlike the transaction-failure test above: a
+  // malformed body is deterministic -- Razorpay would resend the IDENTICAL
+  // bytes on retry and get the identical SyntaxError every time, so there
+  // is nothing a retry could fix. This is the "permanently non-actionable"
+  // half of Fix B's two-way split, not a case the old always-200 behavior
+  // got right by coincidence.
+  assert.equal(res.status, 200);
+  const json = await res.json();
+  assert.equal(json.status, 'error');
+  assert.equal(json.reason, 'malformed_body');
 });

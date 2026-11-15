@@ -351,8 +351,8 @@ model PaymentIntent {
   currency    String              @default("INR")
   status      PaymentIntentStatus @default(PENDING)
   planKey     String?             @map("plan_key")
-  createdAt   DateTime            @default(now())
-  updatedAt   DateTime            @updatedAt
+  createdAt   DateTime            @default(now()) @map("created_at")
+  updatedAt   DateTime            @updatedAt      @map("updated_at")
   user        User                @relation(fields: [userId], references: [id])
 
   @@index([userId])

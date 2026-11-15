@@ -89,7 +89,34 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ status: 'ignored' });
   } catch (error) {
+    // TASK 38B Fix B: distinguish a deterministic failure from a
+    // recoverable one -- they need different HTTP statuses.
+    //
+    // A malformed-body JSON.parse failure is deterministic: Razorpay would
+    // resend the IDENTICAL bytes on retry, which fail identically every
+    // time, so acknowledging it (200) and logging it is correct -- a retry
+    // cannot help, and there is nothing to recover later.
+    //
+    // Anything else reaching this catch (most concretely: a DB/transaction
+    // failure thrown out of verifyAndCreditWalletTopup, e.g. a connection
+    // timeout) is NOT a business outcome the event has durably reached.
+    // Returning 200 for that case was the pre-existing anti-pattern: it
+    // told Razorpay "stop retrying, I've got it" for an event that was
+    // never actually processed, with no recovery mechanism of our own to
+    // pick it back up later -- there is no cron/worker infrastructure in
+    // this deployment to sweep up an event silently dropped this way (see
+    // CLAUDE.md's Vercel Hobby 12-function cap and this repo's cron jobs,
+    // confirmed disabled at the project level in TASK 37). Returning 500
+    // instead lets Razorpay's own documented retry schedule be the actual
+    // recovery mechanism -- the only one that exists for this failure
+    // class. See docs/audits/TASK38B_WALLET_RACE_AND_WEBHOOK_RECOVERY.md
+    // for the full retry-behavior investigation and operator procedure for
+    // when that retry window is exhausted.
+    const isMalformedBody = error instanceof SyntaxError;
     console.error('[WEBHOOK] Error:', error);
-    return NextResponse.json({ status: 'error' }, { status: 200 }); // Always 200 for Razorpay
+    if (isMalformedBody) {
+      return NextResponse.json({ status: 'error', reason: 'malformed_body' }, { status: 200 });
+    }
+    return NextResponse.json({ status: 'error' }, { status: 500 });
   }
 }

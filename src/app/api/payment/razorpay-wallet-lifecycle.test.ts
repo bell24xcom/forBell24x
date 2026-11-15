@@ -69,64 +69,96 @@ mock.module('@/lib/site-url', {
   namedExports: { SITE_URL: 'https://test.invalid' },
 });
 
+const prismaMockOps = {
+  paymentIntent: {
+    create: async ({ data }: { data: Record<string, any> }) => {
+      intentIdCounter += 1;
+      const row: IntentRow = {
+        id: `intent_${intentIdCounter}`,
+        userId: data.userId,
+        purpose: data.purpose,
+        orderId: data.orderId,
+        paymentId: data.paymentId ?? null,
+        amount: data.amount,
+        currency: data.currency,
+        status: data.status ?? 'PENDING',
+      };
+      intents.push(row);
+      return row;
+    },
+    findUnique: async ({ where }: { where: { orderId: string } }) =>
+      intents.find((i) => i.orderId === where.orderId) ?? null,
+    updateMany: async ({ where, data }: { where: { orderId: string; status: string }; data: Record<string, any> }) => {
+      const matches = intents.filter((i) => i.orderId === where.orderId && i.status === where.status);
+      for (const row of matches) Object.assign(row, data);
+      return { count: matches.length };
+    },
+  },
+  // Mocks the single `tx.$queryRaw` call in razorpay-wallet-intent.ts --
+  // `INSERT INTO wallets (...) VALUES (${id}, ${userId}, ...) ON CONFLICT
+  // (user_id) DO NOTHING RETURNING id`. Replicates DO-NOTHING-on-conflict
+  // semantics against the in-memory table; this mock is single-threaded so
+  // it cannot exercise the real race Fix A's actual concurrency proof
+  // requires real Postgres for (see src/lib/payments/razorpay-wallet-concurrency.test.ts).
+  $queryRaw: async (_strings: TemplateStringsArray, id: string, userId: string) => {
+    const existing = wallets.find((w) => w.userId === userId);
+    if (existing) return [];
+    walletIdCounter += 1;
+    wallets.push({ id, userId, balance: 0 });
+    return [{ id }];
+  },
+  wallet: {
+    findUnique: async ({ where }: { where: { userId: string } }) =>
+      wallets.find((w) => w.userId === where.userId) ?? null,
+    create: async ({ data }: { data: { userId: string; balance: number } }) => {
+      walletIdCounter += 1;
+      const row = { id: `wallet_${walletIdCounter}`, userId: data.userId, balance: data.balance };
+      wallets.push(row);
+      return row;
+    },
+    upsert: async ({ where, create }: { where: { userId: string }; create: { userId: string; balance: number }; update: Record<string, unknown> }) => {
+      const existing = wallets.find((w) => w.userId === where.userId);
+      if (existing) return existing;
+      walletIdCounter += 1;
+      const row = { id: `wallet_${walletIdCounter}`, userId: create.userId, balance: create.balance };
+      wallets.push(row);
+      return row;
+    },
+    update: async ({ where, data }: { where: { id: string }; data: { balance: { increment: number } } }) => {
+      const row = wallets.find((w) => w.id === where.id);
+      if (!row) throw new Error('wallet not found');
+      row.balance += data.balance.increment;
+      return row;
+    },
+  },
+  walletTransaction: {
+    create: async ({ data }: { data: Record<string, any> }) => {
+      txnIdCounter += 1;
+      const row = { id: `wtxn_${txnIdCounter}`, walletId: data.walletId, type: data.type, amount: data.amount, reference: data.reference ?? null, description: data.description ?? null };
+      walletTxns.push(row);
+      return row;
+    },
+    findFirst: async ({ where }: { where: { reference: string } }) =>
+      walletTxns.find((t) => t.reference === where.reference) ?? null,
+  },
+};
+
 mock.module('@/lib/prisma', {
   namedExports: {
     prisma: {
-      paymentIntent: {
-        create: async ({ data }: { data: Record<string, any> }) => {
-          intentIdCounter += 1;
-          const row: IntentRow = {
-            id: `intent_${intentIdCounter}`,
-            userId: data.userId,
-            purpose: data.purpose,
-            orderId: data.orderId,
-            paymentId: data.paymentId ?? null,
-            amount: data.amount,
-            currency: data.currency,
-            status: data.status ?? 'PENDING',
-          };
-          intents.push(row);
-          return row;
-        },
-        findUnique: async ({ where }: { where: { orderId: string } }) =>
-          intents.find((i) => i.orderId === where.orderId) ?? null,
-        updateMany: async ({ where, data }: { where: { orderId: string; status: string }; data: Record<string, any> }) => {
-          const matches = intents.filter((i) => i.orderId === where.orderId && i.status === where.status);
-          for (const row of matches) Object.assign(row, data);
-          return { count: matches.length };
-        },
-      },
-      wallet: {
-        findUnique: async ({ where }: { where: { userId: string } }) =>
-          wallets.find((w) => w.userId === where.userId) ?? null,
-        create: async ({ data }: { data: { userId: string; balance: number } }) => {
-          walletIdCounter += 1;
-          const row = { id: `wallet_${walletIdCounter}`, userId: data.userId, balance: data.balance };
-          wallets.push(row);
-          return row;
-        },
-        update: async ({ where, data }: { where: { id: string }; data: { balance: { increment: number } } }) => {
-          const row = wallets.find((w) => w.id === where.id);
-          if (!row) throw new Error('wallet not found');
-          row.balance += data.balance.increment;
-          return row;
-        },
-      },
-      walletTransaction: {
-        create: async ({ data }: { data: Record<string, any> }) => {
-          txnIdCounter += 1;
-          const row = { id: `wtxn_${txnIdCounter}`, walletId: data.walletId, type: data.type, amount: data.amount, reference: data.reference ?? null, description: data.description ?? null };
-          walletTxns.push(row);
-          return row;
-        },
-        findFirst: async ({ where }: { where: { reference: string } }) =>
-          walletTxns.find((t) => t.reference === where.reference) ?? null,
-      },
-      // Array-form $transaction: Prisma evaluates each array item eagerly
-      // (they're already-invoked promises by the time $transaction sees
-      // them), so the mock just awaits them in order -- matching how
-      // src/lib/payments/razorpay-wallet-intent.ts calls it.
-      $transaction: async (ops: Promise<unknown>[]) => Promise.all(ops),
+      ...prismaMockOps,
+      // Interactive-callback-form $transaction, matching how
+      // src/lib/payments/razorpay-wallet-intent.ts calls it as of the Fix A
+      // restructure (TASK 38B): the callback receives the same mocked
+      // operations as `tx` and runs against the shared in-memory tables
+      // above. This mock has NO real rollback semantics -- a throw inside
+      // the callback propagates, but any mutation already applied to the
+      // in-memory arrays before the throw is NOT undone (unlike real
+      // Postgres, which rolls back the whole transaction). Tests that need
+      // to prove rollback behavior (e.g. "a failure leaves the intent
+      // PENDING, not stranded as PAID") must use the real-Postgres probe,
+      // not this mock -- see src/lib/payments/razorpay-wallet-concurrency.test.ts.
+      $transaction: async (fn: (tx: typeof prismaMockOps) => Promise<unknown>) => fn(prismaMockOps),
     },
   },
 });

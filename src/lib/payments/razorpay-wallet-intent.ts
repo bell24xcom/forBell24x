@@ -165,14 +165,91 @@ export async function verifyAndCreditWalletTopup(
     return decision as VerifyWalletTopupResult;
   }
 
-  // Atomic PENDING -> PAID transition. Only one concurrent caller can ever
-  // see `count === 1` for a given order_id.
-  const { count } = await prisma.paymentIntent.updateMany({
-    where: { orderId: params.orderId, status: 'PENDING' },
-    data: { status: 'PAID', paymentId: params.paymentId },
+  const amountRupees = decision.amount / 100;
+
+  // Single interactive transaction: the PENDING -> PAID claim, the
+  // find-or-create wallet, and the balance credit all commit or roll back
+  // together. This matters beyond the wallet-creation race itself -- if the
+  // claim is a separate auto-committing statement (as it was before) and
+  // anything after it throws, the intent is stranded as PAID with no
+  // credit ever applied, and a retry sees `count === 0` and reports
+  // ALREADY_PROCESSED instead of actually crediting. Wrapping all three
+  // steps together means a thrown error rolls the claim back to PENDING too,
+  // so a retry can re-claim and credit cleanly.
+  //
+  // The wallet step uses `upsert` (not findUnique + create) because
+  // `wallets.user_id` carries a real DB-level unique index
+  // (`wallets_user_id_key`, present since migration 0001_baseline and never
+  // dropped) -- Postgres, not just Prisma, is the thing preventing two
+  // concurrent callers for the same user from ever creating two wallet rows.
+  const result = await prisma.$transaction(async (tx) => {
+    // Only one concurrent caller can ever see `count === 1` for a given
+    // order_id -- Postgres row-level locking on this UPDATE serializes
+    // concurrent verifications of the same order.
+    const { count } = await tx.paymentIntent.updateMany({
+      where: { orderId: params.orderId, status: 'PENDING' },
+      data: { status: 'PAID', paymentId: params.paymentId },
+    });
+
+    if (count === 0) {
+      return { outcome: 'RACE_LOST' as const };
+    }
+
+    // `prisma.wallet.upsert()` is NOT used here -- confirmed empirically
+    // (real Postgres, query logging enabled, see TASK 38B's probe) that
+    // inside an interactive `$transaction` callback, Prisma's query engine
+    // compiles `upsert` down to a plain SELECT -> INSERT -> SELECT
+    // sequence, not a single `INSERT ... ON CONFLICT` statement, and gives
+    // the engine no retry-as-update path of its own. Under genuine
+    // concurrency this still can't create two wallet rows (the second
+    // caller's INSERT blocks on the real `wallets_user_id_key` unique
+    // index until the first commits), but the second caller's INSERT then
+    // raises P2002 -- and Postgres aborts the ENTIRE transaction on any
+    // statement error (so much as a later SELECT fails with `25P02: current
+    // transaction is aborted` once that happens), which would also roll
+    // back the PENDING -> PAID claim above for an otherwise-legitimate,
+    // distinct payment. A `catch`-and-retry inside the same transaction
+    // cannot recover from that -- it would need its own SAVEPOINT.
+    //
+    // A raw `INSERT ... ON CONFLICT (user_id) DO NOTHING` has no error path
+    // at all: the conflict is handled inside Postgres itself, and the
+    // statement simply returns zero rows instead of raising. That is the
+    // genuine atomic primitive `wallets_user_id_key` was created to support,
+    // and what Task 38A's review assumed was already happening.
+    const inserted = await tx.$queryRaw<{ id: string }[]>`
+      INSERT INTO wallets (id, user_id, balance, currency, "createdAt", "updatedAt")
+      VALUES (${crypto.randomUUID()}, ${params.userId}, 0, 'INR', now(), now())
+      ON CONFLICT (user_id) DO NOTHING
+      RETURNING id
+    `;
+    const wallet = inserted[0]
+      ? inserted[0]
+      : await tx.wallet.findUniqueOrThrow({ where: { userId: params.userId } });
+
+    const updatedWallet = await tx.wallet.update({
+      where: { id: wallet.id },
+      data: { balance: { increment: amountRupees } },
+    });
+
+    await tx.walletTransaction.create({
+      data: {
+        walletId: wallet.id,
+        type: 'CREDIT',
+        amount: amountRupees,
+        description: isTestMode ? 'Test deposit' : 'Razorpay deposit',
+        reference: params.paymentId,
+      },
+    });
+
+    return {
+      outcome: 'CREDITED' as const,
+      amount: decision.amount,
+      currency: decision.currency,
+      balance: updatedWallet.balance,
+    };
   });
 
-  if (count === 0) {
+  if (result.outcome === 'RACE_LOST') {
     // Lost the race to a concurrent verification of the same order -- not an
     // error, just not the one that gets to credit. Re-read to confirm it's
     // genuinely now PAID (not FAILED) before telling the caller it's fine.
@@ -181,32 +258,5 @@ export async function verifyAndCreditWalletTopup(
     return { outcome: 'PAYMENT_ID_CONFLICT' };
   }
 
-  const amountRupees = decision.amount / 100;
-  let wallet = await prisma.wallet.findUnique({ where: { userId: params.userId } });
-  if (!wallet) {
-    wallet = await prisma.wallet.create({ data: { userId: params.userId, balance: 0 } });
-  }
-
-  const [, updatedWallet] = await prisma.$transaction([
-    prisma.walletTransaction.create({
-      data: {
-        walletId: wallet.id,
-        type: 'CREDIT',
-        amount: amountRupees,
-        description: isTestMode ? 'Test deposit' : 'Razorpay deposit',
-        reference: params.paymentId,
-      },
-    }),
-    prisma.wallet.update({
-      where: { id: wallet.id },
-      data: { balance: { increment: amountRupees } },
-    }),
-  ]);
-
-  return {
-    outcome: 'CREDITED',
-    amount: decision.amount,
-    currency: decision.currency,
-    balance: updatedWallet.balance,
-  };
+  return result;
 }
