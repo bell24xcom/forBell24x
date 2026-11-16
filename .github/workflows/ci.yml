@@ -54,6 +54,18 @@ jobs:
       - name: Marketing outreach send regression tests
         run: npm run test:marketing-outreach-send
 
+      - name: Outreach follow-up admin-auth regression tests
+        run: npm run test:outreach-follow-up
+
+      - name: Outreach generate admin-auth regression tests
+        run: npm run test:outreach-generate
+
+      - name: Marketing event admin-auth regression tests
+        run: npm run test:marketing-event
+
+      - name: Outreach dashboard response-handling regression tests
+        run: npm run test:outreach-response
+
       - name: Quote-token security unit tests
         run: npm run test:quote-token
 
