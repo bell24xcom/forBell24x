@@ -1,73 +1,49 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
+import { requireAdmin, isErrorResponse } from '@/lib/admin-auth';
 
 export const dynamic = 'force-dynamic';
 
+// No messaging provider is wired into this route — see docs/audits/TASK39A8_SUPPLIER_DRIP_CONTAINMENT.md
 export async function POST(req: NextRequest) {
-  const INSFORGE_URL = process.env.INSFORGE_URL;
-  const INSFORGE_API_KEY = process.env.INSFORGE_API_KEY;
+  const auth = requireAdmin(req);
+  if (isErrorResponse(auth)) return auth;
 
   try {
     const { rfq_id, supplier, step, channel_override } = await req.json();
 
-    // 1. Channel Selection Logic
-    // Hierarchy: WhatsApp (if phone) -> Email (if email) -> Push (default)
-    const channel = channel_override || (supplier.phone ? 'whatsapp' : 'email');
+    if (!rfq_id || !supplier || typeof supplier !== 'object' || !supplier.id) {
+      return NextResponse.json(
+        { success: false, error: 'Missing rfq_id or supplier.id' },
+        { status: 400 },
+      );
+    }
 
-    // 2. Message Personalization (Templates)
+    // Channel selection and message templating are harmless to compute and
+    // return for inspection — they are not a delivery claim by themselves.
+    const channel = channel_override || (supplier.phone ? 'whatsapp' : 'email');
     const templates: Record<number, string> = {
       0: `Hi ${supplier.name}, new RFQ for ${supplier.category}! View here: {{link}}`,
       1: `Gentle reminder: RFQ for ${supplier.category} is still open. Check details: {{link}}`,
       2: `URGENT: Buyer is making a decision soon for ${supplier.category}. Submit your quote: {{link}}`,
-      3: `Last chance: Final request for quote. Don't miss this deal: {{link}}`
+      3: `Last chance: Final request for quote. Don't miss this deal: {{link}}`,
     };
-
     const token = btoa(JSON.stringify({ rfq_id, supplier_id: supplier.id }));
     const link = `${process.env.NEXTAUTH_URL}/quote/${token}`;
     const content = (templates[step] || templates[0]).replace('{{link}}', link);
 
-    // 3. Update/Create Sequence State in InsForge
-    const { data: seqData, error: seqErr } = await fetch(`${INSFORGE_URL}/rest/v1/outreach_sequences`, {
-      method: 'POST',
-      headers: {
-        'apikey': INSFORGE_API_KEY!,
-        'Authorization': `Bearer ${INSFORGE_API_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'return=representation'
-      },
-      body: JSON.stringify([{
-        rfq_id,
-        supplier_id: supplier.id,
-        current_step: step,
-        status: 'active',
-        updated_at: new Date().toISOString()
-      }])
-    }).then(r => r.json());
+    logger.info(`[Outreach] No provider configured — not sending ${channel} step ${step} to ${supplier.id}`);
 
-    // 4. Log Communication
-    await fetch(`${INSFORGE_URL}/rest/v1/communication_logs`, {
-      method: 'POST',
-      headers: {
-        'apikey': INSFORGE_API_KEY!,
-        'Authorization': `Bearer ${INSFORGE_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify([{
-        sequence_id: seqData?.[0]?.id,
-        channel,
-        content,
-        status: 'sent'
-      }])
+    return NextResponse.json({
+      success: false,
+      status: 'not_configured',
+      channel,
+      step,
+      content,
+      message: 'No messaging provider is connected to this route. Nothing was sent and nothing was recorded as sent.',
     });
-
-    // 5. Trigger Real Execution (n8n or direct service)
-    // Here we'd call the actual WhatsApp/Email API
-    logger.info(`[Outreach] Sent ${channel} step ${step} to ${supplier.id}`);
-
-    return NextResponse.json({ success: true, channel, step });
-
   } catch (error: any) {
     logger.error('Outreach API Error', { error: error.message });
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ success: false, status: 'failed', error: error.message }, { status: 500 });
   }
 }

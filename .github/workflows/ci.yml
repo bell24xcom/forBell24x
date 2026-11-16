@@ -42,6 +42,18 @@ jobs:
       - name: Outreach unit tests
         run: npm run test:outreach
 
+      - name: Supplier-drip cron daily-dispatcher regression tests
+        run: npm run test:cron-daily
+
+      - name: Supplier-drip cron read-only regression tests
+        run: npm run test:supplier-drip-cron
+
+      - name: Outreach drip admin-auth regression tests
+        run: npm run test:outreach-drip
+
+      - name: Marketing outreach send regression tests
+        run: npm run test:marketing-outreach-send
+
       - name: Quote-token security unit tests
         run: npm run test:quote-token
 

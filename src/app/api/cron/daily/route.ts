@@ -28,7 +28,7 @@ async function run(req: NextRequest) {
   const jobs: string[] = ['/api/cron/expire-rfqs'];
   if (isMonday) jobs.push('/api/cron/weekly-digest', '/api/cron/churn-check');
   jobs.push(
-    '/api/cron/supplier-drip',
+    // '/api/cron/supplier-drip' removed — see docs/audits/TASK39A8_SUPPLIER_DRIP_CONTAINMENT.md
     '/api/cron/follow-up-due',
     '/api/cron/demand-loop',
     '/api/cron/analyze-behavior',
