@@ -140,26 +140,34 @@ produced any type error.
 `NOT VERIFIED` — flagged rather than asserted, per the task's fail-closed
 instruction.
 
-`src/app/dashboard/operator/page.tsx`'s `loadDrips()`/`markDripSent()` use
-`fetch(..., { credentials: 'include' })` — this sends the `admin-token`
-cookie *if the browser already has one*, but the page itself has **no
-login gate, no redirect, no check** of its own. The cookie only exists if
-the operator separately authenticated via `/api/admin/login` or the OTP
-`widget-verify` admin path. If an operator reaches `/dashboard/operator`
-without having done that, `GET /api/outreach/drip` now 401s silently (the
-dashboard will just show no drips) and, worse, `markDripSent()` ignores the
-fetch response entirely (`.catch(() => {})`, no `.ok` check) and
-unconditionally removes the row from the UI — so a POST that was actually
-rejected with 401 looks, to the operator, exactly like a successful send
-confirmation.
+`src/app/dashboard/operator/page.tsx` itself has **no admin-specific
+authentication check of its own** — no login gate, no redirect, no role
+check in the page or in `dashboard/layout.tsx`. However, the route is not
+fully open: `src/middleware.ts` gates every `/dashboard/*` path (via
+`PROTECTED_USER_PATHS`) on a valid `auth-token` cookie, redirecting to
+`/auth/phone-email` otherwise. **This is not an admin-specific gate** — any
+logged-in user, of any role, can reach this page; `requireAdmin()` on the
+API side is what actually restricts the drip endpoints to admin role.
+
+The realistic residual risk is therefore narrower than "anyone can reach
+this with zero login": a non-admin user who is logged in, or an
+administrator whose session has expired mid-use, can land on this page and
+trigger its silent UI-clearing behaviour. `loadDrips()` checks `res?.ok`
+before using the response (an unauthorized GET correctly just shows no
+drips), but `markDripSent()` ignores the fetch response entirely
+(`.catch(() => {})`, no `.ok` check) and unconditionally removes the row
+from the UI — so a POST that was actually rejected by `requireAdmin` looks,
+to that user, exactly like a successful send confirmation. The server
+correctly rejects the unauthorized write, so **this UI behaviour does not
+itself create a false database record** — the risk is confined to a
+misleading UI state, not data integrity.
 
 This fix does not edit `page.tsx` (out of scope — it wasn't one of the
 named files, and changing it risks its own regressions). **Follow-up
-needed, owner decision**: either (a) add a login gate to
-`/dashboard/operator` plus an `.ok` check in `markDripSent`/`loadFollowUps`
-before the optimistic UI update, or (b) confirm operators always reach this
-page through an already-authenticated admin session today and accept the
-silent-failure risk as-is.
+needed, owner decision**: either (a) add an `.ok` check in `markDripSent`
+(and the equivalent `loadFollowUps`/`markFollowUpSent` pair) before the
+optimistic UI update, and/or restrict `/dashboard/operator` itself to admin
+role, or (b) accept the current silent-failure risk as-is.
 
 ## 7. Other findings noticed but not fixed (explicitly out of scope)
 
@@ -171,12 +179,13 @@ silent-failure risk as-is.
   only reports counts), so the automatic cron path for follow-ups was never
   affected by this bug; only the manual `/api/outreach/follow-up` endpoint
   shares the drip route's auth gap.
-- **Historical row ambiguity**: both the old cron path and the operator
-  path wrote identical `InteractionMemory` rows (`actionType:
-  'drip_${type}_sent'`, `source: 'whatsapp'`/`'cron'`) with no field
-  distinguishing "cron fabricated this" from "an operator actually sent
-  this." `NOT VERIFIED` whether any such rows exist in production (no
-  database access in this session) — if they do, `getDripsDue()`'s
+- **Historical row ambiguity**: `logDripSent()` in `lib/supplier-drip-engine.ts`
+  hardcodes `source: 'whatsapp'` on every call, regardless of caller — both
+  the old cron path and the new operator-confirmed path write identical
+  `InteractionMemory` rows (`actionType: 'drip_${type}_sent'`,
+  `source: 'whatsapp'`), with no field distinguishing "cron fabricated this"
+  from "an operator actually sent this." `NOT VERIFIED` whether any such rows
+  exist in production (no database access in this session) — if they do, `getDripsDue()`'s
   already-logged exclusion means past false rows are silently suppressing
   real outreach to those suppliers today. This needs an owner-level
   decision: whether to audit/backfill-correct existing rows once database
@@ -190,7 +199,31 @@ silent-failure risk as-is.
   rows" — `NOT VERIFIED` whether that's still true; not relevant to this
   fix's correctness either way.
 
-## 8. How to restore real automated sending later
+## 8. Known follow-ups (not fixed in this task)
+
+These are findings, not fixes. Recorded so an owner can decide what to do
+with them; nothing below was changed as part of Task 39A-8.
+
+- **`src/app/dashboard/operator/page.tsx`**: `markDripSent()` ignores
+  `response.ok` and unconditionally clears the UI row regardless of what
+  the server actually did (see §6).
+- **`/api/outreach/follow-up`**: unauthenticated GET and POST — GET exposes
+  due-follow-up supplier data to any caller, POST can fabricate a sent
+  record exactly like the pre-fix drip bug did (see §7).
+- **`/api/outreach/generate`**: unauthenticated GET exposes supplier PII
+  (name, company, phone, email, location, trust score, message drafts) to
+  any caller.
+- **`/api/marketing/event`**: unauthenticated POST writes arbitrary
+  client-supplied analytics events with no validation.
+- **`src/app/admin/n8n/page.tsx`**: its manual trigger button references
+  `NEXT_PUBLIC_CRON_SECRET`. Whether this variable is actually set in
+  Vercel's environment configuration is `NOT VERIFIED` in this session. If
+  it were ever set, `NEXT_PUBLIC_*` variables are inlined into client-side
+  JavaScript by Next.js, which would expose the real cron secret to the
+  browser — this describes a possible exposure contingent on that
+  configuration, not a confirmed one.
+
+## 9. How to restore real automated sending later
 
 A real WhatsApp provider already exists in this codebase —
 `src/lib/whatsapp/MetaWhatsAppProvider.ts` / `WhatsAppService.ts` — but it
@@ -206,7 +239,7 @@ whether to keep writing to InsForge (currently paused/unreachable per prior
 audits — see `project_vyaparsethu_insforge_dependency_2026-10-18` in
 memory) or move the log elsewhere.
 
-## 9. How to verify this fix after deployment
+## 10. How to verify this fix after deployment
 
 1. Confirm the Vercel Cron run of `/api/cron/daily` no longer includes
    `/api/cron/supplier-drip` in its `results` array (check the function
