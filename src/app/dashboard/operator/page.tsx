@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { MessageCircle, Mail, RefreshCw, ExternalLink, Users, FileText, TrendingUp, Copy, CheckCheck } from 'lucide-react';
 import { logEvent } from '@/lib/log-event';
+import { interpretOutreachResponse } from '@/lib/outreach-response';
 
 interface SupplierMessage {
   supplierId: string;
@@ -90,13 +91,18 @@ export default function OperatorDashboard() {
   }
 
   async function markFollowUpSent(supplierId: string, rfqId: string, type: string) {
-    await fetch('/api/outreach/follow-up', {
+    const res = await fetch('/api/outreach/follow-up', {
       method: 'POST',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ supplierId, rfqId, type }),
-    }).catch(() => {});
-    setFollowUps(prev => prev.filter(f => !(f.supplierId === supplierId && f.rfqId === rfqId)));
+    }).catch(() => null);
+    const result = await interpretOutreachResponse(res);
+    if (result.ok) {
+      setFollowUps(prev => prev.filter(f => !(f.supplierId === supplierId && f.rfqId === rfqId)));
+    } else {
+      alert(result.message);
+    }
   }
 
   async function loadDrips() {
@@ -108,13 +114,18 @@ export default function OperatorDashboard() {
   }
 
   async function markDripSent(supplierId: string, dripType: string) {
-    await fetch('/api/outreach/drip', {
+    const res = await fetch('/api/outreach/drip', {
       method: 'POST',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ supplierId, dripType }),
-    }).catch(() => {});
-    setDrips(prev => prev.filter(d => d.supplierId !== supplierId));
+    }).catch(() => null);
+    const result = await interpretOutreachResponse(res);
+    if (result.ok) {
+      setDrips(prev => prev.filter(d => d.supplierId !== supplierId));
+    } else {
+      alert(result.message);
+    }
   }
 
   async function generateOutreach() {

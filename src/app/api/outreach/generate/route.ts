@@ -2,11 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { logEvent } from '@/lib/log-event';
 import { SITE_URL } from '@/lib/site-url';
+import { requireAdmin, isErrorResponse } from '@/lib/admin-auth';
 
 export const dynamic = 'force-dynamic';
 
 /**
- * GET /api/outreach/generate
+ * GET /api/outreach/generate — admin only.
  * Returns ready-to-send WhatsApp + email messages for top suppliers per category.
  * Designed for MANUAL activation — copy-paste to reach first real suppliers.
  *
@@ -15,6 +16,9 @@ export const dynamic = 'force-dynamic';
  *   limit    — max suppliers per category (default 10)
  */
 export async function GET(request: NextRequest) {
+  const auth = requireAdmin(request);
+  if (isErrorResponse(auth)) return auth;
+
   try {
     const { searchParams } = new URL(request.url);
     const filterCategory = searchParams.get('category');
