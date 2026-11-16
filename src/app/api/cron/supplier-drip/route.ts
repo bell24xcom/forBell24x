@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDripsDue, logDripSent } from '@/lib/supplier-drip-engine';
+import { getDripsDue } from '@/lib/supplier-drip-engine';
 import { verifyCronSecret } from '@/lib/cronAuth';
 
 export const dynamic = 'force-dynamic';
 
+// Read-only — reports who is due and a wa.me link; writes nothing. See docs/audits/TASK39A8_SUPPLIER_DRIP_CONTAINMENT.md
 async function run(request: NextRequest) {
   if (!verifyCronSecret(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -13,14 +14,11 @@ async function run(request: NextRequest) {
     console.log('[CRON_START] /api/cron/supplier-drip');
     const due = await getDripsDue();
 
-    // Log each drip as sent (idempotent — won't re-log if already exists)
-    await Promise.allSettled(due.map(d => logDripSent(d.supplierId, d.dripType)));
-
     const day3  = due.filter(d => d.dripType === 'day3').length;
     const day7  = due.filter(d => d.dripType === 'day7').length;
     const day14 = due.filter(d => d.dripType === 'day14').length;
 
-    console.log('[CRON_END] /api/cron/supplier-drip', { total: due.length, day3, day7, day14 });
+    console.log('[CRON_END] /api/cron/supplier-drip', { total: due.length, day3, day7, day14, autoSent: 0 });
 
     return NextResponse.json({
       success: true,
@@ -28,13 +26,13 @@ async function run(request: NextRequest) {
       day3,
       day7,
       day14,
-      // wa.me links returned for operator to click if needed
       drips: due.map(d => ({
         supplierId: d.supplierId,
         name: d.name,
         company: d.company,
         dripType: d.dripType,
         waLink: d.waLink,
+        status: 'not_configured' as const,
       })),
       timestamp: new Date().toISOString(),
     });

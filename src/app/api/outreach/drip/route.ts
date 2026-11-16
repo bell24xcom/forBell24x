@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDripsDue, logDripSent, DripType } from '@/lib/supplier-drip-engine';
+import { requireAdmin, isErrorResponse } from '@/lib/admin-auth';
 
 export const dynamic = 'force-dynamic';
 
-/** GET /api/outreach/drip — list all onboarding drips due today */
-export async function GET(_request: NextRequest) {
+// Both methods require an admin session — see docs/audits/TASK39A8_SUPPLIER_DRIP_CONTAINMENT.md
+
+/** GET /api/outreach/drip — list all onboarding drips due today (admin only) */
+export async function GET(request: NextRequest) {
+  const auth = requireAdmin(request);
+  if (isErrorResponse(auth)) return auth;
+
   try {
     const due = await getDripsDue();
     return NextResponse.json({
@@ -21,8 +27,11 @@ export async function GET(_request: NextRequest) {
   }
 }
 
-/** POST /api/outreach/drip — mark a drip as sent */
+/** POST /api/outreach/drip — operator confirms they personally sent a drip (admin only) */
 export async function POST(request: NextRequest) {
+  const auth = requireAdmin(request);
+  if (isErrorResponse(auth)) return auth;
+
   try {
     const { supplierId, dripType } = await request.json();
     if (!supplierId || !dripType) {
