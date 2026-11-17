@@ -66,6 +66,9 @@ jobs:
       - name: Outreach dashboard response-handling regression tests
         run: npm run test:outreach-response
 
+      - name: Deal-complete retirement regression tests
+        run: npm run test:deal-complete
+
       - name: Quote-token security unit tests
         run: npm run test:quote-token
 
