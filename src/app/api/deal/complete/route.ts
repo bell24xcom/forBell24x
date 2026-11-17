@@ -1,36 +1,29 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-export async function POST(req: NextRequest) {
-  const INSFORGE_URL = process.env.INSFORGE_URL;
-  const INSFORGE_API_KEY = process.env.INSFORGE_API_KEY;
+/**
+ * This endpoint used to PATCH an InsForge "deal" to completed and log a
+ * fabricated "escrow_released" transaction with zero authentication and
+ * zero confirmation that any payment actually occurred (Task 39A-13C-A).
+ * It had no caller anywhere in the repository. Retired rather than fixed —
+ * there is no real workflow to authenticate here, since deal settlement
+ * already has a real, authenticated home at /api/deal/[id]/complete.
+ */
+function retired() {
+  return NextResponse.json(
+    { error: 'This endpoint has been retired.' },
+    { status: 410 },
+  );
+}
 
-  try {
-    const { dealId, buyerId } = await req.json();
+export const GET = retired;
+export const POST = retired;
+export const PUT = retired;
+export const PATCH = retired;
+export const DELETE = retired;
+export const OPTIONS = retired;
 
-    // 1. Update Deal to 'completed'
-    await fetch(`${INSFORGE_URL}/rest/v1/deals?id=eq.${dealId}`, {
-      method: 'PATCH',
-      headers: { 'apikey': INSFORGE_API_KEY!, 'Authorization': `Bearer ${INSFORGE_API_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status: 'completed', updated_at: new Date().toISOString() })
-    });
-
-    // 2. Log Final Transaction
-    await fetch(`${INSFORGE_URL}/rest/v1/transactions`, {
-      method: 'POST',
-      headers: { 'apikey': INSFORGE_API_KEY!, 'Authorization': `Bearer ${INSFORGE_API_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify([{
-        deal_id: dealId,
-        provider: 'system',
-        amount: 0,
-        status: 'escrow_released'
-      }])
-    });
-
-    return NextResponse.json({ success: true, message: 'Deal finalized. Funds released to supplier.' });
-
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
+export function HEAD() {
+  return new NextResponse(null, { status: 410 });
 }
