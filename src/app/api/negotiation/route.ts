@@ -3,6 +3,7 @@ import { authenticate } from '@/lib/jwt';
 import { prisma } from '@/lib/prisma';
 import { Bell24hAIClient } from '@/lib/ai-client';
 import { acceptQuote } from '@/lib/quote-acceptance';
+import { isNegotiationActionAuthorized } from '@/lib/negotiation-authorization';
 
 export const dynamic = 'force-dynamic';
 
@@ -52,11 +53,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if user is authorized (buyer or supplier)
+    // Check if user is authorized for this action (buyer-only for accept;
+    // buyer or supplier for reject/counter — see lib/negotiation-authorization.ts).
+    // This is a second, route-level gate in front of acceptQuote()'s own
+    // unconditional self-accept check (lib/quote-acceptance.ts) — not a
+    // replacement for it.
     const isBuyer = quote.rfq.createdBy === user.userId;
     const isSupplier = quote.supplierId === user.userId;
 
-    if (!isBuyer && !isSupplier) {
+    if (!isNegotiationActionAuthorized(action, { isBuyer, isSupplier })) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 403 }
